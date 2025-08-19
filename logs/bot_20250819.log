@@ -1,0 +1,547 @@
+2025-08-19 03:47:33,992 - __main__ - INFO - Multi-Login Bot Orchestrator initialized
+2025-08-19 03:47:33,992 - __main__ - INFO - Starting daily visits: 142
+2025-08-19 03:47:34,416 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_1: ID
+2025-08-19 03:47:34,417 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=panduan%20lengkap%20terbaru&ie=utf-8
+2025-08-19 03:47:34,423 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d51c0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,423 - __main__ - ERROR - Failed to create profile for proxy proxy_1
+2025-08-19 03:47:34,423 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_2: ID
+2025-08-19 03:47:34,423 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=berita%20terbaru%202024&start=20
+2025-08-19 03:47:34,425 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10153bf10>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,425 - __main__ - ERROR - Failed to create profile for proxy proxy_2
+2025-08-19 03:47:34,425 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_3: ID
+2025-08-19 03:47:34,425 - src.core.referer_simulator - INFO - Generated facebook referer: https://www.facebook.com/pages/update-terbaru
+2025-08-19 03:47:34,426 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5c70>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,426 - __main__ - ERROR - Failed to create profile for proxy proxy_3
+2025-08-19 03:47:34,426 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_4: ID
+2025-08-19 03:47:34,426 - src.core.referer_simulator - INFO - Generated reddit referer: https://www.reddit.com/r/todayilearned/
+2025-08-19 03:47:34,427 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b66d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,427 - __main__ - ERROR - Failed to create profile for proxy proxy_4
+2025-08-19 03:47:34,427 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_5: ID
+2025-08-19 03:47:34,428 - src.core.referer_simulator - INFO - Generated reddit referer: https://www.reddit.com/r/worldnews/
+2025-08-19 03:47:34,429 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be130>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,429 - __main__ - ERROR - Failed to create profile for proxy proxy_5
+2025-08-19 03:47:34,429 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_6: ID
+2025-08-19 03:47:34,431 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6d90>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,431 - __main__ - ERROR - Failed to create profile for proxy proxy_6
+2025-08-19 03:47:34,431 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_7: ID
+2025-08-19 03:47:34,431 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20tips%20dan%20trik&hl=id
+2025-08-19 03:47:34,433 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b64f0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,433 - __main__ - ERROR - Failed to create profile for proxy proxy_7
+2025-08-19 03:47:34,433 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_8: ID
+2025-08-19 03:47:34,433 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=cara%20tips%20dan%20trik
+2025-08-19 03:47:34,435 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5820>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,435 - __main__ - ERROR - Failed to create profile for proxy proxy_8
+2025-08-19 03:47:34,435 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_9: ID
+2025-08-19 03:47:34,435 - src.core.referer_simulator - INFO - Generated instagram referer: https://www.instagram.com/p/4656379273409443310/
+2025-08-19 03:47:34,436 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10153bfd0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,436 - __main__ - ERROR - Failed to create profile for proxy proxy_9
+2025-08-19 03:47:34,436 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_10: ID
+2025-08-19 03:47:34,437 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20tips%20dan%20trik&hl=id-ID
+2025-08-19 03:47:34,438 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018bebe0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,438 - __main__ - ERROR - Failed to create profile for proxy proxy_10
+2025-08-19 03:47:34,438 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_11: ID
+2025-08-19 03:47:34,438 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20informasi%20penting&source=hp
+2025-08-19 03:47:34,440 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101595250>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,440 - __main__ - ERROR - Failed to create profile for proxy proxy_11
+2025-08-19 03:47:34,440 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_12: ID
+2025-08-19 03:47:34,440 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20tips%20dan%20trik&source=hp
+2025-08-19 03:47:34,441 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5310>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,441 - __main__ - ERROR - Failed to create profile for proxy proxy_12
+2025-08-19 03:47:34,442 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_13: ID
+2025-08-19 03:47:34,443 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5f70>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,443 - __main__ - ERROR - Failed to create profile for proxy proxy_13
+2025-08-19 03:47:34,443 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_14: ID
+2025-08-19 03:47:34,443 - src.core.referer_simulator - INFO - Generated pinterest referer: https://www.pinterest.com/search/pins/?q=tips%20dan%20trik
+2025-08-19 03:47:34,444 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be370>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,444 - __main__ - ERROR - Failed to create profile for proxy proxy_14
+2025-08-19 03:47:34,444 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_15: ID
+2025-08-19 03:47:34,444 - src.core.referer_simulator - INFO - Generated facebook referer: https://www.facebook.com/
+2025-08-19 03:47:34,446 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b62b0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,446 - __main__ - ERROR - Failed to create profile for proxy proxy_15
+2025-08-19 03:47:34,446 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_16: ID
+2025-08-19 03:47:34,446 - src.core.referer_simulator - INFO - Generated reddit referer: https://www.reddit.com/r/indonesia/
+2025-08-19 03:47:34,448 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1640>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,448 - __main__ - ERROR - Failed to create profile for proxy proxy_16
+2025-08-19 03:47:34,448 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_17: ID
+2025-08-19 03:47:34,448 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20penting%202024&hl=en
+2025-08-19 03:47:34,449 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6c40>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,450 - __main__ - ERROR - Failed to create profile for proxy proxy_17
+2025-08-19 03:47:34,450 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_18: ID
+2025-08-19 03:47:34,451 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b60a0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,451 - __main__ - ERROR - Failed to create profile for proxy proxy_18
+2025-08-19 03:47:34,451 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_19: ID
+2025-08-19 03:47:34,453 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5310>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,453 - __main__ - ERROR - Failed to create profile for proxy proxy_19
+2025-08-19 03:47:34,453 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_20: ID
+2025-08-19 03:47:34,453 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=panduan%20lengkap%202024
+2025-08-19 03:47:34,455 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be880>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,455 - __main__ - ERROR - Failed to create profile for proxy proxy_20
+2025-08-19 03:47:34,455 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_21: ID
+2025-08-19 03:47:34,456 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be070>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,456 - __main__ - ERROR - Failed to create profile for proxy proxy_21
+2025-08-19 03:47:34,456 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_22: ID
+2025-08-19 03:47:34,456 - src.core.referer_simulator - INFO - Generated youtube referer: https://www.youtube.com/
+2025-08-19 03:47:34,458 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1160>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,458 - __main__ - ERROR - Failed to create profile for proxy proxy_22
+2025-08-19 03:47:34,458 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_23: ID
+2025-08-19 03:47:34,459 - src.core.referer_simulator - INFO - Generated facebook referer: https://m.facebook.com/
+2025-08-19 03:47:34,460 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be100>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,460 - __main__ - ERROR - Failed to create profile for proxy proxy_23
+2025-08-19 03:47:34,460 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_24: ID
+2025-08-19 03:47:34,462 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d54f0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,462 - __main__ - ERROR - Failed to create profile for proxy proxy_24
+2025-08-19 03:47:34,462 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_25: ID
+2025-08-19 03:47:34,462 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20artikel%20menarik&ie=utf-8
+2025-08-19 03:47:34,464 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5f70>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,464 - __main__ - ERROR - Failed to create profile for proxy proxy_25
+2025-08-19 03:47:34,464 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_26: ID
+2025-08-19 03:47:34,464 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20informasi%20penting&start=10
+2025-08-19 03:47:34,465 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6b80>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,465 - __main__ - ERROR - Failed to create profile for proxy proxy_26
+2025-08-19 03:47:34,465 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_27: ID
+2025-08-19 03:47:34,465 - src.core.referer_simulator - INFO - Generated facebook referer: https://www.facebook.com/
+2025-08-19 03:47:34,467 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c18e0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,467 - __main__ - ERROR - Failed to create profile for proxy proxy_27
+2025-08-19 03:47:34,467 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_28: ID
+2025-08-19 03:47:34,467 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20penting&hl=en
+2025-08-19 03:47:34,468 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6a00>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,468 - __main__ - ERROR - Failed to create profile for proxy proxy_28
+2025-08-19 03:47:34,468 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_29: ID
+2025-08-19 03:47:34,468 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=panduan%20lengkap&ie=utf-8
+2025-08-19 03:47:34,470 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6040>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,470 - __main__ - ERROR - Failed to create profile for proxy proxy_29
+2025-08-19 03:47:34,470 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_30: ID
+2025-08-19 03:47:34,470 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20dan%20trik&source=hp
+2025-08-19 03:47:34,471 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5cd0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,471 - __main__ - ERROR - Failed to create profile for proxy proxy_30
+2025-08-19 03:47:34,471 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_31: ID
+2025-08-19 03:47:34,471 - src.core.referer_simulator - INFO - Generated pinterest referer: https://www.pinterest.com/pin/{pin_id}/
+2025-08-19 03:47:34,473 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be880>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,473 - __main__ - ERROR - Failed to create profile for proxy proxy_31
+2025-08-19 03:47:34,473 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_32: ID
+2025-08-19 03:47:34,473 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=cara%20panduan%20lengkap
+2025-08-19 03:47:34,475 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018beca0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,475 - __main__ - ERROR - Failed to create profile for proxy proxy_32
+2025-08-19 03:47:34,475 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_33: ID
+2025-08-19 03:47:34,475 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20tips%20dan%20trik&hl=id-ID
+2025-08-19 03:47:34,477 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c21c0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,477 - __main__ - ERROR - Failed to create profile for proxy proxy_33
+2025-08-19 03:47:34,477 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_34: ID
+2025-08-19 03:47:34,477 - src.core.referer_simulator - INFO - Generated instagram referer: https://www.instagram.com/
+2025-08-19 03:47:34,478 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be520>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,478 - __main__ - ERROR - Failed to create profile for proxy proxy_34
+2025-08-19 03:47:34,478 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_35: ID
+2025-08-19 03:47:34,478 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=cara%20artikel%20menarik&ie=utf-8
+2025-08-19 03:47:34,480 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d57c0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,480 - __main__ - ERROR - Failed to create profile for proxy proxy_35
+2025-08-19 03:47:34,480 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_36: ID
+2025-08-19 03:47:34,480 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=artikel%20menarik&hl=id
+2025-08-19 03:47:34,481 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1be0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,481 - __main__ - ERROR - Failed to create profile for proxy proxy_36
+2025-08-19 03:47:34,481 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_37: ID
+2025-08-19 03:47:34,481 - src.core.referer_simulator - INFO - Generated twitter referer: https://twitter.com/
+2025-08-19 03:47:34,483 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6280>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,483 - __main__ - ERROR - Failed to create profile for proxy proxy_37
+2025-08-19 03:47:34,483 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_38: ID
+2025-08-19 03:47:34,483 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=cara%20panduan%20lengkap&source=hp
+2025-08-19 03:47:34,485 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6c10>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,485 - __main__ - ERROR - Failed to create profile for proxy proxy_38
+2025-08-19 03:47:34,485 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_39: ID
+2025-08-19 03:47:34,486 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6e50>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,486 - __main__ - ERROR - Failed to create profile for proxy proxy_39
+2025-08-19 03:47:34,486 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_40: ID
+2025-08-19 03:47:34,486 - src.core.referer_simulator - INFO - Generated pinterest referer: https://www.pinterest.com/
+2025-08-19 03:47:34,487 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b62b0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,488 - __main__ - ERROR - Failed to create profile for proxy proxy_40
+2025-08-19 03:47:34,488 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_41: ID
+2025-08-19 03:47:34,488 - src.core.referer_simulator - INFO - Generated pinterest referer: https://www.pinterest.com/search/pins/?q=tips%20dan%20trik
+2025-08-19 03:47:34,489 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5040>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,489 - __main__ - ERROR - Failed to create profile for proxy proxy_41
+2025-08-19 03:47:34,489 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_42: ID
+2025-08-19 03:47:34,489 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20tips%20dan%20trik&source=hp
+2025-08-19 03:47:34,491 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c11f0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,491 - __main__ - ERROR - Failed to create profile for proxy proxy_42
+2025-08-19 03:47:34,491 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_43: ID
+2025-08-19 03:47:34,492 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1fd0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,492 - __main__ - ERROR - Failed to create profile for proxy proxy_43
+2025-08-19 03:47:34,492 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_44: ID
+2025-08-19 03:47:34,492 - src.core.referer_simulator - INFO - Generated reddit referer: https://www.reddit.com/r/news/comments/5280026290238983759/
+2025-08-19 03:47:34,494 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018bebe0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,494 - __main__ - ERROR - Failed to create profile for proxy proxy_44
+2025-08-19 03:47:34,494 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_45: ID
+2025-08-19 03:47:34,495 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be460>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,495 - __main__ - ERROR - Failed to create profile for proxy proxy_45
+2025-08-19 03:47:34,495 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_46: ID
+2025-08-19 03:47:34,497 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c18e0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,497 - __main__ - ERROR - Failed to create profile for proxy proxy_46
+2025-08-19 03:47:34,497 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_47: ID
+2025-08-19 03:47:34,497 - src.core.referer_simulator - INFO - Generated twitter referer: https://twitter.com/
+2025-08-19 03:47:34,498 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d52e0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,498 - __main__ - ERROR - Failed to create profile for proxy proxy_47
+2025-08-19 03:47:34,499 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_48: ID
+2025-08-19 03:47:34,499 - src.core.referer_simulator - INFO - Generated reddit referer: https://www.reddit.com/
+2025-08-19 03:47:34,500 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d50a0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,500 - __main__ - ERROR - Failed to create profile for proxy proxy_48
+2025-08-19 03:47:34,500 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_49: ID
+2025-08-19 03:47:34,500 - src.core.referer_simulator - INFO - Generated facebook referer: https://www.facebook.com/groups/3805786
+2025-08-19 03:47:34,502 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b69d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,502 - __main__ - ERROR - Failed to create profile for proxy proxy_49
+2025-08-19 03:47:34,502 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_50: ID
+2025-08-19 03:47:34,503 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b66d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,503 - __main__ - ERROR - Failed to create profile for proxy proxy_50
+2025-08-19 03:47:34,503 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_51: ID
+2025-08-19 03:47:34,503 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20tips%20dan%20trik
+2025-08-19 03:47:34,505 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5b50>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,505 - __main__ - ERROR - Failed to create profile for proxy proxy_51
+2025-08-19 03:47:34,505 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_52: ID
+2025-08-19 03:47:34,506 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d53d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,506 - __main__ - ERROR - Failed to create profile for proxy proxy_52
+2025-08-19 03:47:34,506 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_53: ID
+2025-08-19 03:47:34,506 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20berita%20terbaru
+2025-08-19 03:47:34,508 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1940>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,508 - __main__ - ERROR - Failed to create profile for proxy proxy_53
+2025-08-19 03:47:34,508 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_54: ID
+2025-08-19 03:47:34,508 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20informasi%20penting&hl=id
+2025-08-19 03:47:34,509 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be970>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,510 - __main__ - ERROR - Failed to create profile for proxy proxy_54
+2025-08-19 03:47:34,510 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_55: ID
+2025-08-19 03:47:34,510 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20panduan%20lengkap&hl=en
+2025-08-19 03:47:34,511 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c2430>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,511 - __main__ - ERROR - Failed to create profile for proxy proxy_55
+2025-08-19 03:47:34,511 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_56: ID
+2025-08-19 03:47:34,511 - src.core.referer_simulator - INFO - Generated instagram referer: https://www.instagram.com/
+2025-08-19 03:47:34,513 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be790>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,513 - __main__ - ERROR - Failed to create profile for proxy proxy_56
+2025-08-19 03:47:34,513 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_57: ID
+2025-08-19 03:47:34,513 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20penting&start=10
+2025-08-19 03:47:34,514 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1460>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,515 - __main__ - ERROR - Failed to create profile for proxy proxy_57
+2025-08-19 03:47:34,515 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_58: ID
+2025-08-19 03:47:34,515 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=cara%20artikel%20menarik&ie=utf-8
+2025-08-19 03:47:34,516 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10153bfd0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,516 - __main__ - ERROR - Failed to create profile for proxy proxy_58
+2025-08-19 03:47:34,516 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_59: ID
+2025-08-19 03:47:34,516 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=artikel%20menarik%202024&source=hp
+2025-08-19 03:47:34,518 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5f40>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,518 - __main__ - ERROR - Failed to create profile for proxy proxy_59
+2025-08-19 03:47:34,518 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_60: ID
+2025-08-19 03:47:34,518 - src.core.referer_simulator - INFO - Generated pinterest referer: https://www.pinterest.com/pin/{pin_id}/
+2025-08-19 03:47:34,520 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6430>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,520 - __main__ - ERROR - Failed to create profile for proxy proxy_60
+2025-08-19 03:47:34,520 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_61: ID
+2025-08-19 03:47:34,520 - src.core.referer_simulator - INFO - Generated youtube referer: https://www.youtube.com/watch?v=6gJfxPGKVua
+2025-08-19 03:47:34,521 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6fa0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,521 - __main__ - ERROR - Failed to create profile for proxy proxy_61
+2025-08-19 03:47:34,521 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_62: ID
+2025-08-19 03:47:34,521 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=panduan%20lengkap%20terbaru&hl=id-ID
+2025-08-19 03:47:34,523 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6d90>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,523 - __main__ - ERROR - Failed to create profile for proxy proxy_62
+2025-08-19 03:47:34,523 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_63: ID
+2025-08-19 03:47:34,523 - src.core.referer_simulator - INFO - Generated youtube referer: https://www.youtube.com/results?search_query=artikel%20menarik
+2025-08-19 03:47:34,525 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5e50>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,525 - __main__ - ERROR - Failed to create profile for proxy proxy_63
+2025-08-19 03:47:34,525 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_64: ID
+2025-08-19 03:47:34,525 - src.core.referer_simulator - INFO - Generated youtube referer: https://www.youtube.com/watch?v=clKf5CHhtZn
+2025-08-19 03:47:34,526 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5eb0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,527 - __main__ - ERROR - Failed to create profile for proxy proxy_64
+2025-08-19 03:47:34,527 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_65: ID
+2025-08-19 03:47:34,528 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1ee0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,528 - __main__ - ERROR - Failed to create profile for proxy proxy_65
+2025-08-19 03:47:34,528 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_66: ID
+2025-08-19 03:47:34,528 - src.core.referer_simulator - INFO - Generated reddit referer: https://www.reddit.com/r/worldnews/comments/5775689258887453284/
+2025-08-19 03:47:34,530 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be160>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,530 - __main__ - ERROR - Failed to create profile for proxy proxy_66
+2025-08-19 03:47:34,530 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_67: ID
+2025-08-19 03:47:34,530 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=artikel%20menarik&ie=utf-8
+2025-08-19 03:47:34,555 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018beaf0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,557 - __main__ - ERROR - Failed to create profile for proxy proxy_67
+2025-08-19 03:47:34,559 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_68: ID
+2025-08-19 03:47:34,593 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1a90>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,593 - __main__ - ERROR - Failed to create profile for proxy proxy_68
+2025-08-19 03:47:34,593 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_69: ID
+2025-08-19 03:47:34,593 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20tips%20dan%20trik&hl=en
+2025-08-19 03:47:34,595 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10156f490>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,595 - __main__ - ERROR - Failed to create profile for proxy proxy_69
+2025-08-19 03:47:34,595 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_70: ID
+2025-08-19 03:47:34,595 - src.core.referer_simulator - INFO - Generated twitter referer: https://twitter.com/infoterkini/status/1049666852587776461
+2025-08-19 03:47:34,597 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5a00>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,597 - __main__ - ERROR - Failed to create profile for proxy proxy_70
+2025-08-19 03:47:34,597 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_71: ID
+2025-08-19 03:47:34,597 - src.core.referer_simulator - INFO - Generated youtube referer: https://www.youtube.com/watch?v=s4NQnsqDc7r
+2025-08-19 03:47:34,598 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6400>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,599 - __main__ - ERROR - Failed to create profile for proxy proxy_71
+2025-08-19 03:47:34,599 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_72: ID
+2025-08-19 03:47:34,600 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c2250>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,600 - __main__ - ERROR - Failed to create profile for proxy proxy_72
+2025-08-19 03:47:34,600 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_73: ID
+2025-08-19 03:47:34,600 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20berita%20terbaru&hl=id
+2025-08-19 03:47:34,602 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6fd0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,602 - __main__ - ERROR - Failed to create profile for proxy proxy_73
+2025-08-19 03:47:34,602 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_74: ID
+2025-08-19 03:47:34,602 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=cara%20artikel%20menarik&start=0
+2025-08-19 03:47:34,605 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b65b0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,605 - __main__ - ERROR - Failed to create profile for proxy proxy_74
+2025-08-19 03:47:34,605 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_75: ID
+2025-08-19 03:47:34,605 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20tips%20dan%20trik&hl=id-ID
+2025-08-19 03:47:34,613 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5160>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,613 - __main__ - ERROR - Failed to create profile for proxy proxy_75
+2025-08-19 03:47:34,613 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_76: ID
+2025-08-19 03:47:34,613 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=artikel%20menarik%20terbaru
+2025-08-19 03:47:34,617 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1d30>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,617 - __main__ - ERROR - Failed to create profile for proxy proxy_76
+2025-08-19 03:47:34,617 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_77: ID
+2025-08-19 03:47:34,617 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=panduan%20lengkap&start=20
+2025-08-19 03:47:34,619 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be4c0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,619 - __main__ - ERROR - Failed to create profile for proxy proxy_77
+2025-08-19 03:47:34,619 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_78: ID
+2025-08-19 03:47:34,619 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=artikel%20menarik%202024&hl=id-ID
+2025-08-19 03:47:34,620 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be100>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,620 - __main__ - ERROR - Failed to create profile for proxy proxy_78
+2025-08-19 03:47:34,620 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_79: ID
+2025-08-19 03:47:34,621 - src.core.referer_simulator - INFO - Generated facebook referer: https://www.facebook.com/pages/tips-dan-trik
+2025-08-19 03:47:34,622 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be0d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,623 - __main__ - ERROR - Failed to create profile for proxy proxy_79
+2025-08-19 03:47:34,623 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_80: ID
+2025-08-19 03:47:34,623 - src.core.referer_simulator - INFO - Generated youtube referer: https://www.youtube.com/watch?v=od6LupMy9Yx
+2025-08-19 03:47:34,624 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1ee0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,624 - __main__ - ERROR - Failed to create profile for proxy proxy_80
+2025-08-19 03:47:34,624 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_81: ID
+2025-08-19 03:47:34,624 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=cara%20informasi%20penting&start=0
+2025-08-19 03:47:34,626 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5f40>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,626 - __main__ - ERROR - Failed to create profile for proxy proxy_81
+2025-08-19 03:47:34,626 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_82: ID
+2025-08-19 03:47:34,626 - src.core.referer_simulator - INFO - Generated pinterest referer: https://www.pinterest.com/search/pins/?q=panduan%20lengkap
+2025-08-19 03:47:34,627 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5ca0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,627 - __main__ - ERROR - Failed to create profile for proxy proxy_82
+2025-08-19 03:47:34,627 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_83: ID
+2025-08-19 03:47:34,628 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6610>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,629 - __main__ - ERROR - Failed to create profile for proxy proxy_83
+2025-08-19 03:47:34,629 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_84: ID
+2025-08-19 03:47:34,629 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20panduan%20lengkap&source=hp
+2025-08-19 03:47:34,630 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10157bd30>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,630 - __main__ - ERROR - Failed to create profile for proxy proxy_84
+2025-08-19 03:47:34,630 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_85: ID
+2025-08-19 03:47:34,630 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=panduan%20lengkap%202024&source=hp
+2025-08-19 03:47:34,632 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d56a0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,632 - __main__ - ERROR - Failed to create profile for proxy proxy_85
+2025-08-19 03:47:34,632 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_86: ID
+2025-08-19 03:47:34,634 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5280>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,634 - __main__ - ERROR - Failed to create profile for proxy proxy_86
+2025-08-19 03:47:34,634 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_87: ID
+2025-08-19 03:47:34,634 - src.core.referer_simulator - INFO - Generated pinterest referer: https://www.pinterest.com/search/pins/?q=berita%20terbaru
+2025-08-19 03:47:34,635 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1b80>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,635 - __main__ - ERROR - Failed to create profile for proxy proxy_87
+2025-08-19 03:47:34,635 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_88: ID
+2025-08-19 03:47:34,636 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be100>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,636 - __main__ - ERROR - Failed to create profile for proxy proxy_88
+2025-08-19 03:47:34,637 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_89: ID
+2025-08-19 03:47:34,637 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20dan%20trik%20terbaru&source=hp
+2025-08-19 03:47:34,638 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c2a60>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,638 - __main__ - ERROR - Failed to create profile for proxy proxy_89
+2025-08-19 03:47:34,638 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_90: ID
+2025-08-19 03:47:34,640 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be550>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,640 - __main__ - ERROR - Failed to create profile for proxy proxy_90
+2025-08-19 03:47:34,640 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_91: ID
+2025-08-19 03:47:34,641 - src.core.referer_simulator - INFO - Generated pinterest referer: https://www.pinterest.com/pin/{pin_id}/
+2025-08-19 03:47:34,642 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1ca0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,643 - __main__ - ERROR - Failed to create profile for proxy proxy_91
+2025-08-19 03:47:34,643 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_92: ID
+2025-08-19 03:47:34,643 - src.core.referer_simulator - INFO - Generated instagram referer: https://www.instagram.com/explore/
+2025-08-19 03:47:34,644 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10156f370>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,644 - __main__ - ERROR - Failed to create profile for proxy proxy_92
+2025-08-19 03:47:34,644 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_93: ID
+2025-08-19 03:47:34,644 - src.core.referer_simulator - INFO - Generated pinterest referer: https://www.pinterest.com/pin/{pin_id}/
+2025-08-19 03:47:34,646 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d57c0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,646 - __main__ - ERROR - Failed to create profile for proxy proxy_93
+2025-08-19 03:47:34,646 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_94: ID
+2025-08-19 03:47:34,646 - src.core.referer_simulator - INFO - Generated facebook referer: https://www.facebook.com/pages/tips-dan-trik
+2025-08-19 03:47:34,647 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6c40>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,647 - __main__ - ERROR - Failed to create profile for proxy proxy_94
+2025-08-19 03:47:34,647 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_95: ID
+2025-08-19 03:47:34,648 - src.core.referer_simulator - INFO - Generated facebook referer: https://www.facebook.com/pages/tips-dan-trik
+2025-08-19 03:47:34,649 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c2340>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,649 - __main__ - ERROR - Failed to create profile for proxy proxy_95
+2025-08-19 03:47:34,649 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_96: ID
+2025-08-19 03:47:34,652 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6d60>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,652 - __main__ - ERROR - Failed to create profile for proxy proxy_96
+2025-08-19 03:47:34,652 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_97: ID
+2025-08-19 03:47:34,652 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=artikel%20menarik%202024&hl=en
+2025-08-19 03:47:34,653 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d56d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,654 - __main__ - ERROR - Failed to create profile for proxy proxy_97
+2025-08-19 03:47:34,654 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_98: ID
+2025-08-19 03:47:34,654 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=panduan%20lengkap%20terbaru&source=hp
+2025-08-19 03:47:34,655 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5a30>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,655 - __main__ - ERROR - Failed to create profile for proxy proxy_98
+2025-08-19 03:47:34,655 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_99: ID
+2025-08-19 03:47:34,655 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=berita%20terbaru&hl=id
+2025-08-19 03:47:34,657 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1fa0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,657 - __main__ - ERROR - Failed to create profile for proxy proxy_99
+2025-08-19 03:47:34,657 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_100: ID
+2025-08-19 03:47:34,657 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=panduan%20lengkap%202024
+2025-08-19 03:47:34,659 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be730>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,659 - __main__ - ERROR - Failed to create profile for proxy proxy_100
+2025-08-19 03:47:34,659 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_101: ID
+2025-08-19 03:47:34,659 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20artikel%20menarik&source=hp
+2025-08-19 03:47:34,661 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be070>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,661 - __main__ - ERROR - Failed to create profile for proxy proxy_101
+2025-08-19 03:47:34,661 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_102: ID
+2025-08-19 03:47:34,661 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=cara%20informasi%20penting
+2025-08-19 03:47:34,662 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1ca0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,662 - __main__ - ERROR - Failed to create profile for proxy proxy_102
+2025-08-19 03:47:34,662 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_103: ID
+2025-08-19 03:47:34,662 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=panduan%20lengkap%202024&source=hp
+2025-08-19 03:47:34,664 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101580550>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,664 - __main__ - ERROR - Failed to create profile for proxy proxy_103
+2025-08-19 03:47:34,664 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_104: ID
+2025-08-19 03:47:34,664 - src.core.referer_simulator - INFO - Generated reddit referer: https://www.reddit.com/r/todayilearned/
+2025-08-19 03:47:34,665 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d56d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,665 - __main__ - ERROR - Failed to create profile for proxy proxy_104
+2025-08-19 03:47:34,665 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_105: ID
+2025-08-19 03:47:34,666 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20tips%20dan%20trik&start=0
+2025-08-19 03:47:34,667 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6eb0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,667 - __main__ - ERROR - Failed to create profile for proxy proxy_105
+2025-08-19 03:47:34,667 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_106: ID
+2025-08-19 03:47:34,667 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20penting%20terbaru&start=0
+2025-08-19 03:47:34,668 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c2bb0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,669 - __main__ - ERROR - Failed to create profile for proxy proxy_106
+2025-08-19 03:47:34,669 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_107: ID
+2025-08-19 03:47:34,669 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=artikel%20menarik%20terbaru&start=20
+2025-08-19 03:47:34,670 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b69a0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,670 - __main__ - ERROR - Failed to create profile for proxy proxy_107
+2025-08-19 03:47:34,670 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_108: ID
+2025-08-19 03:47:34,670 - src.core.referer_simulator - INFO - Generated twitter referer: https://mobile.twitter.com/
+2025-08-19 03:47:34,672 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6280>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,672 - __main__ - ERROR - Failed to create profile for proxy proxy_108
+2025-08-19 03:47:34,672 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_109: ID
+2025-08-19 03:47:34,672 - src.core.referer_simulator - INFO - Generated pinterest referer: https://www.pinterest.com/
+2025-08-19 03:47:34,673 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5b20>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,674 - __main__ - ERROR - Failed to create profile for proxy proxy_109
+2025-08-19 03:47:34,674 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_110: ID
+2025-08-19 03:47:34,674 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20dan%20trik%202024&source=hp
+2025-08-19 03:47:34,675 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1d90>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,675 - __main__ - ERROR - Failed to create profile for proxy proxy_110
+2025-08-19 03:47:34,675 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_111: ID
+2025-08-19 03:47:34,675 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=cara%20informasi%20penting&hl=id-ID
+2025-08-19 03:47:34,677 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be7f0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,677 - __main__ - ERROR - Failed to create profile for proxy proxy_111
+2025-08-19 03:47:34,677 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_112: ID
+2025-08-19 03:47:34,677 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=panduan%20lengkap&start=20
+2025-08-19 03:47:34,678 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c2070>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,678 - __main__ - ERROR - Failed to create profile for proxy proxy_112
+2025-08-19 03:47:34,678 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_113: ID
+2025-08-19 03:47:34,678 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=panduan%20lengkap%202024&hl=id
+2025-08-19 03:47:34,681 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be850>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,681 - __main__ - ERROR - Failed to create profile for proxy proxy_113
+2025-08-19 03:47:34,681 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_114: ID
+2025-08-19 03:47:34,681 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20informasi%20penting&ie=utf-8
+2025-08-19 03:47:34,683 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1be0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,683 - __main__ - ERROR - Failed to create profile for proxy proxy_114
+2025-08-19 03:47:34,683 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_115: ID
+2025-08-19 03:47:34,683 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20informasi%20penting&hl=en
+2025-08-19 03:47:34,684 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5910>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,684 - __main__ - ERROR - Failed to create profile for proxy proxy_115
+2025-08-19 03:47:34,684 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_116: ID
+2025-08-19 03:47:34,685 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d55b0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,685 - __main__ - ERROR - Failed to create profile for proxy proxy_116
+2025-08-19 03:47:34,685 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_117: ID
+2025-08-19 03:47:34,685 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=berita%20terbaru
+2025-08-19 03:47:34,687 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6c10>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,687 - __main__ - ERROR - Failed to create profile for proxy proxy_117
+2025-08-19 03:47:34,687 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_118: ID
+2025-08-19 03:47:34,689 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10157bd30>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,689 - __main__ - ERROR - Failed to create profile for proxy proxy_118
+2025-08-19 03:47:34,689 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_119: ID
+2025-08-19 03:47:34,689 - src.core.referer_simulator - INFO - Generated reddit referer: https://www.reddit.com/r/worldnews/
+2025-08-19 03:47:34,691 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6340>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,691 - __main__ - ERROR - Failed to create profile for proxy proxy_119
+2025-08-19 03:47:34,691 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_120: ID
+2025-08-19 03:47:34,691 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20dan%20trik&hl=id
+2025-08-19 03:47:34,693 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5160>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,693 - __main__ - ERROR - Failed to create profile for proxy proxy_120
+2025-08-19 03:47:34,693 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_121: ID
+2025-08-19 03:47:34,693 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20dan%20trik%202024&start=0
+2025-08-19 03:47:34,694 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1940>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,694 - __main__ - ERROR - Failed to create profile for proxy proxy_121
+2025-08-19 03:47:34,694 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_122: ID
+2025-08-19 03:47:34,694 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20tips%20dan%20trik&start=20
+2025-08-19 03:47:34,696 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be9d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,696 - __main__ - ERROR - Failed to create profile for proxy proxy_122
+2025-08-19 03:47:34,696 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_123: ID
+2025-08-19 03:47:34,696 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20panduan%20lengkap&source=hp
+2025-08-19 03:47:34,697 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c2040>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,697 - __main__ - ERROR - Failed to create profile for proxy proxy_123
+2025-08-19 03:47:34,697 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_124: ID
+2025-08-19 03:47:34,698 - src.core.referer_simulator - INFO - Generated pinterest referer: https://www.pinterest.com/
+2025-08-19 03:47:34,699 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be520>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,699 - __main__ - ERROR - Failed to create profile for proxy proxy_124
+2025-08-19 03:47:34,700 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_125: ID
+2025-08-19 03:47:34,700 - src.core.referer_simulator - INFO - Generated twitter referer: https://twitter.com/beritahariini/status/9833049703294197283
+2025-08-19 03:47:34,701 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1b50>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,701 - __main__ - ERROR - Failed to create profile for proxy proxy_125
+2025-08-19 03:47:34,701 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_126: ID
+2025-08-19 03:47:34,701 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=berita%20terbaru&ie=utf-8
+2025-08-19 03:47:34,702 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d59d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,702 - __main__ - ERROR - Failed to create profile for proxy proxy_126
+2025-08-19 03:47:34,702 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_127: ID
+2025-08-19 03:47:34,702 - src.core.referer_simulator - INFO - Generated twitter referer: https://twitter.com/
+2025-08-19 03:47:34,704 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5a00>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,704 - __main__ - ERROR - Failed to create profile for proxy proxy_127
+2025-08-19 03:47:34,704 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_128: ID
+2025-08-19 03:47:34,704 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20dan%20trik%20terbaru&start=30
+2025-08-19 03:47:34,705 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c2400>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,705 - __main__ - ERROR - Failed to create profile for proxy proxy_128
+2025-08-19 03:47:34,705 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_129: ID
+2025-08-19 03:47:34,705 - src.core.referer_simulator - INFO - Generated facebook referer: https://m.facebook.com/
+2025-08-19 03:47:34,707 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b6bb0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,707 - __main__ - ERROR - Failed to create profile for proxy proxy_129
+2025-08-19 03:47:34,707 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_130: ID
+2025-08-19 03:47:34,707 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20dan%20trik%202024&start=20
+2025-08-19 03:47:34,709 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d58b0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,709 - __main__ - ERROR - Failed to create profile for proxy proxy_130
+2025-08-19 03:47:34,709 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_131: ID
+2025-08-19 03:47:34,711 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1f70>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,711 - __main__ - ERROR - Failed to create profile for proxy proxy_131
+2025-08-19 03:47:34,711 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_132: ID
+2025-08-19 03:47:34,711 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20artikel%20menarik
+2025-08-19 03:47:34,713 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c24f0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,713 - __main__ - ERROR - Failed to create profile for proxy proxy_132
+2025-08-19 03:47:34,713 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_133: ID
+2025-08-19 03:47:34,714 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c2250>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,714 - __main__ - ERROR - Failed to create profile for proxy proxy_133
+2025-08-19 03:47:34,715 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_134: ID
+2025-08-19 03:47:34,715 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=informasi%20penting%202024
+2025-08-19 03:47:34,716 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be520>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,716 - __main__ - ERROR - Failed to create profile for proxy proxy_134
+2025-08-19 03:47:34,716 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_135: ID
+2025-08-19 03:47:34,717 - src.core.referer_simulator - INFO - Generated facebook referer: https://www.facebook.com/groups/8754441
+2025-08-19 03:47:34,718 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018be160>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,718 - __main__ - ERROR - Failed to create profile for proxy proxy_135
+2025-08-19 03:47:34,718 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_136: ID
+2025-08-19 03:47:34,718 - src.core.referer_simulator - INFO - Generated reddit referer: https://www.reddit.com/
+2025-08-19 03:47:34,719 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c29a0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,719 - __main__ - ERROR - Failed to create profile for proxy proxy_136
+2025-08-19 03:47:34,720 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_137: ID
+2025-08-19 03:47:34,720 - src.core.referer_simulator - INFO - Generated youtube referer: https://www.youtube.com/
+2025-08-19 03:47:34,721 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c2910>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,721 - __main__ - ERROR - Failed to create profile for proxy proxy_137
+2025-08-19 03:47:34,721 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_138: ID
+2025-08-19 03:47:34,721 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=tips%20dan%20trik%202024
+2025-08-19 03:47:34,722 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018c1460>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,723 - __main__ - ERROR - Failed to create profile for proxy proxy_138
+2025-08-19 03:47:34,723 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_139: ID
+2025-08-19 03:47:34,723 - src.core.referer_simulator - INFO - Generated youtube referer: https://www.youtube.com/watch?v=SuC88Z5CFGg
+2025-08-19 03:47:34,724 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5160>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,724 - __main__ - ERROR - Failed to create profile for proxy proxy_139
+2025-08-19 03:47:34,724 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_140: ID
+2025-08-19 03:47:34,724 - src.core.referer_simulator - INFO - Generated instagram referer: https://www.instagram.com/p/2007095472943715379/
+2025-08-19 03:47:34,728 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018b65e0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,728 - __main__ - ERROR - Failed to create profile for proxy proxy_140
+2025-08-19 03:47:34,728 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_141: ID
+2025-08-19 03:47:34,728 - src.core.referer_simulator - INFO - Generated Google referer: https://www.google.com/search?q=panduan%20lengkap
+2025-08-19 03:47:34,730 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1018d5dc0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,730 - __main__ - ERROR - Failed to create profile for proxy proxy_141
+2025-08-19 03:47:34,730 - src.core.fingerprint_engine - INFO - Generated fingerprint for proxy proxy_142: ID
+2025-08-19 03:47:34,730 - src.core.referer_simulator - INFO - Generated twitter referer: https://twitter.com/infoterkini/status/3988437061459410757
+2025-08-19 03:47:34,731 - src.core.multilogin_manager - ERROR - Error creating profile: HTTPConnectionPool(host='localhost', port=35000): Max retries exceeded with url: /api/v2/profile (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10156fe80>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-19 03:47:34,731 - __main__ - ERROR - Failed to create profile for proxy proxy_142
+2025-08-19 03:47:34,731 - __main__ - INFO - Daily visits completed: 0/142 successful

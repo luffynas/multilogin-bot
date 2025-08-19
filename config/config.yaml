@@ -1,0 +1,132 @@
+# Multi-Login Bot Configuration for AdSense Testing
+multilogin:
+  api_key: "YOUR_MULTILOGIN_API_KEY"
+  base_url: "http://localhost:35000"
+  max_concurrent_profiles: 50  # Reduced from 100 for conservative approach
+  profile_timeout: 1800  # 30 minutes
+
+proxy:
+  provider: "oxylabs"  # or "webshare", "brightdata"
+  type: "socks5"
+  total_count: 10000
+  daily_limit_per_proxy: 1
+  health_check_interval: 180  # 3 minutes (reduced from 300)
+  success_rate_min: 0.9       # 90% success rate requirement
+  response_time_max: 5.0      # 5 seconds max response time
+
+target_website:
+  url: "https://your-target-website.com"
+  articles_path: "/artikel/"
+  reading_time_min: 240  # 4 minutes
+  reading_time_max: 420  # 7 minutes
+
+behavior:
+  daily_visits_min: 20    # Reduced from 50 for conservative approach
+  daily_visits_max: 50    # Reduced from 150 for conservative approach
+  session_delay_min: 60   # Increased from 30 for more natural spacing
+  session_delay_max: 180  # Increased from 120 for more natural spacing
+  scroll_interval_min: 10
+  scroll_interval_max: 30
+
+referer_simulation:
+  enabled: true
+  sources:
+    - "https://www.google.com/search?q={keyword}"
+    - "https://www.facebook.com/"
+    - "https://twitter.com/"
+    - "https://www.instagram.com/"
+    - "https://www.youtube.com/"
+    - "https://www.reddit.com/"
+    - "https://www.pinterest.com/"
+  keywords:
+    - "artikel menarik"
+    - "tips dan trik"
+    - "berita terbaru"
+    - "informasi penting"
+    - "panduan lengkap"
+
+fingerprint:
+  enable_geo_consistency: true
+  enable_canvas_randomization: true
+  enable_webrtc_protection: true
+  enable_advanced_stealth: true  # Added for maximum stealth
+  enable_ai_behavior: true       # Added for AI-driven behavior
+  stealth_level: "expert"        # basic, advanced, expert
+
+# Advanced Undetectable Traffic Settings
+undetectable_traffic:
+  enabled: true
+  
+  # Mouse Movement Simulation
+  mouse_simulation:
+    enabled: true
+    movement_patterns:
+      linear: 0.3      # 30% straight movements
+      curved: 0.5      # 50% curved movements (Bezier curves)
+      hesitation: 0.2  # 20% hesitant movements
+    human_variations:
+      micro_tremors: true
+      speed_variations: true
+      pause_patterns: true
+      overshoot_correction: true
+    speed_config:
+      min_speed: 100    # pixels per second
+      max_speed: 800    # pixels per second
+  
+  # Hardware Emulation
+  hardware_emulation:
+    enabled: true
+    device_types:
+      - "desktop_windows"
+      - "desktop_mac"
+      - "laptop_windows"
+    network_profiles:
+      - "home_wifi"
+      - "mobile_4g"
+      - "office_ethernet"
+    performance_simulation: true
+    sensor_emulation: true
+  
+  # Advanced Behavior Patterns
+  behavior_patterns:
+    enabled: true
+    decision_tree_complexity: "advanced"  # basic, intermediate, advanced
+    context_awareness: true
+    personality_traits: true
+    attention_patterns: true
+    break_patterns: true
+  
+  # Anti-Detection Measures
+  anti_detection:
+    enabled: true
+    bot_detection_bypass: true
+    automation_detection_bypass: true
+    fingerprint_randomization: true
+    timing_randomization: true
+    pattern_randomization: true
+
+# AdSense Testing Specific Settings
+adsense_testing:
+  enabled: true
+  max_daily_revenue_test: 0.01  # Maximum $0.01 per day for testing
+  avoid_click_fraud: true
+  natural_behavior_only: true
+  session_spacing_min: 300      # 5 minutes minimum between sessions
+  session_spacing_max: 600      # 10 minutes maximum between sessions
+  
+  # Conservative interaction settings
+  click_probability: 0.3        # 30% chance to click (reduced from default)
+  hover_probability: 0.5        # 50% chance to hover
+  scroll_probability: 0.8       # 80% chance to scroll
+  
+  # Reading behavior for AdSense
+  reading_patterns:
+    - "thorough": 0.4           # 40% thorough readers
+    - "average": 0.4            # 40% average readers  
+    - "skimming": 0.2           # 20% skimming readers
+  
+  # AdSense specific monitoring
+  monitor_impressions: true
+  monitor_ctr: true
+  monitor_cpm: true
+  alert_on_suspicious_activity: true
