@@ -51,6 +51,10 @@ class ConfigValidator:
         if "referer_simulation" in config:
             self._validate_referer_config(config["referer_simulation"])
         
+        # Validate dynamic entry points configuration
+        if "dynamic_entry_points" in config:
+            self._validate_dynamic_entry_points_config(config["dynamic_entry_points"])
+        
         return len(self.errors) == 0, self.errors, self.warnings
     
     def _validate_required_sections(self, config: Dict):
@@ -159,6 +163,59 @@ class ConfigValidator:
             max_time = config["reading_time_max"]
             if min_time >= max_time:
                 self.errors.append("Target website reading_time_min must be less than reading_time_max")
+    
+    def _validate_dynamic_entry_points_config(self, config: Dict):
+        """Validate dynamic entry points configuration"""
+        if not config.get("enabled", False):
+            return  # Skip validation if not enabled
+        
+        # Validate target_websites
+        if "target_websites" in config:
+            target_websites = config["target_websites"]
+            if not isinstance(target_websites, dict):
+                self.errors.append("dynamic_entry_points.target_websites must be a dictionary")
+            else:
+                # Validate primary website
+                if "primary" in target_websites:
+                    primary = target_websites["primary"]
+                    if not isinstance(primary, dict):
+                        self.errors.append("dynamic_entry_points.target_websites.primary must be a dictionary")
+                    else:
+                        if "url" not in primary:
+                            self.errors.append("dynamic_entry_points.target_websites.primary.url is required")
+                        elif not primary["url"].startswith(("http://", "https://")):
+                            self.errors.append("dynamic_entry_points.target_websites.primary.url must be a valid URL")
+                
+                # Validate secondary websites
+                if "secondary" in target_websites:
+                    secondary = target_websites["secondary"]
+                    if not isinstance(secondary, list):
+                        self.errors.append("dynamic_entry_points.target_websites.secondary must be a list")
+                    else:
+                        for i, site in enumerate(secondary):
+                            if not isinstance(site, dict):
+                                self.errors.append(f"dynamic_entry_points.target_websites.secondary[{i}] must be a dictionary")
+                            elif "url" not in site:
+                                self.errors.append(f"dynamic_entry_points.target_websites.secondary[{i}].url is required")
+                            elif not site["url"].startswith(("http://", "https://")):
+                                self.errors.append(f"dynamic_entry_points.target_websites.secondary[{i}].url must be a valid URL")
+        
+        # Validate entry strategies
+        if "entry_strategies" in config:
+            strategies = config["entry_strategies"]
+            if not isinstance(strategies, dict):
+                self.errors.append("dynamic_entry_points.entry_strategies must be a dictionary")
+            else:
+                for strategy_name, strategy_config in strategies.items():
+                    if not isinstance(strategy_config, dict):
+                        self.errors.append(f"dynamic_entry_points.entry_strategies.{strategy_name} must be a dictionary")
+                    else:
+                        if "enabled" in strategy_config and not isinstance(strategy_config["enabled"], bool):
+                            self.errors.append(f"dynamic_entry_points.entry_strategies.{strategy_name}.enabled must be a boolean")
+                        if "weight" in strategy_config:
+                            weight = strategy_config["weight"]
+                            if not isinstance(weight, (int, float)) or weight < 0 or weight > 1:
+                                self.errors.append(f"dynamic_entry_points.entry_strategies.{strategy_name}.weight must be a number between 0 and 1")
     
     def _validate_behavior_config(self, config: Dict):
         """Validate behavior configuration"""

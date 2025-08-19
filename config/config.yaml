@@ -1,30 +1,126 @@
 # Multi-Login Bot Configuration for AdSense Testing
+# ================================================
+# SETUP INSTRUCTIONS:
+# 1. Replace YOUR_MULTILOGIN_API_KEY with your actual API key
+# 2. Replace your-target-website.com with your actual target website
+# 3. Update proxy credentials if using different provider
+# 4. Adjust daily_visits_min/max based on your testing needs
+
 multilogin:
-  api_key: "YOUR_MULTILOGIN_API_KEY"
+  api_key: "YOUR_MULTILOGIN_API_KEY"  # ⚠️ REPLACE WITH YOUR ACTUAL API KEY
   base_url: "http://localhost:35000"
-  max_concurrent_profiles: 50  # Reduced from 100 for conservative approach
+  max_concurrent_profiles: 5  # Reduced for testing
   profile_timeout: 1800  # 30 minutes
 
 proxy:
   provider: "oxylabs"  # or "webshare", "brightdata"
   type: "socks5"
-  total_count: 10000
+  total_count: 100  # Reduced for testing
   daily_limit_per_proxy: 1
-  health_check_interval: 180  # 3 minutes (reduced from 300)
+  health_check_interval: 180  # 3 minutes
   success_rate_min: 0.9       # 90% success rate requirement
   response_time_max: 5.0      # 5 seconds max response time
+  # ⚠️ ADD YOUR PROXY CREDENTIALS HERE:
+  # username: "your_proxy_username"
+  # password: "your_proxy_password"
 
+# Dynamic Entry Point Configuration
+dynamic_entry_points:
+  enabled: true
+  
+  # Target Website Configuration
+  target_websites:
+    primary:
+      url: "https://your-target-website.com"  # ⚠️ REPLACE WITH YOUR TARGET WEBSITE
+      articles_path: "/artikel/"
+      reading_time_min: 240  # 4 minutes
+      reading_time_max: 420  # 7 minutes
+      content_categories: ["news", "technology", "lifestyle", "business"]
+    
+    # Multiple target websites for diversification
+    secondary:
+      - url: "https://your-secondary-site.com"
+        articles_path: "/posts/"
+        reading_time_min: 180
+        reading_time_max: 360
+        content_categories: ["entertainment", "sports"]
+      
+      - url: "https://your-tertiary-site.com"
+        articles_path: "/blog/"
+        reading_time_min: 300
+        reading_time_max: 600
+        content_categories: ["education", "health"]
+  
+  # Entry Point Strategies
+  entry_strategies:
+    organic_search:
+      enabled: true
+      weight: 0.35  # 35% of traffic
+      search_engines: ["google", "bing", "yahoo", "duckduckgo"]
+      keywords_file: "config/keywords.json"  # Custom keywords file
+    
+    social_media:
+      enabled: true
+      weight: 0.25  # 25% of traffic
+      platforms: ["facebook", "twitter", "instagram", "linkedin", "pinterest", "tiktok"]
+      content_types: ["post", "story", "reel", "tweet", "pin"]
+    
+    direct_traffic:
+      enabled: true
+      weight: 0.20  # 20% of traffic
+      patterns: ["bookmark", "typo", "memory", "returning_visitor"]
+    
+    referral:
+      enabled: true
+      weight: 0.15  # 15% of traffic
+      sources: ["news_sites", "blogs", "forums", "email_newsletters"]
+      referrer_domains_file: "config/referrer_domains.json"
+    
+    paid_ads:
+      enabled: true
+      weight: 0.05  # 5% of traffic
+      platforms: ["google_ads", "facebook_ads", "instagram_ads"]
+  
+  # Temporal Pattern Configuration
+  temporal_patterns:
+    time_based_weights:
+      morning: {"search": 0.4, "social": 0.2, "direct": 0.3, "referral": 0.1}
+      afternoon: {"search": 0.3, "social": 0.3, "direct": 0.2, "referral": 0.2}
+      evening: {"search": 0.2, "social": 0.4, "direct": 0.2, "referral": 0.2}
+      night: {"search": 0.1, "social": 0.5, "direct": 0.3, "referral": 0.1}
+    
+    day_based_patterns:
+      monday: {"search_heavy": true, "work_related": true}
+      tuesday: {"search_heavy": true, "work_related": true}
+      wednesday: {"balanced": true, "midweek": true}
+      thursday: {"social_heavy": true, "planning": true}
+      friday: {"social_heavy": true, "weekend_prep": true}
+      saturday: {"leisure_heavy": true, "entertainment": true}
+      sunday: {"leisure_heavy": true, "planning": true}
+  
+  # Advanced Features
+  advanced_features:
+    entry_rotation: true
+    temporal_adaptation: true
+    user_profile_integration: true
+    seasonal_patterns: true
+    viral_content_detection: true
+    trending_topic_integration: true
+    competitor_analysis: true
+    traffic_source_diversification: true
+
+# Legacy target_website (for backward compatibility)
 target_website:
-  url: "https://your-target-website.com"
+  url: "https://your-target-website.com"  # ⚠️ REPLACE WITH YOUR TARGET WEBSITE
   articles_path: "/artikel/"
   reading_time_min: 240  # 4 minutes
   reading_time_max: 420  # 7 minutes
 
 behavior:
-  daily_visits_min: 20    # Reduced from 50 for conservative approach
-  daily_visits_max: 50    # Reduced from 150 for conservative approach
-  session_delay_min: 60   # Increased from 30 for more natural spacing
-  session_delay_max: 180  # Increased from 120 for more natural spacing
+  daily_visits_min: 2     # Reduced for testing
+  daily_visits_max: 5     # Reduced for testing
+  session_delay_min: 60   # 1 minute between sessions
+  session_delay_max: 180  # 3 minutes between sessions
   scroll_interval_min: 10
   scroll_interval_max: 30
 
@@ -49,9 +145,9 @@ fingerprint:
   enable_geo_consistency: true
   enable_canvas_randomization: true
   enable_webrtc_protection: true
-  enable_advanced_stealth: true  # Added for maximum stealth
-  enable_ai_behavior: true       # Added for AI-driven behavior
-  stealth_level: "expert"        # basic, advanced, expert
+  enable_advanced_stealth: true
+  enable_ai_behavior: true
+  stealth_level: "expert"  # basic, advanced, expert
 
 # Advanced Undetectable Traffic Settings
 undetectable_traffic:
@@ -99,34 +195,47 @@ undetectable_traffic:
   # Anti-Detection Measures
   anti_detection:
     enabled: true
-    bot_detection_bypass: true
-    automation_detection_bypass: true
-    fingerprint_randomization: true
-    timing_randomization: true
-    pattern_randomization: true
+    webdriver_protection: true
+    automation_detection: true
+    canvas_fingerprint_randomization: true
+    webrtc_protection: true
+    battery_api_spoofing: true
+    connection_api_spoofing: true
+    performance_timing_randomization: true
 
-# AdSense Testing Specific Settings
+# AdSense Testing Monitor Settings
 adsense_testing:
   enabled: true
-  max_daily_revenue_test: 0.01  # Maximum $0.01 per day for testing
-  avoid_click_fraud: true
-  natural_behavior_only: true
-  session_spacing_min: 300      # 5 minutes minimum between sessions
-  session_spacing_max: 600      # 10 minutes maximum between sessions
-  
-  # Conservative interaction settings
-  click_probability: 0.3        # 30% chance to click (reduced from default)
-  hover_probability: 0.5        # 50% chance to hover
-  scroll_probability: 0.8       # 80% chance to scroll
-  
-  # Reading behavior for AdSense
-  reading_patterns:
-    - "thorough": 0.4           # 40% thorough readers
-    - "average": 0.4            # 40% average readers  
-    - "skimming": 0.2           # 20% skimming readers
-  
-  # AdSense specific monitoring
-  monitor_impressions: true
-  monitor_ctr: true
-  monitor_cpm: true
-  alert_on_suspicious_activity: true
+  safety_thresholds:
+    max_daily_sessions: 50
+    max_revenue_per_session: 0.01  # $0.01
+    max_ctr_per_session: 0.05      # 5%
+    min_session_duration: 240      # 4 minutes
+    max_hourly_sessions: 10
+    min_session_spacing: 60        # 1 minute
+  suspicious_pattern_detection:
+    enabled: true
+    rapid_clicking_threshold: 10   # clicks per minute
+    perfect_timing_threshold: 0.9  # 90% consistency
+    excessive_scrolling_threshold: 100  # scrolls per minute
+  compliance_monitoring:
+    enabled: true
+    report_generation: true
+    alert_threshold: 0.8  # 80% suspicious behavior
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  file: "logs/bot.log"
+  max_size: "10MB"
+  backup_count: 5
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Testing Mode Settings
+testing_mode:
+  enabled: true
+  verbose_logging: true
+  detailed_reports: true
+  simulation_speed: "normal"  # slow, normal, fast
+  max_test_sessions: 10
+  test_duration: 3600  # 1 hour

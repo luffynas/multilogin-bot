@@ -32,6 +32,7 @@ from src.core.social_proof_simulator import SocialProofSimulator
 from src.core.content_intelligence_engine import ContentIntelligenceEngine
 from src.core.behavioral_biometrics_engine import BehavioralBiometricsEngine
 from src.core.temporal_pattern_analyzer import TemporalPatternAnalyzer
+from src.core.dynamic_entry_manager import DynamicEntryManager
 
 def parse_arguments():
     """Parse command line arguments"""
@@ -155,9 +156,12 @@ class MultiLoginBotOrchestrator:
             self.behavioral_biometrics_engine = BehavioralBiometricsEngine(self.config)
             self.temporal_pattern_analyzer = TemporalPatternAnalyzer(self.config)
             
+            # Initialize dynamic entry manager
+            self.dynamic_entry_manager = DynamicEntryManager(self.config)
+
             # Start network monitoring
             self.network_behavior_simulator.start_network_monitoring()
-            
+
             self.logger.info("Ultra-advanced undetectable components initialized")
         else:
             self.mouse_simulator = None
@@ -169,6 +173,7 @@ class MultiLoginBotOrchestrator:
             self.content_intelligence_engine = None
             self.behavioral_biometrics_engine = None
             self.temporal_pattern_analyzer = None
+            self.dynamic_entry_manager = None
         
         # Session tracking
         self.active_sessions = {}
@@ -274,13 +279,29 @@ class MultiLoginBotOrchestrator:
         return available_proxies
     
     def create_session(self, proxy_config: Dict, target_url: str) -> Optional[Dict]:
-        """Create complete browsing session with referer simulation"""
+        """Create complete browsing session with dynamic entry point simulation"""
         try:
             # Step 1: Generate fingerprint
             fingerprint = self.fingerprint_engine.generate_geo_consistent_fingerprint(proxy_config)
             
-            # Step 2: Generate referer
-            referer = self.referer_simulator.generate_referer()
+            # Step 2: Generate dynamic entry point if enabled
+            entry_point = None
+            referer = None
+            if self.dynamic_entry_manager and self.config.get("dynamic_entry_points", {}).get("enabled", False):
+                # Generate user profile for entry point selection
+                user_profile = {
+                    "personality_type": random.choice(["casual", "professional", "social_butterfly", "tech_savvy"]),
+                    "age_group": random.choice(["18-24", "25-34", "35-44", "45-54", "55+"]),
+                    "interests": random.choice([["technology", "business"], ["lifestyle", "entertainment"], ["news", "politics"]])
+                }
+                
+                entry_point = self.dynamic_entry_manager.generate_dynamic_entry_point(target_url, user_profile)
+                referer = entry_point.get("referrer", "")
+                
+                self.logger.info(f"Generated dynamic entry point: {entry_point['type']} from {entry_point['source']}")
+            else:
+                # Fallback to basic referer simulation
+                referer = self.referer_simulator.generate_referer()
             
             # Step 3: Create Multilogin profile
             profile_name = f"session_{int(time.time())}_{proxy_config['id']}"
@@ -307,6 +328,7 @@ class MultiLoginBotOrchestrator:
                 self.ml_manager.execute_script(profile["uuid"], script)
             
             # Step 5.5: Inject advanced undetectable scripts if enabled
+            hardware_profile = None
             if self.hardware_emulator and self.config.get("undetectable_traffic", {}).get("enabled", False):
                 # Generate hardware profile
                 hardware_profile = self.hardware_emulator.generate_hardware_profile(
@@ -322,12 +344,22 @@ class MultiLoginBotOrchestrator:
                 performance_scripts = self.hardware_emulator.get_performance_scripts(hardware_profile)
                 for script in performance_scripts:
                     self.ml_manager.execute_script(profile["uuid"], script)
-                
-                # Update session data with hardware info
-                session_data["hardware_profile"] = hardware_profile
             
-            # Step 6: Navigate with referer
-            success = self.ml_manager.navigate_to_url(profile["uuid"], target_url, referer)
+            # Step 6: Navigate with dynamic entry point or referer
+            if entry_point and entry_point.get("click_through", False):
+                # Simulate click-through from entry point
+                entry_url = entry_point.get("entry_url", "")
+                if entry_url:
+                    # Navigate to entry point first
+                    self.ml_manager.navigate_to_url(profile["uuid"], entry_url, "")
+                    time.sleep(random.uniform(2, 5))  # Simulate time on entry page
+                    
+                    # Then navigate to target with referer
+                    success = self.ml_manager.navigate_to_url(profile["uuid"], target_url, entry_url)
+                else:
+                    success = self.ml_manager.navigate_to_url(profile["uuid"], target_url, referer)
+            else:
+                success = self.ml_manager.navigate_to_url(profile["uuid"], target_url, referer)
             
             if not success:
                 self.logger.error(f"Failed to navigate to {target_url}")
@@ -338,8 +370,10 @@ class MultiLoginBotOrchestrator:
                 "proxy_config": proxy_config,
                 "fingerprint": fingerprint,
                 "referer": referer,
+                "entry_point": entry_point,
                 "start_time": time.time(),
-                "browser_info": browser_info
+                "browser_info": browser_info,
+                "hardware_profile": hardware_profile
             }
             
             self.active_sessions[profile["uuid"]] = session_data
@@ -367,7 +401,25 @@ class MultiLoginBotOrchestrator:
             self.logger.warning(f"Not enough available proxies. Need {visit_count}, have {len(available_proxies)}")
             visit_count = len(available_proxies)
         
-        target_url = self.config["target_website"]["url"]
+        # Get target URL with priority: dynamic_entry_points > target_website
+        target_url = None
+        
+        # Try dynamic entry points first
+        if self.config.get("dynamic_entry_points", {}).get("enabled", False):
+            dynamic_config = self.config.get("dynamic_entry_points", {}).get("target_websites", {})
+            if dynamic_config.get("primary", {}).get("url"):
+                target_url = dynamic_config["primary"]["url"]
+                self.logger.info(f"Using dynamic entry point target: {target_url}")
+        
+        # Fallback to legacy target_website
+        if not target_url:
+            target_url = self.config.get("target_website", {}).get("url")
+            if target_url:
+                self.logger.info(f"Using legacy target_website: {target_url}")
+        
+        # Final fallback
+        if not target_url:
+            raise ValueError("No target URL found in configuration. Please set either dynamic_entry_points.target_websites.primary.url or target_website.url")
         
         # Run sessions
         successful_sessions = 0

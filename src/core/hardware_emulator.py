@@ -82,6 +82,94 @@ class HardwareEmulator:
                 ],
                 "color_depths": [24, 32],
                 "pixel_ratios": [1.0, 1.25, 1.5]
+            },
+            "mobile_android": {
+                "cpu_cores": [4, 6, 8],
+                "cpu_models": [
+                    "Qualcomm Snapdragon 855",
+                    "Qualcomm Snapdragon 865",
+                    "Qualcomm Snapdragon 888",
+                    "Samsung Exynos 2100",
+                    "MediaTek Dimensity 1200"
+                ],
+                "memory_sizes": [4, 6, 8, 12, 16],
+                "gpu_models": [
+                    "Adreno 640",
+                    "Adreno 650",
+                    "Adreno 660",
+                    "Mali-G78 MP14",
+                    "Mali-G78 MP10"
+                ],
+                "screen_resolutions": [
+                    "720x1280", "1080x1920", "1440x2560", "1080x2400", "1440x3200"
+                ],
+                "color_depths": [24, 32],
+                "pixel_ratios": [2.0, 2.5, 3.0, 3.5]
+            },
+            "mobile_ios": {
+                "cpu_cores": [2, 4, 6],
+                "cpu_models": [
+                    "Apple A13 Bionic",
+                    "Apple A14 Bionic",
+                    "Apple A15 Bionic",
+                    "Apple A16 Bionic",
+                    "Apple A17 Pro"
+                ],
+                "memory_sizes": [3, 4, 6, 8],
+                "gpu_models": [
+                    "Apple A13 GPU",
+                    "Apple A14 GPU",
+                    "Apple A15 GPU",
+                    "Apple A16 GPU",
+                    "Apple A17 Pro GPU"
+                ],
+                "screen_resolutions": [
+                    "750x1334", "1125x2436", "1170x2532", "1179x2556", "1290x2796"
+                ],
+                "color_depths": [24, 32],
+                "pixel_ratios": [2.0, 2.5, 3.0]
+            },
+            "tablet_android": {
+                "cpu_cores": [4, 6, 8],
+                "cpu_models": [
+                    "Qualcomm Snapdragon 870",
+                    "MediaTek Dimensity 1100",
+                    "Samsung Exynos 2100",
+                    "Unisoc T618"
+                ],
+                "memory_sizes": [4, 6, 8, 12],
+                "gpu_models": [
+                    "Adreno 650",
+                    "Mali-G77 MC9",
+                    "Mali-G78 MP10",
+                    "Mali-G52 MC2"
+                ],
+                "screen_resolutions": [
+                    "1200x1920", "1600x2560", "2048x2732", "2560x1600"
+                ],
+                "color_depths": [24, 32],
+                "pixel_ratios": [1.5, 2.0, 2.5]
+            },
+            "tablet_ios": {
+                "cpu_cores": [4, 6, 8],
+                "cpu_models": [
+                    "Apple A12Z Bionic",
+                    "Apple A14 Bionic",
+                    "Apple M1",
+                    "Apple M2"
+                ],
+                "memory_sizes": [4, 6, 8, 16],
+                "gpu_models": [
+                    "Apple A12Z GPU",
+                    "Apple A14 GPU",
+                    "Apple M1 GPU",
+                    "Apple M2 GPU"
+                ],
+                "screen_resolutions": [
+                    "1668x2388", "2048x2732", "2360x1640", "2732x2048"
+                ],
+                "color_depths": [24, 32],
+                "pixel_ratios": [2.0, 2.5]
             }
         }
         
