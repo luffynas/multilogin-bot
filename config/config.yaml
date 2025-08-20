@@ -104,24 +104,18 @@ dynamic_entry_points:
   target_websites:
     primary:
       url: "https://your-target-website.com"  # ⚠️ REPLACE WITH YOUR TARGET WEBSITE
-      articles_path: "/artikel/"
       reading_time_min: 240  # 4 minutes
       reading_time_max: 420  # 7 minutes
-      content_categories: ["news", "technology", "lifestyle", "business"]
     
     # Multiple target websites for diversification
     secondary:
       - url: "https://your-secondary-site.com"
-        articles_path: "/posts/"
         reading_time_min: 180
         reading_time_max: 360
-        content_categories: ["entertainment", "sports"]
       
       - url: "https://your-tertiary-site.com"
-        articles_path: "/blog/"
         reading_time_min: 300
         reading_time_max: 600
-        content_categories: ["education", "health"]
   
   # Entry Point Strategies
   entry_strategies:
