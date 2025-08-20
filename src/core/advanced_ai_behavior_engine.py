@@ -22,6 +22,7 @@ class PersonalityType(Enum):
     IMPULSIVE_CLICKER = "impulsive_clicker"
     ANALYTICAL_THINKER = "analytical_thinker"
     MULTITASKER = "multitasker"
+    SELECTIVE_READER = "selective_reader" # Added for complexity-based selection
 
 class ContextType(Enum):
     """Context types for behavior adaptation"""
@@ -344,36 +345,310 @@ class AdvancedAIBehaviorEngine:
                     "adaptability": "very_high",
                     "consistency": "very_low"
                 }
+            },
+            PersonalityType.SELECTIVE_READER: { # Added for complexity-based selection
+                "traits": {
+                    "openness": 0.7,
+                    "curiosity": 0.7,
+                    "risk_tolerance": 0.5,
+                    "patience": 0.7,
+                    "focus": 0.7
+                },
+                "behavioral_patterns": {
+                    "click_probability": 0.4,
+                    "exploration_depth": "shallow",
+                    "return_visits": "frequent",
+                    "social_sharing": "moderate",
+                    "content_consumption": "trending"
+                },
+                "decision_making": {
+                    "speed": "fast",
+                    "thoroughness": "medium",
+                    "adaptability": "high",
+                    "consistency": "low"
+                }
             }
         }
     
-    def generate_behavioral_profile(self, session_context: Dict) -> Dict:
-        """Generate sophisticated behavioral profile based on context"""
-        # Determine personality type based on context
-        personality_type = self.determine_personality_type(session_context)
-        personality = self.personality_profiles[personality_type]
+    def generate_behavioral_profile(self, context: Dict) -> Dict:
+        """Generate behavioral profile with complexity-based variations"""
+        # Extract context information
+        session_data = context.get("session_data", {})
+        page_type = context.get("page_type", "article")
+        content_category = context.get("content_category", "general")
+        geo_location = context.get("geo_location", "ID")
+        device_type = context.get("device_type", "desktop_windows")
+        session_complexity = context.get("session_complexity", "moderate")
         
-        # Generate mood state
-        mood = self.mood_system.generate_mood(session_context)
+        # Complexity-based personality selection
+        if session_complexity == "simple":
+            personality_options = [
+                PersonalityType.FAST_SCANNER,
+                PersonalityType.CAUTIOUS_OBSERVER
+            ]
+        elif session_complexity == "moderate":
+            personality_options = [
+                PersonalityType.CURIOUS_EXPLORER,
+                PersonalityType.SELECTIVE_READER,
+                PersonalityType.MULTITASKER
+            ]
+        elif session_complexity == "complex":
+            personality_options = [
+                PersonalityType.THOROUGH_READER,
+                PersonalityType.ANALYTICAL_THINKER,
+                PersonalityType.SOCIAL_BUTTERFLY,
+                PersonalityType.IMPULSIVE_CLICKER
+            ]
+        else:
+            personality_options = list(PersonalityType)
         
-        # Generate attention state
-        attention = self.attention_system.generate_attention_state(session_context)
+        # Select personality based on complexity
+        personality_type = random.choice(personality_options)
         
-        # Create behavioral profile
-        profile = {
+        # Generate base behavioral profile
+        behavioral_profile = {
             "personality_type": personality_type.value,
-            "personality_traits": personality["traits"],
-            "behavioral_patterns": personality["behavioral_patterns"],
-            "decision_making": personality["decision_making"],
-            "mood_state": mood,
-            "attention_state": attention,
-            "context_awareness": self.generate_context_awareness(session_context),
-            "learning_preferences": self.generate_learning_preferences(personality_type),
-            "social_behavior": self.generate_social_behavior(personality_type, session_context),
-            "temporal_patterns": self.generate_temporal_patterns(session_context)
+            "session_complexity": session_complexity,
+            "geo_location": geo_location,
+            "device_type": device_type,
+            "page_type": page_type,
+            "content_category": content_category,
+            "attention_span": self._generate_attention_span(session_complexity),
+            "interaction_frequency": self._generate_interaction_frequency(session_complexity),
+            "reading_speed": self._generate_reading_speed(session_complexity, personality_type),
+            "decision_making_speed": self._generate_decision_speed(session_complexity),
+            "curiosity_level": self._generate_curiosity_level(session_complexity),
+            "social_engagement": self._generate_social_engagement(session_complexity),
+            "technical_expertise": self._generate_technical_expertise(session_complexity),
+            "mood_state": self.mood_system.generate_mood_state(session_complexity),
+            "attention_state": self.attention_system.generate_attention_state(session_complexity),
+            "learning_preferences": self._generate_learning_preferences(session_complexity),
+            "behavioral_signature": self._generate_behavioral_signature(session_complexity)
         }
         
-        return profile
+        # Add complexity-specific behaviors
+        if session_complexity == "complex":
+            behavioral_profile.update({
+                "advanced_interactions": True,
+                "deep_engagement": True,
+                "multi_task_capability": True,
+                "analytical_thinking": True,
+                "social_sharing_tendency": random.choice([True, False])
+            })
+        elif session_complexity == "moderate":
+            behavioral_profile.update({
+                "advanced_interactions": random.choice([True, False]),
+                "deep_engagement": random.choice([True, False]),
+                "multi_task_capability": False,
+                "analytical_thinking": random.choice([True, False]),
+                "social_sharing_tendency": False
+            })
+        else:  # simple
+            behavioral_profile.update({
+                "advanced_interactions": False,
+                "deep_engagement": False,
+                "multi_task_capability": False,
+                "analytical_thinking": False,
+                "social_sharing_tendency": False
+            })
+        
+        # Store behavioral signature for consistency
+        session_id = session_data.get("profile_id", "unknown")
+        self.behavioral_signatures[session_id] = behavioral_profile
+        
+        return behavioral_profile
+    
+    def _generate_attention_span(self, complexity: str) -> Dict:
+        """Generate attention span based on complexity"""
+        if complexity == "simple":
+            return {
+                "duration_minutes": random.uniform(2, 8),
+                "focus_level": random.uniform(0.3, 0.6),
+                "distraction_sensitivity": random.uniform(0.7, 1.0)
+            }
+        elif complexity == "moderate":
+            return {
+                "duration_minutes": random.uniform(5, 15),
+                "focus_level": random.uniform(0.5, 0.8),
+                "distraction_sensitivity": random.uniform(0.4, 0.7)
+            }
+        else:  # complex
+            return {
+                "duration_minutes": random.uniform(10, 30),
+                "focus_level": random.uniform(0.7, 0.95),
+                "distraction_sensitivity": random.uniform(0.2, 0.5)
+            }
+    
+    def _generate_interaction_frequency(self, complexity: str) -> Dict:
+        """Generate interaction frequency based on complexity"""
+        if complexity == "simple":
+            return {
+                "clicks_per_minute": random.uniform(0.1, 0.5),
+                "scrolls_per_minute": random.uniform(1, 3),
+                "hovers_per_minute": random.uniform(0.2, 1.0)
+            }
+        elif complexity == "moderate":
+            return {
+                "clicks_per_minute": random.uniform(0.3, 1.2),
+                "scrolls_per_minute": random.uniform(2, 6),
+                "hovers_per_minute": random.uniform(0.5, 2.0)
+            }
+        else:  # complex
+            return {
+                "clicks_per_minute": random.uniform(0.8, 2.5),
+                "scrolls_per_minute": random.uniform(4, 10),
+                "hovers_per_minute": random.uniform(1.0, 4.0)
+            }
+    
+    def _generate_reading_speed(self, complexity: str, personality: PersonalityType) -> Dict:
+        """Generate reading speed based on complexity and personality"""
+        base_speed = {
+            "simple": random.uniform(150, 300),
+            "moderate": random.uniform(200, 400),
+            "complex": random.uniform(250, 500)
+        }
+        
+        # Adjust based on personality
+        if personality == PersonalityType.FAST_SCANNER:
+            speed_multiplier = random.uniform(1.5, 2.0)
+        elif personality == PersonalityType.THOROUGH_READER:
+            speed_multiplier = random.uniform(0.6, 0.9)
+        else:
+            speed_multiplier = random.uniform(0.8, 1.2)
+        
+        words_per_minute = base_speed[complexity] * speed_multiplier
+        
+        return {
+            "words_per_minute": words_per_minute,
+            "comprehension_rate": random.uniform(0.6, 0.95),
+            "reread_probability": random.uniform(0.1, 0.4)
+        }
+    
+    def _generate_decision_speed(self, complexity: str) -> Dict:
+        """Generate decision making speed based on complexity"""
+        if complexity == "simple":
+            return {
+                "click_delay_seconds": random.uniform(0.5, 2.0),
+                "navigation_delay_seconds": random.uniform(1.0, 3.0),
+                "reading_pause_seconds": random.uniform(5, 15)
+            }
+        elif complexity == "moderate":
+            return {
+                "click_delay_seconds": random.uniform(1.0, 4.0),
+                "navigation_delay_seconds": random.uniform(2.0, 8.0),
+                "reading_pause_seconds": random.uniform(10, 30)
+            }
+        else:  # complex
+            return {
+                "click_delay_seconds": random.uniform(2.0, 8.0),
+                "navigation_delay_seconds": random.uniform(5.0, 15.0),
+                "reading_pause_seconds": random.uniform(20, 60)
+            }
+    
+    def _generate_curiosity_level(self, complexity: str) -> Dict:
+        """Generate curiosity level based on complexity"""
+        if complexity == "simple":
+            return {
+                "exploration_tendency": random.uniform(0.1, 0.4),
+                "link_clicking_probability": random.uniform(0.05, 0.2),
+                "content_depth": "surface"
+            }
+        elif complexity == "moderate":
+            return {
+                "exploration_tendency": random.uniform(0.3, 0.7),
+                "link_clicking_probability": random.uniform(0.15, 0.4),
+                "content_depth": "moderate"
+            }
+        else:  # complex
+            return {
+                "exploration_tendency": random.uniform(0.6, 0.9),
+                "link_clicking_probability": random.uniform(0.3, 0.7),
+                "content_depth": "deep"
+            }
+    
+    def _generate_social_engagement(self, complexity: str) -> Dict:
+        """Generate social engagement based on complexity"""
+        if complexity == "simple":
+            return {
+                "sharing_probability": random.uniform(0.01, 0.1),
+                "comment_probability": random.uniform(0.01, 0.05),
+                "social_interaction_level": "minimal"
+            }
+        elif complexity == "moderate":
+            return {
+                "sharing_probability": random.uniform(0.05, 0.25),
+                "comment_probability": random.uniform(0.02, 0.15),
+                "social_interaction_level": "moderate"
+            }
+        else:  # complex
+            return {
+                "sharing_probability": random.uniform(0.15, 0.5),
+                "comment_probability": random.uniform(0.1, 0.3),
+                "social_interaction_level": "high"
+            }
+    
+    def _generate_technical_expertise(self, complexity: str) -> Dict:
+        """Generate technical expertise based on complexity"""
+        if complexity == "simple":
+            return {
+                "tech_savviness": random.uniform(0.1, 0.4),
+                "advanced_feature_usage": random.uniform(0.01, 0.2),
+                "error_recovery_ability": random.uniform(0.2, 0.5)
+            }
+        elif complexity == "moderate":
+            return {
+                "tech_savviness": random.uniform(0.3, 0.7),
+                "advanced_feature_usage": random.uniform(0.1, 0.4),
+                "error_recovery_ability": random.uniform(0.4, 0.7)
+            }
+        else:  # complex
+            return {
+                "tech_savviness": random.uniform(0.6, 0.9),
+                "advanced_feature_usage": random.uniform(0.3, 0.7),
+                "error_recovery_ability": random.uniform(0.6, 0.9)
+            }
+    
+    def _generate_learning_preferences(self, complexity: str) -> Dict:
+        """Generate learning preferences based on complexity"""
+        if complexity == "simple":
+            return {
+                "learning_style": "visual",
+                "information_retention": random.uniform(0.3, 0.6),
+                "preferred_content_length": "short"
+            }
+        elif complexity == "moderate":
+            return {
+                "learning_style": random.choice(["visual", "auditory", "kinesthetic"]),
+                "information_retention": random.uniform(0.5, 0.8),
+                "preferred_content_length": "medium"
+            }
+        else:  # complex
+            return {
+                "learning_style": random.choice(["visual", "auditory", "kinesthetic", "reading"]),
+                "information_retention": random.uniform(0.7, 0.95),
+                "preferred_content_length": "long"
+            }
+    
+    def _generate_behavioral_signature(self, complexity: str) -> Dict:
+        """Generate unique behavioral signature based on complexity"""
+        signature = {
+            "mouse_movement_pattern": random.choice(["linear", "curved", "hesitant", "confident"]),
+            "typing_speed": random.uniform(30, 80),  # WPM
+            "pause_patterns": random.choice(["frequent", "moderate", "rare"]),
+            "scroll_behavior": random.choice(["smooth", "jerky", "variable"]),
+            "click_precision": random.uniform(0.7, 0.98),
+            "navigation_style": random.choice(["direct", "exploratory", "cautious"])
+        }
+        
+        # Add complexity-specific signature elements
+        if complexity == "complex":
+            signature.update({
+                "multi_tasking_ability": random.uniform(0.6, 0.9),
+                "analytical_thinking": random.uniform(0.7, 0.95),
+                "pattern_recognition": random.uniform(0.6, 0.9)
+            })
+        
+        return signature
     
     def determine_personality_type(self, context: Dict) -> PersonalityType:
         """Determine personality type based on context and session data"""
@@ -710,113 +985,125 @@ class AdvancedAIBehaviorEngine:
 
 
 class MoodSystem:
-    """Simulates human mood states affecting behavior"""
+    """Advanced mood state management system"""
     
     def __init__(self):
-        self.mood_states = ["happy", "neutral", "stressed", "excited", "tired", "focused", "distracted"]
-        self.mood_transitions = self.build_mood_transitions()
-    
-    def build_mood_transitions(self) -> Dict:
-        """Build mood transition probabilities"""
-        return {
-            "happy": {"happy": 0.7, "neutral": 0.2, "excited": 0.1},
-            "neutral": {"neutral": 0.6, "happy": 0.2, "stressed": 0.1, "tired": 0.1},
-            "stressed": {"stressed": 0.5, "neutral": 0.3, "tired": 0.2},
-            "excited": {"excited": 0.4, "happy": 0.4, "neutral": 0.2},
-            "tired": {"tired": 0.6, "neutral": 0.3, "stressed": 0.1},
-            "focused": {"focused": 0.5, "neutral": 0.3, "tired": 0.2},
-            "distracted": {"distracted": 0.4, "neutral": 0.4, "stressed": 0.2}
+        self.mood_states = {
+            "positive": {"energy": 0.8, "patience": 0.7, "curiosity": 0.8},
+            "neutral": {"energy": 0.5, "patience": 0.5, "curiosity": 0.5},
+            "focused": {"energy": 0.7, "patience": 0.8, "curiosity": 0.6},
+            "relaxed": {"energy": 0.4, "patience": 0.9, "curiosity": 0.4},
+            "curious": {"energy": 0.6, "patience": 0.6, "curiosity": 0.9},
+            "impatient": {"energy": 0.8, "patience": 0.2, "curiosity": 0.3}
         }
     
-    def generate_mood(self, context: Dict) -> Dict:
-        """Generate mood state based on context"""
-        current_mood = random.choice(self.mood_states)
+    def generate_mood_state(self, complexity: str = "moderate") -> Dict:
+        """Generate mood state with complexity-based variations"""
+        # Select mood based on complexity
+        if complexity == "simple":
+            mood_type = random.choice(["neutral", "relaxed", "impatient"])
+        elif complexity == "moderate":
+            mood_type = random.choice(["neutral", "focused", "curious", "positive"])
+        else:  # complex
+            mood_type = random.choice(["focused", "curious", "positive"])
+        
+        base_mood = self.mood_states[mood_type]
+        
+        # Add complexity-based variations
+        if complexity == "complex":
+            # Higher energy and curiosity for complex sessions
+            energy = base_mood["energy"] * random.uniform(1.0, 1.3)
+            patience = base_mood["patience"] * random.uniform(1.0, 1.2)
+            curiosity = base_mood["curiosity"] * random.uniform(1.0, 1.3)
+        elif complexity == "simple":
+            # Lower energy and patience for simple sessions
+            energy = base_mood["energy"] * random.uniform(0.7, 1.0)
+            patience = base_mood["patience"] * random.uniform(0.8, 1.0)
+            curiosity = base_mood["curiosity"] * random.uniform(0.7, 1.0)
+        else:
+            # Moderate variations
+            energy = base_mood["energy"] * random.uniform(0.9, 1.1)
+            patience = base_mood["patience"] * random.uniform(0.9, 1.1)
+            curiosity = base_mood["curiosity"] * random.uniform(0.9, 1.1)
         
         return {
-            "current_mood": current_mood,
-            "mood_intensity": random.uniform(0.3, 0.9),
-            "mood_stability": random.uniform(0.5, 0.9),
-            "mood_duration": random.randint(300, 1800),  # 5-30 minutes
-            "mood_factors": self.analyze_mood_factors(context)
+            "type": mood_type,
+            "energy_level": min(1.0, energy),
+            "patience_level": min(1.0, patience),
+            "curiosity_level": min(1.0, curiosity),
+            "complexity": complexity,
+            "mood_stability": self._calculate_mood_stability(mood_type, complexity)
         }
     
-    def analyze_mood_factors(self, context: Dict) -> Dict:
-        """Analyze factors affecting mood"""
-        return {
-            "time_of_day": self.get_time_mood_factor(),
-            "content_quality": context.get("content_quality", "neutral"),
-            "social_context": context.get("social_context", "neutral"),
-            "technical_issues": context.get("technical_issues", False),
-            "personal_interest": context.get("personal_interest", 0.5)
-        }
-    
-    def get_time_mood_factor(self) -> str:
-        """Get mood factor based on time of day"""
-        hour = datetime.now().hour
-        if 6 <= hour <= 9:
-            return "morning_energy"
-        elif 9 <= hour <= 12:
-            return "peak_productivity"
-        elif 12 <= hour <= 14:
-            return "lunch_break"
-        elif 14 <= hour <= 17:
-            return "afternoon_focus"
-        elif 17 <= hour <= 20:
-            return "evening_relaxation"
+    def _calculate_mood_stability(self, mood_type: str, complexity: str) -> str:
+        """Calculate mood stability based on mood type and complexity"""
+        stable_moods = ["neutral", "focused", "relaxed"]
+        unstable_moods = ["impatient", "curious"]
+        
+        if mood_type in stable_moods:
+            return "stable"
+        elif mood_type in unstable_moods:
+            return "variable"
         else:
-            return "late_night"
+            return "moderate"
 
 
 class AttentionSystem:
-    """Simulates human attention patterns"""
+    """Advanced attention state management system"""
     
     def __init__(self):
-        self.attention_states = ["focused", "distracted", "multitasking", "deep_work", "casual"]
-        self.attention_factors = self.build_attention_factors()
-    
-    def build_attention_factors(self) -> Dict:
-        """Build attention factor weights"""
-        return {
-            "content_interest": 0.3,
-            "environmental_noise": 0.2,
-            "time_pressure": 0.15,
-            "device_distractions": 0.15,
-            "personal_energy": 0.2
+        self.attention_states = {
+            "focused": {"level": 0.8, "duration": 15, "distraction_resistance": 0.9},
+            "engaged": {"level": 0.6, "duration": 10, "distraction_resistance": 0.7},
+            "casual": {"level": 0.4, "duration": 5, "distraction_resistance": 0.5},
+            "distracted": {"level": 0.2, "duration": 2, "distraction_resistance": 0.2},
+            "deep_focus": {"level": 0.95, "duration": 30, "distraction_resistance": 0.95}
         }
     
-    def generate_attention_state(self, context: Dict) -> Dict:
-        """Generate attention state based on context"""
-        attention_state = random.choice(self.attention_states)
+    def generate_attention_state(self, complexity: str = "moderate") -> Dict:
+        """Generate attention state based on complexity"""
+        if complexity == "simple":
+            attention_type = random.choice(["casual", "distracted"])
+        elif complexity == "moderate":
+            attention_type = random.choice(["engaged", "casual", "focused"])
+        else:  # complex
+            attention_type = random.choice(["focused", "deep_focus", "engaged"])
+        
+        base_state = self.attention_states[attention_type]
+        
+        # Add complexity-based variations
+        if complexity == "complex":
+            # Higher attention levels for complex sessions
+            attention_level = base_state["level"] * random.uniform(1.0, 1.2)
+            duration = base_state["duration"] * random.uniform(1.2, 1.5)
+        elif complexity == "simple":
+            # Lower attention levels for simple sessions
+            attention_level = base_state["level"] * random.uniform(0.8, 1.0)
+            duration = base_state["duration"] * random.uniform(0.7, 1.0)
+        else:
+            # Moderate variations
+            attention_level = base_state["level"] * random.uniform(0.9, 1.1)
+            duration = base_state["duration"] * random.uniform(0.9, 1.1)
         
         return {
-            "current_state": attention_state,
-            "attention_span": self.calculate_attention_span(attention_state),
-            "distraction_sensitivity": random.uniform(0.1, 0.8),
-            "focus_recovery_time": random.uniform(30, 300),  # 30 seconds to 5 minutes
-            "multitasking_capacity": random.uniform(0.2, 0.8),
-            "attention_factors": self.analyze_attention_factors(context)
+            "type": attention_type,
+            "level": min(1.0, attention_level),
+            "duration_minutes": duration,
+            "distraction_resistance": base_state["distraction_resistance"],
+            "complexity": complexity,
+            "focus_quality": self._calculate_focus_quality(attention_level, complexity)
         }
     
-    def calculate_attention_span(self, state: str) -> int:
-        """Calculate attention span in seconds based on state"""
-        spans = {
-            "focused": random.randint(300, 900),      # 5-15 minutes
-            "distracted": random.randint(30, 120),    # 30 seconds to 2 minutes
-            "multitasking": random.randint(60, 300),  # 1-5 minutes
-            "deep_work": random.randint(900, 1800),   # 15-30 minutes
-            "casual": random.randint(120, 600)        # 2-10 minutes
-        }
-        return spans.get(state, 300)
-    
-    def analyze_attention_factors(self, context: Dict) -> Dict:
-        """Analyze factors affecting attention"""
-        return {
-            "content_complexity": context.get("content_complexity", "medium"),
-            "environmental_distractions": context.get("environmental_distractions", "low"),
-            "time_constraints": context.get("time_constraints", "none"),
-            "device_notifications": context.get("device_notifications", "low"),
-            "personal_energy_level": context.get("energy_level", "medium")
-        }
+    def _calculate_focus_quality(self, attention_level: float, complexity: str) -> str:
+        """Calculate focus quality based on attention level and complexity"""
+        if attention_level > 0.8:
+            return "excellent"
+        elif attention_level > 0.6:
+            return "good"
+        elif attention_level > 0.4:
+            return "moderate"
+        else:
+            return "poor"
 
 
 class LearningSystem:

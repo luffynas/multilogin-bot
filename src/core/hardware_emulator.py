@@ -198,41 +198,71 @@ class HardwareEmulator:
             }
         }
     
-    def generate_hardware_profile(self, device_type: str = None, 
-                                geo_location: str = None) -> Dict:
-        """Generate realistic hardware profile"""
-        if device_type is None:
-            device_type = random.choice(list(self.hardware_profiles.keys()))
-        
-        profile = self.hardware_profiles[device_type]
-        
-        hardware_profile = {
-            "device_type": device_type,
-            "cpu": {
-                "cores": random.choice(profile["cpu_cores"]),
-                "model": random.choice(profile["cpu_models"]),
-                "architecture": self._get_architecture(device_type)
-            },
-            "memory": {
-                "size_gb": random.choice(profile["memory_sizes"]),
-                "available_gb": lambda: random.uniform(0.7, 0.95) * hardware_profile["memory"]["size_gb"]
-            },
-            "gpu": {
-                "model": random.choice(profile["gpu_models"]),
-                "memory_mb": random.choice([512, 1024, 2048, 4096, 8192])
-            },
-            "display": {
-                "resolution": random.choice(profile["screen_resolutions"]),
-                "color_depth": random.choice(profile["color_depths"]),
-                "pixel_ratio": random.choice(profile["pixel_ratios"]),
-                "orientation": "landscape"
-            },
-            "network": self._generate_network_profile(),
-            "battery": self._generate_battery_profile(device_type),
-            "sensors": self._generate_sensor_profile(),
-            "timezone": self._get_timezone_for_geo(geo_location),
-            "language": self._get_language_for_geo(geo_location)
+    def generate_hardware_profile(self, geo_location: str = "ID", complexity: str = "moderate") -> Dict:
+        """Generate hardware profile with complexity-based variations"""
+        # Base hardware configuration
+        base_config = {
+            "device_type": random.choice(self.config.get("hardware_emulation", {}).get("device_types", ["desktop_windows"])),
+            "network_profile": random.choice(self.config.get("hardware_emulation", {}).get("network_profiles", ["home_wifi"])),
+            "geo_location": geo_location
         }
+        
+        # Complexity-based hardware variations
+        if complexity == "simple":
+            # Simple hardware: Basic configuration
+            hardware_config = {
+                "cpu_cores": random.choice([2, 4]),
+                "memory_gb": random.choice([4, 8]),
+                "gpu_memory": random.choice([1, 2]),
+                "storage_type": "hdd",
+                "network_speed": random.choice([10, 25, 50]),  # Mbps
+                "screen_resolution": random.choice(["1366x768", "1440x900"]),
+                "battery_level": random.randint(20, 80),
+                "performance_level": "basic"
+            }
+        elif complexity == "moderate":
+            # Moderate hardware: Mid-range configuration
+            hardware_config = {
+                "cpu_cores": random.choice([4, 6, 8]),
+                "memory_gb": random.choice([8, 16]),
+                "gpu_memory": random.choice([2, 4, 6]),
+                "storage_type": random.choice(["hdd", "ssd"]),
+                "network_speed": random.choice([50, 100, 200]),  # Mbps
+                "screen_resolution": random.choice(["1920x1080", "2560x1440"]),
+                "battery_level": random.randint(30, 90),
+                "performance_level": "mid_range"
+            }
+        elif complexity == "complex":
+            # Complex hardware: High-end configuration
+            hardware_config = {
+                "cpu_cores": random.choice([8, 12, 16]),
+                "memory_gb": random.choice([16, 32, 64]),
+                "gpu_memory": random.choice([6, 8, 12, 16]),
+                "storage_type": "ssd",
+                "network_speed": random.choice([200, 500, 1000]),  # Mbps
+                "screen_resolution": random.choice(["2560x1440", "3840x2160"]),
+                "battery_level": random.randint(40, 95),
+                "performance_level": "high_end"
+            }
+        
+        # Merge configurations
+        hardware_profile = {**base_config, **hardware_config}
+        
+        # Add complexity-specific features
+        if complexity == "complex":
+            hardware_profile.update({
+                "advanced_features": True,
+                "sensor_support": True,
+                "high_performance_mode": True,
+                "multiple_displays": random.choice([True, False])
+            })
+        else:
+            hardware_profile.update({
+                "advanced_features": False,
+                "sensor_support": False,
+                "high_performance_mode": False,
+                "multiple_displays": False
+            })
         
         return hardware_profile
     
@@ -319,17 +349,17 @@ class HardwareEmulator:
         # CPU and memory emulation
         cpu_script = f"""
         Object.defineProperty(navigator, 'hardwareConcurrency', {{
-            get: () => {profile['cpu']['cores']}
+            get: () => {profile['cpu_cores']}
         }});
         
         Object.defineProperty(navigator, 'deviceMemory', {{
-            get: () => {profile['memory']['size_gb']}
+            get: () => {profile['memory_gb']}
         }});
         """
         scripts.append(cpu_script)
         
         # Screen characteristics
-        width, height = profile['display']['resolution'].split('x')
+        width, height = profile['screen_resolution'].split('x')
         screen_script = f"""
         Object.defineProperty(screen, 'width', {{
             get: () => {width}
@@ -340,11 +370,11 @@ class HardwareEmulator:
         }});
         
         Object.defineProperty(screen, 'colorDepth', {{
-            get: () => {profile['display']['color_depth']}
+            get: () => {profile['color_depths']}
         }});
         
         Object.defineProperty(window, 'devicePixelRatio', {{
-            get: () => {profile['display']['pixel_ratio']}
+            get: () => {profile['pixel_ratios']}
         }});
         """
         scripts.append(screen_script)
@@ -353,19 +383,19 @@ class HardwareEmulator:
         network_script = f"""
         if (navigator.connection) {{
             Object.defineProperty(navigator.connection, 'effectiveType', {{
-                get: () => '{profile['network']['effective_type']}'
+                get: () => '{profile['network_profile']['effective_type']}'
             }});
             
             Object.defineProperty(navigator.connection, 'rtt', {{
-                get: () => {profile['network']['rtt']}
+                get: () => {profile['network_profile']['rtt']}
             }});
             
             Object.defineProperty(navigator.connection, 'downlink', {{
-                get: () => {profile['network']['downlink']}
+                get: () => {profile['network_speed']}
             }});
             
             Object.defineProperty(navigator.connection, 'saveData', {{
-                get: () => {str(profile['network']['save_data']).lower()}
+                get: () => {str(profile['network_profile']['save_data']).lower()}
             }});
         }}
         """
@@ -376,10 +406,10 @@ class HardwareEmulator:
         if (navigator.getBattery) {{
             navigator.getBattery = function() {{
                 return Promise.resolve({{
-                    charging: {str(profile['battery']['charging']).lower()},
-                    level: {profile['battery']['level']},
-                    chargingTime: {profile['battery']['charging_time']},
-                    dischargingTime: {profile['battery']['discharging_time']}
+                    charging: {str(profile['battery_level'] > 50).lower()},
+                    level: {profile['battery_level']},
+                    chargingTime: {profile['charging_time']},
+                    dischargingTime: {profile['discharging_time']}
                 }});
             }};
         }}
@@ -391,13 +421,13 @@ class HardwareEmulator:
         // Emulate sensor availability
         if ('Accelerometer' in window) {{
             Object.defineProperty(window, 'Accelerometer', {{
-                get: () => {str(profile['sensors']['accelerometer']).lower()} ? Accelerometer : undefined
+                get: () => {str(profile['accelerometer']).lower()} ? Accelerometer : undefined
             }});
         }}
         
         if ('Gyroscope' in window) {{
             Object.defineProperty(window, 'Gyroscope', {{
-                get: () => {str(profile['sensors']['gyroscope']).lower()} ? Gyroscope : undefined
+                get: () => {str(profile['gyroscope']).lower()} ? Gyroscope : undefined
             }});
         }}
         """
@@ -474,16 +504,16 @@ class HardwareEmulator:
         warnings = []
         
         # Check CPU and memory consistency
-        if profile['cpu']['cores'] > 16 and profile['memory']['size_gb'] < 8:
+        if profile['cpu_cores'] > 16 and profile['memory_gb'] < 8:
             issues.append("High CPU core count with low memory is unrealistic")
         
         # Check GPU memory consistency
-        if profile['gpu']['memory_mb'] > 4096 and profile['memory']['size_gb'] < 16:
+        if profile['gpu_memory'] > 4096 and profile['memory_gb'] < 16:
             warnings.append("High GPU memory with low system memory may be unrealistic")
         
         # Check screen resolution consistency
-        width, height = map(int, profile['display']['resolution'].split('x'))
-        if width * height > 4000000 and profile['gpu']['memory_mb'] < 1024:
+        width, height = map(int, profile['screen_resolution'].split('x'))
+        if width * height > 4000000 and profile['gpu_memory'] < 1024:
             warnings.append("High resolution with low GPU memory may cause performance issues")
         
         return {

@@ -290,3 +290,251 @@ class HumanSimulator:
             interaction_type = interaction.get("type", "unknown")
             types[interaction_type] = types.get(interaction_type, 0) + 1
         return types
+
+    def simulate_reading_session_with_complexity(self, session_data: Dict, reading_time_min: int = 240, 
+                                               reading_time_max: int = 420, behavioral_profile: Dict = None, 
+                                               session_complexity: str = "moderate") -> Dict:
+        """Simulate reading session with complexity-based behavior variation"""
+        session_data = session_data.copy()
+        session_data["start_time"] = time.time()
+        session_data["page_views"] = 0
+        session_data["interactions"] = []
+        session_data["success"] = True
+        session_data["session_complexity"] = session_complexity
+        
+        try:
+            self.logger.info(f"Starting {session_complexity} reading session for profile {session_data.get('profile_id', 'unknown')}")
+            
+            # Complexity-based session structure
+            if session_complexity == "simple":
+                # Simple session: Single page visit
+                reading_time = random.randint(reading_time_min // 2, reading_time_max // 2)  # Shorter reading time
+                self.simulate_article_reading_with_complexity(session_data, reading_time, behavioral_profile, "simple")
+                session_data["page_views"] = 1
+                
+            elif session_complexity == "moderate":
+                # Moderate session: Multiple page visits with navigation
+                reading_time = random.randint(reading_time_min, reading_time_max)
+                self.simulate_article_reading_with_complexity(session_data, reading_time, behavioral_profile, "moderate")
+                session_data["page_views"] = 2
+                
+                # Add navigation between articles
+                if random.random() < 0.7:  # 70% chance to navigate
+                    navigation_delay = random.uniform(5, 15)
+                    time.sleep(navigation_delay)
+                    
+                    # Read second article
+                    reading_time_2 = random.randint(reading_time_min // 2, reading_time_max // 2)
+                    self.simulate_article_reading_with_complexity(session_data, reading_time_2, behavioral_profile, "moderate")
+                    session_data["page_views"] = 3
+                
+            elif session_complexity == "complex":
+                # Complex session: Multiple pages with rich interactions
+                reading_time = random.randint(reading_time_min, reading_time_max + 120)  # Longer reading time
+                self.simulate_article_reading_with_complexity(session_data, reading_time, behavioral_profile, "complex")
+                session_data["page_views"] = 2
+                
+                # Add multiple navigation steps
+                for nav_step in range(random.randint(1, 3)):
+                    navigation_delay = random.uniform(10, 30)
+                    time.sleep(navigation_delay)
+                    
+                    # Read additional articles
+                    reading_time_nav = random.randint(reading_time_min // 3, reading_time_max // 2)
+                    self.simulate_article_reading_with_complexity(session_data, reading_time_nav, behavioral_profile, "complex")
+                    session_data["page_views"] += 1
+                    
+                    # Add complex interactions
+                    if random.random() < 0.6:  # 60% chance for complex interactions
+                        self.simulate_complex_interactions(session_data, behavioral_profile)
+            
+            session_data["duration"] = time.time() - session_data["start_time"]
+            self.logger.info(f"{session_complexity.capitalize()} session completed: {session_data['duration']:.2f}s, {session_data['page_views']} pageviews")
+            
+        except Exception as e:
+            self.logger.error(f"Error in {session_complexity} reading session: {str(e)}")
+            session_data["success"] = False
+            session_data["error"] = str(e)
+        
+        return session_data
+    
+    def simulate_article_reading_with_complexity(self, session_data: Dict, reading_time: int, 
+                                               behavioral_profile: Dict = None, complexity: str = "moderate"):
+        """Simulate article reading with complexity-based behavior"""
+        start_time = time.time()
+        
+        # Complexity-based reading patterns
+        if complexity == "simple":
+            # Simple: Basic scrolling
+            while time.time() - start_time < reading_time:
+                self.simulate_basic_scroll(session_data)
+                pause_time = random.uniform(15, 45)
+                time.sleep(pause_time)
+                
+        elif complexity == "moderate":
+            # Moderate: Varied interactions
+            while time.time() - start_time < reading_time:
+                action = random.choice(["scroll", "pause", "interact"])
+                
+                if action == "scroll":
+                    self.simulate_realistic_scroll(session_data)
+                elif action == "pause":
+                    pause_time = random.uniform(20, 60)
+                    time.sleep(pause_time)
+                elif action == "interact":
+                    if random.random() < 0.3:  # 30% chance
+                        self.simulate_random_interaction(session_data)
+                
+                # Add occasional longer pauses
+                if random.random() < 0.2:  # 20% chance
+                    long_pause = random.uniform(30, 90)
+                    time.sleep(long_pause)
+                
+        elif complexity == "complex":
+            # Complex: Rich interactions and behaviors
+            while time.time() - start_time < reading_time:
+                action = random.choice(["scroll", "pause", "interact", "highlight", "note"])
+                
+                if action == "scroll":
+                    self.simulate_advanced_scroll(session_data)
+                elif action == "pause":
+                    pause_time = random.uniform(25, 75)
+                    time.sleep(pause_time)
+                elif action == "interact":
+                    if random.random() < 0.5:  # 50% chance
+                        self.simulate_complex_interaction(session_data, behavioral_profile)
+                elif action == "highlight":
+                    if random.random() < 0.2:  # 20% chance
+                        self.simulate_text_highlighting(session_data)
+                elif action == "note":
+                    if random.random() < 0.1:  # 10% chance
+                        self.simulate_note_taking(session_data)
+                
+                # Add thinking pauses
+                if random.random() < 0.3:  # 30% chance
+                    thinking_pause = random.uniform(45, 120)
+                    time.sleep(thinking_pause)
+    
+    def simulate_basic_scroll(self, session_data: Dict):
+        """Simulate basic scrolling behavior"""
+        scroll_distance = random.randint(100, 300)
+        scroll_duration = random.uniform(0.5, 2.0)
+        
+        # Add to interactions
+        session_data["interactions"].append({
+            "type": "scroll",
+            "distance": scroll_distance,
+            "duration": scroll_duration,
+            "timestamp": time.time()
+        })
+    
+    def simulate_realistic_scroll(self, session_data: Dict):
+        """Simulate realistic scrolling with variations"""
+        # Variable scroll patterns
+        scroll_pattern = random.choice(["smooth", "jerky", "hesitant"])
+        
+        if scroll_pattern == "smooth":
+            scroll_distance = random.randint(200, 500)
+            scroll_duration = random.uniform(1.0, 3.0)
+        elif scroll_pattern == "jerky":
+            scroll_distance = random.randint(50, 200)
+            scroll_duration = random.uniform(0.3, 1.0)
+        else:  # hesitant
+            scroll_distance = random.randint(100, 250)
+            scroll_duration = random.uniform(2.0, 4.0)
+        
+        session_data["interactions"].append({
+            "type": "scroll",
+            "pattern": scroll_pattern,
+            "distance": scroll_distance,
+            "duration": scroll_duration,
+            "timestamp": time.time()
+        })
+    
+    def simulate_advanced_scroll(self, session_data: Dict):
+        """Simulate advanced scrolling with complex patterns"""
+        # Multi-directional scrolling
+        scroll_type = random.choice(["down", "up", "bounce", "search"])
+        
+        if scroll_type == "down":
+            scroll_distance = random.randint(300, 800)
+            scroll_duration = random.uniform(1.5, 4.0)
+        elif scroll_type == "up":
+            scroll_distance = random.randint(100, 400)
+            scroll_duration = random.uniform(1.0, 2.5)
+        elif scroll_type == "bounce":
+            # Bounce back and forth
+            scroll_distance = random.randint(50, 200)
+            scroll_duration = random.uniform(0.5, 1.5)
+        else:  # search
+            scroll_distance = random.randint(200, 600)
+            scroll_duration = random.uniform(2.0, 5.0)
+        
+        session_data["interactions"].append({
+            "type": "advanced_scroll",
+            "scroll_type": scroll_type,
+            "distance": scroll_distance,
+            "duration": scroll_duration,
+            "timestamp": time.time()
+        })
+    
+    def simulate_complex_interaction(self, session_data: Dict, behavioral_profile: Dict = None):
+        """Simulate complex user interactions"""
+        interaction_type = random.choice(["hover", "click", "select", "copy"])
+        
+        if interaction_type == "hover":
+            hover_duration = random.uniform(1.0, 5.0)
+            session_data["interactions"].append({
+                "type": "hover",
+                "duration": hover_duration,
+                "timestamp": time.time()
+            })
+        elif interaction_type == "click":
+            click_type = random.choice(["link", "button", "image"])
+            session_data["interactions"].append({
+                "type": "click",
+                "click_type": click_type,
+                "timestamp": time.time()
+            })
+        elif interaction_type == "select":
+            selection_length = random.randint(10, 100)
+            session_data["interactions"].append({
+                "type": "text_selection",
+                "length": selection_length,
+                "timestamp": time.time()
+            })
+        elif interaction_type == "copy":
+            session_data["interactions"].append({
+                "type": "copy_action",
+                "timestamp": time.time()
+            })
+    
+    def simulate_text_highlighting(self, session_data: Dict):
+        """Simulate text highlighting behavior"""
+        highlight_length = random.randint(5, 50)
+        highlight_duration = random.uniform(0.5, 2.0)
+        
+        session_data["interactions"].append({
+            "type": "highlight",
+            "length": highlight_length,
+            "duration": highlight_duration,
+            "timestamp": time.time()
+        })
+    
+    def simulate_note_taking(self, session_data: Dict):
+        """Simulate note-taking behavior"""
+        note_type = random.choice(["bookmark", "note", "share"])
+        
+        session_data["interactions"].append({
+            "type": "note_taking",
+            "note_type": note_type,
+            "timestamp": time.time()
+        })
+    
+    def simulate_complex_interactions(self, session_data: Dict, behavioral_profile: Dict = None):
+        """Simulate multiple complex interactions"""
+        num_interactions = random.randint(1, 3)
+        
+        for _ in range(num_interactions):
+            self.simulate_complex_interaction(session_data, behavioral_profile)
+            time.sleep(random.uniform(0.5, 2.0))  # Small delay between interactions

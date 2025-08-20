@@ -14,3 +14,88 @@
 2025-08-20 12:59:19,330 - __main__ - INFO - Content intelligence summary: 0 analyses, avg quality: 0.00
 2025-08-20 12:59:19,330 - __main__ - INFO - Behavioral biometrics summary: 5 profiles, session history: 0
 2025-08-20 12:59:19,331 - __main__ - INFO - Temporal pattern summary: 5 profiles, session history: 0
+2025-08-20 13:24:30,047 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x1429ccdc0>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 13:24:30,053 - core.ml_adaptive_engine - INFO - Models loaded successfully
+2025-08-20 13:24:30,054 - __main__ - INFO - Ultra-advanced undetectable components initialized
+2025-08-20 13:24:30,054 - __main__ - INFO - Multi-Login Bot Orchestrator initialized
+2025-08-20 13:24:30,054 - __main__ - INFO - Starting daily visits: 1
+2025-08-20 13:24:30,054 - __main__ - INFO - Running sequential execution
+2025-08-20 13:24:30,054 - __main__ - WARNING - No available proxies found. Provider: socksescort
+2025-08-20 13:24:30,054 - __main__ - WARNING - Not enough available proxies. Need 1, have 0
+2025-08-20 13:24:30,054 - __main__ - INFO - Using dynamic entry point target: https://your-target-website.com
+2025-08-20 13:24:30,054 - __main__ - INFO - Sequential daily visits completed: 0/0 successful
+2025-08-20 13:24:35,059 - __main__ - INFO - Network behavior summary: 0 switches, stability score: 0.00
+2025-08-20 13:24:35,060 - __main__ - INFO - Proxy Manager summary: 0 proxies, provider: socksescort, active: 0
+2025-08-20 13:24:35,060 - __main__ - INFO - ML Learning summary: 0 sessions, success rate: 0.50
+2025-08-20 13:24:35,060 - __main__ - INFO - Social proof summary: 0 interactions, total impact: 0.00
+2025-08-20 13:24:35,060 - __main__ - INFO - Content intelligence summary: 0 analyses, avg quality: 0.00
+2025-08-20 13:24:35,060 - __main__ - INFO - Behavioral biometrics summary: 5 profiles, session history: 0
+2025-08-20 13:24:35,060 - __main__ - INFO - Temporal pattern summary: 5 profiles, session history: 0
+2025-08-20 13:37:46,066 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x1594bc1c0>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 13:37:46,072 - core.ml_adaptive_engine - INFO - Models loaded successfully
+2025-08-20 13:37:46,073 - __main__ - INFO - Ultra-advanced undetectable components initialized
+2025-08-20 13:37:46,073 - __main__ - INFO - Multi-Login Bot Orchestrator initialized
+2025-08-20 13:37:46,073 - __main__ - INFO - Starting daily visits: 1
+2025-08-20 13:37:46,073 - __main__ - INFO - Running sequential execution
+2025-08-20 13:37:46,073 - __main__ - WARNING - No available proxies found. Provider: socksescort
+2025-08-20 13:37:46,073 - __main__ - WARNING - Not enough available proxies. Need 1, have 0
+2025-08-20 13:37:46,073 - __main__ - INFO - Using dynamic entry point target: https://your-target-website.com
+2025-08-20 13:37:46,073 - __main__ - INFO - Sequential daily visits completed: 0/0 successful
+2025-08-20 13:37:51,079 - __main__ - INFO - Network behavior summary: 0 switches, stability score: 0.00
+2025-08-20 13:37:51,079 - __main__ - INFO - Proxy Manager summary: 0 proxies, provider: socksescort, active: 0
+2025-08-20 13:37:51,079 - __main__ - INFO - ML Learning summary: 0 sessions, success rate: 0.50
+2025-08-20 13:37:51,079 - __main__ - INFO - Social proof summary: 0 interactions, total impact: 0.00
+2025-08-20 13:37:51,079 - __main__ - INFO - Content intelligence summary: 0 analyses, avg quality: 0.00
+2025-08-20 13:37:51,079 - __main__ - INFO - Behavioral biometrics summary: 5 profiles, session history: 0
+2025-08-20 13:37:51,079 - __main__ - INFO - Temporal pattern summary: 5 profiles, session history: 0
+2025-08-20 13:49:51,170 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x127610a30>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 13:49:51,176 - core.ml_adaptive_engine - INFO - Models loaded successfully
+2025-08-20 13:49:51,177 - __main__ - INFO - Ultra-advanced undetectable components initialized
+2025-08-20 13:49:51,177 - __main__ - INFO - Multi-Login Bot Orchestrator initialized
+2025-08-20 13:49:51,177 - __main__ - INFO - Starting daily visits: 1
+2025-08-20 13:49:51,177 - __main__ - INFO - Running sequential execution
+2025-08-20 13:49:51,177 - __main__ - WARNING - No available proxies found. Provider: socksescort
+2025-08-20 13:49:51,177 - __main__ - WARNING - Not enough available proxies. Need 1, have 0
+2025-08-20 13:49:51,177 - __main__ - INFO - Using dynamic entry point target: https://your-target-website.com
+2025-08-20 13:49:51,177 - __main__ - INFO - Sequential daily visits completed: 0/0 successful
+2025-08-20 13:49:56,179 - __main__ - INFO - Network behavior summary: 0 switches, stability score: 0.00
+2025-08-20 13:49:56,179 - __main__ - INFO - Proxy Manager summary: 0 proxies, provider: socksescort, active: 0
+2025-08-20 13:49:56,179 - __main__ - INFO - ML Learning summary: 0 sessions, success rate: 0.50
+2025-08-20 13:49:56,179 - __main__ - INFO - Social proof summary: 0 interactions, total impact: 0.00
+2025-08-20 13:49:56,179 - __main__ - INFO - Content intelligence summary: 0 analyses, avg quality: 0.00
+2025-08-20 13:49:56,179 - __main__ - INFO - Behavioral biometrics summary: 5 profiles, session history: 0
+2025-08-20 13:49:56,179 - __main__ - INFO - Temporal pattern summary: 5 profiles, session history: 0
+2025-08-20 14:13:50,446 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x15980a520>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 14:13:50,453 - core.ml_adaptive_engine - INFO - Models loaded successfully
+2025-08-20 14:13:50,453 - __main__ - INFO - Ultra-advanced undetectable components initialized
+2025-08-20 14:13:50,453 - __main__ - INFO - Multi-Login Bot Orchestrator initialized
+2025-08-20 14:13:50,453 - __main__ - INFO - Starting daily visits: 1
+2025-08-20 14:13:50,453 - __main__ - INFO - Running sequential execution
+2025-08-20 14:13:50,453 - __main__ - WARNING - No available proxies found. Provider: socksescort
+2025-08-20 14:13:50,454 - __main__ - WARNING - Not enough available proxies. Need 1, have 0
+2025-08-20 14:13:50,454 - __main__ - INFO - Using dynamic entry point target: https://your-target-website.com
+2025-08-20 14:13:50,454 - __main__ - INFO - Sequential daily visits completed: 0/0 successful
+2025-08-20 14:13:55,456 - __main__ - INFO - Network behavior summary: 0 switches, stability score: 0.00
+2025-08-20 14:13:55,457 - __main__ - INFO - Proxy Manager summary: 0 proxies, provider: socksescort, active: 0
+2025-08-20 14:13:55,457 - __main__ - INFO - ML Learning summary: 0 sessions, success rate: 0.50
+2025-08-20 14:13:55,457 - __main__ - INFO - Social proof summary: 0 interactions, total impact: 0.00
+2025-08-20 14:13:55,457 - __main__ - INFO - Content intelligence summary: 0 analyses, avg quality: 0.00
+2025-08-20 14:13:55,457 - __main__ - INFO - Behavioral biometrics summary: 5 profiles, session history: 0
+2025-08-20 14:13:55,457 - __main__ - INFO - Temporal pattern summary: 5 profiles, session history: 0
+2025-08-20 14:19:10,332 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x12fc08520>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 14:19:10,338 - core.ml_adaptive_engine - INFO - Models loaded successfully
+2025-08-20 14:19:10,339 - __main__ - INFO - Ultra-advanced undetectable components initialized
+2025-08-20 14:19:10,339 - __main__ - INFO - Multi-Login Bot Orchestrator initialized
+2025-08-20 14:19:10,339 - __main__ - INFO - Starting daily visits: 1
+2025-08-20 14:19:10,339 - __main__ - INFO - Running sequential execution
+2025-08-20 14:19:10,339 - __main__ - WARNING - No available proxies found. Provider: socksescort
+2025-08-20 14:19:10,339 - __main__ - WARNING - Not enough available proxies. Need 1, have 0
+2025-08-20 14:19:10,339 - __main__ - INFO - Using dynamic entry point target: https://your-target-website.com
+2025-08-20 14:19:10,339 - __main__ - INFO - Sequential daily visits completed: 0/0 successful
+2025-08-20 14:19:15,345 - __main__ - INFO - Network behavior summary: 0 switches, stability score: 0.00
+2025-08-20 14:19:15,345 - __main__ - INFO - Proxy Manager summary: 0 proxies, provider: socksescort, active: 0
+2025-08-20 14:19:15,345 - __main__ - INFO - ML Learning summary: 0 sessions, success rate: 0.50
+2025-08-20 14:19:15,345 - __main__ - INFO - Social proof summary: 0 interactions, total impact: 0.00
+2025-08-20 14:19:15,345 - __main__ - INFO - Content intelligence summary: 0 analyses, avg quality: 0.00
+2025-08-20 14:19:15,345 - __main__ - INFO - Behavioral biometrics summary: 5 profiles, session history: 0
+2025-08-20 14:19:15,345 - __main__ - INFO - Temporal pattern summary: 5 profiles, session history: 0

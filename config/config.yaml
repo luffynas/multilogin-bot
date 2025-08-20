@@ -9,13 +9,22 @@
 multilogin:
   api_key: "YOUR_MULTILOGIN_API_KEY"  # ⚠️ REPLACE WITH YOUR ACTUAL API KEY
   base_url: "http://localhost:35000"
-  max_concurrent_profiles: 5  # Reduced for testing
+  max_concurrent_profiles: 20  # Increased for high-volume processing
   profile_timeout: 1800  # 30 minutes
+
+# Concurrent Execution Configuration
+concurrent_execution:
+  enabled: true  # Enable concurrent execution for high-volume processing
+  max_concurrent_profiles: 20  # Maximum concurrent profiles (adjust based on system resources)
+  thread_safety: true  # Enable thread safety for shared resources
+  batch_processing: true  # Enable batch processing for large proxy pools
+  batch_size: 50  # Number of sessions per batch
+  batch_delay: 300  # Delay between batches (5 minutes)
 
 proxy:
   provider: "socksescort"  # Supported: oxylabs, brightdata, socksescort, nodemaven, decodo, proxyempire, netnut, soax, iproyal
   type: "socks5"
-  total_count: 100  # Reduced for testing
+  total_count: 1000  # Increased to 1000 proxies for high-volume processing
   daily_limit_per_proxy: 1
   health_check_interval: 180  # 3 minutes
   success_rate_min: 0.9       # 90% success rate requirement
@@ -117,10 +126,10 @@ target_website:
   reading_time_max: 420  # 7 minutes
 
 behavior:
-  daily_visits_min: 2     # Reduced for testing
-  daily_visits_max: 5     # Reduced for testing
-  session_delay_min: 60   # 1 minute between sessions
-  session_delay_max: 180  # 3 minutes between sessions
+  daily_visits_min: 100    # Increased for high-volume processing
+  daily_visits_max: 200    # Increased for high-volume processing
+  session_delay_min: 10    # Reduced delay for concurrent execution
+  session_delay_max: 30    # Reduced delay for concurrent execution
   scroll_interval_min: 10
   scroll_interval_max: 30
 
@@ -203,16 +212,17 @@ undetectable_traffic:
     connection_api_spoofing: true
     performance_timing_randomization: true
 
-# AdSense Testing Monitor Settings
+# AdSense Testing Monitor Settings with HIGH CPC Focus
 adsense_testing:
   enabled: true
   safety_thresholds:
     max_daily_sessions: 50
-    max_revenue_per_session: 0.01  # $0.01
+    max_revenue_per_session: 0.02  # $0.02 (realistic)
     max_ctr_per_session: 0.05      # 5%
     min_session_duration: 240      # 4 minutes
     max_hourly_sessions: 10
     min_session_spacing: 60        # 1 minute
+    target_cpc_threshold: 0.10     # Target $0.10+ CPC (realistic)
   suspicious_pattern_detection:
     enabled: true
     rapid_clicking_threshold: 10   # clicks per minute
@@ -222,6 +232,30 @@ adsense_testing:
     enabled: true
     report_generation: true
     alert_threshold: 0.8  # 80% suspicious behavior
+  
+  # HIGH CPC Focus Configuration - STEALTH FOCUSED
+  high_cpc_focus:
+    enabled: true
+    
+    display_ad_positions:
+      - "top"
+      - "sidebar"
+      - "in-content"
+      - "bottom"
+    
+    impression_time_strategies:
+      minimum_view_time: 10      # 10 seconds minimum (realistic)
+      optimal_view_time: 20      # 20 seconds optimal (realistic)
+      maximum_view_time: 60      # 1 minute maximum (realistic)
+      scroll_into_view_probability: 0.2  # 20% chance (realistic)
+      hover_over_ad_probability: 0.1     # 10% chance (realistic)
+      click_probability: 0.001           # 0.1% chance (realistic for display ads)
+    
+    revenue_optimization:
+      premium_content_focus: true
+      high_value_keywords: true
+      long_session_optimization: true
+      natural_engagement: true
 
 # Logging Configuration
 logging:
