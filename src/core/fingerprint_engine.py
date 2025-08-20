@@ -99,10 +99,10 @@ class FingerprintEngine:
             }
         }
         
-        # Default configuration
+        # Default configuration (US-based)
         self.default_config = {
-            "timezone": "Asia/Jakarta",
-            "language": "id-ID",
+            "timezone": "America/New_York",
+            "language": "en-US",
             "screen_resolution": "1920x1080",
             "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             "webgl_vendor": "Google Inc. (Intel)",
@@ -113,7 +113,7 @@ class FingerprintEngine:
         """Detect geo location from proxy configuration"""
         # This would typically use a geo-IP service
         # For now, we'll use a simple mapping or random selection
-        geo_options = ["ID", "US", "GB"]
+        geo_options = ["US", "ID", "GB"]
         
         if "geo" in proxy_config:
             return proxy_config["geo"]

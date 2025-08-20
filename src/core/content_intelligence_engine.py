@@ -32,6 +32,14 @@ class ContentIntelligenceEngine:
         self.config = config
         self.logger = logging.getLogger(__name__)
         
+        # Load configurable target categories
+        self.content_analysis_config = config.get("content_analysis", {})
+        self.target_categories = self.content_analysis_config.get("target_categories", [
+            "technology", "lifestyle", "business", "entertainment", "education"
+        ])
+        self.category_weights = self.content_analysis_config.get("category_weights", {})
+        self.category_patterns = self.content_analysis_config.get("category_patterns", {})
+        
         # Content analysis models
         self.content_patterns = self.load_content_patterns()
         self.reading_patterns = self.load_reading_patterns()
@@ -45,6 +53,8 @@ class ContentIntelligenceEngine:
         # Real-time analysis
         self.current_content = None
         self.content_metrics = {}
+        
+        self.logger.info(f"Content Intelligence Engine initialized with {len(self.target_categories)} target categories")
         
     def load_content_patterns(self) -> Dict:
         """Load content analysis patterns"""
@@ -81,38 +91,7 @@ class ContentIntelligenceEngine:
                     "interaction_probability": 0.5
                 }
             },
-            "topic_categories": {
-                "technology": {
-                    "interest_level": 0.8,
-                    "reading_speed": "medium",
-                    "interaction_type": "analytical",
-                    "share_probability": 0.6
-                },
-                "lifestyle": {
-                    "interest_level": 0.7,
-                    "reading_speed": "fast",
-                    "interaction_type": "emotional",
-                    "share_probability": 0.8
-                },
-                "business": {
-                    "interest_level": 0.9,
-                    "reading_speed": "slow",
-                    "interaction_type": "professional",
-                    "share_probability": 0.4
-                },
-                "entertainment": {
-                    "interest_level": 0.6,
-                    "reading_speed": "fast",
-                    "interaction_type": "casual",
-                    "share_probability": 0.7
-                },
-                "education": {
-                    "interest_level": 0.8,
-                    "reading_speed": "slow",
-                    "interaction_type": "studious",
-                    "share_probability": 0.5
-                }
-            },
+            "topic_categories": self.get_topic_categories_patterns(),
             "complexity_levels": {
                 "simple": {
                     "reading_speed": "fast",
@@ -293,33 +272,183 @@ class ContentIntelligenceEngine:
             return "article"  # Default
     
     def categorize_topic(self, content_data: Dict) -> str:
-        """Categorize content topic"""
+        """Categorize content topic using configurable target categories"""
         title = content_data.get("title", "")
         content = content_data.get("content", "")
         keywords = content_data.get("keywords", [])
         
-        # Topic keywords
-        topic_keywords = {
-            "technology": ["ai", "tech", "software", "digital", "innovation", "startup"],
-            "lifestyle": ["health", "fitness", "food", "travel", "fashion", "wellness"],
-            "business": ["business", "entrepreneur", "marketing", "finance", "strategy"],
-            "entertainment": ["movie", "music", "game", "celebrity", "show", "fun"],
-            "education": ["learn", "study", "course", "tutorial", "knowledge", "skill"]
-        }
+        # Load topic keywords for configurable categories
+        topic_keywords = self.load_topic_keywords_for_categories()
         
         # Analyze text for topic keywords
         text = (title + " " + content).lower()
         topic_scores = {}
         
-        for topic, keywords_list in topic_keywords.items():
-            score = sum(1 for keyword in keywords_list if keyword in text)
-            topic_scores[topic] = score
+        # Only analyze configured target categories
+        for topic in self.target_categories:
+            if topic in topic_keywords:
+                keywords_list = topic_keywords[topic]
+                score = sum(1 for keyword in keywords_list if keyword in text)
+                topic_scores[topic] = score
         
-        # Return topic with highest score
-        if topic_scores:
+        # Apply category weights if configured
+        if self.category_weights and topic_scores:
+            return self.select_weighted_category(topic_scores)
+        elif topic_scores:
+            # Return topic with highest score
             return max(topic_scores, key=topic_scores.get)
         else:
             return "general"
+    
+    def load_topic_keywords_for_categories(self) -> Dict[str, List[str]]:
+        """Load topic keywords for configurable target categories"""
+        return {
+            "technology": ["ai", "tech", "software", "digital", "innovation", "startup", "programming", "coding", "app", "web", "mobile", "cloud", "data", "algorithm"],
+            "lifestyle": ["health", "fitness", "food", "travel", "fashion", "wellness", "diet", "exercise", "beauty", "style", "home", "family", "relationship"],
+            "business": ["business", "entrepreneur", "marketing", "finance", "strategy", "management", "leadership", "startup", "investment", "sales", "growth", "profit"],
+            "entertainment": ["movie", "music", "game", "celebrity", "show", "fun", "film", "song", "artist", "actor", "actress", "concert", "festival", "comedy"],
+            "education": ["learn", "study", "course", "tutorial", "knowledge", "skill", "training", "school", "university", "college", "degree", "certificate", "online"],
+            "finance": ["money", "investment", "banking", "loan", "credit", "debt", "saving", "budget", "financial", "economy", "stock", "trading", "insurance"],
+            "health": ["medical", "doctor", "hospital", "treatment", "medicine", "disease", "symptom", "diagnosis", "therapy", "recovery", "prevention", "wellness"],
+            "sports": ["football", "basketball", "tennis", "soccer", "baseball", "golf", "swimming", "running", "fitness", "athlete", "team", "championship", "tournament"],
+            "news": ["breaking", "latest", "update", "announcement", "report", "investigation", "analysis", "opinion", "editorial", "headline", "story"],
+            "travel": ["vacation", "trip", "destination", "hotel", "flight", "booking", "resort", "beach", "mountain", "city", "country", "culture", "adventure"]
+        }
+    
+    def select_weighted_category(self, topic_scores: Dict[str, int]) -> str:
+        """Select category using weighted probability based on scores and configured weights"""
+        if not self.category_weights:
+            return max(topic_scores, key=topic_scores.get)
+        
+        # Calculate weighted scores
+        weighted_scores = {}
+        total_weight = 0
+        
+        for topic, score in topic_scores.items():
+            weight = self.category_weights.get(topic, 0.1)  # Default weight if not configured
+            weighted_score = score * weight
+            weighted_scores[topic] = weighted_score
+            total_weight += weighted_score
+        
+        if total_weight == 0:
+            # Fallback to unweighted selection
+            return max(topic_scores, key=topic_scores.get)
+        
+        # Normalize weights
+        normalized_weights = {}
+        for topic, weighted_score in weighted_scores.items():
+            normalized_weights[topic] = weighted_score / total_weight
+        
+        # Select category using weighted random choice
+        import random
+        categories = list(normalized_weights.keys())
+        weights = list(normalized_weights.values())
+        
+        return random.choices(categories, weights=weights, k=1)[0]
+    
+    def get_topic_categories_patterns(self) -> Dict:
+        """Get topic categories patterns from config or use defaults"""
+        if self.category_patterns:
+            return self.category_patterns
+        
+        # Default patterns if not configured
+        return {
+            "technology": {
+                "interest_level": 0.8,
+                "reading_speed": "medium",
+                "interaction_type": "analytical",
+                "share_probability": 0.6,
+                "engagement_depth": "high"
+            },
+            "lifestyle": {
+                "interest_level": 0.7,
+                "reading_speed": "fast",
+                "interaction_type": "emotional",
+                "share_probability": 0.8,
+                "engagement_depth": "medium"
+            },
+            "business": {
+                "interest_level": 0.9,
+                "reading_speed": "slow",
+                "interaction_type": "professional",
+                "share_probability": 0.4,
+                "engagement_depth": "high"
+            },
+            "entertainment": {
+                "interest_level": 0.6,
+                "reading_speed": "fast",
+                "interaction_type": "casual",
+                "share_probability": 0.7,
+                "engagement_depth": "medium"
+            },
+            "education": {
+                "interest_level": 0.8,
+                "reading_speed": "slow",
+                "interaction_type": "studious",
+                "share_probability": 0.5,
+                "engagement_depth": "high"
+            },
+            "finance": {
+                "interest_level": 0.9,
+                "reading_speed": "slow",
+                "interaction_type": "analytical",
+                "share_probability": 0.3,
+                "engagement_depth": "high"
+            },
+            "health": {
+                "interest_level": 0.8,
+                "reading_speed": "medium",
+                "interaction_type": "careful",
+                "share_probability": 0.6,
+                "engagement_depth": "high"
+            },
+            "sports": {
+                "interest_level": 0.7,
+                "reading_speed": "fast",
+                "interaction_type": "enthusiastic",
+                "share_probability": 0.7,
+                "engagement_depth": "medium"
+            },
+            "news": {
+                "interest_level": 0.8,
+                "reading_speed": "medium",
+                "interaction_type": "informed",
+                "share_probability": 0.5,
+                "engagement_depth": "medium"
+            },
+            "travel": {
+                "interest_level": 0.8,
+                "reading_speed": "medium",
+                "interaction_type": "exploratory",
+                "share_probability": 0.7,
+                "engagement_depth": "medium"
+            }
+        }
+    
+    def get_category_pattern(self, topic: str) -> Dict:
+        """Get behavioral pattern for a specific category"""
+        patterns = self.get_topic_categories_patterns()
+        return patterns.get(topic, {
+            "interest_level": 0.7,
+            "reading_speed": "medium",
+            "interaction_type": "general",
+            "share_probability": 0.5,
+            "engagement_depth": "medium"
+        })
+    
+    def get_random_target_category(self) -> str:
+        """Get a random target category using configured weights"""
+        if not self.target_categories:
+            return "general"
+        
+        if self.category_weights:
+            # Use weighted selection
+            categories = list(self.category_weights.keys())
+            weights = list(self.category_weights.values())
+            return random.choices(categories, weights=weights, k=1)[0]
+        else:
+            # Use uniform selection
+            return random.choice(self.target_categories)
     
     def assess_complexity(self, content_data: Dict) -> str:
         """Assess content complexity level"""

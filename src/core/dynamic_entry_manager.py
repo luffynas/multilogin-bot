@@ -36,6 +36,24 @@ class DynamicEntryManager:
         self.config = config
         self.logger = logging.getLogger(__name__)
         
+        # Load custom keywords configuration
+        self.custom_keywords_config = config.get("dynamic_entry_points", {}).get("custom_keywords", {})
+        self.custom_keywords_enabled = self.custom_keywords_config.get("enabled", False)
+        self.custom_keywords_file = self.custom_keywords_config.get("keywords_file", "config/keywords.json")
+        self.fallback_to_categories = self.custom_keywords_config.get("fallback_to_categories", True)
+        self.merge_with_categories = self.custom_keywords_config.get("merge_with_categories", False)
+        self.keywords_per_category = self.custom_keywords_config.get("keywords_per_category", 10)
+        self.custom_search_engines = self.custom_keywords_config.get("custom_search_engines", [])
+        
+        # Load custom referrer domains configuration
+        self.custom_referrer_config = config.get("dynamic_entry_points", {}).get("custom_referrer_domains", {})
+        self.custom_referrer_enabled = self.custom_referrer_config.get("enabled", False)
+        self.custom_referrer_file = self.custom_referrer_config.get("referrer_file", "config/referrer_domains.json")
+        self.fallback_to_defaults = self.custom_referrer_config.get("fallback_to_defaults", True)
+        self.merge_with_defaults = self.custom_referrer_config.get("merge_with_defaults", False)
+        self.domains_per_category = self.custom_referrer_config.get("domains_per_category", 15)
+        self.geo_specific = self.custom_referrer_config.get("geo_specific", True)
+        
         # Entry point strategies
         self.entry_strategies = self.load_entry_strategies()
         self.traffic_sources = self.load_traffic_sources()
@@ -50,12 +68,31 @@ class DynamicEntryManager:
         self.current_strategy = None
         self.entry_rotation = True
         
+        # Log custom keywords configuration
+        if self.custom_keywords_enabled:
+            self.logger.info(f"Custom keywords enabled: {self.custom_keywords_file}")
+            if self.custom_search_engines:
+                self.logger.info(f"Custom search engines: {', '.join(self.custom_search_engines)}")
+        else:
+            self.logger.info("Using default keywords from target categories")
+        
+        # Log custom referrer domains configuration
+        if self.custom_referrer_enabled:
+            self.logger.info(f"Custom referrer domains enabled: {self.custom_referrer_file}")
+            if self.geo_specific:
+                self.logger.info("Geo-specific referrer domains enabled")
+        else:
+            self.logger.info("Using default referrer domains")
+        
     def load_entry_strategies(self) -> Dict:
         """Load comprehensive entry point strategies"""
+        # Get search engines based on custom configuration
+        search_engines = self.custom_search_engines if self.custom_search_engines else ["google", "bing", "yahoo", "duckduckgo"]
+        
         return {
             "organic_search": {
                 "weight": 0.35,  # 35% of traffic
-                "sources": ["google", "bing", "yahoo", "duckduckgo"],
+                "sources": search_engines,
                 "patterns": {
                     "keywords": self.generate_search_keywords(),
                     "search_types": ["web", "news", "images", "videos"],
@@ -90,7 +127,7 @@ class DynamicEntryManager:
                 "patterns": {
                     "link_types": ["text_link", "banner", "image_link", "button"],
                     "anchor_texts": self.generate_anchor_texts(),
-                    "referrer_domains": self.generate_referrer_domains()
+                    "referrer_domains": self.generate_referrer_domains("US")  # Default geo location
                 }
             },
             "paid_ads": {
@@ -106,27 +143,11 @@ class DynamicEntryManager:
     
     def load_traffic_sources(self) -> Dict:
         """Load realistic traffic sources"""
+        # Get search engines based on custom configuration
+        search_engines_config = self.get_search_engines_config()
+        
         return {
-            "search_engines": {
-                "google": {
-                    "base_url": "https://www.google.com/search",
-                    "parameters": ["q", "hl", "gl", "source", "ie"],
-                    "user_agents": self.get_search_user_agents(),
-                    "referrer_patterns": ["google.com", "google.co.id", "google.com.my"]
-                },
-                "bing": {
-                    "base_url": "https://www.bing.com/search",
-                    "parameters": ["q", "cc", "setlang"],
-                    "user_agents": self.get_search_user_agents(),
-                    "referrer_patterns": ["bing.com", "bing.com/id"]
-                },
-                "yahoo": {
-                    "base_url": "https://search.yahoo.com/search",
-                    "parameters": ["p", "fr", "ei"],
-                    "user_agents": self.get_search_user_agents(),
-                    "referrer_patterns": ["yahoo.com", "search.yahoo.com"]
-                }
-            },
+            "search_engines": search_engines_config,
             "social_platforms": {
                 "facebook": {
                     "base_url": "https://www.facebook.com",
@@ -222,24 +243,173 @@ class DynamicEntryManager:
         }
     
     def generate_search_keywords(self) -> List[str]:
-        """Generate realistic search keywords"""
-        return [
-            # General keywords
-            "artikel menarik", "tips dan trik", "berita terbaru", "informasi penting",
-            "panduan lengkap", "cara mudah", "solusi terbaik", "update terbaru",
+        """Generate search keywords with custom file support"""
+        if self.custom_keywords_enabled:
+            return self.load_custom_keywords()
+        else:
+            return self.generate_keywords_from_categories()
+    
+    def load_custom_keywords(self) -> List[str]:
+        """Load keywords from custom keywords file"""
+        try:
+            with open(self.custom_keywords_file, 'r', encoding='utf-8') as f:
+                custom_keywords_data = json.load(f)
             
-            # Topic-specific keywords
-            "teknologi terbaru", "bisnis online", "investasi crypto", "kesehatan mental",
-            "olahraga fitness", "masakan resep", "travel wisata", "pendidikan belajar",
+            all_keywords = []
             
-            # Long-tail keywords
-            "bagaimana cara membuat", "apa itu", "kapan waktu terbaik",
-            "dimana tempat", "siapa yang", "mengapa penting",
+            if self.merge_with_categories:
+                # Merge custom keywords with category keywords
+                category_keywords = self.generate_keywords_from_categories()
+                all_keywords.extend(category_keywords)
             
-            # Question-based keywords
-            "cara apa", "tips bagaimana", "solusi untuk", "panduan lengkap",
-            "review terbaru", "perbandingan", "rekomendasi terbaik"
-        ]
+            # Add custom keywords
+            for category, keywords in custom_keywords_data.items():
+                if isinstance(keywords, list):
+                    # Limit keywords per category if configured
+                    if self.keywords_per_category > 0:
+                        keywords = keywords[:self.keywords_per_category]
+                    all_keywords.extend(keywords)
+            
+            self.logger.info(f"Loaded {len(all_keywords)} custom keywords from {self.custom_keywords_file}")
+            return all_keywords
+            
+        except FileNotFoundError:
+            self.logger.warning(f"Custom keywords file not found: {self.custom_keywords_file}")
+            if self.fallback_to_categories:
+                self.logger.info("Falling back to category-based keywords")
+                return self.generate_keywords_from_categories()
+            else:
+                return []
+        except Exception as e:
+            self.logger.error(f"Error loading custom keywords: {str(e)}")
+            if self.fallback_to_categories:
+                self.logger.info("Falling back to category-based keywords")
+                return self.generate_keywords_from_categories()
+            else:
+                return []
+    
+    def generate_keywords_from_categories(self) -> List[str]:
+        """Generate search keywords based on target categories"""
+        # Get target categories from config
+        content_analysis_config = self.config.get("content_analysis", {})
+        target_categories = content_analysis_config.get("target_categories", [
+            "technology", "lifestyle", "business", "entertainment", "education"
+        ])
+        
+        # Generate keywords for each category
+        all_keywords = []
+        for category in target_categories:
+            category_keywords = self.generate_category_keywords(category)
+            all_keywords.extend(category_keywords)
+        
+        return all_keywords
+    
+    def generate_category_keywords(self, category: str) -> List[str]:
+        """Generate keywords for a specific category"""
+        category_keywords = {
+            "technology": [
+                "artificial intelligence", "machine learning", "blockchain", "cloud computing",
+                "cybersecurity", "data science", "web development", "mobile apps",
+                "software engineering", "digital transformation", "IoT", "virtual reality"
+            ],
+            "lifestyle": [
+                "healthy living", "fitness tips", "nutrition advice", "mental wellness",
+                "workout routines", "diet plans", "stress management", "work-life balance",
+                "personal development", "mindfulness", "home organization", "fashion trends"
+            ],
+            "business": [
+                "entrepreneurship", "business strategy", "marketing tactics", "financial planning",
+                "leadership skills", "startup advice", "investment tips", "sales techniques",
+                "business growth", "management skills", "digital marketing", "brand building"
+            ],
+            "entertainment": [
+                "movie reviews", "music releases", "gaming news", "celebrity gossip",
+                "TV shows", "streaming services", "concert tickets", "video games",
+                "comedy shows", "theater performances", "podcast recommendations"
+            ],
+            "education": [
+                "online courses", "study tips", "academic writing", "research methods",
+                "learning strategies", "skill development", "certification programs",
+                "tutorial videos", "educational resources", "student life", "career guidance"
+            ],
+            "finance": [
+                "personal finance", "investment strategies", "stock market", "cryptocurrency",
+                "retirement planning", "tax advice", "budgeting tips", "credit management",
+                "insurance options", "real estate investment", "financial planning"
+            ],
+            "health": [
+                "medical advice", "healthcare tips", "disease prevention", "treatment options",
+                "mental health", "nutrition facts", "exercise benefits", "wellness programs",
+                "healthcare technology", "medical research", "alternative medicine"
+            ],
+            "sports": [
+                "football news", "basketball updates", "tennis tournaments", "soccer matches",
+                "baseball games", "golf championships", "swimming competitions", "running events",
+                "fitness training", "sports betting", "athlete profiles"
+            ],
+            "news": [
+                "breaking news", "current events", "political updates", "world news",
+                "local news", "business news", "technology news", "sports news",
+                "entertainment news", "health news", "science news"
+            ],
+            "travel": [
+                "vacation destinations", "travel tips", "hotel bookings", "flight deals",
+                "travel insurance", "tourist attractions", "travel planning", "backpacking tips",
+                "luxury travel", "budget travel", "travel photography"
+            ]
+        }
+        
+        return category_keywords.get(category, [
+            "how to", "best practices", "tips and tricks", "product reviews",
+            "comparison guides", "tutorial videos", "expert advice", "industry insights"
+        ])
+    
+    def get_search_engines_config(self) -> Dict:
+        """Get search engines configuration based on custom settings"""
+        all_search_engines = {
+            "google": {
+                "base_url": "https://www.google.com/search",
+                "parameters": ["q", "hl", "gl", "source", "ie"],
+                "user_agents": self.get_search_user_agents(),
+                "referrer_patterns": ["google.com", "google.co.id", "google.com.my"]
+            },
+            "bing": {
+                "base_url": "https://www.bing.com/search",
+                "parameters": ["q", "cc", "setlang"],
+                "user_agents": self.get_search_user_agents(),
+                "referrer_patterns": ["bing.com", "bing.com/id"]
+            },
+            "yahoo": {
+                "base_url": "https://search.yahoo.com/search",
+                "parameters": ["p", "fr", "ei"],
+                "user_agents": self.get_search_user_agents(),
+                "referrer_patterns": ["yahoo.com", "search.yahoo.com"]
+            },
+            "duckduckgo": {
+                "base_url": "https://duckduckgo.com/",
+                "parameters": ["q", "t", "ia"],
+                "user_agents": self.get_search_user_agents(),
+                "referrer_patterns": ["duckduckgo.com"]
+            }
+        }
+        
+        # If custom search engines are configured, filter the available ones
+        if self.custom_search_engines:
+            filtered_engines = {}
+            for engine in self.custom_search_engines:
+                if engine in all_search_engines:
+                    filtered_engines[engine] = all_search_engines[engine]
+                else:
+                    self.logger.warning(f"Unknown search engine: {engine}")
+            
+            if filtered_engines:
+                self.logger.info(f"Using custom search engines: {', '.join(filtered_engines.keys())}")
+                return filtered_engines
+            else:
+                self.logger.warning("No valid custom search engines found, using defaults")
+        
+        # Return all search engines if no custom configuration
+        return all_search_engines
     
     def generate_anchor_texts(self) -> List[str]:
         """Generate realistic anchor texts"""
@@ -250,24 +420,136 @@ class DynamicEntryManager:
             "cara mudah", "tutorial", "guide", "manual"
         ]
     
-    def generate_referrer_domains(self) -> List[str]:
-        """Generate realistic referrer domains"""
-        return [
-            # News sites
-            "detik.com", "kompas.com", "tribunnews.com", "liputan6.com",
-            "cnnindonesia.com", "tempo.co", "viva.co.id", "merdeka.com",
+    def generate_referrer_domains(self, geo_location: str = "US") -> List[str]:
+        """Generate referrer domains with custom file support"""
+        if self.custom_referrer_enabled:
+            return self.load_custom_referrer_domains(geo_location)
+        else:
+            return self.generate_default_referrer_domains(geo_location)
+    
+    def load_custom_referrer_domains(self, geo_location: str = "US") -> List[str]:
+        """Load referrer domains from custom referrer domains file"""
+        try:
+            with open(self.custom_referrer_file, 'r', encoding='utf-8') as f:
+                custom_referrer_data = json.load(f)
             
-            # Blogs
-            "blogger.com", "wordpress.com", "medium.com", "substack.com",
-            "ghost.org", "wix.com", "squarespace.com",
+            all_domains = []
             
-            # Forums
-            "kaskus.co.id", "indonesiaindonesia.com", "forum.detik.com",
-            "kompasiana.com", "vemale.com", "fimela.com",
+            if self.merge_with_defaults:
+                # Merge custom domains with default domains
+                default_domains = self.generate_default_referrer_domains(geo_location)
+                all_domains.extend(default_domains)
             
-            # Email newsletters
-            "mailchimp.com", "convertkit.com", "substack.com", "revue.com"
-        ]
+            # Add custom domains based on geo location if geo_specific is enabled
+            if self.geo_specific:
+                geo_domains = self.get_geo_specific_domains(custom_referrer_data, geo_location)
+                all_domains.extend(geo_domains)
+            
+            # Add all domains from custom file
+            for category, domains_data in custom_referrer_data.items():
+                if isinstance(domains_data, dict):
+                    # Handle nested structure (e.g., news_sites -> global/indonesia)
+                    for subcategory, domains in domains_data.items():
+                        if isinstance(domains, list):
+                            # Limit domains per category if configured
+                            if self.domains_per_category > 0:
+                                domains = domains[:self.domains_per_category]
+                            all_domains.extend(domains)
+                elif isinstance(domains_data, list):
+                    # Handle flat structure
+                    domains = domains_data
+                    if self.domains_per_category > 0:
+                        domains = domains[:self.domains_per_category]
+                    all_domains.extend(domains)
+            
+            # Remove duplicates while preserving order
+            unique_domains = list(dict.fromkeys(all_domains))
+            
+            self.logger.info(f"Loaded {len(unique_domains)} custom referrer domains from {self.custom_referrer_file}")
+            return unique_domains
+            
+        except FileNotFoundError:
+            self.logger.warning(f"Custom referrer domains file not found: {self.custom_referrer_file}")
+            if self.fallback_to_defaults:
+                self.logger.info("Falling back to default referrer domains")
+                return self.generate_default_referrer_domains(geo_location)
+            else:
+                return []
+        except Exception as e:
+            self.logger.error(f"Error loading custom referrer domains: {str(e)}")
+            if self.fallback_to_defaults:
+                self.logger.info("Falling back to default referrer domains")
+                return self.generate_default_referrer_domains(geo_location)
+            else:
+                return []
+    
+    def get_geo_specific_domains(self, referrer_data: Dict, geo_location: str) -> List[str]:
+        """Get geo-specific domains based on proxy location"""
+        geo_domains = []
+        geo_mapping = {
+            "US": "global",
+            "ID": "indonesia",
+            "SG": "singapore", 
+            "MY": "malaysia",
+            "UK": "global",
+            "AU": "global",
+            "CA": "global"
+        }
+        
+        geo_key = geo_mapping.get(geo_location, "global")
+        
+        # Look for geo-specific domains in each category
+        for category, domains_data in referrer_data.items():
+            if isinstance(domains_data, dict):
+                if geo_key in domains_data and isinstance(domains_data[geo_key], list):
+                    domains = domains_data[geo_key]
+                    if self.domains_per_category > 0:
+                        domains = domains[:self.domains_per_category]
+                    geo_domains.extend(domains)
+                elif "global" in domains_data and isinstance(domains_data["global"], list):
+                    # Fallback to global domains
+                    domains = domains_data["global"]
+                    if self.domains_per_category > 0:
+                        domains = domains[:self.domains_per_category]
+                    geo_domains.extend(domains)
+        
+        return geo_domains
+    
+    def generate_default_referrer_domains(self, geo_location: str = "US") -> List[str]:
+        """Generate default referrer domains based on geo location"""
+        if geo_location == "ID":
+            return [
+                # Indonesian news sites
+                "detik.com", "kompas.com", "tribunnews.com", "liputan6.com",
+                "cnnindonesia.com", "tempo.co", "viva.co.id", "merdeka.com",
+                
+                # Global platforms
+                "blogger.com", "wordpress.com", "medium.com", "substack.com",
+                "ghost.org", "wix.com", "squarespace.com",
+                
+                # Indonesian forums
+                "kaskus.co.id", "indonesiaindonesia.com", "forum.detik.com",
+                "kompasiana.com", "vemale.com", "fimela.com",
+                
+                # Email newsletters
+                "mailchimp.com", "convertkit.com", "substack.com", "revue.com"
+            ]
+        else:
+            return [
+                # Global news sites
+                "cnn.com", "bbc.com", "reuters.com", "bloomberg.com",
+                "wsj.com", "nytimes.com", "guardian.com", "forbes.com",
+                
+                # Blogs
+                "blogger.com", "wordpress.com", "medium.com", "substack.com",
+                "ghost.org", "wix.com", "squarespace.com",
+                
+                # Forums
+                "reddit.com", "stackoverflow.com", "quora.com", "github.com",
+                
+                # Email newsletters
+                "mailchimp.com", "convertkit.com", "substack.com", "revue.com"
+            ]
     
     def get_search_user_agents(self) -> List[str]:
         """Get realistic search user agents"""

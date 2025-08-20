@@ -169,6 +169,11 @@ class MultiLoginBotOrchestrator:
             # Start network monitoring
             self.network_behavior_simulator.start_network_monitoring()
 
+            # Log target categories configuration
+            if hasattr(self, 'content_intelligence_engine') and self.content_intelligence_engine:
+                target_categories = self.content_intelligence_engine.target_categories
+                self.logger.info(f"Content analysis configured with {len(target_categories)} target categories: {', '.join(target_categories)}")
+
             self.logger.info("Ultra-advanced undetectable components initialized")
         else:
             self.mouse_simulator = None
@@ -187,6 +192,18 @@ class MultiLoginBotOrchestrator:
         self.session_history = []
         
         self.logger.info("Multi-Login Bot Orchestrator initialized")
+    
+    def get_target_categories(self) -> List[str]:
+        """Get configured target categories for content analysis"""
+        if hasattr(self, 'content_intelligence_engine') and self.content_intelligence_engine:
+            return self.content_intelligence_engine.target_categories
+        return ["technology", "lifestyle", "business", "entertainment", "education"]
+    
+    def get_random_target_category(self) -> str:
+        """Get a random target category using configured weights"""
+        if hasattr(self, 'content_intelligence_engine') and self.content_intelligence_engine:
+            return self.content_intelligence_engine.get_random_target_category()
+        return random.choice(["technology", "lifestyle", "business", "entertainment", "education"])
     
     def override_config_with_args(self, args: argparse.Namespace):
         """Override configuration with command line arguments"""
@@ -323,11 +340,11 @@ class MultiLoginBotOrchestrator:
                 # Generate hardware profile with optional persistence
                 if self.config.get("fingerprint", {}).get("hardware_persistence", {}).get("enabled", False):
                     hardware_profile = self.hardware_emulator.get_hardware_profile_with_persistence(
-                        geo_location=proxy_config.get("geo", "ID")
+                        geo_location=proxy_config.get("geo", "US")
                     )
                 else:
                     hardware_profile = self.hardware_emulator.generate_hardware_profile(
-                        geo_location=proxy_config.get("geo", "ID")
+                        geo_location=proxy_config.get("geo", "US")
                     )
                 
                 # Inject hardware emulation scripts
@@ -547,7 +564,7 @@ class MultiLoginBotOrchestrator:
                         "session_data": session_data,
                         "page_type": "article",
                         "content_category": "general",
-                        "geo_location": proxy_config.get("geo", "ID"),
+                        "geo_location": proxy_config.get("geo", "US"),
                         "device_type": session_data.get("hardware_profile", {}).get("device_type", "desktop_windows"),
                         "session_complexity": session_complexity
                     })
@@ -716,7 +733,7 @@ class MultiLoginBotOrchestrator:
                             "session_data": session_data,
                             "page_type": "article",
                             "content_category": "general",
-                            "geo_location": proxy_config.get("geo", "ID"),
+                            "geo_location": proxy_config.get("geo", "US"),
                             "device_type": session_data.get("hardware_profile", {}).get("device_type", "desktop_windows")
                         })
                         

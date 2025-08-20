@@ -99,55 +99,146 @@ proxy:
 # Dynamic Entry Point Configuration
 dynamic_entry_points:
   enabled: true
-  
-  # Target Website Configuration
   target_websites:
     primary:
-      url: "https://your-target-website.com"  # ⚠️ REPLACE WITH YOUR TARGET WEBSITE
-      reading_time_min: 240  # 4 minutes
-      reading_time_max: 420  # 7 minutes
-    
-    # Multiple target websites for diversification
+      url: "https://dev-plugin.local/"
+      weight: 0.7
     secondary:
-      - url: "https://your-secondary-site.com"
-        reading_time_min: 180
-        reading_time_max: 360
-      
-      - url: "https://your-tertiary-site.com"
-        reading_time_min: 300
-        reading_time_max: 600
-  
-  # Entry Point Strategies
-  entry_strategies:
+      url: "https://dev-plugin.local/category/technology"
+      weight: 0.2
+    tertiary:
+      url: "https://dev-plugin.local/category/lifestyle"
+      weight: 0.1
+  entry_point_types:
     organic_search:
       enabled: true
-      weight: 0.35  # 35% of traffic
-      search_engines: ["google", "bing", "yahoo", "duckduckgo"]
-      keywords_file: "config/keywords.json"  # Custom keywords file
-    
+      weight: 0.35
     social_media:
       enabled: true
-      weight: 0.25  # 25% of traffic
-      platforms: ["facebook", "twitter", "instagram", "linkedin", "pinterest", "tiktok"]
-      content_types: ["post", "story", "reel", "tweet", "pin"]
-    
+      weight: 0.25
     direct_traffic:
       enabled: true
-      weight: 0.20  # 20% of traffic
-      patterns: ["bookmark", "typo", "memory", "returning_visitor"]
-    
+      weight: 0.20
     referral:
       enabled: true
-      weight: 0.15  # 15% of traffic
-      sources: ["news_sites", "blogs", "forums", "email_newsletters"]
-      referrer_domains_file: "config/referrer_domains.json"
-    
+      weight: 0.15
     paid_ads:
-      enabled: true
-      weight: 0.05  # 5% of traffic
-      platforms: ["google_ads", "facebook_ads", "instagram_ads"]
+      enabled: false
+      weight: 0.05
   
-  # Temporal Pattern Configuration
+  # Custom Keywords Configuration (Optional)
+  custom_keywords:
+    enabled: true  # Set true to use custom keywords file
+    keywords_file: "../config/keywords.json"  # Path to custom keywords file
+    fallback_to_categories: true  # Use target_categories if file not found
+    merge_with_categories: false  # Merge custom keywords with category keywords
+    keywords_per_category: 10  # Number of keywords to use per category
+    custom_search_engines: ["google", "bing"]  # Override default search engines (optional)
+    # Example: ["google", "bing"] - if empty, uses default: ["google", "bing", "yahoo", "duckduckgo"]
+  
+  # Custom Referrer Domains Configuration (Optional)
+  custom_referrer_domains:
+    enabled: true  # Set true to use custom referrer domains file
+    referrer_file: "../config/referrer_domains.json"  # Path to custom referrer domains file
+    fallback_to_defaults: true  # Use default domains if file not found
+    merge_with_defaults: false  # Merge custom domains with default domains
+    domains_per_category: 15  # Number of domains to use per category
+    geo_specific: true  # Use geo-specific domains based on proxy location
+
+# Content Analysis Configuration
+content_analysis:
+  enabled: true
+  # Configurable target categories for content analysis and behavioral adaptation
+  target_categories:
+    - "technology"
+    - "lifestyle"
+    - "business"
+    - "entertainment"
+    - "education"
+    - "finance"
+    - "health"
+    - "sports"
+    - "news"
+    - "travel"
+  
+  # Category weights for weighted selection (optional)
+  # Higher weights = higher probability of selection
+  category_weights:
+    technology: 0.20
+    lifestyle: 0.18
+    business: 0.15
+    entertainment: 0.12
+    education: 0.10
+    finance: 0.08
+    health: 0.07
+    sports: 0.04
+    news: 0.03
+    travel: 0.03
+  
+  # Category-specific behavioral patterns
+  category_patterns:
+    technology:
+      interest_level: 0.8
+      reading_speed: "medium"
+      interaction_type: "analytical"
+      share_probability: 0.6
+      engagement_depth: "high"
+    lifestyle:
+      interest_level: 0.7
+      reading_speed: "fast"
+      interaction_type: "emotional"
+      share_probability: 0.8
+      engagement_depth: "medium"
+    business:
+      interest_level: 0.9
+      reading_speed: "slow"
+      interaction_type: "professional"
+      share_probability: 0.4
+      engagement_depth: "high"
+    entertainment:
+      interest_level: 0.6
+      reading_speed: "fast"
+      interaction_type: "casual"
+      share_probability: 0.7
+      engagement_depth: "medium"
+    education:
+      interest_level: 0.8
+      reading_speed: "slow"
+      interaction_type: "studious"
+      share_probability: 0.5
+      engagement_depth: "high"
+    finance:
+      interest_level: 0.9
+      reading_speed: "slow"
+      interaction_type: "analytical"
+      share_probability: 0.3
+      engagement_depth: "high"
+    health:
+      interest_level: 0.8
+      reading_speed: "medium"
+      interaction_type: "careful"
+      share_probability: 0.6
+      engagement_depth: "high"
+    sports:
+      interest_level: 0.7
+      reading_speed: "fast"
+      interaction_type: "enthusiastic"
+      share_probability: 0.7
+      engagement_depth: "medium"
+    news:
+      interest_level: 0.8
+      reading_speed: "medium"
+      interaction_type: "informed"
+      share_probability: 0.5
+      engagement_depth: "medium"
+    travel:
+      interest_level: 0.8
+      reading_speed: "medium"
+      interaction_type: "exploratory"
+      share_probability: 0.7
+      engagement_depth: "medium"
+
+# Temporal Pattern Configuration
   temporal_patterns:
     time_based_weights:
       morning: {"search": 0.4, "social": 0.2, "direct": 0.3, "referral": 0.1}

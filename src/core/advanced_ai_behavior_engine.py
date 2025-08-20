@@ -42,6 +42,13 @@ class AdvancedAIBehaviorEngine:
         self.config = config
         self.logger = logging.getLogger(__name__)
         
+        # Load configurable target categories
+        self.content_analysis_config = config.get("content_analysis", {})
+        self.target_categories = self.content_analysis_config.get("target_categories", [
+            "technology", "lifestyle", "business", "entertainment", "education"
+        ])
+        self.category_weights = self.content_analysis_config.get("category_weights", {})
+        
         # Load behavior models
         self.behavior_models = self.load_advanced_behavior_models()
         self.decision_trees = self.build_advanced_decision_trees()
@@ -56,6 +63,8 @@ class AdvancedAIBehaviorEngine:
         self.mood_system = MoodSystem()
         self.attention_system = AttentionSystem()
         self.learning_system = LearningSystem()
+        
+        self.logger.info(f"Advanced AI Behavior Engine initialized with {len(self.target_categories)} target categories")
     
     def load_advanced_behavior_models(self) -> Dict:
         """Load sophisticated behavior models based on human psychology"""
@@ -376,7 +385,7 @@ class AdvancedAIBehaviorEngine:
         session_data = context.get("session_data", {})
         page_type = context.get("page_type", "article")
         content_category = context.get("content_category", "general")
-        geo_location = context.get("geo_location", "ID")
+        geo_location = context.get("geo_location", "US")
         device_type = context.get("device_type", "desktop_windows")
         session_complexity = context.get("session_complexity", "moderate")
         
@@ -523,6 +532,92 @@ class AdvancedAIBehaviorEngine:
             "comprehension_rate": random.uniform(0.6, 0.95),
             "reread_probability": random.uniform(0.1, 0.4)
         }
+    
+    def get_random_target_category(self) -> str:
+        """Get a random target category using configured weights"""
+        if not self.target_categories:
+            return "general"
+        
+        if self.category_weights:
+            # Use weighted selection
+            categories = list(self.category_weights.keys())
+            weights = list(self.category_weights.values())
+            return random.choices(categories, weights=weights, k=1)[0]
+        else:
+            # Use uniform selection
+            return random.choice(self.target_categories)
+    
+    def get_category_aware_behavior(self, category: str) -> Dict:
+        """Get behavior patterns specific to a category"""
+        category_behaviors = {
+            "technology": {
+                "reading_speed": "medium",
+                "interaction_type": "analytical",
+                "engagement_level": "high",
+                "share_probability": 0.6
+            },
+            "lifestyle": {
+                "reading_speed": "fast",
+                "interaction_type": "emotional",
+                "engagement_level": "medium",
+                "share_probability": 0.8
+            },
+            "business": {
+                "reading_speed": "slow",
+                "interaction_type": "professional",
+                "engagement_level": "high",
+                "share_probability": 0.4
+            },
+            "entertainment": {
+                "reading_speed": "fast",
+                "interaction_type": "casual",
+                "engagement_level": "medium",
+                "share_probability": 0.7
+            },
+            "education": {
+                "reading_speed": "slow",
+                "interaction_type": "studious",
+                "engagement_level": "high",
+                "share_probability": 0.5
+            },
+            "finance": {
+                "reading_speed": "slow",
+                "interaction_type": "analytical",
+                "engagement_level": "high",
+                "share_probability": 0.3
+            },
+            "health": {
+                "reading_speed": "medium",
+                "interaction_type": "careful",
+                "engagement_level": "high",
+                "share_probability": 0.6
+            },
+            "sports": {
+                "reading_speed": "fast",
+                "interaction_type": "enthusiastic",
+                "engagement_level": "medium",
+                "share_probability": 0.7
+            },
+            "news": {
+                "reading_speed": "medium",
+                "interaction_type": "informed",
+                "engagement_level": "medium",
+                "share_probability": 0.5
+            },
+            "travel": {
+                "reading_speed": "medium",
+                "interaction_type": "exploratory",
+                "engagement_level": "medium",
+                "share_probability": 0.7
+            }
+        }
+        
+        return category_behaviors.get(category, {
+            "reading_speed": "medium",
+            "interaction_type": "general",
+            "engagement_level": "medium",
+            "share_probability": 0.5
+        })
     
     def _generate_decision_speed(self, complexity: str) -> Dict:
         """Generate decision making speed based on complexity"""

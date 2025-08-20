@@ -210,7 +210,7 @@ class HardwareEmulator:
             }
         }
     
-    def generate_hardware_profile(self, geo_location: str = "ID", complexity: str = "moderate") -> Dict:
+    def generate_hardware_profile(self, geo_location: str = "US", complexity: str = "moderate") -> Dict:
         """Generate hardware profile with complexity-based variations"""
         # Base hardware configuration
         base_config = {
@@ -344,7 +344,7 @@ class HardwareEmulator:
             
             self.logger.info(f"Cleaned up {entries_to_remove} old hardware entries")
     
-    def get_hardware_profile_with_persistence(self, geo_location: str = "ID", complexity: str = "moderate") -> Dict:
+    def get_hardware_profile_with_persistence(self, geo_location: str = "US", complexity: str = "moderate") -> Dict:
         """Get hardware profile with optional persistence"""
         # Create unique key for this combination
         profile_key = f"{geo_location}_{complexity}"
@@ -417,8 +417,8 @@ class HardwareEmulator:
     def _get_timezone_for_geo(self, geo_location: str) -> str:
         """Get timezone based on geo location"""
         timezone_map = {
-            "ID": "Asia/Jakarta",
             "US": "America/New_York",
+            "ID": "Asia/Jakarta",
             "GB": "Europe/London",
             "DE": "Europe/Berlin",
             "FR": "Europe/Paris",
@@ -431,8 +431,8 @@ class HardwareEmulator:
     def _get_language_for_geo(self, geo_location: str) -> str:
         """Get language based on geo location"""
         language_map = {
-            "ID": "id-ID",
             "US": "en-US",
+            "ID": "id-ID",
             "GB": "en-GB",
             "DE": "de-DE",
             "FR": "fr-FR",

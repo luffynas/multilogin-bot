@@ -1,223 +1,142 @@
 {
-  "news_sites": [
-    "detik.com",
-    "kompas.com",
-    "tribunnews.com",
-    "liputan6.com",
-    "cnnindonesia.com",
-    "tempo.co",
-    "viva.co.id",
-    "merdeka.com",
-    "antaranews.com",
-    "republika.co.id",
-    "suara.com",
-    "okezone.com",
-    "sindonews.com",
-    "jawapos.com",
-    "pikiran-rakyat.com"
-  ],
-  "blogs": [
-    "blogger.com",
-    "wordpress.com",
-    "medium.com",
-    "substack.com",
-    "ghost.org",
-    "wix.com",
-    "squarespace.com",
-    "weebly.com",
-    "tumblr.com",
-    "livejournal.com",
-    "blogspot.com",
-    "typepad.com"
-  ],
-  "forums": [
-    "kaskus.co.id",
-    "indonesiaindonesia.com",
-    "forum.detik.com",
-    "kompasiana.com",
-    "vemale.com",
-    "fimela.com",
-    "brilio.net",
-    "hipwee.com",
-    "idntimes.com",
-    "popbela.com",
-    "cosmopolitan.co.id",
-    "femina.co.id"
-  ],
-  "email_newsletters": [
-    "mailchimp.com",
-    "convertkit.com",
-    "substack.com",
-    "revue.com",
-    "buttondown.email",
-    "tinyletter.com",
-    "mailerlite.com",
-    "activecampaign.com",
-    "klaviyo.com",
-    "drip.com"
-  ],
-  "social_media": [
-    "facebook.com",
-    "twitter.com",
-    "instagram.com",
-    "linkedin.com",
-    "pinterest.com",
-    "tiktok.com",
-    "youtube.com",
-    "reddit.com",
-    "snapchat.com",
-    "telegram.org",
-    "whatsapp.com",
-    "line.me"
-  ],
-  "search_engines": [
-    "google.com",
-    "google.co.id",
-    "bing.com",
-    "yahoo.com",
-    "duckduckgo.com",
-    "baidu.com",
-    "yandex.com",
-    "searx.me",
-    "startpage.com",
-    "qwant.com"
-  ],
-  "ecommerce": [
-    "tokopedia.com",
-    "shopee.co.id",
-    "bukalapak.com",
-    "lazada.co.id",
-    "blibli.com",
-    "jd.id",
-    "amazon.com",
-    "ebay.com",
-    "aliexpress.com",
-    "zalora.co.id",
-    "sociolla.com",
-    "orami.co.id"
-  ],
-  "tech_sites": [
-    "techcrunch.com",
-    "theverge.com",
-    "wired.com",
-    "ars-technica.com",
-    "engadget.com",
-    "gizmodo.com",
-    "mashable.com",
-    "venturebeat.com",
-    "recode.net",
-    "techradar.com",
-    "cnet.com",
-    "zdnet.com"
-  ],
-  "business_sites": [
-    "forbes.com",
-    "bloomberg.com",
-    "reuters.com",
-    "wsj.com",
-    "ft.com",
-    "economist.com",
-    "hbr.org",
-    "inc.com",
-    "entrepreneur.com",
-    "fastcompany.com",
-    "wired.com",
-    "techcrunch.com"
-  ],
-  "lifestyle_sites": [
-    "vogue.com",
-    "cosmopolitan.com",
-    "elle.com",
-    "harpersbazaar.com",
-    "instyle.com",
-    "people.com",
-    "usmagazine.com",
-    "okmagazine.com",
-    "lifeandstylemag.com",
-    "starstyle.com"
-  ],
-  "entertainment_sites": [
-    "variety.com",
-    "hollywoodreporter.com",
-    "deadline.com",
-    "indiewire.com",
-    "screenrant.com",
-    "collider.com",
-    "slashfilm.com",
-    "movieinsider.com",
-    "imdb.com",
-    "rottentomatoes.com"
-  ],
-  "gaming_sites": [
-    "ign.com",
-    "gamespot.com",
-    "polygon.com",
-    "kotaku.com",
-    "eurogamer.net",
-    "pcgamer.com",
-    "gamesradar.com",
-    "destructoid.com",
-    "joystiq.com",
-    "vice.com"
-  ],
-  "educational_sites": [
-    "coursera.org",
-    "udemy.com",
-    "edx.org",
-    "khanacademy.org",
-    "skillshare.com",
-    "pluralsight.com",
-    "lynda.com",
-    "udacity.com",
-    "codecademy.com",
-    "freecodecamp.org"
-  ],
-  "health_sites": [
-    "webmd.com",
-    "mayoclinic.org",
-    "healthline.com",
-    "medicalnewstoday.com",
-    "verywellhealth.com",
-    "health.com",
-    "prevention.com",
-    "menshealth.com",
-    "womenshealthmag.com",
-    "shape.com"
-  ],
-  "travel_sites": [
-    "tripadvisor.com",
-    "booking.com",
-    "expedia.com",
-    "kayak.com",
-    "skyscanner.com",
-    "airbnb.com",
-    "hotels.com",
-    "agoda.com",
-    "traveloka.com",
-    "pegipegi.com"
-  ],
-  "finance_sites": [
-    "yahoo.com/finance",
-    "marketwatch.com",
-    "investing.com",
-    "seekingalpha.com",
-    "fool.com",
-    "morningstar.com",
-    "barrons.com",
-    "cnbc.com",
-    "bloomberg.com",
-    "reuters.com/finance"
-  ],
-  "sports_sites": [
-    "espn.com",
-    "sports.yahoo.com",
-    "bleacherreport.com",
-    "sbnation.com",
-    "deadspin.com",
-    "sportingnews.com",
-    "cbssports.com",
-    "nfl.com",
-    "nba.com",
-    "mlb.com"
-  ]
+  "news_sites": {
+    "global": [
+      "cnn.com", "bbc.com", "reuters.com", "ap.org", "bloomberg.com",
+      "wsj.com", "nytimes.com", "guardian.com", "washingtonpost.com",
+      "forbes.com", "techcrunch.com", "engadget.com", "theverge.com",
+      "arstechnica.com", "wired.com"
+    ],
+    "indonesia": [
+      "detik.com", "kompas.com", "tribunnews.com", "liputan6.com",
+      "cnnindonesia.com", "tempo.co", "viva.co.id", "merdeka.com",
+      "antaranews.com", "republika.co.id", "okezone.com", "sindonews.com",
+      "jpnn.com", "suara.com", "beritasatu.com"
+    ],
+    "singapore": [
+      "straitstimes.com", "channelnewsasia.com", "todayonline.com",
+      "asiaone.com", "businesstimes.com.sg"
+    ],
+    "malaysia": [
+      "thestar.com.my", "nst.com.my", "malaymail.com", "freemalaysiatoday.com",
+      "theedgemarkets.com"
+    ]
+  },
+  "blogs": {
+    "platforms": [
+      "blogger.com", "wordpress.com", "medium.com", "substack.com",
+      "ghost.org", "wix.com", "squarespace.com", "tumblr.com",
+      "dev.to", "hashnode.com", "write.as", "notion.so"
+    ],
+    "technology": [
+      "techcrunch.com", "mashable.com", "gizmodo.com", "lifehacker.com",
+      "digitaltrends.com", "9to5mac.com", "androidcentral.com",
+      "xda-developers.com", "howtogeek.com", "macrumors.com"
+    ],
+    "business": [
+      "entrepreneur.com", "inc.com", "fastcompany.com", "harvard.edu",
+      "mit.edu", "wharton.upenn.edu", "kellogg.northwestern.edu",
+      "gsb.stanford.edu", "businessinsider.com", "fortune.com"
+    ],
+    "lifestyle": [
+      "buzzfeed.com", "refinery29.com", "popsugar.com", "allure.com",
+      "vogue.com", "elle.com", "cosmopolitan.com", "marieclaire.com",
+      "womenshealthmag.com", "menshealth.com"
+    ]
+  },
+  "forums": {
+    "indonesia": [
+      "kaskus.co.id", "indonesiaindonesia.com", "forum.detik.com",
+      "kompasiana.com", "vemale.com", "fimela.com", "brilio.net",
+      "kapanlagi.com", "merdeka.com", "dream.co.id"
+    ],
+    "global": [
+      "reddit.com", "stackoverflow.com", "quora.com", "hackernews.com",
+      "producthunt.com", "indiehackers.com", "github.com",
+      "gitlab.com", "bitbucket.org", "sourceforge.net"
+    ],
+    "technology": [
+      "stackoverflow.com", "github.com", "dev.to", "hashnode.com",
+      "hackernews.ycombinator.com", "lobste.rs", "slashdot.org",
+      "techrepublic.com", "spiceworks.com", "serverfault.com"
+    ]
+  },
+  "social_media": {
+    "major_platforms": [
+      "facebook.com", "twitter.com", "instagram.com", "linkedin.com",
+      "youtube.com", "tiktok.com", "pinterest.com", "snapchat.com",
+      "discord.com", "telegram.org"
+    ],
+    "professional": [
+      "linkedin.com", "glassdoor.com", "indeed.com", "monster.com",
+      "careerbuilder.com", "ziprecruiter.com", "upwork.com",
+      "freelancer.com", "fiverr.com", "guru.com"
+    ],
+    "content_sharing": [
+      "youtube.com", "vimeo.com", "dailymotion.com", "twitch.tv",
+      "flickr.com", "500px.com", "behance.net", "dribbble.com",
+      "deviantart.com", "artstation.com"
+    ]
+  },
+  "email_newsletters": {
+    "platforms": [
+      "mailchimp.com", "convertkit.com", "substack.com", "revue.com",
+      "buttondown.email", "tinyletter.com", "constantcontact.com",
+      "aweber.com", "getresponse.com", "campaignmonitor.com"
+    ],
+    "tech_newsletters": [
+      "hackernewsletter.com", "tldr.tech", "morningbrew.com",
+      "thehustle.co", "stratechery.com", "ben-evans.com",
+      "a16z.com", "firstround.com", "ycombinator.com"
+    ]
+  },
+  "search_engines": {
+    "major": [
+      "google.com", "bing.com", "yahoo.com", "duckduckgo.com",
+      "baidu.com", "yandex.com", "ask.com", "aol.com"
+    ],
+    "specialized": [
+      "startpage.com", "searx.org", "brave.com", "ecosia.org",
+      "swisscows.com", "qwant.com", "metager.org", "gibiru.com"
+    ]
+  },
+  "ecommerce": {
+    "global": [
+      "amazon.com", "ebay.com", "alibaba.com", "aliexpress.com",
+      "etsy.com", "shopify.com", "walmart.com", "target.com",
+      "bestbuy.com", "newegg.com"
+    ],
+    "indonesia": [
+      "tokopedia.com", "shopee.co.id", "bukalapak.com", "lazada.co.id",
+      "blibli.com", "jd.id", "orami.co.id", "zalora.co.id",
+      "berrybenka.com", "sociolla.com"
+    ]
+  },
+  "educational": {
+    "universities": [
+      "harvard.edu", "mit.edu", "stanford.edu", "berkeley.edu",
+      "caltech.edu", "yale.edu", "princeton.edu", "columbia.edu",
+      "upenn.edu", "cornell.edu"
+    ],
+    "online_learning": [
+      "coursera.org", "edx.org", "udacity.com", "udemy.com",
+      "khanacademy.org", "codecademy.com", "pluralsight.com",
+      "lynda.com", "skillshare.com", "masterclass.com"
+    ],
+    "research": [
+      "scholar.google.com", "researchgate.net", "academia.edu",
+      "jstor.org", "pubmed.ncbi.nlm.nih.gov", "arxiv.org",
+      "ssrn.com", "mendeley.com", "zotero.org"
+    ]
+  },
+  "government": {
+    "indonesia": [
+      "go.id", "kemenkeu.go.id", "bps.go.id", "bi.go.id",
+      "ojk.go.id", "kemendag.go.id", "kemenperin.go.id",
+      "kemenkes.go.id", "kemdikbud.go.id", "kemenaker.go.id"
+    ],
+    "international": [
+      "who.int", "worldbank.org", "imf.org", "un.org",
+      "wto.org", "oecd.org", "asean.org", "apec.org"
+    ]
+  }
 }
