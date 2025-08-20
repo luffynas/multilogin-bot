@@ -320,10 +320,15 @@ class MultiLoginBotOrchestrator:
             # Step 5.5: Inject advanced undetectable scripts if enabled
             hardware_profile = None
             if self.hardware_emulator and self.config.get("undetectable_traffic", {}).get("enabled", False):
-                # Generate hardware profile
-                hardware_profile = self.hardware_emulator.generate_hardware_profile(
-                    geo_location=proxy_config.get("geo", "ID")
-                )
+                # Generate hardware profile with optional persistence
+                if self.config.get("fingerprint", {}).get("hardware_persistence", {}).get("enabled", False):
+                    hardware_profile = self.hardware_emulator.get_hardware_profile_with_persistence(
+                        geo_location=proxy_config.get("geo", "ID")
+                    )
+                else:
+                    hardware_profile = self.hardware_emulator.generate_hardware_profile(
+                        geo_location=proxy_config.get("geo", "ID")
+                    )
                 
                 # Inject hardware emulation scripts
                 hardware_scripts = self.hardware_emulator.get_hardware_scripts(hardware_profile)
@@ -995,6 +1000,16 @@ class MultiLoginBotOrchestrator:
             temporal_summary = self.temporal_pattern_analyzer.get_temporal_pattern_summary()
             self.logger.info(f"Temporal pattern summary: {temporal_summary.get('total_profiles', 0)} profiles, "
                            f"session history: {temporal_summary.get('session_history_count', 0)}")
+        
+        # Generate consistency report if monitoring enabled
+        if hasattr(self, 'fingerprint_engine') and self.fingerprint_engine:
+            consistency_report = self.fingerprint_engine.get_consistency_report()
+            if consistency_report.get("enabled", False):
+                self.logger.info(f"Fingerprint consistency report: {consistency_report.get('total_fingerprint_changes', 0)} changes, "
+                               f"score: {consistency_report.get('consistency_score', 0):.2f}")
+                if consistency_report.get("recommendations"):
+                    for rec in consistency_report["recommendations"]:
+                        self.logger.info(f"Consistency recommendation: {rec}")
 
 def main():
     """Main entry point"""

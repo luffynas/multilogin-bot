@@ -328,3 +328,102 @@
 2025-08-20 17:11:48,639 - __main__ - INFO - Content intelligence summary: 0 analyses, avg quality: 0.00
 2025-08-20 17:11:48,639 - __main__ - INFO - Behavioral biometrics summary: 5 profiles, session history: 0
 2025-08-20 17:11:48,639 - __main__ - INFO - Temporal pattern summary: 5 profiles, session history: 0
+2025-08-20 17:51:31,914 - core.multi_provider_proxy_manager - INFO - Unified multi-provider mode enabled with 9 providers
+2025-08-20 17:51:31,915 - core.multi_provider_proxy_manager - INFO - Primary provider: socksescort (priority 1)
+2025-08-20 17:51:32,275 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x14fe18a90>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 17:51:32,284 - core.ml_adaptive_engine - INFO - Models loaded successfully
+2025-08-20 17:51:32,284 - __main__ - INFO - Ultra-advanced undetectable components initialized
+2025-08-20 17:51:32,284 - __main__ - INFO - Multi-Login Bot Orchestrator initialized
+2025-08-20 17:51:32,284 - __main__ - INFO - Starting daily visits: 1
+2025-08-20 17:51:32,284 - __main__ - INFO - Running sequential execution
+2025-08-20 17:51:32,284 - core.multi_provider_proxy_manager - WARNING - Attempting provider fallback (attempt 1/3)
+2025-08-20 17:51:32,284 - core.multi_provider_proxy_manager - INFO - Switching from socksescort to socksescort
+2025-08-20 17:51:32,287 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x14fe896a0>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 17:51:32,288 - core.multi_provider_proxy_manager - WARNING - Failed to get proxies from socksescort
+2025-08-20 17:51:32,288 - core.multi_provider_proxy_manager - INFO - Waiting 60 seconds before next fallback attempt...
+2025-08-20 17:52:32,292 - core.multi_provider_proxy_manager - WARNING - Attempting provider fallback (attempt 2/3)
+2025-08-20 17:52:32,293 - core.multi_provider_proxy_manager - INFO - Switching from socksescort to socksescort
+2025-08-20 17:52:32,298 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x14fe89d30>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 17:52:32,298 - core.multi_provider_proxy_manager - WARNING - Failed to get proxies from socksescort
+2025-08-20 17:52:32,298 - core.multi_provider_proxy_manager - INFO - Waiting 60 seconds before next fallback attempt...
+2025-08-20 17:53:32,304 - core.multi_provider_proxy_manager - WARNING - Attempting provider fallback (attempt 3/3)
+2025-08-20 17:53:32,307 - core.multi_provider_proxy_manager - INFO - Switching from socksescort to socksescort
+2025-08-20 17:53:32,313 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x14fe9c1f0>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 17:53:32,313 - core.multi_provider_proxy_manager - WARNING - Failed to get proxies from socksescort
+2025-08-20 17:53:32,313 - __main__ - WARNING - No available proxies found. Provider: socksescort
+2025-08-20 17:53:32,313 - __main__ - WARNING - Not enough available proxies. Need 1, have 0
+2025-08-20 17:53:32,313 - __main__ - INFO - Using dynamic entry point target: https://your-target-website.com
+2025-08-20 17:53:32,313 - __main__ - INFO - Sequential daily visits completed: 0/0 successful
+2025-08-20 17:53:37,319 - __main__ - INFO - Network behavior summary: 0 switches, stability score: 0.00
+2025-08-20 17:53:37,319 - __main__ - INFO - Proxy Manager summary: 0 proxies, provider: socksescort, active: 0
+2025-08-20 17:53:37,319 - __main__ - INFO - ML Learning summary: 0 sessions, success rate: 0.50
+2025-08-20 17:53:37,319 - __main__ - INFO - Social proof summary: 0 interactions, total impact: 0.00
+2025-08-20 17:53:37,319 - __main__ - INFO - Content intelligence summary: 0 analyses, avg quality: 0.00
+2025-08-20 17:53:37,319 - __main__ - INFO - Behavioral biometrics summary: 5 profiles, session history: 0
+2025-08-20 17:53:37,319 - __main__ - INFO - Temporal pattern summary: 5 profiles, session history: 0
+2025-08-20 17:59:50,742 - core.multi_provider_proxy_manager - INFO - Unified multi-provider mode enabled with 9 providers
+2025-08-20 17:59:50,742 - core.multi_provider_proxy_manager - INFO - Primary provider: socksescort (priority 1)
+2025-08-20 17:59:50,753 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x13a57f3d0>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 17:59:50,759 - core.ml_adaptive_engine - INFO - Models loaded successfully
+2025-08-20 17:59:50,759 - __main__ - INFO - Ultra-advanced undetectable components initialized
+2025-08-20 17:59:50,759 - __main__ - INFO - Multi-Login Bot Orchestrator initialized
+2025-08-20 17:59:50,759 - __main__ - INFO - Starting daily visits: 1
+2025-08-20 17:59:50,759 - __main__ - INFO - Running sequential execution
+2025-08-20 17:59:50,759 - core.multi_provider_proxy_manager - WARNING - Attempting provider fallback (attempt 1/3)
+2025-08-20 17:59:50,759 - core.multi_provider_proxy_manager - INFO - Switching from socksescort to socksescort
+2025-08-20 17:59:50,761 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x13fb95790>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 17:59:50,761 - core.multi_provider_proxy_manager - WARNING - Failed to get proxies from socksescort
+2025-08-20 17:59:50,761 - core.multi_provider_proxy_manager - INFO - Waiting 60 seconds before next fallback attempt...
+2025-08-20 18:00:50,766 - core.multi_provider_proxy_manager - WARNING - Attempting provider fallback (attempt 2/3)
+2025-08-20 18:00:50,769 - core.multi_provider_proxy_manager - INFO - Switching from socksescort to socksescort
+2025-08-20 18:00:50,780 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x13fb9b130>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 18:00:50,781 - core.multi_provider_proxy_manager - WARNING - Failed to get proxies from socksescort
+2025-08-20 18:00:50,781 - core.multi_provider_proxy_manager - INFO - Waiting 60 seconds before next fallback attempt...
+2025-08-20 18:01:50,786 - core.multi_provider_proxy_manager - WARNING - Attempting provider fallback (attempt 3/3)
+2025-08-20 18:01:50,789 - core.multi_provider_proxy_manager - INFO - Switching from socksescort to socksescort
+2025-08-20 18:01:50,798 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x13fb9ba90>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 18:01:50,799 - core.multi_provider_proxy_manager - WARNING - Failed to get proxies from socksescort
+2025-08-20 18:01:50,799 - __main__ - WARNING - No available proxies found. Provider: socksescort
+2025-08-20 18:01:50,799 - __main__ - WARNING - Not enough available proxies. Need 1, have 0
+2025-08-20 18:01:50,799 - __main__ - INFO - Using dynamic entry point target: https://your-target-website.com
+2025-08-20 18:01:50,799 - __main__ - INFO - Sequential daily visits completed: 0/0 successful
+2025-08-20 18:01:55,805 - __main__ - INFO - Network behavior summary: 0 switches, stability score: 0.00
+2025-08-20 18:01:55,805 - __main__ - INFO - Proxy Manager summary: 0 proxies, provider: socksescort, active: 0
+2025-08-20 18:01:55,805 - __main__ - INFO - ML Learning summary: 0 sessions, success rate: 0.50
+2025-08-20 18:01:55,805 - __main__ - INFO - Social proof summary: 0 interactions, total impact: 0.00
+2025-08-20 18:01:55,805 - __main__ - INFO - Content intelligence summary: 0 analyses, avg quality: 0.00
+2025-08-20 18:01:55,806 - __main__ - INFO - Behavioral biometrics summary: 5 profiles, session history: 0
+2025-08-20 18:01:55,806 - __main__ - INFO - Temporal pattern summary: 5 profiles, session history: 0
+2025-08-20 18:12:23,548 - core.multi_provider_proxy_manager - INFO - Unified multi-provider mode enabled with 9 providers
+2025-08-20 18:12:23,548 - core.multi_provider_proxy_manager - INFO - Primary provider: socksescort (priority 1)
+2025-08-20 18:12:23,556 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x167c533d0>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 18:12:23,562 - core.ml_adaptive_engine - INFO - Models loaded successfully
+2025-08-20 18:12:23,562 - __main__ - INFO - Ultra-advanced undetectable components initialized
+2025-08-20 18:12:23,562 - __main__ - INFO - Multi-Login Bot Orchestrator initialized
+2025-08-20 18:12:23,563 - __main__ - INFO - Starting daily visits: 1
+2025-08-20 18:12:23,563 - __main__ - INFO - Running sequential execution
+2025-08-20 18:12:23,563 - core.multi_provider_proxy_manager - WARNING - Attempting provider fallback (attempt 1/3)
+2025-08-20 18:12:23,563 - core.multi_provider_proxy_manager - INFO - Switching from socksescort to socksescort
+2025-08-20 18:12:23,565 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x167d0e790>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 18:12:23,565 - core.multi_provider_proxy_manager - WARNING - Failed to get proxies from socksescort
+2025-08-20 18:12:23,565 - core.multi_provider_proxy_manager - INFO - Waiting 60 seconds before next fallback attempt...
+2025-08-20 18:13:23,571 - core.multi_provider_proxy_manager - WARNING - Attempting provider fallback (attempt 2/3)
+2025-08-20 18:13:23,572 - core.multi_provider_proxy_manager - INFO - Switching from socksescort to socksescort
+2025-08-20 18:13:23,578 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x167d14130>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 18:13:23,578 - core.multi_provider_proxy_manager - WARNING - Failed to get proxies from socksescort
+2025-08-20 18:13:23,578 - core.multi_provider_proxy_manager - INFO - Waiting 60 seconds before next fallback attempt...
+2025-08-20 18:14:23,581 - core.multi_provider_proxy_manager - WARNING - Attempting provider fallback (attempt 3/3)
+2025-08-20 18:14:23,582 - core.multi_provider_proxy_manager - INFO - Switching from socksescort to socksescort
+2025-08-20 18:14:23,588 - core.multi_provider_proxy_manager - ERROR - Error loading SocksEscort proxies: HTTPSConnectionPool(host='api.socksescort.com', port=443): Max retries exceeded with url: /proxies (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x167d14a90>: Failed to resolve 'api.socksescort.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2025-08-20 18:14:23,589 - core.multi_provider_proxy_manager - WARNING - Failed to get proxies from socksescort
+2025-08-20 18:14:23,589 - __main__ - WARNING - No available proxies found. Provider: socksescort
+2025-08-20 18:14:23,589 - __main__ - WARNING - Not enough available proxies. Need 1, have 0
+2025-08-20 18:14:23,589 - __main__ - INFO - Using dynamic entry point target: https://your-target-website.com
+2025-08-20 18:14:23,589 - __main__ - INFO - Sequential daily visits completed: 0/0 successful
+2025-08-20 18:14:28,594 - __main__ - INFO - Network behavior summary: 0 switches, stability score: 0.00
+2025-08-20 18:14:28,595 - __main__ - INFO - Proxy Manager summary: 0 proxies, provider: socksescort, active: 0
+2025-08-20 18:14:28,595 - __main__ - INFO - ML Learning summary: 0 sessions, success rate: 0.50
+2025-08-20 18:14:28,595 - __main__ - INFO - Social proof summary: 0 interactions, total impact: 0.00
+2025-08-20 18:14:28,595 - __main__ - INFO - Content intelligence summary: 0 analyses, avg quality: 0.00
+2025-08-20 18:14:28,595 - __main__ - INFO - Behavioral biometrics summary: 5 profiles, session history: 0
+2025-08-20 18:14:28,595 - __main__ - INFO - Temporal pattern summary: 5 profiles, session history: 0

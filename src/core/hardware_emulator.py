@@ -6,6 +6,9 @@ Provides realistic hardware fingerprint emulation for undetectable traffic
 import random
 import platform
 import psutil
+import json
+import os
+import shutil
 from typing import Dict, List, Optional
 import logging
 
@@ -15,6 +18,15 @@ class HardwareEmulator:
     def __init__(self, config: Dict):
         self.config = config
         self.logger = logging.getLogger(__name__)
+        
+        # Optional hardware persistence configuration
+        self.hardware_persistence_config = config.get("fingerprint", {}).get("hardware_persistence", {})
+        self.hardware_database = {}
+        
+        # Load persistent hardware data if enabled
+        if self.hardware_persistence_config.get("enabled", False):
+            self.load_hardware_database()
+            self.logger.info("Hardware persistence enabled")
         
         # Hardware profiles for different device types
         self.hardware_profiles = {
@@ -263,6 +275,94 @@ class HardwareEmulator:
                 "high_performance_mode": False,
                 "multiple_displays": False
             })
+        
+        return hardware_profile
+    
+    def save_hardware_database(self):
+        """Save hardware database to file (optional persistence)"""
+        if not self.hardware_persistence_config.get("enabled", False):
+            return
+        
+        try:
+            cache_file = self.hardware_persistence_config.get("cache_file", "hardware_cache.json")
+            
+            # Create backup if enabled
+            if self.hardware_persistence_config.get("backup_enabled", True):
+                import os
+                if os.path.exists(cache_file):
+                    backup_file = f"{cache_file}.backup"
+                    import shutil
+                    shutil.copy2(cache_file, backup_file)
+                    self.logger.debug(f"Created hardware backup: {backup_file}")
+            
+            # Save current database
+            with open(cache_file, "w") as f:
+                json.dump(self.hardware_database, f, indent=2)
+            
+            self.logger.debug(f"Hardware database saved: {len(self.hardware_database)} entries")
+            
+        except Exception as e:
+            self.logger.error(f"Error saving hardware database: {str(e)}")
+    
+    def load_hardware_database(self):
+        """Load hardware database from file (optional persistence)"""
+        if not self.hardware_persistence_config.get("enabled", False):
+            return
+        
+        try:
+            cache_file = self.hardware_persistence_config.get("cache_file", "hardware_cache.json")
+            
+            if os.path.exists(cache_file):
+                with open(cache_file, "r") as f:
+                    self.hardware_database = json.load(f)
+                
+                self.logger.info(f"Hardware database loaded: {len(self.hardware_database)} entries")
+                
+                # Cleanup old entries if needed
+                self.cleanup_hardware_database()
+            else:
+                self.logger.info("No hardware cache file found, starting fresh")
+                
+        except Exception as e:
+            self.logger.error(f"Error loading hardware database: {str(e)}")
+            self.hardware_database = {}
+    
+    def cleanup_hardware_database(self):
+        """Cleanup old hardware entries"""
+        if not self.hardware_persistence_config.get("enabled", False):
+            return
+        
+        max_size = self.hardware_persistence_config.get("max_cache_size", 500)
+        
+        if len(self.hardware_database) > max_size:
+            # Remove oldest entries (simple FIFO)
+            entries_to_remove = len(self.hardware_database) - max_size
+            keys_to_remove = list(self.hardware_database.keys())[:entries_to_remove]
+            
+            for key in keys_to_remove:
+                del self.hardware_database[key]
+            
+            self.logger.info(f"Cleaned up {entries_to_remove} old hardware entries")
+    
+    def get_hardware_profile_with_persistence(self, geo_location: str = "ID", complexity: str = "moderate") -> Dict:
+        """Get hardware profile with optional persistence"""
+        # Create unique key for this combination
+        profile_key = f"{geo_location}_{complexity}"
+        
+        # Check if we have a cached profile
+        if profile_key in self.hardware_database:
+            self.logger.debug(f"Using cached hardware profile for {profile_key}")
+            return self.hardware_database[profile_key]
+        
+        # Generate new profile
+        hardware_profile = self.generate_hardware_profile(geo_location, complexity)
+        
+        # Cache the profile
+        self.hardware_database[profile_key] = hardware_profile
+        
+        # Auto-save if enabled
+        if self.hardware_persistence_config.get("auto_save", True):
+            self.save_hardware_database()
         
         return hardware_profile
     

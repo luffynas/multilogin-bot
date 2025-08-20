@@ -220,6 +220,66 @@ fingerprint:
   enable_advanced_stealth: true
   enable_ai_behavior: true
   stealth_level: "expert"  # basic, advanced, expert
+  
+  # Optional Fingerprint Persistence (for consistency across restarts)
+  persistence:
+    enabled: false                    # ✅ Enable for fingerprint consistency
+    storage_mode: "memory"            # ✅ "memory", "encrypted_file", "secure_temp"
+    cache_file: "fingerprint_cache.json"
+    auto_save: true                   # Auto-save after each fingerprint generation
+    backup_enabled: true              # Create backup before overwriting
+    max_cache_size: 1000              # Maximum number of cached fingerprints
+    cleanup_interval: 86400           # Cleanup old entries every 24 hours (seconds)
+    
+    # ✅ STEALTH ENHANCEMENTS - Anti-Detection for File Operations
+    stealth_file_ops:
+      enabled: true                   # ✅ Enable stealth file operations
+      use_memory_cache: true          # ✅ Prefer in-memory over disk
+      delayed_writes: true            # ✅ Delay file writes to avoid detection
+      write_delay_min: 30             # ✅ Minimum delay before writing (seconds)
+      write_delay_max: 300            # ✅ Maximum delay before writing (seconds)
+      encrypted_storage: true         # ✅ Encrypt cache files
+      temp_file_cleanup: true         # ✅ Clean temp files immediately
+      randomize_filenames: true       # ✅ Use random cache file names
+      obfuscate_content: true         # ✅ Obfuscate file content
+  
+  # Optional Hardware Profile Persistence
+  hardware_persistence:
+    enabled: false                    # ✅ Enable for hardware consistency
+    storage_mode: "memory"            # ✅ "memory", "encrypted_file", "secure_temp"
+    cache_file: "hardware_cache.json"
+    auto_save: true                   # Auto-save after each hardware profile generation
+    backup_enabled: true              # Create backup before overwriting
+    max_cache_size: 500               # Maximum number of cached hardware profiles
+    cleanup_interval: 86400           # Cleanup old entries every 24 hours (seconds)
+    
+    # ✅ STEALTH ENHANCEMENTS - Anti-Detection for File Operations
+    stealth_file_ops:
+      enabled: true                   # ✅ Enable stealth file operations
+      use_memory_cache: true          # ✅ Prefer in-memory over disk
+      delayed_writes: true            # ✅ Delay file writes to avoid detection
+      write_delay_min: 30             # ✅ Minimum delay before writing (seconds)
+      write_delay_max: 300            # ✅ Maximum delay before writing (seconds)
+      encrypted_storage: true         # ✅ Encrypt cache files
+      temp_file_cleanup: true         # ✅ Clean temp files immediately
+      randomize_filenames: true       # ✅ Use random cache file names
+      obfuscate_content: true         # ✅ Obfuscate file content
+  
+  # Optional Consistency Monitoring
+  consistency_monitoring:
+    enabled: false                    # ✅ Enable for fingerprint change detection
+    log_changes: true                 # Log when fingerprints change
+    alert_on_inconsistency: false     # Alert when same proxy gets different fingerprint
+    track_changes: true               # Track fingerprint changes over time
+    change_threshold: 0.8             # Alert if consistency drops below 80%
+    
+    # ✅ STEALTH ENHANCEMENTS - Memory-Only Monitoring
+    stealth_monitoring:
+      enabled: true                   # ✅ Enable stealth monitoring
+      memory_only: true               # ✅ Keep all tracking in memory only
+      no_disk_writes: true            # ✅ Never write monitoring data to disk
+      encrypted_logs: true            # ✅ Encrypt log data in memory
+      auto_cleanup: true              # ✅ Auto-cleanup monitoring data
 
 # Advanced Undetectable Traffic Settings
 undetectable_traffic:
