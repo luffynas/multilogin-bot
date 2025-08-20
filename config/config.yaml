@@ -22,16 +22,79 @@ concurrent_execution:
   batch_delay: 300  # Delay between batches (5 minutes)
 
 proxy:
-  provider: "socksescort"  # Supported: oxylabs, brightdata, socksescort, nodemaven, decodo, proxyempire, netnut, soax, iproyal
+  # Global Proxy Settings
   type: "socks5"
   total_count: 1000  # Increased to 1000 proxies for high-volume processing
   daily_limit_per_proxy: 1
   health_check_interval: 180  # 3 minutes
   success_rate_min: 0.9       # 90% success rate requirement
   response_time_max: 5.0      # 5 seconds max response time
-  # ⚠️ ADD YOUR PROXY CREDENTIALS HERE:
-  # username: "your_socksescort_username"
-  # password: "your_socksescort_password"
+  
+  # Production Monitoring & Alerting
+  alert_threshold: 0.2        # Alert jika < 20% proxy tersedia
+  critical_threshold: 0.1     # Critical alert jika < 10% proxy tersedia
+  auto_fallback: true         # Enable automatic provider fallback
+  fallback_delay: 60          # Delay sebelum fallback (seconds)
+  max_fallback_retries: 3     # Maximum retry attempts
+  
+  # Unified Multi-Provider Configuration (Priority-based)
+  # Supported: oxylabs, brightdata, socksescort, nodemaven, decodo, proxyempire, netnut, soax, iproyal
+  providers:
+    - name: "socksescort"      # PRIMARY PROVIDER (was legacy default)
+      priority: 1
+      enabled: true            # ✅ ENABLED - Primary provider
+      primary: true            # Mark as primary provider
+      credentials:
+        username: "your_socksescort_username"
+        password: "your_socksescort_password"
+    - name: "oxylabs"
+      priority: 2
+      enabled: false           # ❌ DISABLED - Fallback only
+      credentials:
+        username: "your_oxylabs_username"
+        password: "your_oxylabs_password"
+    - name: "brightdata"
+      priority: 3
+      enabled: false           # ❌ DISABLED - Fallback only
+      credentials:
+        username: "your_brightdata_username"
+        password: "your_brightdata_password"
+    - name: "nodemaven"
+      priority: 4
+      enabled: false           # ❌ DISABLED - Fallback only
+      credentials:
+        username: "your_nodemaven_username"
+        password: "your_nodemaven_password"
+    - name: "decodo"
+      priority: 5
+      enabled: false           # ❌ DISABLED - Fallback only
+      credentials:
+        username: "your_decodo_username"
+        password: "your_decodo_password"
+    - name: "proxyempire"
+      priority: 6
+      enabled: false           # ❌ DISABLED - Fallback only
+      credentials:
+        username: "your_proxyempire_username"
+        password: "your_proxyempire_password"
+    - name: "netnut"
+      priority: 7
+      enabled: false           # ❌ DISABLED - Fallback only
+      credentials:
+        username: "your_netnut_username"
+        password: "your_netnut_password"
+    - name: "soax"
+      priority: 8
+      enabled: false           # ❌ DISABLED - Fallback only
+      credentials:
+        username: "your_soax_username"
+        password: "your_soax_password"
+    - name: "iproyal"
+      priority: 9
+      enabled: false           # ❌ DISABLED - Fallback only
+      credentials:
+        username: "your_iproyal_username"
+        password: "your_iproyal_password"
 
 # Dynamic Entry Point Configuration
 dynamic_entry_points:
@@ -256,6 +319,24 @@ adsense_testing:
       high_value_keywords: true
       long_session_optimization: true
       natural_engagement: true
+
+# Error Handling Configuration
+error_handling:
+  max_retries: 3
+  base_delay: 1
+  max_delay: 60
+  backoff_factor: 2
+  jitter: 0.1
+  max_errors_per_hour: 10
+  max_errors_per_session: 3
+  critical_error_threshold: 5
+  
+  # Production Recovery Settings
+  auto_recovery: true
+  recovery_check_interval: 300  # 5 minutes
+  max_recovery_attempts: 5
+  recovery_backoff_factor: 1.5
+  graceful_degradation: true
 
 # Logging Configuration
 logging:

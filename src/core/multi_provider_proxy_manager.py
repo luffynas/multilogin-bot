@@ -113,21 +113,81 @@ class MultiProviderProxyManager:
             }
         }
         
-        # Current provider configuration
-        self.current_provider = config.get("proxy", {}).get("provider", "oxylabs")
+        # Production monitoring settings
+        self.alert_threshold = config.get("proxy", {}).get("alert_threshold", 0.2)
+        self.critical_threshold = config.get("proxy", {}).get("critical_threshold", 0.1)
+        self.auto_fallback = config.get("proxy", {}).get("auto_fallback", True)
+        self.fallback_delay = config.get("proxy", {}).get("fallback_delay", 60)
+        self.max_fallback_retries = config.get("proxy", {}).get("max_fallback_retries", 3)
+        
+        # Unified multi-provider configuration
+        self.provider_list = config.get("proxy", {}).get("providers", [])
+        
+        # Initialize current provider from primary provider in list
+        self.current_provider, self.current_provider_index = self._find_primary_provider()
         self.provider_config = self.provider_configs.get(self.current_provider, {})
+        self.fallback_attempts = 0
+        
+        # Log initialization
+        if self.provider_list:
+            self.logger.info(f"Unified multi-provider mode enabled with {len(self.provider_list)} providers")
+            self.logger.info(f"Primary provider: {self.current_provider} (priority {self.current_provider_index + 1})")
+        else:
+            # Fallback to default if no providers configured
+            self.current_provider = "oxylabs"
+            self.current_provider_index = 0
+            self.logger.warning("No providers configured, using default: oxylabs")
         
         # Proxy pool management
         self.proxy_pool = []
         self.active_proxies = {}
         self.proxy_usage_stats = {}
         
-        # Authentication
-        self.username = config.get("proxy", {}).get("username")
-        self.password = config.get("proxy", {}).get("password")
+        # Authentication from provider credentials
+        self.username, self.password = self._get_current_credentials()
         
         # Load proxy pool
         self.load_proxy_pool()
+    
+    def _find_primary_provider(self) -> tuple[str, int]:
+        """Find primary provider from providers list"""
+        if not self.provider_list:
+            return "oxylabs", 0
+        
+        # Look for provider marked as primary
+        for i, provider in enumerate(self.provider_list):
+            if provider.get("primary", False):
+                return provider["name"], i
+        
+        # If no primary, use first enabled provider
+        for i, provider in enumerate(self.provider_list):
+            if provider.get("enabled", True):
+                return provider["name"], i
+        
+        # Fallback to first provider
+        return self.provider_list[0]["name"], 0
+    
+    def _get_current_credentials(self) -> tuple[str, str]:
+        """Get credentials for current provider"""
+        if not self.provider_list:
+            return None, None
+        
+        current_provider_config = self.provider_list[self.current_provider_index]
+        credentials = current_provider_config.get("credentials", {})
+        
+        return credentials.get("username"), credentials.get("password")
+    
+    def _get_credentials_for_provider(self, provider_config: Dict) -> tuple[str, str]:
+        """Get credentials for specific provider"""
+        credentials = provider_config.get("credentials", {})
+        return credentials.get("username"), credentials.get("password")
+    
+    def _find_provider_index(self, provider_name: str) -> int:
+        """Find provider index in multi-provider list"""
+        for i, provider in enumerate(self.provider_list):
+            if provider.get("name") == provider_name:
+                return i
+        return 0  # Default to first provider if not found
     
     def load_proxy_pool(self):
         """Load proxy pool based on provider"""
@@ -561,7 +621,31 @@ class MultiProviderProxyManager:
         return base64.b64encode(credentials.encode()).decode()
     
     def get_available_proxies(self, count: int = None, geo_filter: str = None) -> List[Dict]:
-        """Get available proxies with optional filtering"""
+        """Get available proxies with auto-recovery and monitoring"""
+        try:
+            # Get proxies from current provider
+            available_proxies = self._get_proxies_from_current_provider(count, geo_filter)
+            
+            # Check if we need to trigger fallback
+            if not available_proxies and self.auto_fallback:
+                available_proxies = self._try_provider_fallback(count, geo_filter)
+            
+            # Monitor proxy availability
+            self._monitor_proxy_availability(available_proxies)
+            
+            return available_proxies
+            
+        except Exception as e:
+            self.logger.error(f"Error getting proxies from {self.current_provider}: {str(e)}")
+            
+            # Try fallback if auto-fallback is enabled
+            if self.auto_fallback:
+                return self._try_provider_fallback(count, geo_filter)
+            
+            return []
+    
+    def _get_proxies_from_current_provider(self, count: int = None, geo_filter: str = None) -> List[Dict]:
+        """Get proxies from current provider with filtering"""
         available_proxies = self.proxy_pool.copy()
         
         # Filter by geo if specified
@@ -580,6 +664,91 @@ class MultiProviderProxyManager:
             available_proxies = available_proxies[:count]
         
         return available_proxies
+    
+    def _try_provider_fallback(self, count: int = None, geo_filter: str = None) -> List[Dict]:
+        """Try fallback to next available provider"""
+        if self.fallback_attempts >= self.max_fallback_retries:
+            self.logger.error(f"Max fallback attempts ({self.max_fallback_retries}) reached")
+            return []
+        
+        self.fallback_attempts += 1
+        self.logger.warning(f"Attempting provider fallback (attempt {self.fallback_attempts}/{self.max_fallback_retries})")
+        
+        # Try next provider in the list
+        for i in range(len(self.provider_list)):
+            next_index = (self.current_provider_index + i) % len(self.provider_list)
+            provider_config = self.provider_list[next_index]
+            
+            if provider_config.get("enabled", True):
+                old_provider = self.current_provider
+                self.current_provider = provider_config["name"]
+                self.current_provider_index = next_index
+                
+                self.logger.info(f"Switching from {old_provider} to {self.current_provider}")
+                
+                # Update credentials from provider config
+                self.username, self.password = self._get_credentials_for_provider(provider_config)
+                
+                # Reload proxy pool for new provider
+                self.load_proxy_pool()
+                
+                # Try to get proxies from new provider
+                proxies = self._get_proxies_from_current_provider(count, geo_filter)
+                
+                if proxies:
+                    self.logger.info(f"Successfully switched to {self.current_provider}")
+                    self.fallback_attempts = 0  # Reset fallback attempts
+                    return proxies
+                else:
+                    self.logger.warning(f"Failed to get proxies from {self.current_provider}")
+        
+        # If all providers failed, wait before retry
+        if self.fallback_attempts < self.max_fallback_retries:
+            self.logger.info(f"Waiting {self.fallback_delay} seconds before next fallback attempt...")
+            time.sleep(self.fallback_delay)
+            return self._try_provider_fallback(count, geo_filter)
+        
+        return []
+    
+    def _monitor_proxy_availability(self, proxies: List[Dict]):
+        """Monitor proxy availability and trigger alerts"""
+        if not proxies:
+            return
+        
+        total_proxies = len(self.proxy_pool) if self.proxy_pool else 1
+        available_ratio = len(proxies) / total_proxies
+        
+        # Check critical threshold
+        if available_ratio <= self.critical_threshold:
+            self.logger.critical(f"CRITICAL: Proxy availability below critical threshold! "
+                               f"Available: {len(proxies)}/{total_proxies} ({available_ratio:.1%})")
+        
+        # Check alert threshold
+        elif available_ratio <= self.alert_threshold:
+            self.logger.warning(f"ALERT: Proxy availability below alert threshold! "
+                              f"Available: {len(proxies)}/{total_proxies} ({available_ratio:.1%})")
+        
+        # Log normal availability
+        else:
+            self.logger.info(f"Proxy availability: {len(proxies)}/{total_proxies} ({available_ratio:.1%})")
+    
+    def retry_proxy_acquisition(self, count: int = 100, max_retries: int = 3) -> List[Dict]:
+        """Retry proxy acquisition with exponential backoff"""
+        for attempt in range(max_retries):
+            self.logger.info(f"Proxy acquisition attempt {attempt + 1}/{max_retries}")
+            
+            proxies = self.get_available_proxies(count=count)
+            if proxies:
+                self.logger.info(f"Successfully acquired {len(proxies)} proxies")
+                return proxies
+            
+            # Exponential backoff
+            delay = 60 * (2 ** attempt)  # 60s, 120s, 240s
+            self.logger.info(f"No proxies available, waiting {delay} seconds before retry...")
+            time.sleep(delay)
+        
+        self.logger.error(f"Failed to acquire proxies after {max_retries} attempts")
+        return []
     
     def get_proxy_for_session(self, session_id: str, geo_preference: str = None) -> Optional[Dict]:
         """Get a proxy for a specific session"""
