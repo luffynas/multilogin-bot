@@ -114,7 +114,10 @@ class ConfigValidator:
         
         # Validate provider
         if "provider" in config and config["provider"]:
-            valid_providers = ["oxylabs", "webshare", "brightdata", "test_provider"]
+            valid_providers = [
+                "oxylabs", "brightdata", "socksescort", "nodemaven", 
+                "decodo", "proxyempire", "netnut", "soax", "iproyal"
+            ]
             if config["provider"] not in valid_providers:
                 self.warnings.append(f"Unknown proxy provider: {config['provider']}")
         

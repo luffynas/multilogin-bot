@@ -13,7 +13,7 @@ multilogin:
   profile_timeout: 1800  # 30 minutes
 
 proxy:
-  provider: "oxylabs"  # or "webshare", "brightdata"
+  provider: "socksescort"  # Supported: oxylabs, brightdata, socksescort, nodemaven, decodo, proxyempire, netnut, soax, iproyal
   type: "socks5"
   total_count: 100  # Reduced for testing
   daily_limit_per_proxy: 1
@@ -21,8 +21,8 @@ proxy:
   success_rate_min: 0.9       # 90% success rate requirement
   response_time_max: 5.0      # 5 seconds max response time
   # ⚠️ ADD YOUR PROXY CREDENTIALS HERE:
-  # username: "your_proxy_username"
-  # password: "your_proxy_password"
+  # username: "your_socksescort_username"
+  # password: "your_socksescort_password"
 
 # Dynamic Entry Point Configuration
 dynamic_entry_points:

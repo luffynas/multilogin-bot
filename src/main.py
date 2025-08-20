@@ -18,21 +18,22 @@ from typing import Dict, List, Optional
 # Add src to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from src.core.multilogin_manager import MultiloginManager
-from src.core.referer_simulator import RefererSimulator
-from src.core.fingerprint_engine import FingerprintEngine
-from src.bots.human_simulator import HumanSimulator
-from src.core.adsense_testing_monitor import AdSenseTestingMonitor
-from src.core.mouse_simulator import MouseSimulator
-from src.core.hardware_emulator import HardwareEmulator
-from src.core.advanced_ai_behavior_engine import AdvancedAIBehaviorEngine
-from src.core.network_behavior_simulator import NetworkBehaviorSimulator
-from src.core.ml_adaptive_engine import MLAdaptiveEngine
-from src.core.social_proof_simulator import SocialProofSimulator
-from src.core.content_intelligence_engine import ContentIntelligenceEngine
-from src.core.behavioral_biometrics_engine import BehavioralBiometricsEngine
-from src.core.temporal_pattern_analyzer import TemporalPatternAnalyzer
-from src.core.dynamic_entry_manager import DynamicEntryManager
+from core.multilogin_manager import MultiloginManager
+from core.referer_simulator import RefererSimulator
+from core.fingerprint_engine import FingerprintEngine
+from bots.human_simulator import HumanSimulator
+from core.adsense_testing_monitor import AdSenseTestingMonitor
+from core.mouse_simulator import MouseSimulator
+from core.hardware_emulator import HardwareEmulator
+from core.advanced_ai_behavior_engine import AdvancedAIBehaviorEngine
+from core.network_behavior_simulator import NetworkBehaviorSimulator
+from core.ml_adaptive_engine import MLAdaptiveEngine
+from core.social_proof_simulator import SocialProofSimulator
+from core.content_intelligence_engine import ContentIntelligenceEngine
+from core.behavioral_biometrics_engine import BehavioralBiometricsEngine
+from core.temporal_pattern_analyzer import TemporalPatternAnalyzer
+from core.dynamic_entry_manager import DynamicEntryManager
+from core.multi_provider_proxy_manager import MultiProviderProxyManager
 
 def parse_arguments():
     """Parse command line arguments"""
@@ -135,6 +136,9 @@ class MultiLoginBotOrchestrator:
             base_url=self.config["multilogin"]["base_url"]
         )
         
+        # Initialize multi-provider proxy manager
+        self.proxy_manager = MultiProviderProxyManager(self.config)
+        
         self.referer_simulator = RefererSimulator(self.config)
         self.fingerprint_engine = FingerprintEngine(self.config)
         self.human_simulator = HumanSimulator(self.config)
@@ -178,7 +182,6 @@ class MultiLoginBotOrchestrator:
         # Session tracking
         self.active_sessions = {}
         self.session_history = []
-        self.proxy_usage = {}
         
         self.logger.info("Multi-Login Bot Orchestrator initialized")
     
@@ -245,38 +248,22 @@ class MultiLoginBotOrchestrator:
             handlers=handlers
         )
     
-    def generate_proxy_config(self, proxy_id: int) -> Dict:
-        """Generate proxy configuration for testing (replace with actual proxy data)"""
-        # This is a placeholder - replace with actual proxy data from your provider
-        proxy_configs = [
-            {
-                "id": f"proxy_{i}",
-                "host": "proxy.oxylabs.io",
-                "port": 1080,
-                "username": f"customer-username-zone-static_route-id-ip-{i}",
-                "password": "your_password",
-                "geo": "ID"
-            }
-            for i in range(1, 10001)  # 10000 proxies
-        ]
-        
-        return proxy_configs[proxy_id % len(proxy_configs)]
-    
     def get_available_proxies(self, count: int) -> List[Dict]:
-        """Get available proxies that haven't been used today"""
-        today = datetime.now().date()
-        available_proxies = []
-        
-        for i in range(count):
-            proxy_config = self.generate_proxy_config(i)
-            proxy_id = proxy_config["id"]
+        """Get available proxies using the new multi-provider proxy manager"""
+        try:
+            # Use the new proxy manager to get available proxies
+            available_proxies = self.proxy_manager.get_available_proxies(count=count)
             
-            # Check if proxy was used today
-            if proxy_id not in self.proxy_usage or self.proxy_usage[proxy_id] != today:
-                available_proxies.append(proxy_config)
-                self.proxy_usage[proxy_id] = today
-        
-        return available_proxies
+            if not available_proxies:
+                self.logger.warning(f"No available proxies found. Provider: {self.proxy_manager.current_provider}")
+                return []
+            
+            self.logger.info(f"Retrieved {len(available_proxies)} proxies from {self.proxy_manager.current_provider}")
+            return available_proxies
+            
+        except Exception as e:
+            self.logger.error(f"Error getting available proxies: {str(e)}")
+            return []
     
     def create_session(self, proxy_config: Dict, target_url: str) -> Optional[Dict]:
         """Create complete browsing session with dynamic entry point simulation"""
@@ -581,7 +568,7 @@ class MultiLoginBotOrchestrator:
             "average_session_duration": sum(s.get("duration", 0) for s in self.session_history) / len(self.session_history),
             "fingerprint_summary": self.fingerprint_engine.get_fingerprint_summary(),
             "referer_distribution": self.get_referer_distribution(),
-            "proxy_usage": len(self.proxy_usage)
+            "proxy_usage": self.proxy_manager.get_proxy_stats().get("total_proxies", 0) if hasattr(self, 'proxy_manager') else 0
         }
         
         # Generate AdSense specific report
@@ -644,6 +631,13 @@ class MultiLoginBotOrchestrator:
             network_summary = self.network_behavior_simulator.get_network_summary()
             self.logger.info(f"Network behavior summary: {network_summary.get('connection_switches', 0)} switches, "
                            f"stability score: {network_summary.get('network_stability_score', 0):.2f}")
+        
+        # Generate proxy manager summary
+        if hasattr(self, 'proxy_manager') and self.proxy_manager:
+            proxy_summary = self.proxy_manager.get_proxy_stats()
+            self.logger.info(f"Proxy Manager summary: {proxy_summary.get('total_proxies', 0)} proxies, "
+                           f"provider: {proxy_summary.get('provider', 'unknown')}, "
+                           f"active: {proxy_summary.get('active_proxies', 0)}")
         
         # Generate final intelligence summaries
         if self.ml_adaptive_engine:
