@@ -1,0 +1,38 @@
+{
+  "start_time": "2025-08-22T21:17:32.292587",
+  "tests": {
+    "multilogin_connection": {
+      "status": "PASSED",
+      "message": "Multilogin X connection successful"
+    },
+    "profile_creation": {
+      "status": "PASSED",
+      "message": "Profile created: d766a182-2248-4114-88fd-c65187ee1e0f",
+      "profile_id": "d766a182-2248-4114-88fd-c65187ee1e0f"
+    },
+    "profile_start": {
+      "status": "PASSED",
+      "message": "Profile started successfully",
+      "browser_info": {
+        "status": {
+          "error_code": "",
+          "http_code": 200,
+          "message": ""
+        }
+      }
+    },
+    "navigation": {
+      "status": "FAILED",
+      "message": "'SimpleComprehensiveTest' object has no attribute 'folder_id'"
+    },
+    "profile_stop": {
+      "status": "FAILED",
+      "message": "'SimpleComprehensiveTest' object has no attribute 'folder_id'"
+    },
+    "profile_cleanup": {
+      "status": "PASSED",
+      "message": "Test profile cleaned up successfully"
+    }
+  },
+  "overall_status": "FAILED"
+}

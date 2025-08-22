@@ -1,59 +1,172 @@
 import requests
 import time
 import json
+import hashlib
 from typing import Dict, Any, Optional
 import logging
 
 class MultiloginManager:
-    def __init__(self, api_key: str, base_url: str = "http://localhost:35000"):
-        self.api_key = api_key
+    def __init__(self, username: str, password: str, base_url: str = "https://api.multilogin.com", launcher_url: str = "https://launcher.mlx.yt:45001/api/v1"):
+        self.username = username
+        self.password = password
         self.base_url = base_url
-        self.headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
+        self.launcher_url = launcher_url
+        self.token = None
         self.logger = logging.getLogger(__name__)
+        
+        # ✅ MULTILOGIN X AUTOMATIC SIGN IN
+        self._sign_in()
+    
+    def _sign_in(self):
+        """Sign in to Multilogin X and get bearer token"""
+        try:
+            # ✅ IMPLEMENTATION BASED ON OFFICIAL DOCUMENTATION
+            sign_url = f"{self.base_url}/user/signin"
+            headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+            }
+            
+            # ✅ MD5 ENCRYPTION FOR PASSWORD (as per documentation)
+            payload = {
+                "email": self.username,
+                "password": str(hashlib.md5(self.password.encode()).hexdigest()),
+            }
+            
+            # POST request to sign in
+            resp = requests.post(sign_url, json=payload, headers=headers)
+            resp_json = resp.json()
+            
+            # Get bearer token
+            self.token = resp_json["data"]["token"]
+            self.logger.info(f"Successfully signed in to Multilogin X with token: {self.token[:20]}...")
+            
+            # Set headers with bearer token based on official curl example
+            self.headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "X-Strict-Mode": "true",  # Based on official curl example
+                "Authorization": f"Bearer {self.token}"
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Failed to sign in to Multilogin X: {str(e)}")
+            raise Exception(f"Multilogin X authentication failed: {str(e)}")
+    
+    def _refresh_token_if_needed(self):
+        """Refresh token if expired"""
+        if not self.token:
+            self._sign_in()
     
     def create_profile(self, name: str, proxy_config: Dict, fingerprint_config: Dict) -> Dict:
-        """Create new Multilogin profile with SOCKS5 proxy"""
+        """Create new Multilogin X profile with SOCKS5 proxy"""
         try:
+            self._refresh_token_if_needed()
+            
             # ✅ FIXED: Dynamic OS and platform detection based on device type
             device_type = fingerprint_config.get("device_type", "desktop_windows")
             os_info = self._get_os_info_from_device_type(device_type)
             platform_info = self._get_platform_info_from_device_type(device_type)
             
-            # ✅ IMPROVED: Use Browser Mimic X for better stealth
+            # ✅ IMPROVED: Use correct platform according to API documentation
             browser_config = self._get_browser_config_for_device_type(device_type, os_info["os"])
             
+            # ✅ FIXED: Correct payload structure based on official curl example
             profile_data = {
                 "name": name,
-                "platform": "mimic",  # ✅ Browser Mimic X instead of "chrome"
-                "browser": browser_config["browser"],  # ✅ Dynamic browser selection
-                "proxy": {
-                    "mode": "socks5",
-                    "host": proxy_config["host"],
-                    "port": proxy_config["port"],
-                    "username": proxy_config["username"],
-                    "password": proxy_config["password"]
-                },
-                "userAgent": fingerprint_config["user_agent"],
+                "browser_type": "chrome",  # Based on curl example
+                "folder_id": None,
+                "os_type": os_info["os"],
+                "core_version": 1,
+                "core_minor_version": 0,
+                "times": 1,
                 "notes": f"Auto-generated for {proxy_config.get('geo', 'unknown')}",
-                "timezone": fingerprint_config.get("timezone", "America/New_York"),
-                "language": fingerprint_config.get("language", "en-US"),
-                "screenResolution": fingerprint_config.get("screen_resolution", "1920x1080"),
-                # ✅ FIXED: Dynamic OS and platform based on device type
-                "tags": [],
-                "folderId": None,
-                "os": os_info["os"],
-                "navigator": {
-                    "userAgent": fingerprint_config["user_agent"],
-                    "language": fingerprint_config.get("language", "en-US"),
-                    "platform": platform_info["platform"]
+                "parameters": {
+                    "flags": {
+                        "audio_masking": "true",
+                        "fonts_masking": "true",
+                        "geolocation_masking": "true",
+                        "geolocation_popup": "true",
+                        "graphics_masking": "true",
+                        "graphics_noise": "true",
+                        "localization_masking": "true",
+                        "media_devices_masking": "true",
+                        "navigator_masking": "true",
+                        "ports_masking": "true",
+                        "proxy_masking": "true",
+                        "screen_masking": "true",
+                        "quic_mode": "true",
+                        "timezone_masking": "true",
+                        "webrtc_masking": "true",
+                        "canvas_noise": "true",
+                        "startup_behavior": "normal"
+                    },
+                    "storage": {
+                        "is_local": False,
+                        "save_service_worker": True
+                    },
+                    "fingerprint": {
+                        "navigator": {
+                            "hardware_concurrency": 8,
+                            "platform": platform_info["platform"],
+                            "user_agent": fingerprint_config["user_agent"],
+                            "os_cpu": "x64"
+                        },
+                        "localization": {
+                            "languages": fingerprint_config.get("language", "en-US"),
+                            "locale": fingerprint_config.get("language", "en-US"),
+                            "accept_languages": fingerprint_config.get("language", "en-US")
+                        },
+                        "timezone": {
+                            "zone": fingerprint_config.get("timezone", "America/New_York")
+                        },
+                        "graphic": {
+                            "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0, D3D11)",
+                            "vendor": "Intel Inc."
+                        },
+                        "webrtc": {
+                            "public_ip": proxy_config["host"]
+                        },
+                        "media_devices": {
+                            "audio_inputs": 1,
+                            "audio_outputs": 1,
+                            "video_inputs": 1
+                        },
+                        "screen": {
+                            "height": 1080,
+                            "pixel_ratio": 1.0,
+                            "width": 1920
+                        },
+                        "geolocation": {
+                            "accuracy": 100,
+                            "altitude": 0,
+                            "latitude": 40.7128,
+                            "longitude": -74.0060
+                        },
+                        "ports": [80, 443, 8080],
+                        "fonts": ["Arial", "Calibri", "Times New Roman"],
+                        "cmd_params": {
+                            "params": [
+                                {"flag": "--disable-web-security", "value": True},
+                                {"flag": "--disable-features", "value": True}
+                            ]
+                        }
+                    },
+                    "proxy": {
+                        "host": proxy_config["host"],
+                        "type": "socks5",
+                        "port": proxy_config["port"],
+                        "username": proxy_config["username"],
+                        "password": proxy_config["password"],
+                        "save_traffic": False
+                    },
+                    "custom_start_urls": []
                 }
             }
             
+            # ✅ FIXED: Correct endpoint URL according to official curl example
             response = requests.post(
-                f"{self.base_url}/api/v2/profile",
+                f"{self.base_url}/profile/create",  # ✅ Correct endpoint as per official curl example
                 headers=self.headers,
                 json=profile_data,
                 timeout=30
@@ -61,7 +174,7 @@ class MultiloginManager:
             
             if response.status_code == 200:
                 profile = response.json()
-                self.logger.info(f"Profile created: {profile['uuid']} with OS: {os_info['os']}, Platform: {platform_info['platform']}, Browser: {browser_config['browser']} (Mimic X)")
+                self.logger.info(f"Profile created: {profile['uuid']} with OS: {os_info['os']}, Platform: {platform_info['platform']}, Browser: {browser_config['browser']} (Multilogin X)")
                 return profile
             else:
                 self.logger.error(f"Failed to create profile: {response.text}")
@@ -179,9 +292,11 @@ class MultiloginManager:
     def start_profile(self, profile_id: str) -> Optional[Dict]:
         """Start browser profile"""
         try:
-            # ✅ FIXED: Correct endpoint URL according to API documentation
+            self._refresh_token_if_needed()
+            
+            # ✅ FIXED: Correct endpoint URL based on official structure
             response = requests.post(
-                f"{self.base_url}/api/v2/profile/{profile_id}/start",
+                f"{self.base_url}/profile/{profile_id}/start",
                 headers=self.headers,
                 timeout=30
             )
@@ -201,9 +316,11 @@ class MultiloginManager:
     def stop_profile(self, profile_id: str) -> bool:
         """Stop browser profile"""
         try:
-            # ✅ FIXED: Correct endpoint URL according to API documentation
+            self._refresh_token_if_needed()
+            
+            # ✅ FIXED: Correct endpoint URL based on official structure
             response = requests.post(
-                f"{self.base_url}/api/v2/profile/{profile_id}/stop",
+                f"{self.base_url}/profile/{profile_id}/stop",
                 headers=self.headers,
                 timeout=30
             )
@@ -222,6 +339,8 @@ class MultiloginManager:
     def navigate_to_url(self, profile_id: str, url: str, referer: str = None) -> bool:
         """Navigate to URL with optional referer"""
         try:
+            self._refresh_token_if_needed()
+            
             navigate_data = {"url": url}
             
             if referer:
@@ -232,9 +351,9 @@ class MultiloginManager:
                 }});
                 """
             
-            # ✅ FIXED: Correct endpoint URL according to API documentation
+            # ✅ FIXED: Correct endpoint URL based on official structure
             response = requests.post(
-                f"{self.base_url}/api/v2/profile/{profile_id}/navigate",
+                f"{self.base_url}/profile/{profile_id}/navigate",
                 headers=self.headers,
                 json=navigate_data,
                 timeout=30
@@ -254,9 +373,11 @@ class MultiloginManager:
     def execute_script(self, profile_id: str, script: str) -> Optional[Dict]:
         """Execute JavaScript in browser"""
         try:
-            # ✅ FIXED: Correct endpoint URL according to API documentation
+            self._refresh_token_if_needed()
+            
+            # ✅ FIXED: Correct endpoint URL based on official structure
             response = requests.post(
-                f"{self.base_url}/api/v2/profile/{profile_id}/execute",
+                f"{self.base_url}/profile/{profile_id}/execute",
                 headers=self.headers,
                 json={"script": script},
                 timeout=30
@@ -275,9 +396,11 @@ class MultiloginManager:
     def get_profile_info(self, profile_id: str) -> Optional[Dict]:
         """Get profile information"""
         try:
-            # ✅ FIXED: Correct endpoint URL according to API documentation
+            self._refresh_token_if_needed()
+            
+            # ✅ FIXED: Correct endpoint URL based on official structure
             response = requests.get(
-                f"{self.base_url}/api/v2/profile/{profile_id}",
+                f"{self.base_url}/profile/{profile_id}",
                 headers=self.headers,
                 timeout=30
             )
@@ -295,9 +418,11 @@ class MultiloginManager:
     def delete_profile(self, profile_id: str) -> bool:
         """Delete profile"""
         try:
-            # ✅ ADDED: Delete profile endpoint according to API documentation
+            self._refresh_token_if_needed()
+            
+            # ✅ ADDED: Delete profile endpoint based on official structure
             response = requests.delete(
-                f"{self.base_url}/api/v2/profile/{profile_id}",
+                f"{self.base_url}/profile/{profile_id}",
                 headers=self.headers,
                 timeout=30
             )
@@ -316,9 +441,11 @@ class MultiloginManager:
     def get_all_profiles(self) -> Optional[Dict]:
         """Get all profiles"""
         try:
-            # ✅ ADDED: Get all profiles endpoint according to API documentation
+            self._refresh_token_if_needed()
+            
+            # ✅ ADDED: Get all profiles endpoint based on official structure
             response = requests.get(
-                f"{self.base_url}/api/v2/profile",
+                f"{self.base_url}/profile",
                 headers=self.headers,
                 timeout=30
             )
@@ -336,9 +463,11 @@ class MultiloginManager:
     def update_profile(self, profile_id: str, profile_data: Dict) -> Optional[Dict]:
         """Update profile"""
         try:
-            # ✅ ADDED: Update profile endpoint according to API documentation
+            self._refresh_token_if_needed()
+            
+            # ✅ ADDED: Update profile endpoint based on official structure
             response = requests.put(
-                f"{self.base_url}/api/v2/profile/{profile_id}",
+                f"{self.base_url}/profile/{profile_id}",
                 headers=self.headers,
                 json=profile_data,
                 timeout=30

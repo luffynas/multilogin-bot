@@ -1,0 +1,38 @@
+{
+  "start_time": "2025-08-22T21:19:29.446724",
+  "tests": {
+    "multilogin_connection": {
+      "status": "PASSED",
+      "message": "Multilogin X connection successful"
+    },
+    "profile_creation": {
+      "status": "PASSED",
+      "message": "Profile created: 2b3de225-bdc0-4bc5-a3e2-25a9ca1c0656",
+      "profile_id": "2b3de225-bdc0-4bc5-a3e2-25a9ca1c0656"
+    },
+    "profile_start": {
+      "status": "PASSED",
+      "message": "Profile started successfully",
+      "browser_info": {
+        "status": {
+          "error_code": "",
+          "http_code": 200,
+          "message": ""
+        }
+      }
+    },
+    "navigation": {
+      "status": "FAILED",
+      "message": "404 - 404 page not found"
+    },
+    "profile_stop": {
+      "status": "FAILED",
+      "message": "404 - 404 page not found"
+    },
+    "profile_cleanup": {
+      "status": "PASSED",
+      "message": "Test profile cleaned up successfully"
+    }
+  },
+  "overall_status": "FAILED"
+}

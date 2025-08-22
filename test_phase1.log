@@ -1,0 +1,11 @@
+2025-08-22 20:24:52,991 - __main__ - INFO - ✅ Pre-made Cookies Manager initialized successfully
+2025-08-22 20:24:53,970 - core.premade_cookies_manager - ERROR - Failed to get target websites: 401
+2025-08-22 20:24:53,970 - __main__ - INFO - ✅ All Pre-made Cookies Manager tests completed successfully
+2025-08-22 20:24:53,971 - __main__ - INFO - ✅ Proxy Generation Manager initialized successfully
+2025-08-22 20:24:55,204 - core.proxy_generation_manager - ERROR - Failed to get proxy usage data: 401
+2025-08-22 20:24:55,204 - __main__ - INFO - ✅ All Proxy Generation Manager tests completed successfully
+2025-08-22 20:24:55,206 - __main__ - INFO - ✅ Script Runner Manager initialized successfully
+2025-08-22 20:24:55,466 - core.script_runner_manager - INFO - Retrieved 2 available scripts
+2025-08-22 20:24:55,466 - core.script_runner_manager - INFO - Successfully created safe AdSense script: /Users/zayn/mlx/deps/scripts/test_adsense_script.py
+2025-08-22 20:24:55,466 - __main__ - INFO - ✅ All Script Runner Manager tests completed successfully
+2025-08-22 20:24:55,467 - __main__ - INFO - ✅ All integration tests completed successfully

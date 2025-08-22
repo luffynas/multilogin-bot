@@ -37,6 +37,12 @@ from core.behavioral_biometrics_engine import BehavioralBiometricsEngine
 from core.temporal_pattern_analyzer import TemporalPatternAnalyzer
 from core.dynamic_entry_manager import DynamicEntryManager
 from core.multi_provider_proxy_manager import MultiProviderProxyManager
+from core.premade_cookies_manager import PremadeCookiesManager
+from core.proxy_generation_manager import ProxyGenerationManager
+from core.script_runner_manager import ScriptRunnerManager
+from core.object_storage_manager import ObjectStorageManager
+from core.bookmark_manager import BookmarkManager
+from core.browser_profile_data_manager import BrowserProfileDataManager
 
 def parse_arguments():
     """Parse command line arguments"""
@@ -135,12 +141,33 @@ class MultiLoginBotOrchestrator:
         
         # Initialize components
         self.ml_manager = MultiloginManager(
-            api_key=self.config["multilogin"]["api_key"],
-            base_url=self.config["multilogin"]["base_url"]
+            username=self.config["multilogin"]["username"],
+            password=self.config["multilogin"]["password"],
+            base_url=self.config["multilogin"]["base_url"],
+            launcher_url=self.config["multilogin"].get("launcher_url", "https://launcher.mlx.yt:45001/api/v1")
         )
         
         # Initialize multi-provider proxy manager
         self.proxy_manager = MultiProviderProxyManager(self.config)
+        
+        # Initialize new Multilogin X managers (Phase 1 & 2 implementation)
+        self.premade_cookies_manager = PremadeCookiesManager()
+        self.proxy_generation_manager = ProxyGenerationManager()
+        self.script_runner_manager = ScriptRunnerManager(
+            launcher_url=self.config["multilogin"].get("launcher_url", "https://launcher.mlx.yt:45001")
+        )
+        
+        # Initialize Phase 2 managers
+        self.object_storage_manager = ObjectStorageManager(
+            base_url=self.config["multilogin"]["base_url"],
+            launcher_url=self.config["multilogin"].get("launcher_url", "https://launcher.mlx.yt:45001")
+        )
+        self.bookmark_manager = BookmarkManager(
+            launcher_url=self.config["multilogin"].get("launcher_url", "https://launcher.mlx.yt:45001")
+        )
+        self.browser_profile_data_manager = BrowserProfileDataManager(
+            base_url=self.config["multilogin"]["base_url"]
+        )
         
         self.referer_simulator = RefererSimulator(self.config)
         self.fingerprint_engine = FingerprintEngine(self.config)

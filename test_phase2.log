@@ -1,0 +1,36 @@
+2025-08-22 20:33:16,180 - __main__ - INFO - ✅ Object Storage Manager initialized successfully
+2025-08-22 20:33:17,407 - core.object_storage_manager - ERROR - Failed to get object types: 401
+2025-08-22 20:33:17,631 - core.object_storage_manager - ERROR - Failed to get object statistics: 401
+2025-08-22 20:33:17,631 - __main__ - INFO - ✅ All Object Storage Manager tests completed successfully
+2025-08-22 20:33:17,632 - __main__ - INFO - ✅ Bookmark Manager initialized successfully
+2025-08-22 20:33:17,635 - __main__ - INFO - ✅ All Bookmark Manager tests completed successfully
+2025-08-22 20:33:17,636 - __main__ - INFO - ✅ Browser Profile Data Manager initialized successfully
+2025-08-22 20:33:17,636 - core.browser_profile_data_manager - INFO - Profile health check completed for test-profile-456
+2025-08-22 20:33:17,636 - core.browser_profile_data_manager - INFO - Profile consistency validation completed for test-profile-456
+2025-08-22 20:33:17,636 - core.browser_profile_data_manager - INFO - Profile backup created: backup_profile_test-profile-456_1755869597.json
+2025-08-22 20:33:17,636 - core.browser_profile_data_manager - INFO - Profile data restoration initiated for test-profile-456 from backup_profile_test-profile-456_1755869597.json
+2025-08-22 20:33:17,636 - core.browser_profile_data_manager - INFO - Cleaned up temporary_files for profile test-profile-456
+2025-08-22 20:33:17,636 - core.browser_profile_data_manager - INFO - Cleaned up cache_data for profile test-profile-456
+2025-08-22 20:33:17,637 - core.browser_profile_data_manager - INFO - Cleaned up session_data for profile test-profile-456
+2025-08-22 20:33:17,637 - core.browser_profile_data_manager - INFO - Cleaned up log_files for profile test-profile-456
+2025-08-22 20:33:17,637 - core.browser_profile_data_manager - INFO - Profile data cleanup completed for test-profile-456
+2025-08-22 20:33:17,638 - core.browser_profile_data_manager - INFO - Optimized memory_usage for profile test-profile-456
+2025-08-22 20:33:17,638 - core.browser_profile_data_manager - INFO - Optimized disk_space for profile test-profile-456
+2025-08-22 20:33:17,638 - core.browser_profile_data_manager - INFO - Optimized network_connections for profile test-profile-456
+2025-08-22 20:33:17,638 - core.browser_profile_data_manager - INFO - Optimized cache_efficiency for profile test-profile-456
+2025-08-22 20:33:17,638 - core.browser_profile_data_manager - INFO - Profile performance optimization completed for test-profile-456
+2025-08-22 20:33:17,638 - core.browser_profile_data_manager - INFO - Starting safe recovery for profile test-profile-456
+2025-08-22 20:33:17,638 - core.browser_profile_data_manager - INFO - Profile health check completed for test-profile-456
+2025-08-22 20:33:17,638 - core.browser_profile_data_manager - INFO - Profile test-profile-456 is healthy, no recovery needed
+2025-08-22 20:33:17,638 - core.browser_profile_data_manager - INFO - Profile health check completed for test-profile-1
+2025-08-22 20:33:17,638 - core.browser_profile_data_manager - INFO - Profile consistency validation completed for test-profile-1
+2025-08-22 20:33:17,639 - core.browser_profile_data_manager - INFO - Profile health check completed for test-profile-2
+2025-08-22 20:33:17,639 - core.browser_profile_data_manager - INFO - Profile consistency validation completed for test-profile-2
+2025-08-22 20:33:17,639 - core.browser_profile_data_manager - INFO - Profile health check completed for test-profile-3
+2025-08-22 20:33:17,639 - core.browser_profile_data_manager - INFO - Profile consistency validation completed for test-profile-3
+2025-08-22 20:33:17,639 - core.browser_profile_data_manager - INFO - Maintenance report generated for 3 profiles
+2025-08-22 20:33:17,639 - __main__ - INFO - ✅ All Browser Profile Data Manager tests completed successfully
+2025-08-22 20:33:18,309 - core.object_storage_manager - ERROR - Failed to get object types: 401
+2025-08-22 20:33:18,309 - core.browser_profile_data_manager - INFO - Profile health check completed for integration-test-profile
+2025-08-22 20:33:18,309 - core.browser_profile_data_manager - INFO - Profile health check completed for invalid-profile-123
+2025-08-22 20:33:18,310 - __main__ - INFO - ✅ All Phase 2 integration tests completed successfully

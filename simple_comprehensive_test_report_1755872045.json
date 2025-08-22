@@ -1,0 +1,38 @@
+{
+  "start_time": "2025-08-22T21:13:52.401739",
+  "tests": {
+    "multilogin_connection": {
+      "status": "PASSED",
+      "message": "Multilogin X connection successful"
+    },
+    "profile_creation": {
+      "status": "PASSED",
+      "message": "Profile created: e15ac58f-3506-4bba-ba4f-3979123b6699",
+      "profile_id": "e15ac58f-3506-4bba-ba4f-3979123b6699"
+    },
+    "profile_start": {
+      "status": "PASSED",
+      "message": "Profile started successfully",
+      "browser_info": {
+        "status": {
+          "error_code": "",
+          "http_code": 200,
+          "message": ""
+        }
+      }
+    },
+    "navigation": {
+      "status": "FAILED",
+      "message": "404 - 404 page not found"
+    },
+    "profile_stop": {
+      "status": "FAILED",
+      "message": "404 - 404 page not found"
+    },
+    "profile_cleanup": {
+      "status": "FAILED",
+      "message": "403 - {\"status\":{\"error_code\":\"PERMISSIONS_NOT_OK\",\"http_code\":403,\"message\":\"key 'ids' is required\"}}"
+    }
+  },
+  "overall_status": "FAILED"
+}

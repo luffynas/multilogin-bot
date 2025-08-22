@@ -1,0 +1,104 @@
+curl --location 'https://api.multilogin.com/profile/create' \
+--header 'Content-Type: application/json' \
+--header 'Accept: application/json' \
+--data '{
+    // This is an example of a successful request with 201 created. The created profile has most of the flags set to Custom. Fingerprints flagged as Custom can be passed manually. If set to Mask/Natural/Disabled, no values are needed.  
+    "name": "Profile_name",
+    "browser_type": "mimic",
+    "folder_id": "4500dd84-d8c5-4450-b2df-1c64daed8bad",
+    "core_version": 124,
+    "auto_update_core": false,
+    "os_type": "windows",
+    "times": 1,
+    "notes": "asd",
+    "parameters": {
+        "flags": {
+            "audio_masking": "mask",
+            "fonts_masking": "custom",
+            "geolocation_masking": "custom",
+            "geolocation_popup": "prompt",
+            "graphics_masking": "custom",
+            "graphics_noise": "mask",
+            "localization_masking": "custom",
+            "media_devices_masking": "custom",
+            "navigator_masking": "custom",
+            "ports_masking": "mask",
+            "proxy_masking": "custom",
+            "quic_mode": "natural",
+            "screen_masking": "custom",
+            "timezone_masking": "custom",
+            "webrtc_masking": "custom",
+            "canvas_noise": "mask",
+            "startup_behavior": "custom"
+        },
+        "storage": {
+            "is_local": false,
+            "save_service_worker": false
+        },
+        "fingerprint": {
+            "navigator": {
+                "hardware_concurrency": 8,
+                "platform": "Win32",
+                "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                "os_cpu": ""
+            },
+            "localization": {
+                "languages": "en-US",
+                "locale": "en-US",
+                "accept_languages": "en-US,en;q=0.5"
+            },
+            "timezone": {
+                "zone": "Asia/Bangkok"
+            },
+            "graphic": {
+                "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti Direct3D11 vs_5_0 ps_5_0, D3D11)",
+                "vendor": "Google Inc. (NVIDIA)"
+            },
+            "webrtc": {
+                "public_ip": "123.123.123.123"
+            },
+            "media_devices": {
+                "audio_inputs": 1,
+                "audio_outputs": 1,
+                "video_inputs": 2
+            },
+            "screen": {
+                "height": 1200,
+                "pixel_ratio": 1,
+                "width": 1920
+            },
+            "geolocation": {
+                "accuracy": 100,
+                "altitude": 100,
+                "latitude": 52.02,
+                "longitude": -52.1
+            },
+            "ports": [
+                12345
+            ],
+            "fonts": [
+                "81938139"
+            ],
+            "cmd_params": {
+                "params": [
+                    {
+                        "flag": "show-fps-counter",
+                        "value": "true"
+                    }
+                ]
+            }
+        },
+        "proxy": {
+            "type": "http",
+            "host": "proxyhost.com",
+            "port": 8081,
+            "username": "username",
+            "password": "password",
+            "save_traffic": false // value by default
+        },
+        "custom_start_urls": [
+            "https://jsonformatter.org/",
+            "https://python.org/"
+        ]
+    }
+}'

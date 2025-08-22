@@ -7,9 +7,22 @@
 # 4. Adjust daily_visits_min/max based on your testing needs
 
 multilogin:
-  api_key: "eyJhbGciOiJIUzUxMiJ9.eyJicGRzLmJ1Y2tldCI6Im1seC1icGRzLXByb2QtZXUtMSIsIm1hY2hpbmVJRCI6IiIsInByb2R1Y3RJRCI6IiIsIndvcmtzcGFjZVJvbGUiOiJvd25lciIsInZlcmlmaWVkIjp0cnVlLCJwbGFuTmFtZSI6IlByb18xMDAgKG1vbnRobHkpIiwic2hhcmRJRCI6ImNiZTEzODAwLWJiYWYtNGM4Zi04MGIzLTE5N2Y4OTYzOTRmMiIsInVzZXJJRCI6IjExMTAxYzhkLTQ1YmEtNDgxMy05NzRlLWNmZDNjMjJjNTY1NSIsImVtYWlsIjoiYmxhbmtibGFuazAyNkBnbWFpbC5jb20iLCJpc0F1dG9tYXRpb24iOmZhbHNlLCJ3b3Jrc3BhY2VJRCI6ImQzNjAyZDUzLTJlNTQtNGNjZS04N2Q3LTY0ZTg5ZTBmODY3OSIsImp0aSI6ImE0MjMyZTNhLWMyYzMtNDIwNi1iM2U4LTE5MTJiMWJlY2Y3YiIsInN1YiI6Ik1MWCIsImlzcyI6IjExMTAxYzhkLTQ1YmEtNDgxMy05NzRlLWNmZDNjMjJjNTY1NSIsImlhdCI6MTc1NTgwMTUxOCwiZXhwIjoxNzU1ODA1MTE4fQ.h6bmlXv5R_MhswlCJUiQSzEGCX_KoU5mGlb8u5TeLPOfBYPt_TSgXwxlXPPX_8dL1ZhsBdHgMUvOQaqauUypzA"  # ⚠️ REPLACE WITH YOUR ACTUAL API KEY
-  # base_url: "http://localhost:35000"
+  # ⚠️ MULTILOGIN X SETUP INSTRUCTIONS:
+  # 1. Use your Multilogin X account credentials (email & password)
+  # 2. The system will automatically sign in and get bearer token
+  # 3. No manual API key generation needed
+  
+  # ✅ MULTILOGIN X CLOUD API (OFFICIAL DOCUMENTATION)
   base_url: "https://api.multilogin.com"
+  launcher_url: "https://launcher.mlx.yt:45001/api/v1"
+  
+  # ✅ ACCOUNT CREDENTIALS (for automatic sign in)
+  username: "blankblank026@gmail.com"  # ⚠️ REPLACE WITH YOUR EMAIL
+  password: "DadiDuwit2025$"  # ⚠️ REPLACE WITH YOUR PASSWORD
+  
+  # ⚠️ NO API KEY NEEDED - System will auto-generate bearer token
+  api_key: "AUTO_GENERATED"  # Will be generated automatically after sign in
+  
   max_concurrent_profiles: 20  # Increased for high-volume processing
   profile_timeout: 1800  # 30 minutes
 
@@ -500,3 +513,56 @@ testing_mode:
   simulation_speed: "normal"  # slow, normal, fast
   max_test_sessions: 10
   test_duration: 3600  # 1 hour
+
+# 🆕 PHASE 1: NEW MULTILOGIN X FEATURES
+# Pre-made Cookies for enhanced AdSense success rate
+premade_cookies:
+  enabled: true
+  target_website: "google"  # Options: google, amazon, bing, ebay, facebook, etsy, mix
+  auto_apply: true
+  validation_enabled: true
+  consistency_check: true
+  safe_application: true
+
+# Internal Proxy Generation (replaces external providers)
+proxy_generation:
+  enabled: true
+  use_internal_proxies: true
+  fallback_to_external: true
+  validation_enabled: true
+  safe_generation: true
+  consistency_maintenance: true
+
+# Script Runner for automation
+script_runner:
+  enabled: true
+  auto_create_scripts: true
+  safe_execution: true
+  conservative_behavior: true
+  automation_type: "selenium"
+  script_validation: true
+
+# 🆕 PHASE 2: ADVANCED FEATURES
+# Object Storage for template management
+object_storage:
+  enabled: true
+  template_management: true
+  safe_operations: true
+  backup_enabled: true
+  encryption_enabled: false
+
+# Bookmark Management for profile consistency
+bookmark_management:
+  enabled: true
+  geo_specific_bookmarks: true
+  safe_import_export: true
+  consistency_check: true
+  auto_sync: true
+
+# Browser Profile Data Recovery
+browser_profile_data:
+  enabled: true
+  health_monitoring: true
+  safe_recovery: true
+  performance_optimization: true
+  maintenance_reports: true

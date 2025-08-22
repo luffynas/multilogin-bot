@@ -1,0 +1,37 @@
+2025-08-22 20:59:18,209 - __main__ - INFO - Configuration loaded successfully
+2025-08-22 20:59:19,793 - core.multilogin_manager - INFO - Successfully signed in to Multilogin X with token: eyJhbGciOiJIUzUxMiJ9...
+2025-08-22 20:59:19,794 - __main__ - INFO - Comprehensive Test initialized
+2025-08-22 20:59:19,794 - __main__ - INFO - 🚀 STARTING COMPREHENSIVE TEST
+2025-08-22 20:59:19,794 - __main__ - INFO - ================================================================================
+2025-08-22 20:59:19,795 - __main__ - INFO - ============================================================
+2025-08-22 20:59:19,795 - __main__ - INFO - TEST 1: MULTILOGIN X CONNECTION
+2025-08-22 20:59:19,795 - __main__ - INFO - ============================================================
+2025-08-22 20:59:19,795 - __main__ - INFO - Testing Multilogin X sign-in...
+2025-08-22 20:59:20,544 - core.multilogin_manager - INFO - Successfully signed in to Multilogin X with token: eyJhbGciOiJIUzUxMiJ9...
+2025-08-22 20:59:20,545 - __main__ - ERROR - ❌ Multilogin X sign-in failed
+2025-08-22 20:59:20,545 - __main__ - ERROR - ❌ Multilogin connection failed. Stopping tests.
+2025-08-22 21:00:04,140 - __main__ - INFO - Configuration loaded successfully
+2025-08-22 21:00:05,022 - core.multilogin_manager - INFO - Successfully signed in to Multilogin X with token: eyJhbGciOiJIUzUxMiJ9...
+2025-08-22 21:00:05,024 - __main__ - INFO - Comprehensive Test initialized
+2025-08-22 21:00:05,024 - __main__ - INFO - 🚀 STARTING COMPREHENSIVE TEST
+2025-08-22 21:00:05,024 - __main__ - INFO - ================================================================================
+2025-08-22 21:00:05,024 - __main__ - INFO - ============================================================
+2025-08-22 21:00:05,024 - __main__ - INFO - TEST 1: MULTILOGIN X CONNECTION
+2025-08-22 21:00:05,024 - __main__ - INFO - ============================================================
+2025-08-22 21:00:05,024 - __main__ - INFO - Testing Multilogin X sign-in...
+2025-08-22 21:00:05,867 - core.multilogin_manager - INFO - Successfully signed in to Multilogin X with token: eyJhbGciOiJIUzUxMiJ9...
+2025-08-22 21:00:05,868 - __main__ - INFO - ✅ Multilogin X sign-in successful
+2025-08-22 21:00:05,868 - __main__ - INFO - Testing token refresh...
+2025-08-22 21:00:05,868 - __main__ - INFO - ✅ Token refresh successful
+2025-08-22 21:00:05,868 - __main__ - INFO - Testing get all profiles...
+2025-08-22 21:00:06,542 - core.multilogin_manager - ERROR - Failed to get profiles: 404 page not found
+2025-08-22 21:00:06,544 - __main__ - INFO - ✅ No existing profiles found (normal for new account)
+2025-08-22 21:00:06,544 - __main__ - INFO - ============================================================
+2025-08-22 21:00:06,544 - __main__ - INFO - TEST 2: PROFILE CREATION
+2025-08-22 21:00:06,544 - __main__ - INFO - ============================================================
+2025-08-22 21:00:06,544 - __main__ - INFO - Creating test profile...
+2025-08-22 21:00:06,544 - __main__ - INFO - Profile name: Test_Profile_1755871206
+2025-08-22 21:00:06,544 - __main__ - INFO - Proxy: gate.multilogin.com:1080
+2025-08-22 21:00:07,295 - core.multilogin_manager - ERROR - Failed to create profile: {"status":{"error_code":"BAD_REQUEST_BODY","http_code":400,"message":"parse error: expected string near offset 1649 of 'value'"}}
+2025-08-22 21:00:07,297 - __main__ - ERROR - ❌ Profile creation failed: None
+2025-08-22 21:00:07,297 - __main__ - ERROR - ❌ Profile creation failed. Stopping tests.
