@@ -7,8 +7,9 @@
 # 4. Adjust daily_visits_min/max based on your testing needs
 
 multilogin:
-  api_key: "YOUR_MULTILOGIN_API_KEY"  # ⚠️ REPLACE WITH YOUR ACTUAL API KEY
-  base_url: "http://localhost:35000"
+  api_key: "eyJhbGciOiJIUzUxMiJ9.eyJicGRzLmJ1Y2tldCI6Im1seC1icGRzLXByb2QtZXUtMSIsIm1hY2hpbmVJRCI6IiIsInByb2R1Y3RJRCI6IiIsIndvcmtzcGFjZVJvbGUiOiJvd25lciIsInZlcmlmaWVkIjp0cnVlLCJwbGFuTmFtZSI6IlByb18xMDAgKG1vbnRobHkpIiwic2hhcmRJRCI6ImNiZTEzODAwLWJiYWYtNGM4Zi04MGIzLTE5N2Y4OTYzOTRmMiIsInVzZXJJRCI6IjExMTAxYzhkLTQ1YmEtNDgxMy05NzRlLWNmZDNjMjJjNTY1NSIsImVtYWlsIjoiYmxhbmtibGFuazAyNkBnbWFpbC5jb20iLCJpc0F1dG9tYXRpb24iOmZhbHNlLCJ3b3Jrc3BhY2VJRCI6ImQzNjAyZDUzLTJlNTQtNGNjZS04N2Q3LTY0ZTg5ZTBmODY3OSIsImp0aSI6ImE0MjMyZTNhLWMyYzMtNDIwNi1iM2U4LTE5MTJiMWJlY2Y3YiIsInN1YiI6Ik1MWCIsImlzcyI6IjExMTAxYzhkLTQ1YmEtNDgxMy05NzRlLWNmZDNjMjJjNTY1NSIsImlhdCI6MTc1NTgwMTUxOCwiZXhwIjoxNzU1ODA1MTE4fQ.h6bmlXv5R_MhswlCJUiQSzEGCX_KoU5mGlb8u5TeLPOfBYPt_TSgXwxlXPPX_8dL1ZhsBdHgMUvOQaqauUypzA"  # ⚠️ REPLACE WITH YOUR ACTUAL API KEY
+  # base_url: "http://localhost:35000"
+  base_url: "https://api.multilogin.com"
   max_concurrent_profiles: 20  # Increased for high-volume processing
   profile_timeout: 1800  # 30 minutes
 

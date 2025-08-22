@@ -135,6 +135,9 @@ class FingerprintEngine:
         old_fingerprint = self.fingerprint_database.get(proxy_id, None)
         
         if proxy_id not in self.fingerprint_database:
+            # ✅ ADDED: Device type selection for dynamic OS detection
+            device_type = self._select_device_type_for_geo(geo)
+            
             fingerprint = {
                 "timezone": geo_config["timezone"],
                 "language": geo_config["language"],
@@ -145,15 +148,17 @@ class FingerprintEngine:
                 "fonts": random.sample(geo_config["fonts"], random.randint(3, 5)),
                 "device_memory": random.choice([4, 8, 16, 32]),
                 "hardware_concurrency": random.choice([2, 4, 6, 8, 12, 16]),
-                "platform": random.choice(["Win32", "MacIntel", "Linux x86_64"]),
+                "platform": self._get_platform_for_device_type(device_type),
                 "do_not_track": random.choice(["1", "0", None]),
                 "color_depth": random.choice([24, 32]),
                 "pixel_ratio": random.choice([1, 1.25, 1.5, 2]),
-                "geo": geo
+                "geo": geo,
+                # ✅ ADDED: Device type for dynamic OS detection
+                "device_type": device_type
             }
             
             self.fingerprint_database[proxy_id] = fingerprint
-            self.logger.info(f"Generated fingerprint for proxy {proxy_id}: {geo}")
+            self.logger.info(f"Generated fingerprint for proxy {proxy_id}: {geo} with device: {device_type}")
             
             # Track fingerprint change if monitoring enabled
             if old_fingerprint:
@@ -167,6 +172,63 @@ class FingerprintEngine:
                     self.save_fingerprint_database()
         
         return self.fingerprint_database[proxy_id]
+    
+    def _select_device_type_for_geo(self, geo: str) -> str:
+        """Select appropriate device type based on geo location"""
+        # Device type distribution based on geo location
+        geo_device_distribution = {
+            "US": {
+                "desktop_windows": 0.35,
+                "desktop_mac": 0.25,
+                "laptop_windows": 0.20,
+                "laptop_mac": 0.10,
+                "mobile_android": 0.05,
+                "mobile_ios": 0.05
+            },
+            "GB": {
+                "desktop_windows": 0.30,
+                "desktop_mac": 0.20,
+                "laptop_windows": 0.25,
+                "laptop_mac": 0.15,
+                "mobile_android": 0.05,
+                "mobile_ios": 0.05
+            },
+            "ID": {
+                "desktop_windows": 0.40,
+                "desktop_mac": 0.10,
+                "laptop_windows": 0.30,
+                "laptop_mac": 0.05,
+                "mobile_android": 0.10,
+                "mobile_ios": 0.05
+            }
+        }
+        
+        # Get distribution for geo, fallback to US if not found
+        distribution = geo_device_distribution.get(geo, geo_device_distribution["US"])
+        
+        # Select device type based on weighted distribution
+        import random
+        device_types = list(distribution.keys())
+        weights = list(distribution.values())
+        
+        return random.choices(device_types, weights=weights, k=1)[0]
+    
+    def _get_platform_for_device_type(self, device_type: str) -> str:
+        """Get platform string based on device type"""
+        platform_mapping = {
+            "desktop_windows": "Win32",
+            "desktop_mac": "MacIntel",
+            "desktop_linux": "Linux x86_64",
+            "laptop_windows": "Win32",
+            "laptop_mac": "MacIntel",
+            "laptop_linux": "Linux x86_64",
+            "mobile_android": "Linux armv8l",
+            "mobile_ios": "iPhone",
+            "tablet_android": "Linux armv8l",
+            "tablet_ios": "iPad"
+        }
+        
+        return platform_mapping.get(device_type, "Win32")
     
     def save_fingerprint_database_stealth(self):
         """Save fingerprint database with stealth anti-detection measures"""
