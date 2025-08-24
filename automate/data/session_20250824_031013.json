@@ -1,0 +1,218 @@
+{
+  "start_time": "2025-08-24 02:54:47.499116",
+  "personality": "explorer",
+  "device_type": "desktop",
+  "pages_visited": [
+    {
+      "url": "https://maxgaming.biz.id/nordvpn-vs-expressvpn-for-gamers-which-one-wins-2025-detailed-review/",
+      "timestamp": "2025-08-24T02:55:01.516148",
+      "title": "NordVPN vs ExpressVPN for Gamers: Which One Wins? (2025 Detailed Review) - MaxGaming"
+    },
+    {
+      "url": "https://maxgaming.biz.id/can-a-vpn-really-boost-your-fps-or-reduce-lag-2025-guide-for-gamers/",
+      "content_type": "news",
+      "timestamp": "2025-08-24T03:10:02.568252",
+      "title": "Can a VPN Really Boost Your FPS or Reduce Lag? (2025 Guide for Gamers) - MaxGaming"
+    },
+    {
+      "url": "https://cekmedia.my.id/pinjaman-bca-online-langsung-cair-solusi-dana-instan-dari-bank-terpercaya/",
+      "content_type": "blog",
+      "timestamp": "2025-08-24T03:10:07.879236",
+      "title": "Pinjaman BCA Online Langsung Cair: Solusi Dana Instan dari Bank Terpercaya \u2013 Best Insurance"
+    }
+  ],
+  "interactions": [
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T02:57:06.389887"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T02:57:08.249689"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T02:57:20.162339"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T02:57:29.072569"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T02:57:29.875295"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T02:57:31.080389"
+    },
+    {
+      "type": "personality_navigation",
+      "personality": "casual",
+      "preferred_nav_type": "random",
+      "timestamp": "2025-08-24T03:09:50.183526"
+    },
+    {
+      "type": "personality_navigation",
+      "personality": "professional",
+      "preferred_nav_type": "previous_next",
+      "timestamp": "2025-08-24T03:09:50.259373"
+    },
+    {
+      "type": "personality_navigation",
+      "personality": "researcher",
+      "preferred_nav_type": "previous_next",
+      "timestamp": "2025-08-24T03:09:50.310035"
+    },
+    {
+      "type": "personality_navigation",
+      "personality": "explorer",
+      "preferred_nav_type": "category",
+      "timestamp": "2025-08-24T03:09:50.513684"
+    },
+    {
+      "type": "browser_navigation",
+      "pattern_number": 1,
+      "timestamp": "2025-08-24T03:09:50.513743"
+    },
+    {
+      "type": "browser_navigation",
+      "pattern_number": 2,
+      "timestamp": "2025-08-24T03:09:51.516225"
+    },
+    {
+      "type": "browser_navigation",
+      "pattern_number": 3,
+      "timestamp": "2025-08-24T03:09:52.516687"
+    },
+    {
+      "type": "navigation_demo",
+      "total_tests": 5,
+      "successful_navigations": 5,
+      "success_rate": 100.0,
+      "navigation_results": [
+        {
+          "test_number": 1,
+          "from_url": "https://maxgaming.biz.id/nordvpn-vs-expressvpn-for-gamers-which-one-wins-2025-detailed-review/",
+          "to_url": "https://maxgaming.biz.id/top-5-gaming-vpns-for-warzone-fortnite-apex-legends-2025-edition/",
+          "actual_url": "https://maxgaming.biz.id/top-5-gaming-vpns-for-warzone-fortnite-apex-legends-2025-edition/",
+          "page_title": "Top 5 Gaming VPNs for Warzone, Fortnite & Apex Legends (2025 Edition) - MaxGaming",
+          "success": true,
+          "timestamp": "2025-08-24T02:57:40.534218"
+        },
+        {
+          "test_number": 2,
+          "from_url": "https://maxgaming.biz.id/top-5-gaming-vpns-for-warzone-fortnite-apex-legends-2025-edition/",
+          "to_url": "https://maxgaming.biz.id/how-to-reduce-game-lag-using-a-vpn-tested-in-2025/",
+          "actual_url": "https://maxgaming.biz.id/how-to-reduce-game-lag-using-a-vpn-tested-in-2025/",
+          "page_title": "How to Reduce Game Lag Using a VPN (Tested in 2025) - MaxGaming",
+          "success": true,
+          "timestamp": "2025-08-24T03:00:04.396790"
+        },
+        {
+          "test_number": 3,
+          "from_url": "https://maxgaming.biz.id/how-to-reduce-game-lag-using-a-vpn-tested-in-2025/",
+          "to_url": "https://maxgaming.biz.id/best-vpns-for-online-gaming-in-2025-low-ping-high-speed/",
+          "actual_url": "https://maxgaming.biz.id/best-vpns-for-online-gaming-in-2025-low-ping-high-speed/",
+          "page_title": "Best VPNs for Online Gaming in 2025 (Low Ping & High Speed) - MaxGaming",
+          "success": true,
+          "timestamp": "2025-08-24T03:03:18.120710"
+        },
+        {
+          "test_number": 4,
+          "from_url": "https://maxgaming.biz.id/best-vpns-for-online-gaming-in-2025-low-ping-high-speed/",
+          "to_url": "https://maxgaming.biz.id/how-to-reduce-game-lag-using-a-vpn-tested-in-2025/",
+          "actual_url": "https://maxgaming.biz.id/how-to-reduce-game-lag-using-a-vpn-tested-in-2025/",
+          "page_title": "How to Reduce Game Lag Using a VPN (Tested in 2025) - MaxGaming",
+          "success": true,
+          "timestamp": "2025-08-24T03:06:19.772499"
+        },
+        {
+          "test_number": 5,
+          "from_url": "https://maxgaming.biz.id/how-to-reduce-game-lag-using-a-vpn-tested-in-2025/",
+          "to_url": "https://maxgaming.biz.id/best-vpns-for-online-gaming-in-2025-low-ping-high-speed/",
+          "actual_url": "https://maxgaming.biz.id/best-vpns-for-online-gaming-in-2025-low-ping-high-speed/",
+          "page_title": "Best VPNs for Online Gaming in 2025 (Low Ping & High Speed) - MaxGaming",
+          "success": true,
+          "timestamp": "2025-08-24T03:07:59.651129"
+        }
+      ],
+      "timestamp": "2025-08-24T03:09:53.521903"
+    },
+    {
+      "type": "content_navigation",
+      "content_type": "news",
+      "navigation_found": true,
+      "navigation_url": "https://maxgaming.biz.id/best-vpn-settings-for-smooth-cloud-gaming-2025-guide/",
+      "timestamp": "2025-08-24T03:10:02.675949"
+    },
+    {
+      "type": "content_navigation",
+      "content_type": "blog",
+      "navigation_found": true,
+      "navigation_url": "https://cekmedia.my.id/pinjaman-online-cepat-cair-solusi-dana-darurat-tanpa-ribet/",
+      "timestamp": "2025-08-24T03:10:07.940808"
+    },
+    {
+      "type": "session_memory",
+      "description": "Maintaining personality consistency",
+      "timestamp": "2025-08-24T03:10:13.272604"
+    },
+    {
+      "type": "time_based",
+      "hour": 3,
+      "timestamp": "2025-08-24T03:10:13.272614"
+    },
+    {
+      "type": "geographic",
+      "description": "Geographic behavior adaptation",
+      "timestamp": "2025-08-24T03:10:13.272621"
+    },
+    {
+      "type": "device_specific",
+      "device_type": "desktop",
+      "timestamp": "2025-08-24T03:10:13.272628"
+    },
+    {
+      "type": "attention_span",
+      "personality": "researcher",
+      "timestamp": "2025-08-24T03:10:13.272640"
+    },
+    {
+      "type": "adsense",
+      "ads_found": 0,
+      "clicks_performed": 0,
+      "timestamp": "2025-08-24T03:10:13.280688"
+    }
+  ],
+  "errors": [
+    {
+      "type": "tech_content",
+      "error": "Message: no such window: target window already closed\nfrom unknown error: web view not found\n  (Session info: chrome=139.0.7258.66)\nStacktrace:\n0   chromedriver                        0x0000000100abf480 cxxbridge1$str$ptr + 2800132\n1   chromedriver                        0x0000000100ab73f0 cxxbridge1$str$ptr + 2767220\n2   chromedriver                        0x00000001005de8b0 cxxbridge1$string$len + 82188\n3   chromedriver                        0x00000001005bb2a4 chromedriver + 144036\n4   chromedriver                        0x0000000100653aec cxxbridge1$string$len + 561992\n5   chromedriver                        0x000000010066c8f4 cxxbridge1$string$len + 663888\n6   chromedriver                        0x000000010061fd1c cxxbridge1$string$len + 349560\n7   chromedriver                        0x0000000100a82880 cxxbridge1$str$ptr + 2551300\n8   chromedriver                        0x0000000100a85ab4 cxxbridge1$str$ptr + 2564152\n9   chromedriver                        0x0000000100a636b8 cxxbridge1$str$ptr + 2423868\n10  chromedriver                        0x0000000100a86370 cxxbridge1$str$ptr + 2566388\n11  chromedriver                        0x0000000100a547b0 cxxbridge1$str$ptr + 2362676\n12  chromedriver                        0x0000000100aa5e8c cxxbridge1$str$ptr + 2696208\n13  chromedriver                        0x0000000100aa6018 cxxbridge1$str$ptr + 2696604\n14  chromedriver                        0x0000000100ab703c cxxbridge1$str$ptr + 2766272\n15  libsystem_pthread.dylib             0x000000018bf36f94 _pthread_start + 136\n16  libsystem_pthread.dylib             0x000000018bf31d34 thread_start + 8\n"
+    },
+    {
+      "type": "product_content",
+      "error": "Message: no such window: target window already closed\nfrom unknown error: web view not found\n  (Session info: chrome=139.0.7258.66)\nStacktrace:\n0   chromedriver                        0x0000000100abf480 cxxbridge1$str$ptr + 2800132\n1   chromedriver                        0x0000000100ab73f0 cxxbridge1$str$ptr + 2767220\n2   chromedriver                        0x00000001005de8b0 cxxbridge1$string$len + 82188\n3   chromedriver                        0x00000001005bb2a4 chromedriver + 144036\n4   chromedriver                        0x0000000100653aec cxxbridge1$string$len + 561992\n5   chromedriver                        0x000000010066c8f4 cxxbridge1$string$len + 663888\n6   chromedriver                        0x000000010061fd1c cxxbridge1$string$len + 349560\n7   chromedriver                        0x0000000100a82880 cxxbridge1$str$ptr + 2551300\n8   chromedriver                        0x0000000100a85ab4 cxxbridge1$str$ptr + 2564152\n9   chromedriver                        0x0000000100a636b8 cxxbridge1$str$ptr + 2423868\n10  chromedriver                        0x0000000100a86370 cxxbridge1$str$ptr + 2566388\n11  chromedriver                        0x0000000100a547b0 cxxbridge1$str$ptr + 2362676\n12  chromedriver                        0x0000000100aa5e8c cxxbridge1$str$ptr + 2696208\n13  chromedriver                        0x0000000100aa6018 cxxbridge1$str$ptr + 2696604\n14  chromedriver                        0x0000000100ab703c cxxbridge1$str$ptr + 2766272\n15  libsystem_pthread.dylib             0x000000018bf36f94 _pthread_start + 136\n16  libsystem_pthread.dylib             0x000000018bf31d34 thread_start + 8\n"
+    }
+  ],
+  "end_time": "2025-08-24T03:10:13.280787",
+  "duration": "0:15:25.781673"
+}

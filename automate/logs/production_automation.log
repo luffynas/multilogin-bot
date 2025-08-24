@@ -1,0 +1,122 @@
+2025-08-24 07:33:45,957 - multilogin_api - INFO - Successfully authenticated with Multilogin X API
+2025-08-24 07:33:45,957 - __main__ - INFO - 📂 Loading profiles from: ../config/profile.json
+2025-08-24 07:33:45,958 - __main__ - INFO - ✅ Loaded 24 profiles from JSON
+2025-08-24 07:34:03,282 - multilogin_api - INFO - Successfully authenticated with Multilogin X API
+2025-08-24 07:34:03,282 - __main__ - INFO - 📂 Loading profiles from: ../config/profile.json
+2025-08-24 07:34:03,283 - __main__ - INFO - ✅ Loaded 24 profiles from JSON
+2025-08-24 07:34:03,283 - __main__ - INFO - 🚀 Starting production automation for 24 profiles
+2025-08-24 07:34:03,283 - __main__ - INFO - 📊 Concurrent execution: 1-3 profiles
+2025-08-24 07:34:03,283 - __main__ - INFO - 📦 Processing batch 1: 3 profiles
+2025-08-24 07:34:03,283 - __main__ - INFO - 🚀 Starting automation for: ID - FB
+2025-08-24 07:34:03,283 - __main__ - INFO - 🚀 Starting automation for: ID - FB
+2025-08-24 07:34:03,283 - __main__ - INFO - 🚀 Starting automation for: ID - Direct - Mobile
+2025-08-24 07:34:03,283 - __main__ - INFO - 🔄 Updating proxy for profile: ID - FB (7dcb7410-4552-4702-8750-a2e506e97990)
+2025-08-24 07:34:03,284 - __main__ - INFO - 🔄 Updating proxy for profile: ID - FB (703ff0d8-a43b-4249-9612-afa9b8b08f79)
+2025-08-24 07:34:03,284 - __main__ - INFO - 🔄 Updating proxy for profile: ID - Direct - Mobile (3fecb797-b61f-4498-8a9e-4618a504858c)
+2025-08-24 07:34:03,284 - multilogin_api - INFO - 🚀 Starting complete Multilogin proxy update flow for profile 7dcb7410-4552-4702-8750-a2e506e97990
+2025-08-24 07:34:03,284 - multilogin_api - INFO - 🚀 Starting complete Multilogin proxy update flow for profile 703ff0d8-a43b-4249-9612-afa9b8b08f79
+2025-08-24 07:34:03,284 - multilogin_api - INFO - 🚀 Starting complete Multilogin proxy update flow for profile 3fecb797-b61f-4498-8a9e-4618a504858c
+2025-08-24 07:34:03,284 - multilogin_api - INFO - 🔄 Setting up Multilogin proxy profile for id/fb...
+2025-08-24 07:34:03,284 - multilogin_api - INFO - 🔄 Setting up Multilogin proxy profile for id/fb...
+2025-08-24 07:34:03,284 - multilogin_api - INFO - 🔄 Setting up Multilogin proxy profile for id/direct...
+2025-08-24 07:34:03,533 - multilogin_api - INFO - ✅ Profile setup successful for id/fb
+2025-08-24 07:34:03,533 - multilogin_api - INFO - 🔄 Getting proxy connection for id/fb...
+2025-08-24 07:34:03,966 - multilogin_api - INFO - ✅ Profile setup successful for id/fb
+2025-08-24 07:34:03,966 - multilogin_api - INFO - 🔄 Getting proxy connection for id/fb...
+2025-08-24 07:34:04,031 - multilogin_api - INFO - ✅ Profile setup successful for id/direct
+2025-08-24 07:34:04,032 - multilogin_api - INFO - 🔄 Getting proxy connection for id/direct...
+2025-08-24 07:34:04,208 - multilogin_api - INFO - ✅ Proxy connection successful for id/fb
+2025-08-24 07:34:04,208 - multilogin_api - INFO - 🔍 Validating proxy gate.multilogin.com:1080...
+2025-08-24 07:34:04,379 - multilogin_api - INFO - ✅ Proxy connection successful for id/fb
+2025-08-24 07:34:04,379 - multilogin_api - INFO - 🔍 Validating proxy gate.multilogin.com:1080...
+2025-08-24 07:34:04,458 - multilogin_api - INFO - ✅ Proxy connection successful for id/direct
+2025-08-24 07:34:04,458 - multilogin_api - INFO - 🔍 Validating proxy gate.multilogin.com:1080...
+2025-08-24 07:34:05,378 - multilogin_api - ERROR - ❌ Error validating proxy: 400 Client Error: Bad Request for url: https://launcher.mlx.yt:45001/api/v1/proxy/validate
+2025-08-24 07:34:05,379 - multilogin_api - ERROR - ❌ Error validating proxy: 400 Client Error: Bad Request for url: https://launcher.mlx.yt:45001/api/v1/proxy/validate
+2025-08-24 07:34:05,379 - multilogin_api - ERROR - ❌ Error validating proxy: 400 Client Error: Bad Request for url: https://launcher.mlx.yt:45001/api/v1/proxy/validate
+2025-08-24 07:34:05,379 - multilogin_api - ERROR - ❌ Proxy validation failed, aborting profile update
+2025-08-24 07:34:05,379 - multilogin_api - ERROR - ❌ Proxy validation failed, aborting profile update
+2025-08-24 07:34:05,379 - multilogin_api - ERROR - ❌ Proxy validation failed, aborting profile update
+2025-08-24 07:34:05,379 - __main__ - ERROR - ❌ Failed to update proxy for ID - FB
+2025-08-24 07:34:05,380 - __main__ - ERROR - ❌ Failed to update proxy for ID - Direct - Mobile
+2025-08-24 07:34:05,380 - __main__ - ERROR - ❌ Failed to update proxy for ID - FB
+2025-08-24 07:34:05,380 - __main__ - ERROR - ❌ ID - FB: FAILED - Failed to update proxy
+2025-08-24 07:34:05,380 - __main__ - ERROR - ❌ ID - Direct - Mobile: FAILED - Failed to update proxy
+2025-08-24 07:34:05,380 - __main__ - ERROR - ❌ ID - FB: FAILED - Failed to update proxy
+2025-08-24 07:34:05,380 - __main__ - INFO - ⏳ Waiting 30 seconds before next batch...
+2025-08-24 07:34:35,386 - __main__ - INFO - 📦 Processing batch 2: 3 profiles
+2025-08-24 07:34:35,387 - __main__ - INFO - 🚀 Starting automation for: ID - Direct - Mobile
+2025-08-24 07:34:35,387 - __main__ - INFO - 🚀 Starting automation for: ID - FB
+2025-08-24 07:34:35,387 - __main__ - INFO - 🔄 Updating proxy for profile: ID - Direct - Mobile (61364ffa-82a2-415b-8b2a-d253acda9a38)
+2025-08-24 07:34:35,388 - __main__ - INFO - 🚀 Starting automation for: ID - Google
+2025-08-24 07:34:35,388 - __main__ - INFO - 🔄 Updating proxy for profile: ID - FB (13239617-4039-4a0d-9b71-6c6be3b134f6)
+2025-08-24 07:34:35,388 - multilogin_api - INFO - 🚀 Starting complete Multilogin proxy update flow for profile 61364ffa-82a2-415b-8b2a-d253acda9a38
+2025-08-24 07:34:35,388 - __main__ - INFO - 🔄 Updating proxy for profile: ID - Google (5a1de6e6-a974-45ae-862d-335b9f4a1c9b)
+2025-08-24 07:34:35,388 - multilogin_api - INFO - 🚀 Starting complete Multilogin proxy update flow for profile 13239617-4039-4a0d-9b71-6c6be3b134f6
+2025-08-24 07:34:35,389 - multilogin_api - INFO - 🔄 Setting up Multilogin proxy profile for id/direct...
+2025-08-24 07:34:35,389 - multilogin_api - INFO - 🚀 Starting complete Multilogin proxy update flow for profile 5a1de6e6-a974-45ae-862d-335b9f4a1c9b
+2025-08-24 07:34:35,389 - multilogin_api - INFO - 🔄 Setting up Multilogin proxy profile for id/fb...
+2025-08-24 07:34:35,391 - multilogin_api - INFO - 🔄 Setting up Multilogin proxy profile for id/google...
+2025-08-24 07:34:35,642 - multilogin_api - INFO - ✅ Profile setup successful for id/fb
+2025-08-24 07:34:35,643 - multilogin_api - INFO - ✅ Profile setup successful for id/direct
+2025-08-24 07:34:35,644 - multilogin_api - INFO - 🔄 Getting proxy connection for id/fb...
+2025-08-24 07:34:35,644 - multilogin_api - INFO - ✅ Profile setup successful for id/google
+2025-08-24 07:34:35,644 - multilogin_api - INFO - 🔄 Getting proxy connection for id/direct...
+2025-08-24 07:34:35,645 - multilogin_api - INFO - 🔄 Getting proxy connection for id/google...
+2025-08-24 07:34:36,045 - multilogin_api - INFO - ✅ Proxy connection successful for id/direct
+2025-08-24 07:34:36,045 - multilogin_api - INFO - ✅ Proxy connection successful for id/google
+2025-08-24 07:34:36,045 - multilogin_api - INFO - 🔍 Validating proxy gate.multilogin.com:1080...
+2025-08-24 07:34:36,045 - multilogin_api - INFO - 🔍 Validating proxy gate.multilogin.com:1080...
+2025-08-24 07:34:36,206 - multilogin_api - INFO - ✅ Proxy connection successful for id/fb
+2025-08-24 07:34:36,206 - multilogin_api - INFO - 🔍 Validating proxy gate.multilogin.com:1080...
+2025-08-24 07:34:36,504 - multilogin_api - ERROR - ❌ Error validating proxy: 400 Client Error: Bad Request for url: https://launcher.mlx.yt:45001/api/v1/proxy/validate
+2025-08-24 07:34:36,504 - multilogin_api - ERROR - ❌ Proxy validation failed, aborting profile update
+2025-08-24 07:34:36,504 - __main__ - ERROR - ❌ Failed to update proxy for ID - Direct - Mobile
+2025-08-24 07:34:36,504 - __main__ - ERROR - ❌ ID - Direct - Mobile: FAILED - Failed to update proxy
+2025-08-24 07:34:36,523 - multilogin_api - ERROR - ❌ Error validating proxy: 400 Client Error: Bad Request for url: https://launcher.mlx.yt:45001/api/v1/proxy/validate
+2025-08-24 07:34:36,523 - multilogin_api - ERROR - ❌ Proxy validation failed, aborting profile update
+2025-08-24 07:34:36,523 - __main__ - ERROR - ❌ Failed to update proxy for ID - Google
+2025-08-24 07:34:36,524 - __main__ - ERROR - ❌ ID - Google: FAILED - Failed to update proxy
+2025-08-24 07:34:36,585 - multilogin_api - ERROR - ❌ Error validating proxy: 400 Client Error: Bad Request for url: https://launcher.mlx.yt:45001/api/v1/proxy/validate
+2025-08-24 07:34:36,585 - multilogin_api - ERROR - ❌ Proxy validation failed, aborting profile update
+2025-08-24 07:34:36,585 - __main__ - ERROR - ❌ Failed to update proxy for ID - FB
+2025-08-24 07:34:36,586 - __main__ - ERROR - ❌ ID - FB: FAILED - Failed to update proxy
+2025-08-24 07:34:36,586 - __main__ - INFO - ⏳ Waiting 30 seconds before next batch...
+2025-08-24 07:35:06,590 - __main__ - INFO - 📦 Processing batch 3: 3 profiles
+2025-08-24 07:35:06,590 - __main__ - INFO - 🚀 Starting automation for: US - Windows - Google
+2025-08-24 07:35:06,591 - __main__ - INFO - 🚀 Starting automation for: CA - Mobile Android - Bing
+2025-08-24 07:35:06,591 - __main__ - INFO - 🔄 Updating proxy for profile: US - Windows - Google (d2a89b0a-6e15-4e2e-8051-3cb12b392f87)
+2025-08-24 07:35:06,591 - __main__ - INFO - 🔄 Updating proxy for profile: CA - Mobile Android - Bing (2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6)
+2025-08-24 07:35:06,591 - __main__ - INFO - 🚀 Starting automation for: US - Mobile Android - Google
+2025-08-24 07:35:06,592 - multilogin_api - INFO - 🚀 Starting complete Multilogin proxy update flow for profile d2a89b0a-6e15-4e2e-8051-3cb12b392f87
+2025-08-24 07:35:06,592 - multilogin_api - INFO - 🚀 Starting complete Multilogin proxy update flow for profile 2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6
+2025-08-24 07:35:06,592 - __main__ - INFO - 🔄 Updating proxy for profile: US - Mobile Android - Google (0dc12d5c-fda4-49b7-83f5-d5279f759dc3)
+2025-08-24 07:35:06,592 - multilogin_api - INFO - 🔄 Setting up Multilogin proxy profile for us/windows...
+2025-08-24 07:35:06,592 - multilogin_api - INFO - 🔄 Setting up Multilogin proxy profile for ca/mobile_android...
+2025-08-24 07:35:06,592 - multilogin_api - INFO - 🚀 Starting complete Multilogin proxy update flow for profile 0dc12d5c-fda4-49b7-83f5-d5279f759dc3
+2025-08-24 07:35:06,594 - multilogin_api - INFO - 🔄 Setting up Multilogin proxy profile for us/mobile_android...
+2025-08-24 07:35:06,860 - multilogin_api - INFO - ✅ Profile setup successful for us/windows
+2025-08-24 07:35:06,860 - multilogin_api - INFO - ✅ Profile setup successful for ca/mobile_android
+2025-08-24 07:35:06,861 - multilogin_api - INFO - 🔄 Getting proxy connection for us/windows...
+2025-08-24 07:35:06,861 - multilogin_api - INFO - 🔄 Getting proxy connection for ca/mobile_android...
+2025-08-24 07:35:06,979 - multilogin_api - INFO - ✅ Profile setup successful for us/mobile_android
+2025-08-24 07:35:06,979 - multilogin_api - INFO - 🔄 Getting proxy connection for us/mobile_android...
+2025-08-24 07:35:07,270 - multilogin_api - INFO - ✅ Proxy connection successful for us/windows
+2025-08-24 07:35:07,271 - multilogin_api - INFO - 🔍 Validating proxy gate.multilogin.com:1080...
+2025-08-24 07:35:07,298 - multilogin_api - INFO - ✅ Proxy connection successful for ca/mobile_android
+2025-08-24 07:35:07,298 - multilogin_api - INFO - 🔍 Validating proxy gate.multilogin.com:1080...
+2025-08-24 07:35:07,417 - multilogin_api - INFO - ✅ Proxy connection successful for us/mobile_android
+2025-08-24 07:35:07,417 - multilogin_api - INFO - 🔍 Validating proxy gate.multilogin.com:1080...
+2025-08-24 07:35:07,655 - multilogin_api - ERROR - ❌ Error validating proxy: 400 Client Error: Bad Request for url: https://launcher.mlx.yt:45001/api/v1/proxy/validate
+2025-08-24 07:35:07,655 - multilogin_api - ERROR - ❌ Proxy validation failed, aborting profile update
+2025-08-24 07:35:07,655 - __main__ - ERROR - ❌ Failed to update proxy for US - Windows - Google
+2025-08-24 07:35:07,655 - __main__ - ERROR - ❌ US - Windows - Google: FAILED - Failed to update proxy
+2025-08-24 07:35:07,676 - multilogin_api - ERROR - ❌ Error validating proxy: 400 Client Error: Bad Request for url: https://launcher.mlx.yt:45001/api/v1/proxy/validate
+2025-08-24 07:35:07,676 - multilogin_api - ERROR - ❌ Proxy validation failed, aborting profile update
+2025-08-24 07:35:07,676 - __main__ - ERROR - ❌ Failed to update proxy for CA - Mobile Android - Bing
+2025-08-24 07:35:07,676 - __main__ - ERROR - ❌ CA - Mobile Android - Bing: FAILED - Failed to update proxy
+2025-08-24 07:35:07,793 - multilogin_api - ERROR - ❌ Error validating proxy: 400 Client Error: Bad Request for url: https://launcher.mlx.yt:45001/api/v1/proxy/validate
+2025-08-24 07:35:07,793 - multilogin_api - ERROR - ❌ Proxy validation failed, aborting profile update
+2025-08-24 07:35:07,793 - __main__ - ERROR - ❌ Failed to update proxy for US - Mobile Android - Google
+2025-08-24 07:35:07,793 - __main__ - ERROR - ❌ US - Mobile Android - Google: FAILED - Failed to update proxy
+2025-08-24 07:35:07,794 - __main__ - INFO - ⏳ Waiting 30 seconds before next batch...

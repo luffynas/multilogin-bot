@@ -1,0 +1,124 @@
+{
+  "start_time": "2025-08-23 20:28:08.980175",
+  "personality": "professional",
+  "device_type": "tablet",
+  "pages_visited": [
+    {
+      "url": "https://maxgaming.biz.id/can-a-vpn-really-boost-your-fps-or-reduce-lag-2025-guide-for-gamers/",
+      "timestamp": "2025-08-23T20:28:23.134554",
+      "title": "Can a VPN Really Boost Your FPS or Reduce Lag? (2025 Guide for Gamers) - MaxGaming"
+    }
+  ],
+  "interactions": [
+    {
+      "type": "scrolling",
+      "personality": "explorer",
+      "timestamp": "2025-08-23T20:32:42.097062"
+    },
+    {
+      "type": "reading",
+      "personality": "explorer",
+      "timestamp": "2025-08-23T20:32:43.352691"
+    },
+    {
+      "type": "mouse_interactions",
+      "personality": "explorer",
+      "timestamp": "2025-08-23T20:32:52.938116"
+    },
+    {
+      "type": "scrolling",
+      "personality": "researcher",
+      "timestamp": "2025-08-23T20:34:08.611129"
+    },
+    {
+      "type": "reading",
+      "personality": "researcher",
+      "timestamp": "2025-08-23T20:34:08.623574"
+    },
+    {
+      "type": "mouse_interactions",
+      "personality": "researcher",
+      "timestamp": "2025-08-23T20:34:08.625466"
+    },
+    {
+      "type": "scrolling",
+      "personality": "casual",
+      "timestamp": "2025-08-23T20:34:08.627024"
+    },
+    {
+      "type": "reading",
+      "personality": "casual",
+      "timestamp": "2025-08-23T20:34:08.636993"
+    },
+    {
+      "type": "mouse_interactions",
+      "personality": "casual",
+      "timestamp": "2025-08-23T20:34:08.638438"
+    },
+    {
+      "type": "scrolling",
+      "personality": "professional",
+      "timestamp": "2025-08-23T20:34:08.639677"
+    },
+    {
+      "type": "reading",
+      "personality": "professional",
+      "timestamp": "2025-08-23T20:34:08.649946"
+    },
+    {
+      "type": "mouse_interactions",
+      "personality": "professional",
+      "timestamp": "2025-08-23T20:34:08.652927"
+    },
+    {
+      "type": "session_memory",
+      "description": "Maintaining personality consistency",
+      "timestamp": "2025-08-23T20:34:08.659312"
+    },
+    {
+      "type": "time_based",
+      "hour": 20,
+      "timestamp": "2025-08-23T20:34:08.659329"
+    },
+    {
+      "type": "geographic",
+      "description": "Geographic behavior adaptation",
+      "timestamp": "2025-08-23T20:34:08.659335"
+    },
+    {
+      "type": "device_specific",
+      "device_type": "tablet",
+      "timestamp": "2025-08-23T20:34:08.659345"
+    },
+    {
+      "type": "attention_span",
+      "personality": "professional",
+      "timestamp": "2025-08-23T20:34:08.659353"
+    },
+    {
+      "type": "adsense",
+      "ads_found": 0,
+      "timestamp": "2025-08-23T20:34:08.675846"
+    }
+  ],
+  "errors": [
+    {
+      "type": "news_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=55032): Max retries exceeded with url: /session/da033993cb4a6c7f6b5c8ad663fa3df7/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101695b20>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "blog_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=55032): Max retries exceeded with url: /session/da033993cb4a6c7f6b5c8ad663fa3df7/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101695f10>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "tech_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=55032): Max retries exceeded with url: /session/da033993cb4a6c7f6b5c8ad663fa3df7/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1016b1520>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "product_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=55032): Max retries exceeded with url: /session/da033993cb4a6c7f6b5c8ad663fa3df7/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101672220>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    }
+  ],
+  "end_time": "2025-08-23T20:34:08.675929",
+  "duration": "0:05:59.695755"
+}

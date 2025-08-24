@@ -1,0 +1,65 @@
+{
+  "start_time": "2025-08-24 04:23:21.437409",
+  "personality": "explorer",
+  "device_type": "desktop",
+  "pages_visited": [
+    {
+      "url": "https://maxgaming.biz.id/category/vpn-cloud-gaming/",
+      "timestamp": "2025-08-24T04:23:35.084744",
+      "title": "VPN & Cloud Gaming - MaxGaming"
+    }
+  ],
+  "interactions": [
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T04:25:17.915812"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T04:25:19.578420"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T04:25:35.944111"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T04:25:44.324570"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T04:25:45.129805"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T04:25:46.333089"
+    },
+    {
+      "type": "adsense",
+      "ads_found": 0,
+      "clicks_performed": 0,
+      "timestamp": "2025-08-24T04:26:27.822714"
+    }
+  ],
+  "errors": [],
+  "end_time": "2025-08-24T04:26:27.822783",
+  "duration": "0:03:06.385375"
+}

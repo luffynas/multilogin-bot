@@ -1,0 +1,244 @@
+{
+  "start_time": "2025-08-23 23:21:32.052095",
+  "personality": "professional",
+  "device_type": "desktop",
+  "pages_visited": [
+    {
+      "url": "https://maxgaming.biz.id/gaming-vpns-that-work-with-xbox-playstation-and-switch-2025-edition/",
+      "timestamp": "2025-08-23T23:21:46.600959",
+      "title": "Gaming VPNs That Work With Xbox, PlayStation, and Switch (2025 Edition) - MaxGaming"
+    }
+  ],
+  "interactions": [
+    {
+      "type": "scrolling",
+      "personality": "explorer",
+      "timestamp": "2025-08-23T23:23:31.835006"
+    },
+    {
+      "type": "reading",
+      "personality": "explorer",
+      "timestamp": "2025-08-23T23:23:31.843485"
+    },
+    {
+      "type": "mouse_interactions",
+      "personality": "explorer",
+      "timestamp": "2025-08-23T23:23:31.844969"
+    },
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "description": "\ud83d\udd04 Rapid scrolling pattern",
+      "timestamp": "2025-08-23T23:23:31.845987"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "description": "\ud83d\udcd6 Quick reading bursts",
+      "timestamp": "2025-08-23T23:23:31.854163"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "description": "\ud83d\uddb1\ufe0f Fast mouse movements",
+      "timestamp": "2025-08-23T23:23:31.855479"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "description": "\u2328\ufe0f Quick typing simulation",
+      "timestamp": "2025-08-23T23:23:31.856662"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "description": "\ud83e\udded Rapid navigation patterns",
+      "timestamp": "2025-08-23T23:23:31.856690"
+    },
+    {
+      "type": "scrolling",
+      "personality": "researcher",
+      "timestamp": "2025-08-23T23:23:31.858273"
+    },
+    {
+      "type": "reading",
+      "personality": "researcher",
+      "timestamp": "2025-08-23T23:23:31.865298"
+    },
+    {
+      "type": "mouse_interactions",
+      "personality": "researcher",
+      "timestamp": "2025-08-23T23:23:31.868172"
+    },
+    {
+      "type": "concurrent_scrolling",
+      "personality": "researcher",
+      "description": "\ud83d\udd04 Rapid scrolling pattern",
+      "timestamp": "2025-08-23T23:23:31.869662"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "researcher",
+      "description": "\ud83d\udcd6 Quick reading bursts",
+      "timestamp": "2025-08-23T23:23:31.878275"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "researcher",
+      "description": "\ud83d\uddb1\ufe0f Fast mouse movements",
+      "timestamp": "2025-08-23T23:23:31.879492"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "researcher",
+      "description": "\u2328\ufe0f Quick typing simulation",
+      "timestamp": "2025-08-23T23:23:31.880674"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "researcher",
+      "description": "\ud83e\udded Rapid navigation patterns",
+      "timestamp": "2025-08-23T23:23:31.880721"
+    },
+    {
+      "type": "scrolling",
+      "personality": "casual",
+      "timestamp": "2025-08-23T23:23:31.881793"
+    },
+    {
+      "type": "reading",
+      "personality": "casual",
+      "timestamp": "2025-08-23T23:23:31.893061"
+    },
+    {
+      "type": "mouse_interactions",
+      "personality": "casual",
+      "timestamp": "2025-08-23T23:23:31.894562"
+    },
+    {
+      "type": "concurrent_scrolling",
+      "personality": "casual",
+      "description": "\ud83d\udd04 Rapid scrolling pattern",
+      "timestamp": "2025-08-23T23:23:31.895875"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "casual",
+      "description": "\ud83d\udcd6 Quick reading bursts",
+      "timestamp": "2025-08-23T23:23:31.904231"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "casual",
+      "description": "\ud83d\uddb1\ufe0f Fast mouse movements",
+      "timestamp": "2025-08-23T23:23:31.905239"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "casual",
+      "description": "\u2328\ufe0f Quick typing simulation",
+      "timestamp": "2025-08-23T23:23:31.906393"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "casual",
+      "description": "\ud83e\udded Rapid navigation patterns",
+      "timestamp": "2025-08-23T23:23:31.906407"
+    },
+    {
+      "type": "scrolling",
+      "personality": "professional",
+      "timestamp": "2025-08-23T23:23:31.907367"
+    },
+    {
+      "type": "reading",
+      "personality": "professional",
+      "timestamp": "2025-08-23T23:23:31.916257"
+    },
+    {
+      "type": "mouse_interactions",
+      "personality": "professional",
+      "timestamp": "2025-08-23T23:23:31.919443"
+    },
+    {
+      "type": "concurrent_scrolling",
+      "personality": "professional",
+      "description": "\ud83d\udd04 Rapid scrolling pattern",
+      "timestamp": "2025-08-23T23:23:31.920351"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "professional",
+      "description": "\ud83d\udcd6 Quick reading bursts",
+      "timestamp": "2025-08-23T23:23:31.927848"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "professional",
+      "description": "\ud83d\uddb1\ufe0f Fast mouse movements",
+      "timestamp": "2025-08-23T23:23:31.929216"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "professional",
+      "description": "\u2328\ufe0f Quick typing simulation",
+      "timestamp": "2025-08-23T23:23:32.072239"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "professional",
+      "description": "\ud83e\udded Rapid navigation patterns",
+      "timestamp": "2025-08-23T23:23:32.072256"
+    },
+    {
+      "type": "session_memory",
+      "description": "Maintaining personality consistency",
+      "timestamp": "2025-08-23T23:23:32.076298"
+    },
+    {
+      "type": "time_based",
+      "hour": 23,
+      "timestamp": "2025-08-23T23:23:32.076308"
+    },
+    {
+      "type": "geographic",
+      "description": "Geographic behavior adaptation",
+      "timestamp": "2025-08-23T23:23:32.076324"
+    },
+    {
+      "type": "device_specific",
+      "device_type": "desktop",
+      "timestamp": "2025-08-23T23:23:32.076332"
+    },
+    {
+      "type": "attention_span",
+      "personality": "professional",
+      "timestamp": "2025-08-23T23:23:32.076337"
+    },
+    {
+      "type": "adsense",
+      "ads_found": 0,
+      "timestamp": "2025-08-23T23:23:32.093223"
+    }
+  ],
+  "errors": [
+    {
+      "type": "news_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=54334): Max retries exceeded with url: /session/621dec04b6303010a34ccd9cb40567d8/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104c40700>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "blog_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=54334): Max retries exceeded with url: /session/621dec04b6303010a34ccd9cb40567d8/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104c28430>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "tech_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=54334): Max retries exceeded with url: /session/621dec04b6303010a34ccd9cb40567d8/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104c5c640>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "product_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=54334): Max retries exceeded with url: /session/621dec04b6303010a34ccd9cb40567d8/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104ca29d0>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    }
+  ],
+  "end_time": "2025-08-23T23:23:32.093294",
+  "duration": "0:02:00.041201"
+}

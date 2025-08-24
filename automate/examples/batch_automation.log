@@ -1,0 +1,42 @@
+2025-08-23 23:11:08,498 - root - INFO - 🚀 Batch Automation Example
+2025-08-23 23:11:08,498 - root - INFO - ==================================================
+2025-08-23 23:11:08,624 - proxy_manager - INFO - No existing proxy file found, generating sample SOCKS5 proxies
+2025-08-23 23:11:08,627 - proxy_manager - INFO - Generated 2000 sample Multilogin residential SOCKS5 proxies
+2025-08-23 23:11:08,627 - proxy_manager - ERROR - Error loading provider status: Expecting value: line 1 column 1 (char 0)
+2025-08-23 23:11:08,627 - proxy_manager - ERROR - Error saving provider status: 'ProxyManager' object has no attribute 'providers'
+2025-08-23 23:11:08,628 - proxy_manager - INFO - Started SOCKS5 proxy health monitoring
+2025-08-23 23:11:08,628 - profile_manager - INFO - Loaded 2 existing profiles
+2025-08-23 23:11:09,521 - multilogin_api - INFO - Successfully authenticated with Multilogin X API
+2025-08-23 23:11:09,521 - __main__ - INFO - ✅ Batch automation initialized successfully
+2025-08-23 23:11:09,521 - __main__ - INFO - 🚀 Starting batch automation with 3 profiles
+2025-08-23 23:11:09,521 - __main__ - INFO - 🎯 Target URLs: 4
+2025-08-23 23:11:09,521 - __main__ - INFO - ⚙️ Max workers: 2
+2025-08-23 23:11:09,521 - __main__ - INFO - ✅ Found 2 profiles for batch automation
+2025-08-23 23:11:09,522 - Profile-automate_profile_001 - INFO - 🚀 Starting automation for profile: automate_profile_001
+2025-08-23 23:11:09,522 - Profile-automate_profile_002 - INFO - 🚀 Starting automation for profile: automate_profile_002
+2025-08-23 23:11:09,828 - multilogin_api - ERROR - Profile start error: 401 Client Error: Unauthorized for url: https://launcher.mlx.yt:45001/api/v2/profile/f/default/p/3796d576-7ff6-11f0-84f5-1aaa018ad5d1/start?automation_type=selenium&headless_mode=false
+2025-08-23 23:11:09,828 - Profile-automate_profile_001 - ERROR - Profile automation failed: Failed to start profile
+2025-08-23 23:11:09,854 - multilogin_api - ERROR - Profile stop error: 404 Client Error: Not Found for url: https://launcher.mlx.yt:45001/api/v2/profile/f/default/p/3796d576-7ff6-11f0-84f5-1aaa018ad5d1/stop
+2025-08-23 23:11:09,855 - Profile-automate_profile_001 - INFO - ✅ Profile stopped
+2025-08-23 23:11:09,856 - __main__ - INFO - ❌ automate_profile_001: error
+2025-08-23 23:11:09,856 - __main__ - ERROR -    Errors: 1
+2025-08-23 23:11:13,894 - multilogin_api - ERROR - Profile start error: 500 Server Error: Internal Server Error for url: https://launcher.mlx.yt:45001/api/v2/profile/f/default/p/8b6e3c8e-1f75-482f-a28d-ea05d50c6d18/start?automation_type=selenium&headless_mode=false
+2025-08-23 23:11:13,894 - Profile-automate_profile_002 - ERROR - Profile automation failed: Failed to start profile
+2025-08-23 23:11:13,898 - multilogin_api - ERROR - Profile stop error: 404 Client Error: Not Found for url: https://launcher.mlx.yt:45001/api/v2/profile/f/default/p/8b6e3c8e-1f75-482f-a28d-ea05d50c6d18/stop
+2025-08-23 23:11:13,898 - Profile-automate_profile_002 - INFO - ✅ Profile stopped
+2025-08-23 23:11:13,898 - __main__ - INFO - ❌ automate_profile_002: error
+2025-08-23 23:11:13,898 - __main__ - ERROR -    Errors: 1
+2025-08-23 23:11:13,898 - __main__ - INFO - 📊 Batch Automation Summary
+2025-08-23 23:11:13,898 - __main__ - INFO - ==================================================
+2025-08-23 23:11:13,898 - __main__ - INFO - 📈 Total Profiles: 2
+2025-08-23 23:11:13,898 - __main__ - INFO - ✅ Successful: 0
+2025-08-23 23:11:13,898 - __main__ - INFO - ❌ Failed: 2
+2025-08-23 23:11:13,898 - __main__ - INFO - 🌐 URLs Visited: 0
+2025-08-23 23:11:13,898 - __main__ - INFO - ⚠️ Total Errors: 2
+2025-08-23 23:11:13,898 - __main__ - INFO - 
+📋 Individual Profile Results:
+2025-08-23 23:11:13,898 - __main__ - INFO -    ❌ automate_profile_001: 0 URLs, 1 errors
+2025-08-23 23:11:13,898 - __main__ - INFO -    ❌ automate_profile_002: 0 URLs, 1 errors
+2025-08-23 23:11:13,899 - __main__ - INFO - 💾 Batch results saved to: data/batch_results_20250823_231113.json
+2025-08-23 23:11:13,899 - root - INFO - 💾 Results saved to: data/batch_results_20250823_231113.json
+2025-08-23 23:11:13,899 - root - INFO - 🎉 Batch automation example completed!

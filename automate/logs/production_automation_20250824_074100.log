@@ -1,0 +1,66 @@
+2025-08-24 07:41:01,587 - multilogin_api - INFO - Successfully authenticated with Multilogin X API
+2025-08-24 07:41:01,588 - multilogin_api - INFO - 🚀 Starting complete Multilogin proxy update flow for profile 7dcb7410-4552-4702-8750-a2e506e97990
+2025-08-24 07:41:01,588 - multilogin_api - INFO - 🔄 Setting up Multilogin proxy profile for sg/singapore...
+2025-08-24 07:41:01,819 - multilogin_api - INFO - ✅ Profile setup successful for sg/singapore
+2025-08-24 07:41:01,819 - multilogin_api - INFO - 🔄 Getting proxy connection for sg/singapore...
+2025-08-24 07:41:02,534 - multilogin_api - INFO - ✅ Proxy connection successful for sg/singapore
+2025-08-24 07:41:02,534 - multilogin_api - INFO - 🔍 Validating proxy gate.multilogin.com:1080...
+2025-08-24 07:41:05,097 - multilogin_api - INFO - ✅ Proxy validation successful for gate.multilogin.com
+2025-08-24 07:41:05,097 - multilogin_api - INFO - 🔄 Updating proxy for profile 7dcb7410-4552-4702-8750-a2e506e97990...
+2025-08-24 07:41:05,444 - multilogin_api - INFO - ✅ Proxy updated successfully for profile 7dcb7410-4552-4702-8750-a2e506e97990
+2025-08-24 07:41:05,445 - multilogin_api - INFO - ✅ Complete proxy update flow successful for profile 7dcb7410-4552-4702-8750-a2e506e97990
+2025-08-24 07:41:05,445 - multilogin_api - INFO - 🚀 Starting complete Multilogin proxy update flow for profile 703ff0d8-a43b-4249-9612-afa9b8b08f79
+2025-08-24 07:41:05,445 - multilogin_api - INFO - 🔄 Setting up Multilogin proxy profile for sg/singapore...
+2025-08-24 07:41:05,684 - multilogin_api - INFO - ✅ Profile setup successful for sg/singapore
+2025-08-24 07:41:05,685 - multilogin_api - INFO - 🔄 Getting proxy connection for sg/singapore...
+2025-08-24 07:41:06,236 - multilogin_api - INFO - ✅ Proxy connection successful for sg/singapore
+2025-08-24 07:41:06,236 - multilogin_api - INFO - 🔍 Validating proxy gate.multilogin.com:1080...
+2025-08-24 07:41:11,084 - multilogin_api - INFO - ✅ Proxy validation successful for gate.multilogin.com
+2025-08-24 07:41:11,084 - multilogin_api - INFO - 🔄 Updating proxy for profile 703ff0d8-a43b-4249-9612-afa9b8b08f79...
+2025-08-24 07:41:11,403 - multilogin_api - INFO - ✅ Proxy updated successfully for profile 703ff0d8-a43b-4249-9612-afa9b8b08f79
+2025-08-24 07:41:11,403 - multilogin_api - INFO - ✅ Complete proxy update flow successful for profile 703ff0d8-a43b-4249-9612-afa9b8b08f79
+2025-08-24 07:41:11,403 - multilogin_api - INFO - 🚀 Starting complete Multilogin proxy update flow for profile 3fecb797-b61f-4498-8a9e-4618a504858c
+2025-08-24 07:41:11,403 - multilogin_api - INFO - 🔄 Setting up Multilogin proxy profile for sg/singapore...
+2025-08-24 07:41:11,686 - multilogin_api - INFO - ✅ Profile setup successful for sg/singapore
+2025-08-24 07:41:11,686 - multilogin_api - INFO - 🔄 Getting proxy connection for sg/singapore...
+2025-08-24 07:41:12,081 - multilogin_api - INFO - ✅ Proxy connection successful for sg/singapore
+2025-08-24 07:41:12,082 - multilogin_api - INFO - 🔍 Validating proxy gate.multilogin.com:1080...
+2025-08-24 07:41:16,185 - multilogin_api - INFO - ✅ Proxy validation successful for gate.multilogin.com
+2025-08-24 07:41:16,186 - multilogin_api - INFO - 🔄 Updating proxy for profile 3fecb797-b61f-4498-8a9e-4618a504858c...
+2025-08-24 07:41:16,567 - multilogin_api - INFO - ✅ Proxy updated successfully for profile 3fecb797-b61f-4498-8a9e-4618a504858c
+2025-08-24 07:41:16,567 - multilogin_api - INFO - ✅ Complete proxy update flow successful for profile 3fecb797-b61f-4498-8a9e-4618a504858c
+2025-08-24 07:41:16,567 - multilogin_api - INFO - 🚀 Starting complete Multilogin proxy update flow for profile 61364ffa-82a2-415b-8b2a-d253acda9a38
+2025-08-24 07:41:16,567 - multilogin_api - INFO - 🔄 Setting up Multilogin proxy profile for sg/singapore...
+2025-08-24 07:41:16,796 - multilogin_api - INFO - ✅ Profile setup successful for sg/singapore
+2025-08-24 07:41:16,796 - multilogin_api - INFO - 🔄 Getting proxy connection for sg/singapore...
+2025-08-24 07:41:17,181 - multilogin_api - INFO - ✅ Proxy connection successful for sg/singapore
+2025-08-24 07:41:17,181 - multilogin_api - INFO - 🔍 Validating proxy gate.multilogin.com:1080...
+2025-08-24 07:41:19,985 - multilogin_api - INFO - ✅ Proxy validation successful for gate.multilogin.com
+2025-08-24 07:41:19,986 - multilogin_api - INFO - 🔄 Updating proxy for profile 61364ffa-82a2-415b-8b2a-d253acda9a38...
+2025-08-24 07:41:20,252 - multilogin_api - INFO - ✅ Proxy updated successfully for profile 61364ffa-82a2-415b-8b2a-d253acda9a38
+2025-08-24 07:41:20,253 - multilogin_api - INFO - ✅ Complete proxy update flow successful for profile 61364ffa-82a2-415b-8b2a-d253acda9a38
+2025-08-24 07:41:20,253 - multilogin_api - INFO - 🚀 Starting complete Multilogin proxy update flow for profile 13239617-4039-4a0d-9b71-6c6be3b134f6
+2025-08-24 07:41:20,253 - multilogin_api - INFO - 🔄 Setting up Multilogin proxy profile for sg/singapore...
+2025-08-24 07:41:20,511 - multilogin_api - INFO - ✅ Profile setup successful for sg/singapore
+2025-08-24 07:41:20,512 - multilogin_api - INFO - 🔄 Getting proxy connection for sg/singapore...
+2025-08-24 07:41:20,880 - multilogin_api - INFO - ✅ Proxy connection successful for sg/singapore
+2025-08-24 07:41:20,880 - multilogin_api - INFO - 🔍 Validating proxy gate.multilogin.com:1080...
+2025-08-24 07:41:22,753 - multilogin_api - INFO - ✅ Proxy validation successful for gate.multilogin.com
+2025-08-24 07:41:22,753 - multilogin_api - INFO - 🔄 Updating proxy for profile 13239617-4039-4a0d-9b71-6c6be3b134f6...
+2025-08-24 07:41:23,033 - multilogin_api - INFO - ✅ Proxy updated successfully for profile 13239617-4039-4a0d-9b71-6c6be3b134f6
+2025-08-24 07:41:23,034 - multilogin_api - INFO - ✅ Complete proxy update flow successful for profile 13239617-4039-4a0d-9b71-6c6be3b134f6
+2025-08-24 07:41:27,195 - multilogin_api - ERROR - Profile start failed: No debugging URL in response
+2025-08-24 07:41:27,195 - __main__ - ERROR - Automation failed for ID - FB: Failed to start profile
+2025-08-24 07:41:27,198 - multilogin_api - ERROR - Profile start failed: No debugging URL in response
+2025-08-24 07:41:27,198 - __main__ - ERROR - Automation failed for ID - FB: Failed to start profile
+2025-08-24 07:41:27,206 - multilogin_api - ERROR - Profile stop error: 404 Client Error: Not Found for url: https://launcher.mlx.yt:45001/api/v2/profile/f/d3602d53-2e54-4cce-87d7-64e89e0f8679/p/7dcb7410-4552-4702-8750-a2e506e97990/stop
+2025-08-24 07:41:27,206 - multilogin_api - ERROR - Profile stop error: 404 Client Error: Not Found for url: https://launcher.mlx.yt:45001/api/v2/profile/f/d3602d53-2e54-4cce-87d7-64e89e0f8679/p/703ff0d8-a43b-4249-9612-afa9b8b08f79/stop
+2025-08-24 07:41:28,164 - multilogin_api - ERROR - Profile start failed: No debugging URL in response
+2025-08-24 07:41:28,164 - __main__ - ERROR - Automation failed for ID - Direct - Mobile: Failed to start profile
+2025-08-24 07:41:28,165 - multilogin_api - ERROR - Profile start failed: No debugging URL in response
+2025-08-24 07:41:28,165 - __main__ - ERROR - Automation failed for ID - FB: Failed to start profile
+2025-08-24 07:41:28,169 - multilogin_api - ERROR - Profile start failed: No debugging URL in response
+2025-08-24 07:41:28,169 - __main__ - ERROR - Automation failed for ID - Direct - Mobile: Failed to start profile
+2025-08-24 07:41:28,173 - multilogin_api - ERROR - Profile stop error: 404 Client Error: Not Found for url: https://launcher.mlx.yt:45001/api/v2/profile/f/d3602d53-2e54-4cce-87d7-64e89e0f8679/p/13239617-4039-4a0d-9b71-6c6be3b134f6/stop
+2025-08-24 07:41:28,174 - multilogin_api - ERROR - Profile stop error: 404 Client Error: Not Found for url: https://launcher.mlx.yt:45001/api/v2/profile/f/d3602d53-2e54-4cce-87d7-64e89e0f8679/p/3fecb797-b61f-4498-8a9e-4618a504858c/stop
+2025-08-24 07:41:28,177 - multilogin_api - ERROR - Profile stop error: 404 Client Error: Not Found for url: https://launcher.mlx.yt:45001/api/v2/profile/f/d3602d53-2e54-4cce-87d7-64e89e0f8679/p/61364ffa-82a2-415b-8b2a-d253acda9a38/stop

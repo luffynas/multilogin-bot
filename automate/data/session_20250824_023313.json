@@ -1,0 +1,198 @@
+{
+  "start_time": "2025-08-24 02:17:56.057472",
+  "personality": "explorer",
+  "device_type": "desktop",
+  "pages_visited": [
+    {
+      "url": "https://maxgaming.biz.id/can-a-vpn-really-boost-your-fps-or-reduce-lag-2025-guide-for-gamers/",
+      "timestamp": "2025-08-24T02:18:09.796111",
+      "title": "Can a VPN Really Boost Your FPS or Reduce Lag? (2025 Guide for Gamers) - MaxGaming"
+    }
+  ],
+  "interactions": [
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T02:19:39.937908"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T02:19:41.636788"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T02:19:55.034819"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T02:20:03.904512"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T02:20:04.709658"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T02:20:11.375613"
+    },
+    {
+      "type": "personality_navigation",
+      "personality": "casual",
+      "preferred_nav_type": "random",
+      "timestamp": "2025-08-24T02:33:10.428021"
+    },
+    {
+      "type": "personality_navigation",
+      "personality": "professional",
+      "preferred_nav_type": "category",
+      "timestamp": "2025-08-24T02:33:10.444900"
+    },
+    {
+      "type": "personality_navigation",
+      "personality": "researcher",
+      "preferred_nav_type": "legal",
+      "timestamp": "2025-08-24T02:33:10.444922"
+    },
+    {
+      "type": "personality_navigation",
+      "personality": "explorer",
+      "preferred_nav_type": "category",
+      "timestamp": "2025-08-24T02:33:10.455836"
+    },
+    {
+      "type": "browser_navigation",
+      "pattern_number": 1,
+      "timestamp": "2025-08-24T02:33:10.457197"
+    },
+    {
+      "type": "browser_navigation",
+      "pattern_number": 2,
+      "timestamp": "2025-08-24T02:33:11.464151"
+    },
+    {
+      "type": "browser_navigation",
+      "pattern_number": 3,
+      "timestamp": "2025-08-24T02:33:12.469273"
+    },
+    {
+      "type": "navigation_demo",
+      "total_tests": 5,
+      "successful_navigations": 4,
+      "success_rate": 80.0,
+      "navigation_results": [
+        {
+          "test_number": 1,
+          "from_url": "https://maxgaming.biz.id/can-a-vpn-really-boost-your-fps-or-reduce-lag-2025-guide-for-gamers/",
+          "to_url": "https://maxgaming.biz.id/best-vpn-settings-for-smooth-cloud-gaming-2025-guide/",
+          "actual_url": "https://maxgaming.biz.id/best-vpn-settings-for-smooth-cloud-gaming-2025-guide/",
+          "page_title": "Best VPN Settings for Smooth Cloud Gaming (2025 Guide) - MaxGaming",
+          "success": true,
+          "timestamp": "2025-08-24T02:20:24.551663"
+        },
+        {
+          "test_number": 2,
+          "from_url": "https://maxgaming.biz.id/best-vpn-settings-for-smooth-cloud-gaming-2025-guide/",
+          "to_url": "https://maxgaming.biz.id/is-a-vpn-legal-for-gaming-in-the-us-uk-and-australia-2025-update/",
+          "actual_url": "https://maxgaming.biz.id/is-a-vpn-legal-for-gaming-in-the-us-uk-and-australia-2025-update/",
+          "page_title": "Is a VPN Legal for Gaming in the US, UK, and Australia? (2025 Update) - MaxGaming",
+          "success": true,
+          "timestamp": "2025-08-24T02:23:56.605698"
+        },
+        {
+          "test_number": 3,
+          "from_url": "https://maxgaming.biz.id/is-a-vpn-legal-for-gaming-in-the-us-uk-and-australia-2025-update/",
+          "to_url": "https://maxgaming.biz.id/how-a-vpn-can-protect-you-from-ddos-attacks-while-gaming-2025-guide/",
+          "actual_url": "https://maxgaming.biz.id/how-a-vpn-can-protect-you-from-ddos-attacks-while-gaming-2025-guide/",
+          "page_title": "How a VPN Can Protect You from DDoS Attacks While Gaming (2025 Guide) - MaxGaming",
+          "success": true,
+          "timestamp": "2025-08-24T02:27:50.057066"
+        },
+        {
+          "test_number": 4,
+          "from_url": "https://maxgaming.biz.id/how-a-vpn-can-protect-you-from-ddos-attacks-while-gaming-2025-guide/",
+          "to_url": "https://maxgaming.biz.id/best-free-vpns-for-casual-gaming-are-they-worth-it-2025-review/",
+          "actual_url": "https://maxgaming.biz.id/best-free-vpns-for-casual-gaming-are-they-worth-it-2025-review/",
+          "page_title": "Best Free VPNs for Casual Gaming \u2013 Are They Worth It? (2025 Review) - MaxGaming",
+          "success": true,
+          "timestamp": "2025-08-24T02:29:38.562946"
+        },
+        {
+          "test_number": 5,
+          "from_url": "https://maxgaming.biz.id/best-free-vpns-for-casual-gaming-are-they-worth-it-2025-review/",
+          "to_url": "https://maxgaming.biz.id/nordvpn-vs-expressvpn-for-gamers-which-one-wins-2025-detailed-review/",
+          "success": false,
+          "error": "HTTPConnectionPool(host='127.0.0.1', port=62710): Max retries exceeded with url: /session/70b62a4e6286e760e12c74c15ac978b2/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x102643e50>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "timestamp": "2025-08-24T02:33:08.422713"
+        }
+      ],
+      "timestamp": "2025-08-24T02:33:13.474395"
+    },
+    {
+      "type": "session_memory",
+      "description": "Maintaining personality consistency",
+      "timestamp": "2025-08-24T02:33:13.484419"
+    },
+    {
+      "type": "time_based",
+      "hour": 2,
+      "timestamp": "2025-08-24T02:33:13.484441"
+    },
+    {
+      "type": "geographic",
+      "description": "Geographic behavior adaptation",
+      "timestamp": "2025-08-24T02:33:13.484452"
+    },
+    {
+      "type": "device_specific",
+      "device_type": "desktop",
+      "timestamp": "2025-08-24T02:33:13.484464"
+    },
+    {
+      "type": "attention_span",
+      "personality": "researcher",
+      "timestamp": "2025-08-24T02:33:13.484471"
+    },
+    {
+      "type": "adsense",
+      "ads_found": 0,
+      "timestamp": "2025-08-24T02:33:13.506181"
+    }
+  ],
+  "errors": [
+    {
+      "type": "news_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=62710): Max retries exceeded with url: /session/70b62a4e6286e760e12c74c15ac978b2/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x102643fd0>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "blog_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=62710): Max retries exceeded with url: /session/70b62a4e6286e760e12c74c15ac978b2/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x102643f40>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "tech_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=62710): Max retries exceeded with url: /session/70b62a4e6286e760e12c74c15ac978b2/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10264ecd0>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "product_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=62710): Max retries exceeded with url: /session/70b62a4e6286e760e12c74c15ac978b2/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10264e940>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    }
+  ],
+  "end_time": "2025-08-24T02:33:13.506303",
+  "duration": "0:15:17.448834"
+}

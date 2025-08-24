@@ -1,0 +1,9 @@
+2025-08-23 15:22:17,131 - INFO - 🔧 Initializing Multilogin API...
+2025-08-23 15:22:18,130 - INFO - Successfully authenticated with Multilogin X API
+2025-08-23 15:22:18,130 - INFO - ✅ Authentication successful!
+2025-08-23 15:22:18,131 - INFO - Getting folders from: https://api.multilogin.com/workspace/folders
+2025-08-23 15:22:18,385 - INFO - Successfully retrieved 2 folders
+2025-08-23 15:22:18,386 - INFO - Getting folders from: https://api.multilogin.com/workspace/folders
+2025-08-23 15:22:18,672 - INFO - Successfully retrieved 2 folders
+2025-08-23 15:22:18,672 - INFO - Found default folder: Default folder (ID: d3602d53-2e54-4cce-87d7-64e89e0f8679)
+2025-08-23 15:22:18,672 - ERROR - ❌ Test failed with error: 'MultiloginXAPI' object has no attribute 'fingerprint_generator'

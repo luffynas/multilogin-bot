@@ -1,0 +1,336 @@
+{
+  "session_20250823_154649": {
+    "timestamp": "2025-08-23T15:46:49.340877",
+    "personality": "explorer",
+    "device_type": "tablet",
+    "geo_location": "US",
+    "session_data": {
+      "pages_visited": [
+        {
+          "url": "https://cekmedia.my.id/pinjaman-bca-online-langsung-cair-solusi-dana-instan-dari-bank-terpercaya/",
+          "type": "main_page",
+          "content_type": "technology",
+          "content_quality": {
+            "dwell_time": "medium",
+            "engagement": "medium",
+            "reading_speed": "medium"
+          },
+          "dwell_time": 25.477203856050924
+        },
+        {
+          "url": "https://cekmedia.my.id/category/blog/",
+          "type": "category",
+          "content_type": "technology",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 63.765328506765215
+        },
+        {
+          "url": "https://cekmedia.my.id/category/blog/#",
+          "type": "category",
+          "content_type": "technology",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 81.01083216138768
+        }
+      ],
+      "total_pages": 3,
+      "session_duration": 30.44206404685974,
+      "navigation_pattern": [
+        "category",
+        "category"
+      ],
+      "start_time": 1755938778.898779,
+      "personality": "explorer",
+      "device_type": "tablet",
+      "geo_location": "US",
+      "session_memory": {},
+      "geo_behavior": {
+        "reading_speed": "fast",
+        "attention_span": "short",
+        "preferred_content": [
+          "news",
+          "entertainment",
+          "technology"
+        ],
+        "navigation_style": "efficient",
+        "page_dwell_time": [
+          20,
+          120
+        ]
+      }
+    }
+  },
+  "session_20250823_154713": {
+    "timestamp": "2025-08-23T15:47:13.172835",
+    "personality": "explorer",
+    "device_type": "tablet",
+    "geo_location": "US",
+    "session_data": {
+      "pages_visited": [
+        {
+          "url": "https://cekmedia.my.id/pinjaman-online-cepat-cair-solusi-dana-darurat-tanpa-ribet/",
+          "type": "main_page",
+          "content_type": "technology",
+          "content_quality": {
+            "dwell_time": "medium",
+            "engagement": "medium",
+            "reading_speed": "medium"
+          },
+          "dwell_time": 20.438971507528578
+        },
+        {
+          "url": "https://cekmedia.my.id/category/blog/",
+          "type": "category",
+          "content_type": "technology",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 27.43406665968715
+        }
+      ],
+      "total_pages": 2,
+      "session_duration": 18.82414722442627,
+      "navigation_pattern": [
+        "category"
+      ],
+      "start_time": 1755938814.346705,
+      "personality": "explorer",
+      "device_type": "tablet",
+      "geo_location": "US",
+      "session_memory": {
+        "preferred_categories": [
+          "category"
+        ],
+        "reading_speed": "fast",
+        "navigation_style": "explorer"
+      },
+      "geo_behavior": {
+        "reading_speed": "fast",
+        "attention_span": "short",
+        "preferred_content": [
+          "news",
+          "entertainment",
+          "technology"
+        ],
+        "navigation_style": "efficient",
+        "page_dwell_time": [
+          20,
+          120
+        ]
+      }
+    }
+  },
+  "session_20250823_154729": {
+    "timestamp": "2025-08-23T15:47:29.457325",
+    "personality": "researcher",
+    "device_type": "mobile",
+    "geo_location": "US",
+    "session_data": {
+      "pages_visited": [
+        {
+          "url": "https://cekmedia.my.id/pinjaman-bca-online-langsung-cair-solusi-dana-instan-dari-bank-terpercaya/",
+          "type": "main_page",
+          "content_type": "technology",
+          "content_quality": {
+            "dwell_time": "medium",
+            "engagement": "medium",
+            "reading_speed": "medium"
+          },
+          "dwell_time": 63.34119133942379
+        },
+        {
+          "url": "https://cekmedia.my.id/category/blog/",
+          "type": "category",
+          "content_type": "general",
+          "content_quality": {
+            "dwell_time": "medium",
+            "engagement": "medium",
+            "reading_speed": "medium"
+          },
+          "dwell_time": 109.89848168305232
+        }
+      ],
+      "total_pages": 2,
+      "session_duration": 16.23437213897705,
+      "navigation_pattern": [
+        "category"
+      ],
+      "start_time": 1755938833.222657,
+      "personality": "researcher",
+      "device_type": "mobile",
+      "geo_location": "US",
+      "session_memory": {},
+      "geo_behavior": {
+        "reading_speed": "fast",
+        "attention_span": "short",
+        "preferred_content": [
+          "news",
+          "entertainment",
+          "technology"
+        ],
+        "navigation_style": "efficient",
+        "page_dwell_time": [
+          20,
+          120
+        ]
+      }
+    }
+  },
+  "session_20250823_155245": {
+    "timestamp": "2025-08-23T15:52:45.626509",
+    "personality": "explorer",
+    "device_type": "desktop",
+    "geo_location": "US",
+    "session_data": {
+      "pages_visited": [
+        {
+          "url": "https://cekmedia.my.id/pinjaman-bca-online-langsung-cair-solusi-dana-instan-dari-bank-terpercaya/",
+          "type": "main_page",
+          "content_type": "technology",
+          "content_quality": {
+            "dwell_time": "medium",
+            "engagement": "medium",
+            "reading_speed": "medium"
+          },
+          "dwell_time": 34.70863050673753
+        },
+        {
+          "url": "https://cekmedia.my.id/category/blog/",
+          "type": "category",
+          "content_type": "technology",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 21.24754631560263
+        },
+        {
+          "url": "https://cekmedia.my.id/category/blog/#",
+          "type": "category",
+          "content_type": "technology",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 31.493987411819194
+        },
+        {
+          "url": "https://cekmedia.my.id/hello-world/",
+          "type": "random",
+          "content_type": "technology",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 21.12170736407432
+        },
+        {
+          "url": "https://cekmedia.my.id/category/blog/",
+          "type": "random",
+          "content_type": "technology",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 37.70358609247072
+        }
+      ],
+      "total_pages": 5,
+      "session_duration": 62.95452284812927,
+      "navigation_pattern": [
+        "category",
+        "category",
+        "random",
+        "random"
+      ],
+      "start_time": 1755939102.671437,
+      "personality": "explorer",
+      "device_type": "desktop",
+      "geo_location": "US",
+      "session_memory": {},
+      "geo_behavior": {
+        "reading_speed": "fast",
+        "attention_span": "short",
+        "preferred_content": [
+          "news",
+          "entertainment",
+          "technology"
+        ],
+        "navigation_style": "efficient",
+        "page_dwell_time": [
+          20,
+          120
+        ]
+      }
+    }
+  },
+  "session_20250823_155658": {
+    "timestamp": "2025-08-23T15:56:58.860867",
+    "personality": "explorer",
+    "device_type": "mobile",
+    "geo_location": "US",
+    "session_data": {
+      "pages_visited": [
+        {
+          "url": "https://cekmedia.my.id/pinjaman-bca-online-langsung-cair-solusi-dana-instan-dari-bank-terpercaya/",
+          "type": "main_page",
+          "content_type": "technology",
+          "content_quality": {
+            "dwell_time": "medium",
+            "engagement": "medium",
+            "reading_speed": "medium"
+          },
+          "dwell_time": 87.4943644834799
+        },
+        {
+          "url": "https://cekmedia.my.id/hello-world/",
+          "type": "random",
+          "content_type": "technology",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 20.445060500707143
+        }
+      ],
+      "total_pages": 2,
+      "session_duration": 22.870262145996094,
+      "navigation_pattern": [
+        "random"
+      ],
+      "start_time": 1755939395.9901068,
+      "personality": "explorer",
+      "device_type": "mobile",
+      "geo_location": "US",
+      "session_memory": {},
+      "geo_behavior": {
+        "reading_speed": "fast",
+        "attention_span": "short",
+        "preferred_content": [
+          "news",
+          "entertainment",
+          "technology"
+        ],
+        "navigation_style": "efficient",
+        "page_dwell_time": [
+          20,
+          120
+        ]
+      }
+    }
+  }
+}

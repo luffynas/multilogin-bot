@@ -1,0 +1,387 @@
+{
+  "session_20250824_032230": {
+    "timestamp": "2025-08-24T03:22:30.328192",
+    "personality": "explorer",
+    "device_type": "tablet",
+    "geo_location": "US",
+    "session_data": {
+      "pages_visited": [
+        {
+          "url": "https://maxgaming.biz.id/gaming-vpns-that-work-with-xbox-playstation-and-switch-2025-edition/",
+          "type": "main_page",
+          "content_type": "product",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 68.05597686310423
+        }
+      ],
+      "total_pages": 1,
+      "session_duration": 143.96438312530518,
+      "navigation_pattern": [],
+      "start_time": 1755980406.363766,
+      "personality": "explorer",
+      "device_type": "tablet",
+      "geo_location": "US",
+      "session_memory": {},
+      "geo_behavior": {
+        "reading_speed": "fast",
+        "attention_span": "short",
+        "preferred_content": [
+          "news",
+          "entertainment",
+          "technology"
+        ],
+        "navigation_style": "efficient",
+        "page_dwell_time": [
+          20,
+          120
+        ]
+      }
+    }
+  },
+  "session_20250824_033238": {
+    "timestamp": "2025-08-24T03:32:38.385859",
+    "personality": "explorer",
+    "device_type": "tablet",
+    "geo_location": "US",
+    "session_data": {
+      "pages_visited": [
+        {
+          "url": "https://maxgaming.biz.id/gaming-vpns-that-work-with-xbox-playstation-and-switch-2025-edition/",
+          "type": "main_page",
+          "content_type": "product",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 78.58821254986628
+        }
+      ],
+      "total_pages": 1,
+      "session_duration": 129.31978130340576,
+      "navigation_pattern": [],
+      "start_time": 1755981029.0649998,
+      "personality": "explorer",
+      "device_type": "tablet",
+      "geo_location": "US",
+      "session_memory": {
+        "preferred_categories": [],
+        "reading_speed": "slow",
+        "navigation_style": "random"
+      },
+      "geo_behavior": {
+        "reading_speed": "fast",
+        "attention_span": "short",
+        "preferred_content": [
+          "news",
+          "entertainment",
+          "technology"
+        ],
+        "navigation_style": "efficient",
+        "page_dwell_time": [
+          20,
+          120
+        ]
+      }
+    }
+  },
+  "session_20250824_034703": {
+    "timestamp": "2025-08-24T03:47:03.079502",
+    "personality": "explorer",
+    "device_type": "tablet",
+    "geo_location": "US",
+    "session_data": {
+      "pages_visited": [
+        {
+          "url": "https://maxgaming.biz.id/gaming-vpns-that-work-with-xbox-playstation-and-switch-2025-edition/",
+          "type": "main_page",
+          "content_type": "product",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 25.645465174578142
+        },
+        {
+          "url": "https://maxgaming.biz.id/can-a-vpn-really-boost-your-fps-or-reduce-lag-2025-guide-for-gamers/",
+          "type": "random",
+          "content_type": "blog",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 24.869780140209805
+        },
+        {
+          "url": "https://maxgaming.biz.id/category/vpn-cloud-gaming/",
+          "type": "category",
+          "content_type": "blog",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 49.65883671120505
+        }
+      ],
+      "total_pages": 3,
+      "session_duration": 490.982195854187,
+      "navigation_pattern": [
+        "random",
+        "category"
+      ],
+      "start_time": 1755981532.09694,
+      "personality": "explorer",
+      "device_type": "tablet",
+      "geo_location": "US",
+      "session_memory": {
+        "preferred_categories": [],
+        "reading_speed": "slow",
+        "navigation_style": "random"
+      },
+      "geo_behavior": {
+        "reading_speed": "fast",
+        "attention_span": "short",
+        "preferred_content": [
+          "news",
+          "entertainment",
+          "technology"
+        ],
+        "navigation_style": "efficient",
+        "page_dwell_time": [
+          20,
+          120
+        ]
+      }
+    }
+  },
+  "session_20250824_042622": {
+    "timestamp": "2025-08-24T04:26:22.777306",
+    "personality": "explorer",
+    "device_type": "desktop",
+    "geo_location": "US",
+    "session_data": {
+      "pages_visited": [
+        {
+          "url": "https://maxgaming.biz.id/category/vpn-cloud-gaming/",
+          "type": "main_page",
+          "content_type": "blog",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 17.382708534713693
+        }
+      ],
+      "total_pages": 1,
+      "session_duration": 35.53321385383606,
+      "navigation_pattern": [],
+      "start_time": 1755984347.2429981,
+      "personality": "explorer",
+      "device_type": "desktop",
+      "geo_location": "US",
+      "session_memory": {},
+      "geo_behavior": {
+        "reading_speed": "fast",
+        "attention_span": "short",
+        "preferred_content": [
+          "news",
+          "entertainment",
+          "technology"
+        ],
+        "navigation_style": "efficient",
+        "page_dwell_time": [
+          20,
+          120
+        ]
+      }
+    }
+  },
+  "session_20250824_043112": {
+    "timestamp": "2025-08-24T04:31:12.539374",
+    "personality": "explorer",
+    "device_type": "desktop",
+    "geo_location": "US",
+    "session_data": {
+      "pages_visited": [
+        {
+          "url": "https://maxgaming.biz.id/category/vpn-cloud-gaming/",
+          "type": "main_page",
+          "content_type": "blog",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 86.53891564913941
+        }
+      ],
+      "total_pages": 1,
+      "session_duration": 74.33332204818726,
+      "navigation_pattern": [],
+      "start_time": 1755984598.20499,
+      "personality": "explorer",
+      "device_type": "desktop",
+      "geo_location": "US",
+      "session_memory": {
+        "preferred_categories": [],
+        "reading_speed": "fast",
+        "navigation_style": "random"
+      },
+      "geo_behavior": {
+        "reading_speed": "fast",
+        "attention_span": "short",
+        "preferred_content": [
+          "news",
+          "entertainment",
+          "technology"
+        ],
+        "navigation_style": "efficient",
+        "page_dwell_time": [
+          20,
+          120
+        ]
+      }
+    }
+  },
+  "session_20250824_044337": {
+    "timestamp": "2025-08-24T04:43:37.025166",
+    "personality": "explorer",
+    "device_type": "mobile",
+    "geo_location": "US",
+    "session_data": {
+      "pages_visited": [
+        {
+          "url": "https://maxgaming.biz.id/category/vpn-cloud-gaming/",
+          "type": "main_page",
+          "content_type": "blog",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 88.24448388479972
+        }
+      ],
+      "total_pages": 1,
+      "session_duration": 103.70891976356506,
+      "navigation_pattern": [],
+      "start_time": 1755985313.3157482,
+      "personality": "explorer",
+      "device_type": "mobile",
+      "geo_location": "US",
+      "session_memory": {},
+      "geo_behavior": {
+        "reading_speed": "fast",
+        "attention_span": "short",
+        "preferred_content": [
+          "news",
+          "entertainment",
+          "technology"
+        ],
+        "navigation_style": "efficient",
+        "page_dwell_time": [
+          20,
+          120
+        ]
+      }
+    }
+  },
+  "session_20250824_044715": {
+    "timestamp": "2025-08-24T04:47:15.274360",
+    "personality": "explorer",
+    "device_type": "desktop",
+    "geo_location": "US",
+    "session_data": {
+      "pages_visited": [
+        {
+          "url": "https://maxgaming.biz.id/category/vpn-cloud-gaming/",
+          "type": "main_page",
+          "content_type": "blog",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 17.373133039432894
+        }
+      ],
+      "total_pages": 1,
+      "session_duration": 80.1283369064331,
+      "navigation_pattern": [],
+      "start_time": 1755985555.145817,
+      "personality": "explorer",
+      "device_type": "desktop",
+      "geo_location": "US",
+      "session_memory": {
+        "preferred_categories": [],
+        "reading_speed": "fast",
+        "navigation_style": "random"
+      },
+      "geo_behavior": {
+        "reading_speed": "fast",
+        "attention_span": "short",
+        "preferred_content": [
+          "news",
+          "entertainment",
+          "technology"
+        ],
+        "navigation_style": "efficient",
+        "page_dwell_time": [
+          20,
+          120
+        ]
+      }
+    }
+  },
+  "session_20250824_171920": {
+    "timestamp": "2025-08-24T17:19:20.893775",
+    "personality": "researcher",
+    "device_type": "desktop",
+    "geo_location": "US",
+    "session_data": {
+      "pages_visited": [
+        {
+          "url": "https://maxgaming.biz.id/best-vpn-settings-for-smooth-cloud-gaming-2025-guide/",
+          "type": "main_page",
+          "content_type": "blog",
+          "content_quality": {
+            "dwell_time": "long",
+            "engagement": "high",
+            "reading_speed": "slow"
+          },
+          "dwell_time": 251.65774341700396
+        }
+      ],
+      "total_pages": 1,
+      "session_duration": 158.87469625473022,
+      "navigation_pattern": [],
+      "start_time": 1756030602.0178518,
+      "personality": "researcher",
+      "device_type": "desktop",
+      "geo_location": "US",
+      "session_memory": {},
+      "geo_behavior": {
+        "reading_speed": "fast",
+        "attention_span": "short",
+        "preferred_content": [
+          "news",
+          "entertainment",
+          "technology"
+        ],
+        "navigation_style": "efficient",
+        "page_dwell_time": [
+          20,
+          120
+        ]
+      }
+    }
+  }
+}

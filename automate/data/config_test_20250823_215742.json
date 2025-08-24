@@ -1,0 +1,78 @@
+{
+  "tests_passed": 44,
+  "tests_failed": 0,
+  "configuration_checks": {
+    "human_behavior_enabled": true,
+    "human_behavior_mouse_movement": true,
+    "human_behavior_random_delays": true,
+    "human_behavior_natural_scrolling": true,
+    "human_behavior_realistic_typing": true,
+    "human_behavior_min_delay": 1,
+    "human_behavior_max_delay": 5,
+    "human_behavior_scroll_interval_min": 10,
+    "human_behavior_scroll_interval_max": 30,
+    "click_simulation_enabled": true,
+    "click_simulation_natural_click_patterns": true,
+    "click_simulation_hover_before_click": true,
+    "click_simulation_click_delay_variation": true,
+    "click_simulation_double_click_probability": 0.05,
+    "traffic_generation_enabled": true,
+    "traffic_generation_natural_browsing_patterns": true,
+    "traffic_generation_page_dwell_time": [
+      30,
+      180
+    ],
+    "traffic_generation_scroll_behavior": "natural",
+    "traffic_generation_tab_switching": true,
+    "traffic_generation_bookmark_creation": true,
+    "realistic_behavior_enabled": true,
+    "realistic_behavior_attention_span_variation": true,
+    "realistic_behavior_reading_speed_variation": true,
+    "realistic_behavior_mouse_acceleration": true,
+    "realistic_behavior_keyboard_typing_patterns": true,
+    "realistic_behavior_browser_navigation_patterns": true,
+    "advanced_behavior_enabled": true,
+    "advanced_behavior_time_based_adjustment": true,
+    "advanced_behavior_personality_generation": true,
+    "advanced_behavior_personality_weights": {
+      "explorer": 0.25,
+      "researcher": 0.25,
+      "casual": 0.25,
+      "professional": 0.25
+    },
+    "advanced_behavior_device_detection": true,
+    "advanced_behavior_device_distribution": {
+      "desktop": 0.6,
+      "mobile": 0.3,
+      "tablet": 0.1
+    },
+    "advanced_behavior_geo_specific_behavior": true,
+    "advanced_behavior_geo_behavior_enabled": true,
+    "advanced_behavior_content_awareness": true,
+    "advanced_behavior_content_analysis": true,
+    "advanced_behavior_session_memory": true,
+    "advanced_behavior_memory_persistence": true,
+    "advanced_behavior_smart_ad_interaction": true,
+    "advanced_behavior_context_aware_interaction": true
+  },
+  "stealth_metrics": {
+    "session_duration": "0:04:41.544284",
+    "mouse_movements": 3,
+    "clicks": 0,
+    "scrolls": 0,
+    "typing_events": 0,
+    "page_visits": 0,
+    "last_activity": "2025-08-23T21:57:42.878859",
+    "personality": "professional",
+    "device_type": "desktop",
+    "geo_location": "US",
+    "behavior_config": {
+      "human_behavior_enabled": true,
+      "click_simulation_enabled": true,
+      "traffic_generation_enabled": true,
+      "realistic_behavior_enabled": true,
+      "advanced_behavior_enabled": true
+    }
+  },
+  "timestamp": "2025-08-23T21:53:01.313839"
+}

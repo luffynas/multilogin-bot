@@ -1,0 +1,34 @@
+{
+  "timestamp": "2025-08-23T23:11:13.898939",
+  "total_profiles": 2,
+  "successful_profiles": 0,
+  "failed_profiles": 2,
+  "total_urls_visited": 0,
+  "total_errors": 2,
+  "results": [
+    {
+      "profile_name": "automate_profile_001",
+      "profile_id": "3796d576-7ff6-11f0-84f5-1aaa018ad5d1",
+      "status": "error",
+      "start_time": "2025-08-23T23:11:09.522152",
+      "end_time": "2025-08-23T23:11:09.855288",
+      "urls_visited": [],
+      "errors": [
+        "Profile automation failed: Failed to start profile"
+      ],
+      "browsing_sessions": []
+    },
+    {
+      "profile_name": "automate_profile_002",
+      "profile_id": "8b6e3c8e-1f75-482f-a28d-ea05d50c6d18",
+      "status": "error",
+      "start_time": "2025-08-23T23:11:09.522755",
+      "end_time": "2025-08-23T23:11:13.898336",
+      "urls_visited": [],
+      "errors": [
+        "Profile automation failed: Failed to start profile"
+      ],
+      "browsing_sessions": []
+    }
+  ]
+}

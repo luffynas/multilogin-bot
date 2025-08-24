@@ -1,0 +1,28 @@
+2025-08-24 01:47:28,546 - INFO - 🎭 Generated personality: casual
+2025-08-24 01:47:28,546 - INFO - 📱 Detected device type: desktop
+2025-08-24 01:47:28,546 - INFO - 🌙 Night behavior: Very low energy, minimal activity
+2025-08-24 01:47:28,546 - INFO - 👁️ Medium attention span: Balanced mode
+2025-08-24 01:47:28,546 - INFO - 📖 Medium reading speed: Balanced mode
+2025-08-24 01:47:28,546 - ERROR - Error in tab switching: 'NoneType' object has no attribute 'window_handles'
+2025-08-24 01:47:28,546 - INFO - 🎯 All behavior systems initialized successfully
+2025-08-24 01:47:28,606 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x103950880>: Failed to establish a new connection: [Errno 61] Connection refused')': /session
+2025-08-24 01:47:28,607 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x103950820>: Failed to establish a new connection: [Errno 61] Connection refused')': /session
+2025-08-24 01:47:28,608 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x103950d60>: Failed to establish a new connection: [Errno 61] Connection refused')': /session
+2025-08-24 01:47:28,609 - ERROR - Error setting up driver: HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /session (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x103945640>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-24 01:56:42,355 - INFO - 🎭 Generated personality: researcher
+2025-08-24 01:56:42,355 - INFO - 📱 Detected device type: desktop
+2025-08-24 01:56:42,356 - INFO - 🌙 Night behavior: Very low energy, minimal activity
+2025-08-24 01:56:42,356 - INFO - 👁️ Long attention span: Detailed reading mode
+2025-08-24 01:56:42,356 - INFO - 📖 Medium reading speed: Balanced mode
+2025-08-24 01:56:42,356 - ERROR - Error in tab switching: 'NoneType' object has no attribute 'window_handles'
+2025-08-24 01:56:42,356 - INFO - 🎯 All behavior systems initialized successfully
+2025-08-24 01:56:42,427 - ERROR - ❌ Test failed: cannot import name 'MultiloginAPI' from 'multilogin_api' (/Users/zayn/cursor-project/multi-login-bot/automate/src/multilogin_api.py)
+2025-08-24 01:57:02,785 - INFO - 🎭 Generated personality: professional
+2025-08-24 01:57:02,785 - INFO - 📱 Detected device type: desktop
+2025-08-24 01:57:02,785 - INFO - 🌙 Night behavior: Very low energy, minimal activity
+2025-08-24 01:57:02,785 - INFO - 👁️ Long attention span: Detailed reading mode
+2025-08-24 01:57:02,785 - INFO - 📖 Slow reading speed: Thorough reading mode
+2025-08-24 01:57:02,785 - ERROR - Error in tab switching: 'NoneType' object has no attribute 'window_handles'
+2025-08-24 01:57:02,785 - INFO - 🎯 All behavior systems initialized successfully
+2025-08-24 01:57:04,158 - INFO - Successfully authenticated with Multilogin X API
+2025-08-24 01:57:04,267 - ERROR - Profile start error: HTTPSConnectionPool(host='launcher.mlx.yt', port=45001): Max retries exceeded with url: /api/v2/profile/f/default/p/2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6/start?automation_type=selenium&headless_mode=false (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x10236b610>: Failed to establish a new connection: [Errno 61] Connection refused'))

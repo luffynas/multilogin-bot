@@ -1,0 +1,53 @@
+{
+  "start_time": "2025-08-24 17:11:49.604219",
+  "profile_id": "2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6",
+  "personality": "researcher",
+  "device_type": "desktop",
+  "pages_visited": [
+    {
+      "url": "https://maxgaming.biz.id/",
+      "timestamp": "2025-08-24T17:12:03.563589",
+      "title": "MaxGaming \u2013 Play Smart, Earn Big"
+    }
+  ],
+  "interactions": [
+    {
+      "type": "scrolling",
+      "personality": "researcher",
+      "timestamp": "2025-08-24T17:14:05.284056"
+    },
+    {
+      "type": "reading",
+      "personality": "researcher",
+      "timestamp": "2025-08-24T17:14:05.284088"
+    },
+    {
+      "type": "mouse_interactions",
+      "personality": "researcher",
+      "timestamp": "2025-08-24T17:14:05.284092"
+    },
+    {
+      "type": "typing",
+      "personality": "researcher",
+      "timestamp": "2025-08-24T17:14:05.284094"
+    },
+    {
+      "type": "navigation",
+      "from_url": "https://maxgaming.biz.id/",
+      "to_url": "https://maxgaming.biz.id/best-vpn-settings-for-smooth-cloud-gaming-2025-guide/",
+      "actual_url": "https://maxgaming.biz.id/best-vpn-settings-for-smooth-cloud-gaming-2025-guide/",
+      "page_title": "Best VPN Settings for Smooth Cloud Gaming (2025 Guide) - MaxGaming",
+      "success": true,
+      "timestamp": "2025-08-24T17:14:31.429828"
+    },
+    {
+      "type": "adsense",
+      "ads_found": 0,
+      "clicks_performed": 0,
+      "timestamp": "2025-08-24T17:19:25.957015"
+    }
+  ],
+  "errors": [],
+  "end_time": "2025-08-24T17:19:25.957102",
+  "duration": "0:07:36.352885"
+}

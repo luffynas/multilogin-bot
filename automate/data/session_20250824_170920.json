@@ -1,0 +1,65 @@
+{
+  "start_time": "2025-08-24 17:07:49.604744",
+  "personality": "explorer",
+  "device_type": "mobile",
+  "pages_visited": [
+    {
+      "url": "https://maxgaming.biz.id/",
+      "timestamp": "2025-08-24T17:08:11.538261",
+      "title": "MaxGaming \u2013 Play Smart, Earn Big"
+    }
+  ],
+  "interactions": [
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T17:09:10.269190"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T17:09:10.781857"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T17:09:11.788239"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T17:09:12.095046"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T17:09:12.900431"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T17:09:14.105538"
+    },
+    {
+      "type": "adsense",
+      "ads_found": 0,
+      "clicks_performed": 0,
+      "timestamp": "2025-08-24T17:09:20.089213"
+    }
+  ],
+  "errors": [],
+  "end_time": "2025-08-24T17:09:20.089295",
+  "duration": "0:01:30.484553"
+}

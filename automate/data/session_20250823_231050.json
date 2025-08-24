@@ -1,0 +1,124 @@
+{
+  "start_time": "2025-08-23 23:10:03.971873",
+  "personality": "professional",
+  "device_type": "mobile",
+  "pages_visited": [
+    {
+      "url": "https://maxgaming.biz.id/gaming-vpns-that-work-with-xbox-playstation-and-switch-2025-edition/",
+      "timestamp": "2025-08-23T23:10:18.227381",
+      "title": "Gaming VPNs That Work With Xbox, PlayStation, and Switch (2025 Edition) - MaxGaming"
+    }
+  ],
+  "interactions": [
+    {
+      "type": "scrolling",
+      "personality": "explorer",
+      "timestamp": "2025-08-23T23:10:50.610330"
+    },
+    {
+      "type": "reading",
+      "personality": "explorer",
+      "timestamp": "2025-08-23T23:10:50.622685"
+    },
+    {
+      "type": "mouse_interactions",
+      "personality": "explorer",
+      "timestamp": "2025-08-23T23:10:50.624938"
+    },
+    {
+      "type": "scrolling",
+      "personality": "researcher",
+      "timestamp": "2025-08-23T23:10:50.625866"
+    },
+    {
+      "type": "reading",
+      "personality": "researcher",
+      "timestamp": "2025-08-23T23:10:50.633418"
+    },
+    {
+      "type": "mouse_interactions",
+      "personality": "researcher",
+      "timestamp": "2025-08-23T23:10:50.636127"
+    },
+    {
+      "type": "scrolling",
+      "personality": "casual",
+      "timestamp": "2025-08-23T23:10:50.637432"
+    },
+    {
+      "type": "reading",
+      "personality": "casual",
+      "timestamp": "2025-08-23T23:10:50.647941"
+    },
+    {
+      "type": "mouse_interactions",
+      "personality": "casual",
+      "timestamp": "2025-08-23T23:10:50.649276"
+    },
+    {
+      "type": "scrolling",
+      "personality": "professional",
+      "timestamp": "2025-08-23T23:10:50.650642"
+    },
+    {
+      "type": "reading",
+      "personality": "professional",
+      "timestamp": "2025-08-23T23:10:50.658886"
+    },
+    {
+      "type": "mouse_interactions",
+      "personality": "professional",
+      "timestamp": "2025-08-23T23:10:50.662207"
+    },
+    {
+      "type": "session_memory",
+      "description": "Maintaining personality consistency",
+      "timestamp": "2025-08-23T23:10:50.667762"
+    },
+    {
+      "type": "time_based",
+      "hour": 23,
+      "timestamp": "2025-08-23T23:10:50.667771"
+    },
+    {
+      "type": "geographic",
+      "description": "Geographic behavior adaptation",
+      "timestamp": "2025-08-23T23:10:50.667777"
+    },
+    {
+      "type": "device_specific",
+      "device_type": "mobile",
+      "timestamp": "2025-08-23T23:10:50.667797"
+    },
+    {
+      "type": "attention_span",
+      "personality": "professional",
+      "timestamp": "2025-08-23T23:10:50.667802"
+    },
+    {
+      "type": "adsense",
+      "ads_found": 0,
+      "timestamp": "2025-08-23T23:10:50.689479"
+    }
+  ],
+  "errors": [
+    {
+      "type": "news_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=63877): Max retries exceeded with url: /session/9689f274ce3cf9e3120fa507f1da9df7/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1059f8f70>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "blog_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=63877): Max retries exceeded with url: /session/9689f274ce3cf9e3120fa507f1da9df7/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1059c6d30>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "tech_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=63877): Max retries exceeded with url: /session/9689f274ce3cf9e3120fa507f1da9df7/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1059fec40>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "product_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=63877): Max retries exceeded with url: /session/9689f274ce3cf9e3120fa507f1da9df7/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1059c6df0>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    }
+  ],
+  "end_time": "2025-08-23T23:10:50.689561",
+  "duration": "0:00:46.717689"
+}

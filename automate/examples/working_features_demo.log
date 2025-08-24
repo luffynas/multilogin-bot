@@ -1,0 +1,31 @@
+2025-08-23 14:16:54,452 - INFO - Successfully authenticated with Multilogin X API
+2025-08-23 14:16:54,473 - INFO - Generated unique fingerprint for US (attempt 1)
+2025-08-23 14:16:54,473 - INFO - Fingerprint validation passed for US
+2025-08-23 14:16:54,473 - INFO - Generated unique fingerprint for GB (attempt 1)
+2025-08-23 14:16:54,473 - INFO - Fingerprint validation passed for GB
+2025-08-23 14:16:54,473 - INFO - Generated unique fingerprint for DE (attempt 1)
+2025-08-23 14:16:54,473 - INFO - Fingerprint validation passed for DE
+2025-08-23 14:16:54,473 - INFO - Generated unique fingerprint for CA (attempt 1)
+2025-08-23 14:16:54,473 - INFO - Fingerprint validation passed for CA
+2025-08-23 14:16:54,473 - INFO - Generated unique fingerprint for AU (attempt 1)
+2025-08-23 14:16:54,473 - INFO - Fingerprint validation passed for AU
+2025-08-23 14:16:54,493 - INFO - 🔗 Generated google referer: https://www.google.com/search?q=travel
+2025-08-23 14:16:54,493 - INFO - 🔗 Generated google referer: https://www.google.co.uk/search?q=lifestyle+tutorial&hl=en
+2025-08-23 14:16:54,493 - INFO - 🔗 Generated social referer: https://www.facebook.com/
+2025-08-23 14:16:54,493 - INFO - 🔗 Generated social referer: https://www.facebook.com/groups/
+2025-08-23 14:16:54,493 - INFO - 🔗 Generated google referer: https://www.google.com/search?q=startup
+2025-08-23 14:16:54,493 - INFO - 🔗 Generated other referer: https://www.quora.com/search?q=travel
+2025-08-23 14:16:54,493 - INFO - 🔗 Generated google referer: https://www.google.de/search?q=technology+review&hl=en
+2025-08-23 14:16:54,493 - INFO - 🔗 Generated google referer: https://www.google.ca/search?q=design+tutorial&source=hp
+2025-08-23 14:16:54,493 - INFO - 🔗 Generated social referer: https://www.instagram.com/
+2025-08-23 14:16:54,493 - INFO - 🔗 Generated google referer: https://www.google.co.uk/search?q=sports+best
+2025-08-23 14:16:54,493 - INFO - 🔗 Generated other referer: https://search.yahoo.com/search?p=startup
+2025-08-23 14:16:54,493 - INFO - 🔗 Generated social referer: https://www.youtube.com/feed/trending
+2025-08-23 14:16:54,493 - INFO - 🔗 Generated social referer: https://twitter.com/
+2025-08-23 14:16:54,493 - INFO - 🔗 Generated google referer: https://www.google.co.uk/search?q=entertainment+tutorial
+2025-08-23 14:16:54,494 - INFO - 🔗 Generated google referer: https://www.google.de/search?q=sports
+2025-08-23 14:16:54,512 - INFO - No existing proxy file found, generating sample SOCKS5 proxies
+2025-08-23 14:16:54,515 - INFO - Generated 2000 sample Multilogin residential SOCKS5 proxies
+2025-08-23 14:16:54,515 - ERROR - Error loading provider status: Expecting value: line 1 column 1 (char 0)
+2025-08-23 14:16:54,515 - ERROR - Error saving provider status: 'ProxyManager' object has no attribute 'providers'
+2025-08-23 14:16:54,515 - INFO - Started SOCKS5 proxy health monitoring

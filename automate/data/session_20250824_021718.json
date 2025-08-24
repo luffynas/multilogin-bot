@@ -1,0 +1,488 @@
+{
+  "start_time": "2025-08-24 02:07:12.674388",
+  "personality": "explorer",
+  "device_type": "desktop",
+  "pages_visited": [
+    {
+      "url": "https://maxgaming.biz.id/gaming-vpns-that-work-with-xbox-playstation-and-switch-2025-edition/",
+      "timestamp": "2025-08-24T02:07:25.714155",
+      "title": "Gaming VPNs That Work With Xbox, PlayStation, and Switch (2025 Edition) - MaxGaming"
+    }
+  ],
+  "interactions": [
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T02:10:03.579007"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T02:10:05.077219"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T02:10:10.871999"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T02:10:18.463240"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T02:10:19.268325"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T02:10:25.246320"
+    },
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 2,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T02:11:51.492887"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 2,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T02:11:52.953634"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 2,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T02:11:59.919851"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 2,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T02:12:07.853175"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 2,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T02:12:14.044834"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 2,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T02:12:21.426961"
+    },
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 3,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T02:13:51.908477"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 3,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T02:13:53.547072"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 3,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T02:14:04.109172"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 3,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T02:14:12.966584"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 3,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T02:14:13.768824"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 3,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T02:14:14.973889"
+    },
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 4,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T02:16:45.468532"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 4,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T02:16:45.982852"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 4,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T02:16:46.985444"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 4,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T02:16:47.292140"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 4,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T02:16:48.096926"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 4,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T02:16:49.301246"
+    },
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 5,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T02:16:50.213306"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 5,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T02:16:50.730505"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 5,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T02:16:51.736460"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 5,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T02:16:52.041246"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 5,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T02:16:52.846309"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 5,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T02:16:54.047827"
+    },
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 6,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T02:16:54.959108"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 6,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T02:16:55.473850"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 6,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T02:16:56.480832"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 6,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T02:16:56.788367"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 6,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T02:16:57.590929"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 6,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T02:16:58.795999"
+    },
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 7,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T02:16:59.704360"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 7,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T02:17:00.219902"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 7,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T02:17:01.224569"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 7,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T02:17:01.526211"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 7,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T02:17:02.330725"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 7,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T02:17:03.532842"
+    },
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 8,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T02:17:04.441657"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 8,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T02:17:05.013793"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 8,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T02:17:06.027805"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 8,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T02:17:06.335307"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 8,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T02:17:07.138541"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 8,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T02:17:08.340308"
+    },
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 9,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T02:17:09.250592"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 9,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T02:17:09.765519"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 9,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T02:17:10.772758"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 9,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T02:17:11.075928"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 9,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T02:17:11.880804"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 9,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T02:17:13.085884"
+    },
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 10,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T02:17:13.998009"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 10,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T02:17:14.511861"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 10,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T02:17:15.518954"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 10,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T02:17:15.825949"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 10,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T02:17:16.630101"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 10,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T02:17:17.830279"
+    },
+    {
+      "type": "session_memory",
+      "description": "Maintaining personality consistency",
+      "timestamp": "2025-08-24T02:17:18.745090"
+    },
+    {
+      "type": "time_based",
+      "hour": 2,
+      "timestamp": "2025-08-24T02:17:18.745108"
+    },
+    {
+      "type": "geographic",
+      "description": "Geographic behavior adaptation",
+      "timestamp": "2025-08-24T02:17:18.745130"
+    },
+    {
+      "type": "device_specific",
+      "device_type": "desktop",
+      "timestamp": "2025-08-24T02:17:18.745146"
+    },
+    {
+      "type": "attention_span",
+      "personality": "explorer",
+      "timestamp": "2025-08-24T02:17:18.745152"
+    },
+    {
+      "type": "adsense",
+      "ads_found": 0,
+      "timestamp": "2025-08-24T02:17:18.761867"
+    }
+  ],
+  "errors": [
+    {
+      "type": "navigation_demo",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=56260): Max retries exceeded with url: /session/f4d169412f8c365e624707b93faf1363/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x103824df0>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "news_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=56260): Max retries exceeded with url: /session/f4d169412f8c365e624707b93faf1363/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10388b400>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "blog_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=56260): Max retries exceeded with url: /session/f4d169412f8c365e624707b93faf1363/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10380d370>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "tech_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=56260): Max retries exceeded with url: /session/f4d169412f8c365e624707b93faf1363/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10388bac0>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    },
+    {
+      "type": "product_content",
+      "error": "HTTPConnectionPool(host='127.0.0.1', port=56260): Max retries exceeded with url: /session/f4d169412f8c365e624707b93faf1363/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10388b940>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+    }
+  ],
+  "end_time": "2025-08-24T02:17:18.761950",
+  "duration": "0:10:06.087564"
+}

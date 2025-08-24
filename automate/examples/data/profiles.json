@@ -1,0 +1,297 @@
+{
+  "3796d576-7ff6-11f0-84f5-1aaa018ad5d1": {
+    "profile_id": "3796d576-7ff6-11f0-84f5-1aaa018ad5d1",
+    "folder_id": "default",
+    "name": "automate_profile_001",
+    "proxy": "residential",
+    "provider": "multilogin_residential",
+    "fingerprint": {
+      "os": "mac",
+      "arch": "x64",
+      "platform": "Macintosh; Intel Mac OS X 10_15_7",
+      "resolution": {
+        "width": 2560,
+        "height": 1600
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+      "timezone": "America/Denver",
+      "language": "en",
+      "locale": "en-US",
+      "country": "US",
+      "webgl": {
+        "vendor": "Intel Inc.",
+        "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "canvas": "canvas_9144270",
+      "audio": "audio_7902468",
+      "webrtc": {
+        "enabled": false,
+        "publicIP": null
+      },
+      "geolocation": {
+        "latitude": 41.777799,
+        "longitude": -95.111795,
+        "accuracy": 100,
+        "altitude": 970.9185779496331
+      },
+      "mediaDevices": {
+        "enabled": false,
+        "microphone": false,
+        "camera": false
+      },
+      "battery": {
+        "enabled": true,
+        "level": 0.4962211537025035,
+        "charging": true
+      },
+      "connection": {
+        "type": "4g",
+        "downlink": 39.99046302634791,
+        "rtt": 23.590872407745866
+      },
+      "performance": {
+        "timing": {
+          "navigationStart": 1755935590962,
+          "fetchStart": 13,
+          "domainLookupStart": 100,
+          "domainLookupEnd": 286,
+          "connectStart": 348,
+          "connectEnd": 433,
+          "requestStart": 573,
+          "responseStart": 681,
+          "responseEnd": 882,
+          "domLoading": 1163,
+          "domInteractive": 1281,
+          "domContentLoadedEventStart": 1569,
+          "domContentLoadedEventEnd": 1648,
+          "domComplete": 1964,
+          "loadEventStart": 2013,
+          "loadEventEnd": 2200
+        }
+      },
+      "fonts": [
+        "Helvetica",
+        "Arial Black",
+        "Impact",
+        "MS Gothic",
+        "Arial Unicode MS",
+        "Calibri",
+        "Segoe UI Historic",
+        "Segoe UI Variable",
+        "Segoe UI Variable Small",
+        "Webdings",
+        "Wingdings 2",
+        "Arial",
+        "Comic Sans MS",
+        "Wingdings",
+        "Courier New",
+        "MS PMincho",
+        "Segoe UI Variable Display",
+        "Segoe UI Emoji",
+        "Georgia",
+        "Segoe UI Symbol",
+        "Courier",
+        "Cambria Math",
+        "MS UI Gothic",
+        "Times New Roman",
+        "MS PGothic",
+        "Trebuchet MS",
+        "MS Mincho",
+        "Segoe UI",
+        "Cambria",
+        "Times",
+        "Segoe UI Variable Text",
+        "Verdana",
+        "Wingdings 3"
+      ],
+      "plugins": [
+        {
+          "name": "Chrome PDF Viewer",
+          "description": "",
+          "filename": "mhjfbmdgcfjbbpaeojofohoefgiehjai"
+        },
+        {
+          "name": "Native Client",
+          "description": "",
+          "filename": "internal-nacl-plugin"
+        },
+        {
+          "name": "Widevine Content Decryption Module",
+          "description": "Enables Widevine licenses for playback of HTML audio/video content.",
+          "filename": "widevinecdmadapter.dll"
+        },
+        {
+          "name": "Chrome PDF Plugin",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        },
+        {
+          "name": "Shockwave Flash",
+          "description": "Shockwave Flash 32.0 r0",
+          "filename": "flash32_32_0_0_0.ocx"
+        }
+      ],
+      "screen": {
+        "width": 2560,
+        "height": 1600,
+        "colorDepth": 24,
+        "pixelDepth": 24,
+        "availWidth": 2560,
+        "availHeight": 1600
+      },
+      "window": {
+        "innerWidth": 2560,
+        "innerHeight": 1600,
+        "outerWidth": 2560,
+        "outerHeight": 1600
+      },
+      "hardware_concurrency": 4
+    },
+    "created_at": "2025-08-23 14:53:13",
+    "last_used": null,
+    "usage_count": 0,
+    "status": "idle"
+  },
+  "8b6e3c8e-1f75-482f-a28d-ea05d50c6d18": {
+    "profile_id": "8b6e3c8e-1f75-482f-a28d-ea05d50c6d18",
+    "folder_id": "d3602d53-2e54-4cce-87d7-64e89e0f8679",
+    "name": "automate_profile_002",
+    "proxy": "residential",
+    "provider": "multilogin_residential",
+    "fingerprint": {
+      "os": "mac",
+      "arch": "x64",
+      "platform": "Macintosh; Intel Mac OS X 10_14_6",
+      "resolution": {
+        "width": 1920,
+        "height": 1080
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "timezone": "America/Anchorage",
+      "language": "en-US",
+      "locale": "en-US",
+      "country": "US",
+      "webgl": {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (AMD, AMD Radeon RX 580 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "canvas": "canvas_8950737",
+      "audio": "audio_5298196",
+      "webrtc": {
+        "enabled": false,
+        "publicIP": null
+      },
+      "geolocation": {
+        "latitude": 29.269581,
+        "longitude": -77.69463,
+        "accuracy": 100,
+        "altitude": 741.2591337634018
+      },
+      "mediaDevices": {
+        "enabled": false,
+        "microphone": false,
+        "camera": false
+      },
+      "battery": {
+        "enabled": true,
+        "level": 0.9954608506844618,
+        "charging": false
+      },
+      "connection": {
+        "type": "wifi",
+        "downlink": 79.76748205748987,
+        "rtt": 74.29912745901177
+      },
+      "performance": {
+        "timing": {
+          "navigationStart": 1755937876806,
+          "fetchStart": 100,
+          "domainLookupStart": 193,
+          "domainLookupEnd": 209,
+          "connectStart": 334,
+          "connectEnd": 407,
+          "requestStart": 541,
+          "responseStart": 604,
+          "responseEnd": 893,
+          "domLoading": 1122,
+          "domInteractive": 1231,
+          "domContentLoadedEventStart": 1531,
+          "domContentLoadedEventEnd": 1605,
+          "domComplete": 1718,
+          "loadEventStart": 2007,
+          "loadEventEnd": 2168
+        }
+      },
+      "fonts": [
+        "MS PMincho",
+        "Wingdings 2",
+        "Calibri",
+        "Impact",
+        "Arial",
+        "MS Mincho",
+        "Cambria Math",
+        "Segoe UI Variable Small",
+        "Arial Unicode MS",
+        "Courier New",
+        "Courier",
+        "Segoe UI Light",
+        "MS PGothic",
+        "Times",
+        "Segoe UI",
+        "Segoe UI Variable Text",
+        "Segoe UI Emoji",
+        "Segoe UI Variable Display",
+        "Wingdings 3",
+        "Segoe UI Historic",
+        "Cambria",
+        "Wingdings"
+      ],
+      "plugins": [
+        {
+          "name": "Chrome PDF Viewer",
+          "description": "",
+          "filename": "mhjfbmdgcfjbbpaeojofohoefgiehjai"
+        },
+        {
+          "name": "Native Client",
+          "description": "",
+          "filename": "internal-nacl-plugin"
+        },
+        {
+          "name": "Shockwave Flash",
+          "description": "Shockwave Flash 32.0 r0",
+          "filename": "flash32_32_0_0_0.ocx"
+        },
+        {
+          "name": "Widevine Content Decryption Module",
+          "description": "Enables Widevine licenses for playback of HTML audio/video content.",
+          "filename": "widevinecdmadapter.dll"
+        },
+        {
+          "name": "Chrome PDF Plugin",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        }
+      ],
+      "screen": {
+        "width": 1920,
+        "height": 1080,
+        "colorDepth": 24,
+        "pixelDepth": 24,
+        "availWidth": 1920,
+        "availHeight": 1080
+      },
+      "window": {
+        "innerWidth": 1920,
+        "innerHeight": 1080,
+        "outerWidth": 1920,
+        "outerHeight": 1080
+      },
+      "hardware_concurrency": 16
+    },
+    "created_at": "2025-08-23 15:31:18",
+    "last_used": null,
+    "usage_count": 0,
+    "status": "idle"
+  }
+}

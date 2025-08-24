@@ -1,0 +1,368 @@
+2025-08-23 15:45:24,807 - INFO - Successfully authenticated with Multilogin X API
+2025-08-23 15:45:30,869 - INFO - 🎭 Generated personality: casual
+2025-08-23 15:45:30,869 - INFO - 📱 Detected device type: desktop
+2025-08-23 15:45:30,869 - INFO - ☀️ Afternoon behavior: Medium energy, balanced activity
+2025-08-23 15:45:30,871 - ERROR - Error setting up driver: Message: invalid argument: cannot parse capability: goog:chromeOptions
+from invalid argument: unrecognized chrome option: excludeSwitches
+Stacktrace:
+0   chromedriver                        0x0000000100d13480 cxxbridge1$str$ptr + 2800132
+1   chromedriver                        0x0000000100d0b3f0 cxxbridge1$str$ptr + 2767220
+2   chromedriver                        0x00000001008328b0 cxxbridge1$string$len + 82188
+3   chromedriver                        0x000000010085a8a0 cxxbridge1$string$len + 246012
+4   chromedriver                        0x00000001008576d0 cxxbridge1$string$len + 233260
+5   chromedriver                        0x00000001008ab88c cxxbridge1$string$len + 577768
+6   chromedriver                        0x00000001008ab354 cxxbridge1$string$len + 576432
+7   chromedriver                        0x00000001008acabc cxxbridge1$string$len + 582424
+8   chromedriver                        0x00000001008ac8d0 cxxbridge1$string$len + 581932
+9   chromedriver                        0x0000000100873d1c cxxbridge1$string$len + 349560
+10  chromedriver                        0x0000000100cd6880 cxxbridge1$str$ptr + 2551300
+11  chromedriver                        0x0000000100cd9ab4 cxxbridge1$str$ptr + 2564152
+12  chromedriver                        0x0000000100cb76b8 cxxbridge1$str$ptr + 2423868
+13  chromedriver                        0x0000000100cda370 cxxbridge1$str$ptr + 2566388
+14  chromedriver                        0x0000000100ca87b0 cxxbridge1$str$ptr + 2362676
+15  chromedriver                        0x0000000100cf9e8c cxxbridge1$str$ptr + 2696208
+16  chromedriver                        0x0000000100cfa018 cxxbridge1$str$ptr + 2696604
+17  chromedriver                        0x0000000100d0b03c cxxbridge1$str$ptr + 2766272
+18  libsystem_pthread.dylib             0x000000019d1d6f94 _pthread_start + 136
+19  libsystem_pthread.dylib             0x000000019d1d1d34 thread_start + 8
+
+2025-08-23 15:45:59,170 - INFO - Successfully authenticated with Multilogin X API
+2025-08-23 15:46:04,403 - INFO - 🎭 Generated personality: casual
+2025-08-23 15:46:04,404 - INFO - 📱 Detected device type: tablet
+2025-08-23 15:46:04,404 - INFO - ☀️ Afternoon behavior: Medium energy, balanced activity
+2025-08-23 15:46:04,884 - INFO - Successfully setup undetectable Chrome driver
+2025-08-23 15:46:18,816 - ERROR - Error simulating mouse movement: Message: move target out of bounds
+  (Session info: chrome=139.0.7258.66)
+Stacktrace:
+0   chromedriver                        0x0000000102d37480 cxxbridge1$str$ptr + 2800132
+1   chromedriver                        0x0000000102d2f3f0 cxxbridge1$str$ptr + 2767220
+2   chromedriver                        0x0000000102856724 cxxbridge1$string$len + 81792
+3   chromedriver                        0x00000001028ec434 cxxbridge1$string$len + 695440
+4   chromedriver                        0x00000001028e4db4 cxxbridge1$string$len + 665104
+5   chromedriver                        0x0000000102897d1c cxxbridge1$string$len + 349560
+6   chromedriver                        0x0000000102cfa880 cxxbridge1$str$ptr + 2551300
+7   chromedriver                        0x0000000102cfdab4 cxxbridge1$str$ptr + 2564152
+8   chromedriver                        0x0000000102cdb6b8 cxxbridge1$str$ptr + 2423868
+9   chromedriver                        0x0000000102cfe370 cxxbridge1$str$ptr + 2566388
+10  chromedriver                        0x0000000102ccc7b0 cxxbridge1$str$ptr + 2362676
+11  chromedriver                        0x0000000102d1de8c cxxbridge1$str$ptr + 2696208
+12  chromedriver                        0x0000000102d1e018 cxxbridge1$str$ptr + 2696604
+13  chromedriver                        0x0000000102d2f03c cxxbridge1$str$ptr + 2766272
+14  libsystem_pthread.dylib             0x000000019d1d6f94 _pthread_start + 136
+15  libsystem_pthread.dylib             0x000000019d1d1d34 thread_start + 8
+
+2025-08-23 15:46:18,864 - INFO - Applied human-like behavior simulation
+2025-08-23 15:46:18,867 - INFO - Browser driver closed
+2025-08-23 15:46:18,890 - INFO - 🎭 Generated personality: explorer
+2025-08-23 15:46:18,890 - INFO - 📱 Detected device type: tablet
+2025-08-23 15:46:18,890 - INFO - ☀️ Afternoon behavior: Medium energy, balanced activity
+2025-08-23 15:46:18,898 - INFO - Successfully setup undetectable Chrome driver
+2025-08-23 15:46:18,898 - INFO - 🎭 Starting realistic browsing session: 3 pages
+2025-08-23 15:46:18,898 - INFO - 👤 Personality: explorer
+2025-08-23 15:46:18,898 - INFO - 📱 Device: tablet
+2025-08-23 15:46:18,898 - INFO - 🌍 Location: US
+2025-08-23 15:46:18,898 - INFO - 🕒 Time-based behavior: medium
+2025-08-23 15:46:27,682 - ERROR - Error simulating mouse movement: Message: move target out of bounds
+  (Session info: chrome=139.0.7258.66)
+Stacktrace:
+0   chromedriver                        0x0000000102d37480 cxxbridge1$str$ptr + 2800132
+1   chromedriver                        0x0000000102d2f3f0 cxxbridge1$str$ptr + 2767220
+2   chromedriver                        0x0000000102856724 cxxbridge1$string$len + 81792
+3   chromedriver                        0x00000001028ec434 cxxbridge1$string$len + 695440
+4   chromedriver                        0x00000001028e4db4 cxxbridge1$string$len + 665104
+5   chromedriver                        0x0000000102897d1c cxxbridge1$string$len + 349560
+6   chromedriver                        0x0000000102cfa880 cxxbridge1$str$ptr + 2551300
+7   chromedriver                        0x0000000102cfdab4 cxxbridge1$str$ptr + 2564152
+8   chromedriver                        0x0000000102cdb6b8 cxxbridge1$str$ptr + 2423868
+9   chromedriver                        0x0000000102cfe370 cxxbridge1$str$ptr + 2566388
+10  chromedriver                        0x0000000102ccc7b0 cxxbridge1$str$ptr + 2362676
+11  chromedriver                        0x0000000102d1de8c cxxbridge1$str$ptr + 2696208
+12  chromedriver                        0x0000000102d1e018 cxxbridge1$str$ptr + 2696604
+13  chromedriver                        0x0000000102d2f03c cxxbridge1$str$ptr + 2766272
+14  libsystem_pthread.dylib             0x000000019d1d6f94 _pthread_start + 136
+15  libsystem_pthread.dylib             0x000000019d1d1d34 thread_start + 8
+
+2025-08-23 15:46:27,683 - ERROR - Error simulating page behavior: _simulate_natural_scrolling() takes 1 positional argument but 2 were given
+2025-08-23 15:46:38,190 - ERROR - Error simulating mouse movement: Message: move target out of bounds
+  (Session info: chrome=139.0.7258.66)
+Stacktrace:
+0   chromedriver                        0x0000000102d37480 cxxbridge1$str$ptr + 2800132
+1   chromedriver                        0x0000000102d2f3f0 cxxbridge1$str$ptr + 2767220
+2   chromedriver                        0x0000000102856724 cxxbridge1$string$len + 81792
+3   chromedriver                        0x00000001028ec434 cxxbridge1$string$len + 695440
+4   chromedriver                        0x00000001028e4db4 cxxbridge1$string$len + 665104
+5   chromedriver                        0x0000000102897d1c cxxbridge1$string$len + 349560
+6   chromedriver                        0x0000000102cfa880 cxxbridge1$str$ptr + 2551300
+7   chromedriver                        0x0000000102cfdab4 cxxbridge1$str$ptr + 2564152
+8   chromedriver                        0x0000000102cdb6b8 cxxbridge1$str$ptr + 2423868
+9   chromedriver                        0x0000000102cfe370 cxxbridge1$str$ptr + 2566388
+10  chromedriver                        0x0000000102ccc7b0 cxxbridge1$str$ptr + 2362676
+11  chromedriver                        0x0000000102d1de8c cxxbridge1$str$ptr + 2696208
+12  chromedriver                        0x0000000102d1e018 cxxbridge1$str$ptr + 2696604
+13  chromedriver                        0x0000000102d2f03c cxxbridge1$str$ptr + 2766272
+14  libsystem_pthread.dylib             0x000000019d1d6f94 _pthread_start + 136
+15  libsystem_pthread.dylib             0x000000019d1d1d34 thread_start + 8
+
+2025-08-23 15:46:38,191 - ERROR - Error simulating page behavior: _simulate_natural_scrolling() takes 1 positional argument but 2 were given
+2025-08-23 15:46:38,192 - INFO - 📄 Visited page 2: category - technology (long) - https://cekmedia.my.id/category/blog/
+2025-08-23 15:46:49,340 - ERROR - Error simulating mouse movement: Message: move target out of bounds
+  (Session info: chrome=139.0.7258.66)
+Stacktrace:
+0   chromedriver                        0x0000000102d37480 cxxbridge1$str$ptr + 2800132
+1   chromedriver                        0x0000000102d2f3f0 cxxbridge1$str$ptr + 2767220
+2   chromedriver                        0x0000000102856724 cxxbridge1$string$len + 81792
+3   chromedriver                        0x00000001028ec434 cxxbridge1$string$len + 695440
+4   chromedriver                        0x00000001028e4db4 cxxbridge1$string$len + 665104
+5   chromedriver                        0x0000000102897d1c cxxbridge1$string$len + 349560
+6   chromedriver                        0x0000000102cfa880 cxxbridge1$str$ptr + 2551300
+7   chromedriver                        0x0000000102cfdab4 cxxbridge1$str$ptr + 2564152
+8   chromedriver                        0x0000000102cdb6b8 cxxbridge1$str$ptr + 2423868
+9   chromedriver                        0x0000000102cfe370 cxxbridge1$str$ptr + 2566388
+10  chromedriver                        0x0000000102ccc7b0 cxxbridge1$str$ptr + 2362676
+11  chromedriver                        0x0000000102d1de8c cxxbridge1$str$ptr + 2696208
+12  chromedriver                        0x0000000102d1e018 cxxbridge1$str$ptr + 2696604
+13  chromedriver                        0x0000000102d2f03c cxxbridge1$str$ptr + 2766272
+14  libsystem_pthread.dylib             0x000000019d1d6f94 _pthread_start + 136
+15  libsystem_pthread.dylib             0x000000019d1d1d34 thread_start + 8
+
+2025-08-23 15:46:49,340 - ERROR - Error simulating page behavior: _simulate_natural_scrolling() takes 1 positional argument but 2 were given
+2025-08-23 15:46:49,340 - INFO - 📄 Visited page 3: category - technology (long) - https://cekmedia.my.id/category/blog/#
+2025-08-23 15:46:49,341 - INFO - ✅ Browsing session completed: 3 pages, 30.4s
+2025-08-23 15:46:49,341 - INFO - 🎯 Navigation pattern: ['category', 'category']
+2025-08-23 15:46:54,346 - INFO - 🎭 Starting realistic browsing session: 3 pages
+2025-08-23 15:46:54,347 - INFO - 👤 Personality: explorer
+2025-08-23 15:46:54,347 - INFO - 📱 Device: tablet
+2025-08-23 15:46:54,347 - INFO - 🌍 Location: US
+2025-08-23 15:46:54,347 - INFO - 🕒 Time-based behavior: medium
+2025-08-23 15:47:04,622 - ERROR - Error simulating mouse movement: Message: move target out of bounds
+  (Session info: chrome=139.0.7258.66)
+Stacktrace:
+0   chromedriver                        0x0000000102d37480 cxxbridge1$str$ptr + 2800132
+1   chromedriver                        0x0000000102d2f3f0 cxxbridge1$str$ptr + 2767220
+2   chromedriver                        0x0000000102856724 cxxbridge1$string$len + 81792
+3   chromedriver                        0x00000001028ec434 cxxbridge1$string$len + 695440
+4   chromedriver                        0x00000001028e4db4 cxxbridge1$string$len + 665104
+5   chromedriver                        0x0000000102897d1c cxxbridge1$string$len + 349560
+6   chromedriver                        0x0000000102cfa880 cxxbridge1$str$ptr + 2551300
+7   chromedriver                        0x0000000102cfdab4 cxxbridge1$str$ptr + 2564152
+8   chromedriver                        0x0000000102cdb6b8 cxxbridge1$str$ptr + 2423868
+9   chromedriver                        0x0000000102cfe370 cxxbridge1$str$ptr + 2566388
+10  chromedriver                        0x0000000102ccc7b0 cxxbridge1$str$ptr + 2362676
+11  chromedriver                        0x0000000102d1de8c cxxbridge1$str$ptr + 2696208
+12  chromedriver                        0x0000000102d1e018 cxxbridge1$str$ptr + 2696604
+13  chromedriver                        0x0000000102d2f03c cxxbridge1$str$ptr + 2766272
+14  libsystem_pthread.dylib             0x000000019d1d6f94 _pthread_start + 136
+15  libsystem_pthread.dylib             0x000000019d1d1d34 thread_start + 8
+
+2025-08-23 15:47:04,624 - ERROR - Error simulating page behavior: _simulate_natural_scrolling() takes 1 positional argument but 2 were given
+2025-08-23 15:47:13,169 - ERROR - Error simulating mouse movement: Message: move target out of bounds
+  (Session info: chrome=139.0.7258.66)
+Stacktrace:
+0   chromedriver                        0x0000000102d37480 cxxbridge1$str$ptr + 2800132
+1   chromedriver                        0x0000000102d2f3f0 cxxbridge1$str$ptr + 2767220
+2   chromedriver                        0x0000000102856724 cxxbridge1$string$len + 81792
+3   chromedriver                        0x00000001028ec434 cxxbridge1$string$len + 695440
+4   chromedriver                        0x00000001028e4db4 cxxbridge1$string$len + 665104
+5   chromedriver                        0x0000000102897d1c cxxbridge1$string$len + 349560
+6   chromedriver                        0x0000000102cfa880 cxxbridge1$str$ptr + 2551300
+7   chromedriver                        0x0000000102cfdab4 cxxbridge1$str$ptr + 2564152
+8   chromedriver                        0x0000000102cdb6b8 cxxbridge1$str$ptr + 2423868
+9   chromedriver                        0x0000000102cfe370 cxxbridge1$str$ptr + 2566388
+10  chromedriver                        0x0000000102ccc7b0 cxxbridge1$str$ptr + 2362676
+11  chromedriver                        0x0000000102d1de8c cxxbridge1$str$ptr + 2696208
+12  chromedriver                        0x0000000102d1e018 cxxbridge1$str$ptr + 2696604
+13  chromedriver                        0x0000000102d2f03c cxxbridge1$str$ptr + 2766272
+14  libsystem_pthread.dylib             0x000000019d1d6f94 _pthread_start + 136
+15  libsystem_pthread.dylib             0x000000019d1d1d34 thread_start + 8
+
+2025-08-23 15:47:13,170 - ERROR - Error simulating page behavior: _simulate_natural_scrolling() takes 1 positional argument but 2 were given
+2025-08-23 15:47:13,170 - INFO - 📄 Visited page 3: category - technology (long) - https://cekmedia.my.id/category/blog/
+2025-08-23 15:47:13,174 - INFO - ✅ Browsing session completed: 2 pages, 18.8s
+2025-08-23 15:47:13,174 - INFO - 🎯 Navigation pattern: ['category']
+2025-08-23 15:47:13,179 - INFO - Browser driver closed
+2025-08-23 15:47:13,212 - INFO - 🎭 Generated personality: researcher
+2025-08-23 15:47:13,212 - INFO - 📱 Detected device type: mobile
+2025-08-23 15:47:13,212 - INFO - ☀️ Afternoon behavior: Medium energy, balanced activity
+2025-08-23 15:47:13,222 - INFO - Successfully setup undetectable Chrome driver
+2025-08-23 15:47:13,222 - INFO - Testing AdSense ads on: https://cekmedia.my.id/pinjaman-bca-online-langsung-cair-solusi-dana-instan-dari-bank-terpercaya/
+2025-08-23 15:47:13,222 - INFO - 🎭 Starting realistic browsing session: 3 pages
+2025-08-23 15:47:13,222 - INFO - 👤 Personality: researcher
+2025-08-23 15:47:13,222 - INFO - 📱 Device: mobile
+2025-08-23 15:47:13,222 - INFO - 🌍 Location: US
+2025-08-23 15:47:13,222 - INFO - 🕒 Time-based behavior: medium
+2025-08-23 15:47:21,664 - ERROR - Error simulating mouse movement: Message: move target out of bounds
+  (Session info: chrome=139.0.7258.66)
+Stacktrace:
+0   chromedriver                        0x0000000102d37480 cxxbridge1$str$ptr + 2800132
+1   chromedriver                        0x0000000102d2f3f0 cxxbridge1$str$ptr + 2767220
+2   chromedriver                        0x0000000102856724 cxxbridge1$string$len + 81792
+3   chromedriver                        0x00000001028ec434 cxxbridge1$string$len + 695440
+4   chromedriver                        0x00000001028e4db4 cxxbridge1$string$len + 665104
+5   chromedriver                        0x0000000102897d1c cxxbridge1$string$len + 349560
+6   chromedriver                        0x0000000102cfa880 cxxbridge1$str$ptr + 2551300
+7   chromedriver                        0x0000000102cfdab4 cxxbridge1$str$ptr + 2564152
+8   chromedriver                        0x0000000102cdb6b8 cxxbridge1$str$ptr + 2423868
+9   chromedriver                        0x0000000102cfe370 cxxbridge1$str$ptr + 2566388
+10  chromedriver                        0x0000000102ccc7b0 cxxbridge1$str$ptr + 2362676
+11  chromedriver                        0x0000000102d1de8c cxxbridge1$str$ptr + 2696208
+12  chromedriver                        0x0000000102d1e018 cxxbridge1$str$ptr + 2696604
+13  chromedriver                        0x0000000102d2f03c cxxbridge1$str$ptr + 2766272
+14  libsystem_pthread.dylib             0x000000019d1d6f94 _pthread_start + 136
+15  libsystem_pthread.dylib             0x000000019d1d1d34 thread_start + 8
+
+2025-08-23 15:47:21,665 - ERROR - Error simulating page behavior: _simulate_natural_scrolling() takes 1 positional argument but 2 were given
+2025-08-23 15:47:29,352 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be160>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/execute/sync
+2025-08-23 15:47:29,352 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be0a0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/execute/sync
+2025-08-23 15:47:29,353 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060beaf0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/execute/sync
+2025-08-23 15:47:29,370 - ERROR - Error simulating mouse movement: HTTPConnectionPool(host='127.0.0.1', port=56333): Max retries exceeded with url: /session/7d42699b983c4aafeb1dd773b8de1746/execute/sync (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060befd0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-23 15:47:29,372 - ERROR - Error simulating page behavior: _simulate_natural_scrolling() takes 1 positional argument but 2 were given
+2025-08-23 15:47:29,372 - INFO - 📄 Visited page 2: category - general (medium) - https://cekmedia.my.id/category/blog/
+2025-08-23 15:47:29,378 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be220>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,379 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d310>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,393 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d100>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,406 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d580>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,408 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d640>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,417 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615dc40>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,430 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615de20>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,433 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d9d0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,438 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615dd30>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,440 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d070>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,441 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d400>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,441 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d190>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,443 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be820>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,448 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be970>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,451 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060bee50>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,452 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be700>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,452 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be2b0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,452 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615f220>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,454 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615f7f0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,455 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615f820>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,455 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be760>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,456 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be7f0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,456 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be4c0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,456 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060bef10>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,457 - INFO - ✅ Browsing session completed: 2 pages, 16.2s
+2025-08-23 15:47:29,457 - INFO - 🎯 Navigation pattern: ['category']
+2025-08-23 15:47:29,458 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d3d0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,458 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d580>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,458 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615ddc0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,459 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d880>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,460 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d7c0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,460 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615f4f0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,460 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615f8e0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,461 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615f8b0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,461 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615fa60>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,462 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d940>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,463 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615dbe0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,463 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d430>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,463 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d250>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,464 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d100>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,464 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060beee0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,465 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be5b0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,465 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be8e0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,465 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be9d0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,466 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be250>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,466 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615fbe0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,466 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615f490>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,467 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10608dcd0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/element
+2025-08-23 15:47:29,468 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be760>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/element
+2025-08-23 15:47:29,468 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060bef10>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/element
+2025-08-23 15:47:29,469 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060befa0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,470 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060bed00>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,470 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be8b0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,471 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615f820>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,471 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615f130>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,472 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d880>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,473 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d550>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,473 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615de50>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,473 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d040>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:29,474 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d940>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/url
+2025-08-23 15:47:29,474 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d9d0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/url
+2025-08-23 15:47:29,474 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615dc40>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/url
+2025-08-23 15:47:29,475 - ERROR - Error collecting metrics: HTTPConnectionPool(host='127.0.0.1', port=56333): Max retries exceeded with url: /session/7d42699b983c4aafeb1dd773b8de1746/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10608d6a0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-23 15:47:29,475 - INFO - AdSense test completed: 0 ads detected, 2 pages browsed
+2025-08-23 15:47:37,482 - INFO - Testing AdSense ads on: https://cekmedia.my.id/pinjaman-online-cepat-cair-solusi-dana-darurat-tanpa-ribet/
+2025-08-23 15:47:37,483 - INFO - 🎭 Starting realistic browsing session: 6 pages
+2025-08-23 15:47:37,483 - INFO - 👤 Personality: researcher
+2025-08-23 15:47:37,483 - INFO - 📱 Device: mobile
+2025-08-23 15:47:37,483 - INFO - 🌍 Location: US
+2025-08-23 15:47:37,483 - INFO - 🕒 Time-based behavior: medium
+2025-08-23 15:47:37,485 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d370>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/url
+2025-08-23 15:47:37,485 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615dfd0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/url
+2025-08-23 15:47:37,486 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d580>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/url
+2025-08-23 15:47:37,486 - ERROR - Error in realistic browsing: HTTPConnectionPool(host='127.0.0.1', port=56333): Max retries exceeded with url: /session/7d42699b983c4aafeb1dd773b8de1746/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d160>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-23 15:47:37,487 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d2e0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,487 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615f100>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,487 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615f580>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,488 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be5b0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,488 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060beee0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,489 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be9a0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,489 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be400>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,489 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be6d0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,490 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be2b0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,490 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10608dfa0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,491 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d100>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,491 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d0a0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,492 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615daf0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,493 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d370>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,493 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d4c0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,494 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060bea90>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,494 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060bec70>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,495 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be520>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,495 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060bee20>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,495 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060bea00>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,496 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be6a0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,496 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615f940>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/element
+2025-08-23 15:47:37,497 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615fbe0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/element
+2025-08-23 15:47:37,497 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615fc40>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/element
+2025-08-23 15:47:37,498 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be340>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,498 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060bed00>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,498 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060bed30>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,499 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060befd0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,500 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060bec70>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,500 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1060be490>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,500 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615deb0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,501 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615dcd0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,501 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d430>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/elements
+2025-08-23 15:47:37,502 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d1f0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/url
+2025-08-23 15:47:37,502 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d670>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/url
+2025-08-23 15:47:37,503 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d790>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746/url
+2025-08-23 15:47:37,503 - ERROR - Error collecting metrics: HTTPConnectionPool(host='127.0.0.1', port=56333): Max retries exceeded with url: /session/7d42699b983c4aafeb1dd773b8de1746/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615f190>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-23 15:47:37,503 - INFO - AdSense test completed: 0 ads detected, 0 pages browsed
+2025-08-23 15:47:37,503 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615fc70>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746
+2025-08-23 15:47:37,504 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615fe80>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746
+2025-08-23 15:47:37,504 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615f700>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/7d42699b983c4aafeb1dd773b8de1746
+2025-08-23 15:47:37,505 - ERROR - Error closing driver: HTTPConnectionPool(host='127.0.0.1', port=56333): Max retries exceeded with url: /session/7d42699b983c4aafeb1dd773b8de1746 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10615d820>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-23 15:51:26,239 - INFO - Successfully authenticated with Multilogin X API
+2025-08-23 15:51:31,690 - INFO - 🎭 Generated personality: professional
+2025-08-23 15:51:31,690 - INFO - 📱 Detected device type: tablet
+2025-08-23 15:51:31,691 - INFO - ☀️ Afternoon behavior: Medium energy, balanced activity
+2025-08-23 15:51:32,590 - INFO - Successfully setup undetectable Chrome driver
+2025-08-23 15:51:42,634 - INFO - Applied human-like behavior simulation
+2025-08-23 15:51:42,636 - INFO - Browser driver closed
+2025-08-23 15:51:42,662 - INFO - 🎭 Generated personality: explorer
+2025-08-23 15:51:42,662 - INFO - 📱 Detected device type: desktop
+2025-08-23 15:51:42,662 - INFO - ☀️ Afternoon behavior: Medium energy, balanced activity
+2025-08-23 15:51:42,670 - INFO - Successfully setup undetectable Chrome driver
+2025-08-23 15:51:42,671 - INFO - 🎭 Starting realistic browsing session: 5 pages
+2025-08-23 15:51:42,671 - INFO - 👤 Personality: explorer
+2025-08-23 15:51:42,671 - INFO - 📱 Device: desktop
+2025-08-23 15:51:42,671 - INFO - 🌍 Location: US
+2025-08-23 15:51:42,671 - INFO - 🕒 Time-based behavior: medium
+2025-08-23 15:52:07,914 - INFO - 📄 Visited page 2: category - technology (long) - https://cekmedia.my.id/category/blog/
+2025-08-23 15:52:21,349 - INFO - 📄 Visited page 3: category - technology (long) - https://cekmedia.my.id/category/blog/#
+2025-08-23 15:52:36,511 - INFO - 📄 Visited page 4: random - technology (long) - https://cekmedia.my.id/hello-world/
+2025-08-23 15:52:45,623 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x105ebb850>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/aeea3aa694e0f48f1a37a79e13c66c34/execute/sync
+2025-08-23 15:52:45,623 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x105ebb970>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/aeea3aa694e0f48f1a37a79e13c66c34/execute/sync
+2025-08-23 15:52:45,623 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x105ebbfa0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/aeea3aa694e0f48f1a37a79e13c66c34/execute/sync
+2025-08-23 15:52:45,624 - ERROR - Error simulating mouse movement: HTTPConnectionPool(host='127.0.0.1', port=57473): Max retries exceeded with url: /session/aeea3aa694e0f48f1a37a79e13c66c34/execute/sync (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x105e8e460>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-23 15:52:45,624 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x105e8e3d0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/aeea3aa694e0f48f1a37a79e13c66c34/elements
+2025-08-23 15:52:45,625 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x105e8e070>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/aeea3aa694e0f48f1a37a79e13c66c34/elements
+2025-08-23 15:52:45,625 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x105e8e6d0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/aeea3aa694e0f48f1a37a79e13c66c34/elements
+2025-08-23 15:52:45,625 - INFO - 📄 Visited page 5: random - technology (long) - https://cekmedia.my.id/category/blog/
+2025-08-23 15:52:45,627 - INFO - ✅ Browsing session completed: 5 pages, 63.0s
+2025-08-23 15:52:45,627 - INFO - 🎯 Navigation pattern: ['category', 'category', 'random', 'random']
+2025-08-23 15:52:47,208 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x105e8e9a0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/aeea3aa694e0f48f1a37a79e13c66c34
+2025-08-23 15:52:47,209 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x105e8ed00>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/aeea3aa694e0f48f1a37a79e13c66c34
+2025-08-23 15:52:47,209 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x105ec74c0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/aeea3aa694e0f48f1a37a79e13c66c34
+2025-08-23 15:52:47,210 - ERROR - Error closing driver: HTTPConnectionPool(host='127.0.0.1', port=57473): Max retries exceeded with url: /session/aeea3aa694e0f48f1a37a79e13c66c34 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x105ec7ca0>: Failed to establish a new connection: [Errno 61] Connection refused'))

@@ -1,0 +1,50 @@
+2025-08-23 21:52:53,336 - multilogin_api - INFO - Successfully authenticated with Multilogin X API
+2025-08-23 21:53:01,336 - selenium_automation - INFO - 🎭 Generated personality: professional
+2025-08-23 21:53:01,337 - selenium_automation - INFO - 📱 Detected device type: desktop
+2025-08-23 21:53:01,337 - selenium_automation - INFO - 🌆 Evening behavior: Low energy, slow reading, fewer pages
+2025-08-23 21:53:01,337 - selenium_automation - INFO - 👁️ Long attention span: Detailed reading mode
+2025-08-23 21:53:01,337 - selenium_automation - INFO - 📖 Medium reading speed: Balanced mode
+2025-08-23 21:53:01,337 - selenium_automation - ERROR - Error in tab switching: 'NoneType' object has no attribute 'window_handles'
+2025-08-23 21:53:01,337 - selenium_automation - INFO - 🎯 All behavior systems initialized successfully
+2025-08-23 21:53:03,486 - selenium_automation - INFO - Successfully setup undetectable Chrome driver
+2025-08-23 21:53:03,487 - root - INFO - 🌐 Waiting for profile to load...
+2025-08-23 21:53:13,515 - root - INFO - 🔧 Selenium URL: devtools://devtools/bundled/devtools_app.html?remoteBase=https://chrome-devtools-frontend.appspot.com/serve_file/@20f5f85ee4ee04c1a20b44eae92c6eae4d9b8ac0/&targetType=tab&can_dock=true
+2025-08-23 21:53:13,515 - root - INFO - 🔧 Selenium Title: DevTools
+2025-08-23 21:53:13,515 - root - INFO - ⚠️ Selenium is accessing DevTools, switching to main tab...
+2025-08-23 21:53:13,517 - root - INFO - 📑 Available windows: 2
+2025-08-23 21:53:13,517 - root - INFO - 🔄 Switching to main tab...
+2025-08-23 21:53:15,544 - root - INFO - 🌐 Real URL: https://maxgaming.biz.id/can-a-vpn-really-boost-your-fps-or-reduce-lag-2025-guide-for-gamers/
+2025-08-23 21:53:15,544 - root - INFO - 📄 Real Title: Can a VPN Really Boost Your FPS or Reduce Lag? (2025 Guide for Gamers) - MaxGaming
+2025-08-23 21:53:15,544 - root - INFO - ✅ Successfully got real URL from main tab
+2025-08-23 21:53:15,544 - root - INFO - ✅ Successfully got URL: https://maxgaming.biz.id/can-a-vpn-really-boost-your-fps-or-reduce-lag-2025-guide-for-gamers/
+2025-08-23 21:57:42,879 - urllib3.connectionpool - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1064fa790>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/a3a92538d9a3c95912aeb9509c9d5e3b/execute/sync
+2025-08-23 21:57:42,880 - urllib3.connectionpool - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1064fad30>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/a3a92538d9a3c95912aeb9509c9d5e3b/execute/sync
+2025-08-23 21:57:42,881 - urllib3.connectionpool - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1064fa430>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/a3a92538d9a3c95912aeb9509c9d5e3b/execute/sync
+2025-08-23 21:57:42,881 - selenium_automation - ERROR - Error simulating natural scrolling: HTTPConnectionPool(host='127.0.0.1', port=53573): Max retries exceeded with url: /session/a3a92538d9a3c95912aeb9509c9d5e3b/execute/sync (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1064faac0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-23 21:57:42,882 - urllib3.connectionpool - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10651a2e0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/a3a92538d9a3c95912aeb9509c9d5e3b
+2025-08-23 21:57:42,882 - urllib3.connectionpool - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10651a310>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/a3a92538d9a3c95912aeb9509c9d5e3b
+2025-08-23 21:57:42,883 - urllib3.connectionpool - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10651a550>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/a3a92538d9a3c95912aeb9509c9d5e3b
+2025-08-23 21:57:42,883 - selenium_automation - ERROR - Error closing driver: HTTPConnectionPool(host='127.0.0.1', port=53573): Max retries exceeded with url: /session/a3a92538d9a3c95912aeb9509c9d5e3b (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10651a5b0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-23 22:59:41,119 - multilogin_api - INFO - Successfully authenticated with Multilogin X API
+2025-08-23 22:59:48,177 - selenium_automation - INFO - 🎭 Generated personality: professional
+2025-08-23 22:59:48,178 - selenium_automation - INFO - 📱 Detected device type: mobile
+2025-08-23 22:59:48,178 - selenium_automation - INFO - 🌙 Night behavior: Very low energy, minimal activity
+2025-08-23 22:59:48,178 - selenium_automation - INFO - 👁️ Medium attention span: Balanced mode
+2025-08-23 22:59:48,178 - selenium_automation - INFO - 📖 Medium reading speed: Balanced mode
+2025-08-23 22:59:48,178 - selenium_automation - ERROR - Error in tab switching: 'NoneType' object has no attribute 'window_handles'
+2025-08-23 22:59:48,178 - selenium_automation - INFO - 🎯 All behavior systems initialized successfully
+2025-08-23 22:59:50,307 - selenium_automation - INFO - Successfully setup undetectable Chrome driver
+2025-08-23 22:59:50,308 - root - INFO - 🌐 Waiting for profile to load...
+2025-08-23 23:00:00,334 - root - INFO - 🔧 Selenium URL: devtools://devtools/bundled/devtools_app.html?remoteBase=https://chrome-devtools-frontend.appspot.com/serve_file/@20f5f85ee4ee04c1a20b44eae92c6eae4d9b8ac0/&targetType=tab&can_dock=true
+2025-08-23 23:00:00,334 - root - INFO - 🔧 Selenium Title: DevTools
+2025-08-23 23:00:00,334 - root - INFO - ⚠️ Selenium is accessing DevTools, switching to main tab...
+2025-08-23 23:00:00,336 - root - INFO - 📑 Available windows: 2
+2025-08-23 23:00:00,336 - root - INFO - 🔄 Switching to main tab...
+2025-08-23 23:00:02,743 - root - INFO - 🌐 Real URL: https://maxgaming.biz.id/gaming-vpns-that-work-with-xbox-playstation-and-switch-2025-edition/
+2025-08-23 23:00:02,743 - root - INFO - 📄 Real Title: Gaming VPNs That Work With Xbox, PlayStation, and Switch (2025 Edition) - MaxGaming
+2025-08-23 23:00:02,743 - root - INFO - ✅ Successfully got real URL from main tab
+2025-08-23 23:00:02,744 - root - INFO - ✅ Successfully got URL: https://maxgaming.biz.id/gaming-vpns-that-work-with-xbox-playstation-and-switch-2025-edition/
+2025-08-23 23:01:02,116 - urllib3.connectionpool - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1034e2790>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/2c018217f853fe54b55cab2de767cb2a
+2025-08-23 23:01:02,117 - urllib3.connectionpool - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1034e2400>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/2c018217f853fe54b55cab2de767cb2a
+2025-08-23 23:01:02,117 - urllib3.connectionpool - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1034e2a00>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/2c018217f853fe54b55cab2de767cb2a
+2025-08-23 23:01:02,118 - selenium_automation - ERROR - Error closing driver: HTTPConnectionPool(host='127.0.0.1', port=57886): Max retries exceeded with url: /session/2c018217f853fe54b55cab2de767cb2a (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1034e2640>: Failed to establish a new connection: [Errno 61] Connection refused'))

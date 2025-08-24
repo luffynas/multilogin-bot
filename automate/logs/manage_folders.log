@@ -1,0 +1,36 @@
+2025-08-23 15:25:41,511 - INFO - 🔧 Initializing Multilogin API...
+2025-08-23 15:25:42,497 - INFO - Successfully authenticated with Multilogin X API
+2025-08-23 15:25:42,497 - INFO - ✅ Authentication successful!
+2025-08-23 15:25:42,497 - INFO - Getting folders from: https://api.multilogin.com/workspace/folders
+2025-08-23 15:25:42,742 - INFO - Successfully retrieved 2 folders
+2025-08-23 15:25:42,743 - INFO - ✅ Saved 2 folders to data/folders.json
+2025-08-23 15:25:58,442 - INFO - 🔧 Initializing Multilogin API...
+2025-08-23 15:25:59,330 - INFO - Successfully authenticated with Multilogin X API
+2025-08-23 15:25:59,330 - INFO - ✅ Authentication successful!
+2025-08-23 15:25:59,330 - INFO - ✅ Loaded 2 folders from data/folders.json (updated: 2025-08-23 15:25:42)
+2025-08-23 15:25:59,330 - INFO - 📁 Available folders (2 total):
+2025-08-23 15:25:59,331 - INFO -   1. Selenium
+2025-08-23 15:25:59,331 - INFO -      ID: 94caeb51-cc7f-477d-a6db-c79e696b5530
+2025-08-23 15:25:59,331 - INFO -      Profiles: 0
+2025-08-23 15:25:59,331 - INFO -      Created: 2025-08-23T08:15:25.184303Z
+2025-08-23 15:25:59,331 - INFO - 
+2025-08-23 15:25:59,331 - INFO -   2. Default folder
+2025-08-23 15:25:59,331 - INFO -      ID: d3602d53-2e54-4cce-87d7-64e89e0f8679
+2025-08-23 15:25:59,331 - INFO -      Profiles: 16
+2025-08-23 15:25:59,331 - INFO -      Created: 2025-08-21T18:38:32.006482Z
+2025-08-23 15:25:59,331 - INFO - 
+2025-08-23 15:26:06,325 - INFO - 🔧 Initializing Multilogin API...
+2025-08-23 15:26:07,419 - INFO - Successfully authenticated with Multilogin X API
+2025-08-23 15:26:07,420 - INFO - ✅ Authentication successful!
+2025-08-23 15:26:07,420 - INFO - ✅ Loaded 2 folders from data/folders.json (updated: 2025-08-23 15:25:42)
+2025-08-23 15:26:07,445 - INFO - Generated unique fingerprint for US (attempt 1)
+2025-08-23 15:26:07,445 - INFO - 🔗 Generated google referer: https://www.google.com/search?q=health&hl=en
+2025-08-23 15:26:07,445 - INFO - Converted fingerprint for country: US
+2025-08-23 15:26:07,445 - INFO - 🔧 Fixing User Agent for Windows OS
+2025-08-23 15:26:07,445 - INFO - ✅ Updated User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+2025-08-23 15:26:07,445 - INFO - Creating profile with URL: https://launcher.mlx.yt:45001/api/v3/profile/quick
+2025-08-23 15:26:09,338 - INFO - Full API response: {'data': {'browser_type': 'mimic', 'core_version': 135, 'id': 'd1133682-7ffa-11f0-84f5-1aaa018ad5d1', 'is_quick': True, 'port': '50574'}, 'status': {'error_code': '', 'http_code': 200, 'message': 'Quick profile started successfully'}}
+2025-08-23 15:26:09,338 - INFO - Getting folders from: https://api.multilogin.com/workspace/folders
+2025-08-23 15:26:09,648 - INFO - Successfully retrieved 2 folders
+2025-08-23 15:26:09,648 - INFO - Found default folder: Default folder (ID: d3602d53-2e54-4cce-87d7-64e89e0f8679)
+2025-08-23 15:26:09,648 - INFO - Successfully created profile: manual_folder_profile (ID: d1133682-7ffa-11f0-84f5-1aaa018ad5d1, Port: 50574) with multilogin_residential SOCKS5 proxy and google referer

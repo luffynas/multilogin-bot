@@ -1,0 +1,65 @@
+{
+  "start_time": "2025-08-24 03:27:53.752130",
+  "personality": "explorer",
+  "device_type": "tablet",
+  "pages_visited": [
+    {
+      "url": "https://maxgaming.biz.id/gaming-vpns-that-work-with-xbox-playstation-and-switch-2025-edition/",
+      "timestamp": "2025-08-24T03:28:07.742261",
+      "title": "Gaming VPNs That Work With Xbox, PlayStation, and Switch (2025 Edition) - MaxGaming"
+    }
+  ],
+  "interactions": [
+    {
+      "type": "concurrent_scrolling",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udd04 FAST SCROLLING pattern",
+      "timestamp": "2025-08-24T03:30:02.116251"
+    },
+    {
+      "type": "concurrent_reading",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udcd6 QUICK READING bursts",
+      "timestamp": "2025-08-24T03:30:03.625590"
+    },
+    {
+      "type": "concurrent_mouse",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\uddb1\ufe0f RAPID MOUSE movements",
+      "timestamp": "2025-08-24T03:30:17.487271"
+    },
+    {
+      "type": "concurrent_typing",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\u2328\ufe0f FAST TYPING simulation",
+      "timestamp": "2025-08-24T03:30:26.147609"
+    },
+    {
+      "type": "concurrent_navigation",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83e\udded QUICK NAVIGATION patterns",
+      "timestamp": "2025-08-24T03:30:26.949892"
+    },
+    {
+      "type": "concurrent_hovering",
+      "personality": "explorer",
+      "cycle": 1,
+      "description": "\ud83d\udc46 FAST HOVERING actions",
+      "timestamp": "2025-08-24T03:30:28.151435"
+    },
+    {
+      "type": "adsense",
+      "ads_found": 0,
+      "clicks_performed": 0,
+      "timestamp": "2025-08-24T03:32:49.701111"
+    }
+  ],
+  "errors": [],
+  "end_time": "2025-08-24T03:32:49.701337",
+  "duration": "0:04:55.949213"
+}

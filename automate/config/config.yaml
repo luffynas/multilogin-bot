@@ -1,0 +1,604 @@
+# Automate Project Configuration - Undetectable AdSense Testing
+# ============================================================
+
+# Multilogin API Configuration
+multilogin:
+  base_url: "https://api.multilogin.com"
+  launcher_url: "https://launcher.mlx.yt:45001/api/v2"
+  
+  # Account credentials for automatic authentication
+  username: "blankblank026@gmail.com"
+  password: "DadiDuwit2025$"
+  
+  # Profile management
+  max_concurrent_profiles: 20
+  profile_timeout: 1800  # 30 minutes
+  auto_cleanup: true
+
+# Proxy Configuration - Multi-Provider Support (SOCKS5)
+proxy:
+  # Dynamic proxy pool management
+  total_count: 2000  # Total static proxies available
+  rotation_strategy: "daily"  # daily, hourly, session
+  health_check_interval: 300  # 5 minutes
+  success_rate_min: 0.85
+  response_time_max: 5.0
+  
+  # Proxy protocol configuration
+  protocol: "socks5"  # Always use SOCKS5
+  authentication: "basic"  # basic, none
+  
+  # Dynamic proxy rotation schedule
+  rotation_period_days: 10  # Use all 2000 proxies in 10 days (configurable)
+  daily_proxy_target: 200   # 2000 / 10 days = 200 proxies per day
+  
+  # Multi-provider configuration with fallback
+  providers:
+    # Primary: Multilogin built-in residential proxies (5GB)
+    - name: "multilogin_residential"
+      priority: 1
+      enabled: true
+      type: "residential"
+      source: "multilogin_builtin"
+      data_limit: "5GB"
+      protocol: "socks5"
+      credentials:
+        username: ""  # Not needed for built-in proxies
+        password: ""  # Not needed for built-in proxies
+      settings:
+        auto_use: true
+        fallback_enabled: true
+    
+    # Fallback: SocksEscort
+    - name: "socksescort"
+      priority: 2
+      enabled: true
+      type: "static"
+      source: "socksescort"
+      protocol: "socks5"
+      credentials:
+        username: "your_socksescort_username"
+        password: "your_socksescort_password"
+      settings:
+        auto_use: false  # Manual activation
+        fallback_enabled: true
+        api_endpoint: "https://socksescort.com/api"
+  
+  # Provider switching configuration
+  provider_switching:
+    enabled: true
+    auto_fallback: true
+    manual_switch: true
+    switch_conditions:
+      data_limit_reached: true
+      health_score_below: 0.3
+      success_rate_below: 0.7
+      max_failures: 10
+  
+  # Proxy health monitoring
+  health_monitoring:
+    enabled: true
+    check_interval: 1800  # 30 minutes
+    max_failures: 3
+    auto_blacklist: true
+    blacklist_duration: 3600  # 1 hour
+
+# Profile Configuration - Dynamic Count
+profiles:
+  # Dynamic profile count - can be adjusted via command line
+  total_count: 100  # Default, can be overridden
+  fingerprint_strategy: "unique_per_proxy"
+  geo_default: "US"  # Tier 1 targeting - US geolocation
+  
+  # Fingerprint settings for undetectable behavior
+  fingerprint:
+    enable_geo_consistency: true
+    enable_canvas_randomization: true
+    enable_webrtc_protection: true
+    enable_advanced_stealth: true
+    stealth_level: "expert"
+    
+    # Hardware emulation for Tier 1 markets
+    hardware_emulation:
+      enabled: true
+      device_types:
+        - "desktop_windows"
+        - "desktop_mac"
+        - "laptop_windows"
+      network_profiles:
+        - "home_wifi"
+        - "mobile_4g"
+        - "office_ethernet"
+    
+    # Tier 1 market specific settings
+    tier1_targeting:
+      enabled: true
+      countries: ["US", "CA", "GB", "AU", "DE", "FR", "NL"]
+      timezones:
+        US: ["America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles"]
+        CA: ["America/Toronto", "America/Vancouver"]
+        GB: ["Europe/London"]
+        AU: ["Australia/Sydney", "Australia/Melbourne"]
+        DE: ["Europe/Berlin"]
+        FR: ["Europe/Paris"]
+        NL: ["Europe/Amsterdam"]
+
+# Selenium Automation Configuration - Human-like Behavior
+selenium:
+  automation_type: "selenium"
+  undetectable_mode: true
+  headless: false  # Set to true for production
+  
+  # Enhanced human-like behavior simulation
+  human_behavior:
+    enabled: true
+    mouse_movement: true
+    random_delays: true
+    natural_scrolling: true
+    realistic_typing: true
+    
+    # Advanced human simulation
+    click_simulation:
+      enabled: true
+      natural_click_patterns: true
+      hover_before_click: true
+      click_delay_variation: true
+      double_click_probability: 0.05
+    
+    # 🔥 STEALTH ENHANCEMENT: Traffic Generation Patterns
+    traffic_generation:
+      enabled: true
+      natural_browsing_patterns: true
+      page_dwell_time: [180, 300]  # 3-5 minutes per page (was 30-180)
+      scroll_behavior: "natural"
+      tab_switching: true
+      bookmark_creation: true
+    
+    # Real human behavior simulation
+    realistic_behavior:
+      enabled: true
+      attention_span_variation: true
+      reading_speed_variation: true
+      mouse_acceleration: true
+      keyboard_typing_patterns: true
+      browser_navigation_patterns: true
+    
+    # 🔥 STEALTH ENHANCEMENT: Enhanced Timing Variations
+    min_delay: 1
+    max_delay: 5
+    scroll_interval_min: 0.5  # 0.5 seconds between scrolls (faster speed)
+    scroll_interval_max: 1.5  # 1.5 seconds max between scrolls (faster speed)
+  
+  # 🔥 STEALTH ENHANCEMENT: Realistic Browsing Behavior Configuration
+  browsing_behavior:
+    enabled: true
+    min_pages: 1          # Minimum 1 page per session
+    max_pages: 3          # Maximum 3 pages per session
+    page_dwell_time: [180, 300]  # 3-5 minutes per page (was 30-180)
+    navigation_probabilities:
+      category: 0.4
+      legal: 0.3
+      previous_next: 0.8  # Increased probability for previous/next (was 0.6)
+      random: 0.1
+    
+    # Reading behavior simulation
+    reading_behavior:
+      enabled: true
+      chars_per_second: 200
+      max_reading_time: 30
+      text_selectors:
+        - "p"
+        - "article"
+        - ".content"
+        - ".post-content"
+        - ".entry-content"
+        - ".article-content"
+        - "main"
+    
+    # Link hovering simulation
+    link_hovering:
+      enabled: true
+      max_hovers_per_page: 3
+      hover_duration: [0.5, 2.0]
+      hover_probability: 0.4
+    
+    # Navigation selectors
+    navigation_selectors:
+      category:
+        - "a[href*='category']"
+        - "a[href*='cat']"
+        - "a[href*='tag']"
+        - "nav a"
+        - ".category a"
+        - ".categories a"
+        - "ul.menu a"
+        - ".navigation a"
+      
+      legal_pages:
+        - "a[href*='about']"
+        - "a[href*='contact']"
+        - "a[href*='privacy']"
+        - "a[href*='terms']"
+        - "a[href*='disclaimer']"
+        - "a[href*='faq']"
+        - "a[href*='help']"
+        - "a[href*='support']"
+      
+      previous_next:
+        - "a[rel='prev']"
+        - "a[rel='next']"
+        - ".pagination a"
+        - ".nav-previous a"
+        - ".nav-next a"
+        - ".prev a"
+        - ".next a"
+        - "a[href*='page']"
+        - "a[href*='p=']"
+  
+  # Advanced Behavior System Configuration
+  advanced_behavior:
+    enabled: true
+    
+    # Time-based behavior adjustment
+    time_based_adjustment: true
+    
+    # Personality generation
+    personality_generation: false
+    personality_weights:
+      explorer: 0.25
+      researcher: 0.25
+      casual: 0.25
+      professional: 0.25
+    
+    # Device-specific behavior
+    device_detection: true
+    device_distribution:
+      desktop: 0.6
+      mobile: 0.3
+      tablet: 0.1
+    
+    # Geographic behavior patterns
+    geo_specific_behavior: true
+    geo_behavior_enabled: true
+    
+    # Content awareness
+    content_awareness: true
+    content_analysis: true
+    
+    # Session memory system
+    session_memory: true
+    memory_persistence: true
+    
+    # Smart ad interaction
+    smart_ad_interaction: true
+    context_aware_interaction: true
+    
+    # 🔥 POST-AD CLICK BEHAVIOR CONFIGURATION
+    post_ad_click_behavior:
+      enabled: true
+      landing_page_behavior: true
+      form_interaction: true
+      purchase_simulation: true
+      back_navigation: true
+      
+      # Landing page behavior settings
+      landing_page:
+        dwell_time_min: 10
+        dwell_time_max: 30
+        reading_probability: 0.8
+        scrolling_probability: 0.9
+        element_checking: true
+      
+      # Form interaction settings
+      form_interaction:
+        email_filling_probability: 0.7
+        name_filling_probability: 0.6
+        submit_probability: 0.3
+        abandon_probability: 0.7
+        typing_speed_min: 0.05
+        typing_speed_max: 0.15
+      
+      # Purchase simulation settings
+      purchase_simulation:
+        product_browsing_probability: 0.6
+        add_to_cart_probability: 0.4
+        checkout_probability: 0.2
+        payment_abandon_probability: 0.8
+        max_products_to_browse: 3
+      
+      # Back navigation settings
+      back_navigation:
+        enabled: true
+        return_probability: 0.9
+        continue_browsing_probability: 0.8
+  
+  # 🔥 STEALTH ENHANCEMENT: Concurrent Behavior Patterns
+  concurrent_behavior:
+    enabled: true
+    behavior_randomization: true
+    timing_jitter: true
+    pattern_rotation: true
+    interaction_diversity: true
+    
+    # Multiple behavior patterns running concurrently
+    concurrent_patterns:
+      - "reading_focused"     # Deep reading with long pauses
+      - "scanning_mode"       # Quick scanning with frequent scrolls
+      - "research_mode"       # Methodical navigation with notes
+      - "casual_browsing"     # Random clicks and short attention
+    
+    # Pattern switching probability
+    pattern_switch_probability: 0.2  # 20% chance to switch pattern per page
+  
+  # 🔥 STEALTH ENHANCEMENT: Connection Stability Management
+  connection_management:
+    enabled: true
+    max_session_duration: 900      # 15 minutes total session (3 pages * 5 min)
+    auto_reconnect: true
+    silent_recovery: true
+    graceful_shutdown: true
+    connection_timeout: 30
+    retry_attempts: 3
+    retry_delay: [2, 5]
+  
+  # 🔥 STEALTH ENHANCEMENT: Content Interaction Patterns
+  content_interaction:
+    enabled: true
+    ad_detection_threshold: 0.3
+    link_click_probability: 0.15
+    scroll_depth_target: [0.3, 0.8]
+    reading_completion_rate: [0.4, 0.9]
+    
+    # Text selection and highlighting (human-like behavior)
+    text_selection:
+      enabled: true
+      selection_probability: 0.1    # 10% chance to select text
+      highlight_duration: [2, 8]    # Hold selection for 2-8 seconds
+    
+    # Copy-paste behavior simulation
+    copy_paste:
+      enabled: true
+      copy_probability: 0.05        # 5% chance to copy text
+      paste_probability: 0.02       # 2% chance to paste (search, etc.)
+
+# Referer Simulation Configuration
+referer_simulation:
+  enabled: true
+  
+  # Referer sources
+  sources:
+    - "google.com"
+    - "facebook.com"
+    - "twitter.com"
+    - "linkedin.com"
+    - "youtube.com"
+    - "reddit.com"
+    - "pinterest.com"
+    - "instagram.com"
+    - "bing.com"
+    - "duckduckgo.com"
+    - "yahoo.com"
+    - "quora.com"
+    - "medium.com"
+    - "dev.to"
+  
+  # Keywords for search referers
+  keywords:
+    - "technology"
+    - "business"
+    - "news"
+    - "entertainment"
+    - "sports"
+    - "health"
+    - "education"
+    - "finance"
+    - "lifestyle"
+    - "travel"
+    - "tech"
+    - "startup"
+    - "marketing"
+    - "design"
+    - "development"
+  
+  # Referer type probabilities
+  probabilities:
+    google: 0.6      # 60% from Google
+    social: 0.25     # 25% from social media
+    direct: 0.1      # 10% direct traffic
+    other: 0.05      # 5% other sources
+  
+  # Social media platform probabilities
+  social_probabilities:
+    facebook: 0.3
+    twitter: 0.2
+    linkedin: 0.15
+    youtube: 0.15
+    reddit: 0.1
+    pinterest: 0.05
+    instagram: 0.05
+  
+  # Referer injection settings
+  injection:
+    enabled: true
+    method: "multilogin_profile"  # Set at profile level
+    personality_based: true
+    geo_aware: true
+
+# AdSense Testing Configuration - Enhanced for Tier 1
+adsense_testing:
+  enabled: true
+  target_websites:
+    - "https://cekmedia.my.id/pinjaman-bca-online-langsung-cair-solusi-dana-instan-dari-bank-terpercaya/"
+    - "https://cekmedia.my.id/pinjaman-online-cepat-cair-solusi-dana-darurat-tanpa-ribet/"
+    - "https://cekmedia.my.id/pinjaman-bca-online-langsung-cair-solusi-dana-instan-dari-bank-terpercaya/"
+  
+  # Enhanced safety thresholds for Tier 1 markets
+  safety_thresholds:
+    max_daily_sessions: 50
+    max_revenue_per_session: 0.02
+    max_ctr_per_session: 0.05
+    min_session_duration: 240
+    max_hourly_sessions: 10
+    min_session_spacing: 60
+  
+  # High CPC focus for Tier 1 markets
+  high_cpc_focus:
+    enabled: true
+    premium_content_focus: true
+    high_value_keywords: true
+    long_session_optimization: true
+    natural_engagement: true
+    
+    # Tier 1 specific targeting
+    tier1_keywords:
+      - "premium"
+      - "luxury"
+      - "professional"
+      - "enterprise"
+      - "business"
+      - "technology"
+      - "finance"
+      - "healthcare"
+
+# Dynamic Scheduler Configuration
+scheduler:
+  enabled: true
+  # Dynamic rotation period - can be adjusted
+  rotation_period_days: 10  # Configurable: use all proxies in X days
+  daily_sessions_per_profile: 2  # Each profile uses 2 different proxies per day
+  session_spacing_minutes: 30
+  max_concurrent_sessions: 20
+  
+  # Dynamic scheduling options
+  scheduling_modes:
+    continuous: true
+    batch_processing: true
+    adaptive_scheduling: true
+  
+  # Performance optimization
+  performance:
+    auto_scaling: true
+    load_balancing: true
+    resource_monitoring: true
+
+# Data Storage Configuration
+storage:
+  profile_data_file: "data/profiles.json"
+  proxy_usage_file: "data/proxy_usage.json"
+  session_logs_file: "data/session_logs.json"
+  fingerprint_cache_file: "data/fingerprint_cache.json"
+  proxy_health_file: "data/proxy_health.json"
+  provider_status_file: "data/provider_status.json"
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  file: "logs/automate.log"
+  max_size: "10MB"
+  backup_count: 5
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# 🔥 STEALTH ENHANCEMENT: Error Handling Configuration
+error_handling:
+  max_retries: 3
+  base_delay: 1
+  max_delay: 60
+  backoff_factor: 2
+  max_errors_per_hour: 10
+  auto_recovery: true
+  
+  # 🔥 STEALTH ENHANCEMENT: Silent Error Recovery
+  silent_recovery:
+    enabled: true
+    suppress_error_logs: true
+    graceful_degradation: true
+    connection_recovery: true
+    session_recovery: true
+  
+  # 🔥 STEALTH ENHANCEMENT: Connection Stability
+  connection_stability:
+    enabled: true
+    max_session_duration: 1200     # 20 minutes max
+    auto_reconnect: true
+    silent_recovery: true
+    graceful_shutdown: true
+    connection_timeout: 30
+    retry_attempts: 3
+    retry_delay: [2, 5]
+  
+  # 🔥 STEALTH ENHANCEMENT: Behavioral Error Recovery
+  behavioral_recovery:
+    enabled: true
+    pattern_switching: true
+    session_restart: true
+    profile_rotation: true
+    proxy_fallback: true
+
+# 🔥 STEALTH ENHANCEMENT: Performance Monitoring
+performance_monitoring:
+  enabled: true
+  metrics_collection: true
+  real_time_monitoring: true
+  alert_thresholds:
+    cpu_usage: 80
+    memory_usage: 85
+    disk_usage: 90
+    network_latency: 1000
+
+# 🔥 STEALTH ENHANCEMENT: Behavioral Diversity Management
+behavioral_diversity:
+  enabled: true
+  
+  # Session variation patterns
+  session_variation:
+    enabled: true
+    duration_variation: true
+    page_count_variation: true
+    navigation_pattern_variation: true
+    reading_speed_variation: true
+  
+  # Interaction randomization
+  interaction_randomization:
+    enabled: true
+    click_pattern_randomization: true
+    scroll_pattern_randomization: true
+    timing_randomization: true
+    navigation_randomization: true
+  
+  # Pattern rotation system
+  pattern_rotation:
+    enabled: true
+    rotation_frequency: "per_session"  # per_session, per_page, per_hour
+    pattern_memory: true
+    consistency_maintenance: true
+  
+  # Human-like inconsistencies
+  human_inconsistencies:
+    enabled: true
+    attention_span_variation: true
+    reading_speed_variation: true
+    navigation_preference_variation: true
+    session_break_patterns: true
+
+# 🔥 STEALTH ENHANCEMENT: Session Management
+session_management:
+  enabled: true
+  
+  # Session duration control
+  session_control:
+    min_session_duration: 600    # 10 minutes minimum
+    max_session_duration: 1200   # 20 minutes maximum
+    natural_exit_probability: 0.1  # 10% chance to exit naturally
+  
+  # Page navigation control
+  page_navigation:
+    min_pages_per_session: 2
+    max_pages_per_session: 4
+    page_dwell_time: [180, 300]  # 3-5 minutes per page
+    
+  # Navigation patterns
+  navigation_patterns:
+    previous_next_probability: 0.8    # 80% chance to use previous/next
+    category_navigation_probability: 0.4
+    internal_link_probability: 0.3
+    random_navigation_probability: 0.1
