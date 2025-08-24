@@ -5,6 +5,7 @@
 multilogin:
   base_url: "https://api.multilogin.com"
   launcher_url: "https://launcher.mlx.yt:45001/api/v2"
+  localhost: "http://127.0.0.1"
   
   # Account credentials for automatic authentication
   username: "blankblank026@gmail.com"
@@ -431,6 +432,59 @@ adsense_testing:
     - "https://cekmedia.my.id/pinjaman-bca-online-langsung-cair-solusi-dana-instan-dari-bank-terpercaya/"
     - "https://cekmedia.my.id/pinjaman-online-cepat-cair-solusi-dana-darurat-tanpa-ribet/"
     - "https://cekmedia.my.id/pinjaman-bca-online-langsung-cair-solusi-dana-instan-dari-bank-terpercaya/"
+  
+  # Fallback URL configuration
+  fallback_url: "https://gengsego.com"
+  
+  # Keyword relevance indicators for smart ad interaction
+  keyword_relevance:
+    high_relevance:
+      keywords:
+        - "product"
+        - "buy"
+        - "shop"
+        - "purchase"
+        - "service"
+        - "solution"
+        - "order"
+        - "checkout"
+        - "cart"
+        - "payment"
+      interaction_probability: 0.05
+      dwell_time: "long"
+      relevance: "high"
+    
+    medium_relevance:
+      keywords:
+        - "information"
+        - "guide"
+        - "tutorial"
+        - "help"
+        - "support"
+        - "how-to"
+        - "tips"
+        - "advice"
+        - "recommendation"
+        - "review"
+      interaction_probability: 0.02
+      dwell_time: "medium"
+      relevance: "medium"
+    
+    low_relevance:
+      keywords:
+        - "news"
+        - "entertainment"
+        - "blog"
+        - "personal"
+        - "story"
+        - "opinion"
+        - "random"
+        - "fun"
+        - "joke"
+        - "meme"
+      interaction_probability: 0.001
+      dwell_time: "short"
+      relevance: "low"
   
   # Enhanced safety thresholds for Tier 1 markets
   safety_thresholds:

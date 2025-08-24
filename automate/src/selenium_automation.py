@@ -696,28 +696,57 @@ class UndetectableSeleniumAutomation:
             return {"dwell_time": "medium", "engagement": "medium", "reading_speed": "medium"}
     
     def _smart_ad_interaction(self) -> Dict:
-        """Intelligent ad interaction based on context"""
+        """Intelligent ad interaction based on context from config"""
         try:
             # Analyze page context
             page_text = self.driver.find_element(By.TAG_NAME, "body").text.lower()
             page_title = self.driver.title.lower()
             
-            # Context relevance indicators
-            high_relevance = ["product", "buy", "shop", "purchase", "service", "solution"]
-            medium_relevance = ["information", "guide", "tutorial", "help", "support"]
-            low_relevance = ["news", "entertainment", "blog", "personal"]
+            # Get keyword relevance from config
+            keyword_config = self.config.get('adsense_testing', {}).get('keyword_relevance', {})
             
-            # Calculate relevance score
-            high_score = sum(1 for word in high_relevance if word in page_text or word in page_title)
-            medium_score = sum(1 for word in medium_relevance if word in page_text or word in page_title)
-            low_score = sum(1 for word in low_relevance if word in page_text or word in page_title)
+            # Calculate relevance score for each category
+            high_score = 0
+            medium_score = 0
+            low_score = 0
             
+            # High relevance keywords
+            if 'high_relevance' in keyword_config:
+                high_keywords = keyword_config['high_relevance'].get('keywords', [])
+                high_score = sum(1 for word in high_keywords if word in page_text or word in page_title)
+            
+            # Medium relevance keywords
+            if 'medium_relevance' in keyword_config:
+                medium_keywords = keyword_config['medium_relevance'].get('keywords', [])
+                medium_score = sum(1 for word in medium_keywords if word in page_text or word in page_title)
+            
+            # Low relevance keywords
+            if 'low_relevance' in keyword_config:
+                low_keywords = keyword_config['low_relevance'].get('keywords', [])
+                low_score = sum(1 for word in low_keywords if word in page_text or word in page_title)
+            
+            # Return appropriate configuration based on score
             if high_score > 0:
-                return {"interaction_probability": 0.05, "dwell_time": "long", "relevance": "high"}
+                high_config = keyword_config.get('high_relevance', {})
+                return {
+                    "interaction_probability": high_config.get('interaction_probability', 0.05),
+                    "dwell_time": high_config.get('dwell_time', 'long'),
+                    "relevance": high_config.get('relevance', 'high')
+                }
             elif medium_score > 0:
-                return {"interaction_probability": 0.02, "dwell_time": "medium", "relevance": "medium"}
+                medium_config = keyword_config.get('medium_relevance', {})
+                return {
+                    "interaction_probability": medium_config.get('interaction_probability', 0.02),
+                    "dwell_time": medium_config.get('dwell_time', 'medium'),
+                    "relevance": medium_config.get('relevance', 'medium')
+                }
             else:
-                return {"interaction_probability": 0.001, "dwell_time": "short", "relevance": "low"}
+                low_config = keyword_config.get('low_relevance', {})
+                return {
+                    "interaction_probability": low_config.get('interaction_probability', 0.001),
+                    "dwell_time": low_config.get('dwell_time', 'short'),
+                    "relevance": low_config.get('relevance', 'low')
+                }
                 
         except Exception as e:
             self.logger.debug(f"Error in smart ad interaction: {e}")
@@ -2925,13 +2954,11 @@ class UndetectableSeleniumAutomation:
         except Exception as e:
             self.logger.error(f"Error in natural click: {e}")
     
-    def test_adsense_ads(self, target_url: str) -> Dict:
-        """Test AdSense ads on target website with realistic browsing"""
+    def test_adsense_ads(self) -> Dict:
+        """Test AdSense ads on current page with FOCUS on ad interaction"""
         try:
-            self.logger.info(f"Testing AdSense ads on: {target_url}")
-            
-            # Navigate to target URL and simulate realistic browsing
-            browsing_session = self.simulate_realistic_browsing(target_url)
+            current_url = self.driver.current_url
+            self.logger.info(f"Testing AdSense ads on current page: {current_url}")
             
             # Look for AdSense ads on current page
             adsense_results = self._detect_adsense_ads()
@@ -2943,8 +2970,7 @@ class UndetectableSeleniumAutomation:
             metrics = self._collect_adsense_metrics()
             
             results = {
-                "url": target_url,
-                "browsing_session": browsing_session,
+                "url": current_url,
                 "ads_detected": adsense_results["count"],
                 "ad_positions": adsense_results["positions"],
                 "interactions": interaction_results,
@@ -2952,7 +2978,7 @@ class UndetectableSeleniumAutomation:
                 "timestamp": time.strftime('%Y-%m-%d %H:%M:%S')
             }
             
-            self.logger.info(f"AdSense test completed: {adsense_results['count']} ads detected, {browsing_session.get('total_pages', 0)} pages browsed")
+            self.logger.info(f"AdSense test completed: {adsense_results['count']} ads detected")
             return results
             
         except Exception as e:
