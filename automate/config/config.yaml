@@ -53,7 +53,7 @@ proxy:
     # Fallback: SocksEscort
     - name: "socksescort"
       priority: 2
-      enabled: true
+      enabled: false
       type: "static"
       source: "socksescort"
       protocol: "socks5"
@@ -150,7 +150,8 @@ selenium:
     traffic_generation:
       enabled: true
       natural_browsing_patterns: true
-      page_dwell_time: [180, 300]  # 3-5 minutes per page (was 30-180)
+      # page_dwell_time: [180, 300]  # 3-5 minutes per page (was 30-180)
+      page_dwell_time: [30, 180]  # 3-5 minutes per page (was 30-180)
       scroll_behavior: "natural"
       tab_switching: true
       bookmark_creation: true
@@ -165,17 +166,20 @@ selenium:
       browser_navigation_patterns: true
     
     # 🔥 STEALTH ENHANCEMENT: Enhanced Timing Variations
-    min_delay: 1
-    max_delay: 5
-    scroll_interval_min: 0.5  # 0.5 seconds between scrolls (faster speed)
-    scroll_interval_max: 1.5  # 1.5 seconds max between scrolls (faster speed)
+    # min_delay: 1
+    # max_delay: 5
+    min_delay: 30
+    max_delay: 45
+    scroll_interval_min: 2.0  # 0.5 seconds between scrolls (faster speed)
+    scroll_interval_max: 5.0  # 1.5 seconds max between scrolls (faster speed)
   
   # 🔥 STEALTH ENHANCEMENT: Realistic Browsing Behavior Configuration
   browsing_behavior:
     enabled: true
-    min_pages: 1          # Minimum 1 page per session
-    max_pages: 3          # Maximum 3 pages per session
-    page_dwell_time: [180, 300]  # 3-5 minutes per page (was 30-180)
+    min_pages: 3          # Minimum 1 page per session
+    max_pages: 7          # Maximum 3 pages per session
+    # page_dwell_time: [180, 300]  # 3-5 minutes per page (was 30-180)
+    page_dwell_time: [300, 500]  # 3-5 minutes per page (was 30-180)
     navigation_probabilities:
       category: 0.4
       legal: 0.3
@@ -185,8 +189,8 @@ selenium:
     # Reading behavior simulation
     reading_behavior:
       enabled: true
-      chars_per_second: 200
-      max_reading_time: 30
+      chars_per_second: 250
+      max_reading_time: 45
       text_selectors:
         - "p"
         - "article"
@@ -334,7 +338,7 @@ selenium:
   # 🔥 STEALTH ENHANCEMENT: Connection Stability Management
   connection_management:
     enabled: true
-    max_session_duration: 900      # 15 minutes total session (3 pages * 5 min)
+    max_session_duration: 1200      # 20 minutes total session (3 pages * 5 min)
     auto_reconnect: true
     silent_recovery: true
     graceful_shutdown: true
@@ -440,16 +444,70 @@ adsense_testing:
   keyword_relevance:
     high_relevance:
       keywords:
-        - "product"
-        - "buy"
-        - "shop"
-        - "purchase"
-        - "service"
-        - "solution"
-        - "order"
+        - "play to earn"
+        - "P2E"
+        - "crypto"
+        - "NFT"
+        - "token"
+        - "bitcoin"
+        - "ethereum"
+        - "wallet"
+        - "exchange"
+        - "marketplace"
+        - "trading"
+        - "DeFi"
+        - "investment"
+        - "payment"
         - "checkout"
         - "cart"
-        - "payment"
+        - "order"
+        - "purchase"
+        - "buy"
+        - "shop"
+        - "insurance"
+        - "auto insurance"
+        - "health insurance"
+        - "life insurance"
+        - "marketing"
+        - "advertising"
+        - "digital marketing"
+        - "crypto marketing"
+        - "lawyer"
+        - "attorney"
+        - "legal service"
+        - "law firm"
+        - "online banking"
+        - "bank account"
+        - "crypto banking"
+        - "fintech"
+        - "internet"
+        - "telecom"
+        - "broadband"
+        - "5G"
+        - "online education"
+        - "e-learning"
+        - "crypto course"
+        - "blockchain training"
+        - "forex"
+        - "stock trading"
+        - "online trading"
+        - "forex broker"
+        - "auto"
+        - "dealership"
+        - "car finance"
+        - "vehicle loan"
+        - "travel"
+        - "flight booking"
+        - "hotel booking"
+        - "crypto travel"
+        - "pharmaceuticals"
+        - "healthcare"
+        - "medicine"
+        - "online pharmacy"
+        - "real estate"
+        - "property"
+        - "housing"
+        - "mortgage"
       interaction_probability: 0.05
       dwell_time: "long"
       relevance: "high"

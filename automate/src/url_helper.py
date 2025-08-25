@@ -7,6 +7,7 @@ Helper functions for handling URLs in Selenium automation
 
 import time
 import logging
+import random
 
 def get_real_url_from_profile(automation, fallback_url=None):
     """
@@ -118,13 +119,14 @@ def is_valid_website_url(url):
             return False
     return True
 
-def setup_url_for_automation(automation, fallback_url=None):
+def setup_url_for_automation(automation, fallback_url=None, stealth_mode=True):
     """
-    Setup URL for automation - get real URL or navigate to fallback
+    Setup URL for automation with stealth navigation
     
     Args:
         automation: UndetectableSeleniumAutomation instance
         fallback_url: URL to navigate to if needed
+        stealth_mode: Use stealth navigation patterns
     
     Returns:
         tuple: (current_url, success_message)
@@ -134,16 +136,133 @@ def setup_url_for_automation(automation, fallback_url=None):
         logging.info("🌐 Waiting for profile to load...")
         time.sleep(5)
         
-        # Get real URL from profile
-        real_url, message = get_real_url_from_profile(automation, fallback_url)
+        # Get current URL from profile
+        current_url = automation.driver.current_url
+        logging.info(f"🔍 Current URL: {current_url}")
         
-        if real_url:
-            logging.info(f"✅ Successfully got URL: {real_url}")
-            return real_url, message
+        # Check if URL is valid (not blank, devtools, etc.)
+        if is_valid_website_url(current_url) and current_url != "about:blank":
+            logging.info(f"✅ Profile already has valid URL: {current_url}")
+            return current_url, "Profile already has valid URL"
+        
+        # If URL is blank or invalid, navigate with stealth
+        if stealth_mode and fallback_url:
+            return _stealth_navigate_to_url(automation, fallback_url)
+        elif fallback_url:
+            return _navigate_to_fallback(automation, fallback_url)
         else:
-            logging.error(f"❌ Failed to get URL: {message}")
-            return None, message
+            logging.error("❌ No valid URL and no fallback provided")
+            return None, "No valid URL and no fallback provided"
             
     except Exception as e:
         logging.error(f"❌ Error in setup_url_for_automation: {e}")
         return None, f"Error in setup_url_for_automation: {e}"
+
+def _stealth_navigate_to_url(automation, target_url):
+    """
+    Navigate to URL using stealth patterns to avoid detection
+    
+    Args:
+        automation: UndetectableSeleniumAutomation instance
+        target_url: URL to navigate to
+    
+    Returns:
+        tuple: (current_url, success_message)
+    """
+    try:
+        logging.info(f"🕵️ Stealth navigation to: {target_url}")
+        
+        # Simulate human-like behavior before navigation
+        _simulate_pre_navigation_behavior(automation)
+        
+        # Navigate to URL
+        automation.driver.get(target_url)
+        
+        # Wait for page load with realistic timing
+        _wait_for_page_load(automation)
+        
+        # Simulate post-navigation behavior
+        _simulate_post_navigation_behavior(automation)
+        
+        # Get final URL
+        final_url = automation.driver.current_url
+        final_title = automation.driver.title
+        
+        logging.info(f"✅ Stealth navigation successful: {final_url}")
+        logging.info(f"📄 Page title: {final_title}")
+        
+        return final_url, f"Stealth navigation successful: {final_url}"
+        
+    except Exception as e:
+        logging.error(f"❌ Error in stealth navigation: {e}")
+        return None, f"Error in stealth navigation: {e}"
+
+def _simulate_pre_navigation_behavior(automation):
+    """Simulate human behavior before navigation"""
+    try:
+        # Random delay before navigation (human thinking time)
+        thinking_time = random.uniform(1.0, 3.0)
+        time.sleep(thinking_time)
+        
+        # Sometimes move mouse (simulate user interaction)
+        if random.random() < 0.3:
+            automation._simulate_mouse_movement()
+        
+        # Sometimes scroll slightly (simulate user checking current page)
+        if random.random() < 0.2:
+            automation.driver.execute_script("window.scrollBy(0, 100);")
+            time.sleep(random.uniform(0.5, 1.5))
+        
+    except Exception as e:
+        logging.debug(f"Pre-navigation behavior simulation failed: {e}")
+
+def _wait_for_page_load(automation):
+    """Wait for page to load with realistic timing"""
+    try:
+        # Wait for page to start loading
+        time.sleep(random.uniform(1.0, 2.0))
+        
+        # Wait for page to be ready
+        max_wait = 30
+        wait_time = 0
+        
+        while wait_time < max_wait:
+            try:
+                # Check if page is loaded
+                ready_state = automation.driver.execute_script("return document.readyState;")
+                if ready_state == "complete":
+                    break
+                
+                time.sleep(1)
+                wait_time += 1
+                
+            except Exception:
+                # If script fails, assume page is loaded
+                break
+        
+        # Additional random wait (human behavior)
+        extra_wait = random.uniform(1.0, 3.0)
+        time.sleep(extra_wait)
+        
+    except Exception as e:
+        logging.debug(f"Page load wait failed: {e}")
+
+def _simulate_post_navigation_behavior(automation):
+    """Simulate human behavior after navigation"""
+    try:
+        # Random delay after page load (human reading time)
+        reading_time = random.uniform(2.0, 5.0)
+        time.sleep(reading_time)
+        
+        # Sometimes scroll slightly (simulate user checking page)
+        if random.random() < 0.4:
+            scroll_amount = random.randint(50, 200)
+            automation.driver.execute_script(f"window.scrollBy(0, {scroll_amount});")
+            time.sleep(random.uniform(0.5, 1.5))
+        
+        # Sometimes move mouse (simulate user interaction)
+        if random.random() < 0.3:
+            automation._simulate_mouse_movement()
+        
+    except Exception as e:
+        logging.debug(f"Post-navigation behavior simulation failed: {e}")

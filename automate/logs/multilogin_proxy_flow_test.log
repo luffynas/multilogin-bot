@@ -144,3 +144,11 @@
 2025-08-24 06:53:32,198 - multilogin_api - INFO - ✅ Proxy connection successful for uk/england
 2025-08-24 06:53:35,369 - multilogin_api - INFO - 🔄 Getting proxy connection for au/new_south_wales...
 2025-08-24 06:53:35,750 - multilogin_api - INFO - ✅ Proxy connection successful for au/new_south_wales
+2025-08-25 01:12:12,427 - multilogin_api - INFO - Successfully authenticated with Multilogin X API
+2025-08-25 01:12:12,428 - multilogin_api - INFO - 🔍 Getting location data for profile: 2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6
+2025-08-25 01:12:12,631 - multilogin_api - ERROR - Error getting profile: 404 Client Error: Not Found for url: https://api.multilogin.com/profiles/2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6
+2025-08-25 01:12:12,631 - multilogin_api - ERROR - ❌ Profile not found: 2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6
+2025-08-25 01:29:57,869 - multilogin_api - INFO - Successfully authenticated with Multilogin X API
+2025-08-25 01:29:57,869 - multilogin_api - INFO - 🔍 Getting location data for profile: 2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6
+2025-08-25 01:29:58,088 - multilogin_api - ERROR - Error getting profile: 404 Client Error: Not Found for url: https://api.multilogin.com/profiles/2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6
+2025-08-25 01:29:58,089 - multilogin_api - ERROR - ❌ Profile not found: 2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6

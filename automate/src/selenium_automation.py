@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
@@ -20,12 +21,13 @@ import os
 import json
 
 class UndetectableSeleniumAutomation:
-    def __init__(self, config_path: str = "../config/config.yaml"):
+    def __init__(self, config_path: str = "../config/config.yaml", profile_id: str = None):
         """Initialize undetectable Selenium automation with comprehensive configuration"""
         self.config = self._load_config(config_path)
         self.logger = logging.getLogger(__name__)
         self.driver = None
         self.wait = None
+        self.profile_id = profile_id  # Store profile ID for consistent behavior
         
         # Load all selenium configurations from YAML
         selenium_config = self.config.get("selenium", {})
@@ -37,10 +39,10 @@ class UndetectableSeleniumAutomation:
             "random_delays": True,
             "natural_scrolling": True,
             "realistic_typing": True,
-            "min_delay": 1,
-            "max_delay": 5,
-            "scroll_interval_min": 0.5,  # Fixed: Use faster speed
-            "scroll_interval_max": 1.5   # Fixed: Use faster speed
+            "min_delay": 20,
+            "max_delay": 30,
+            "scroll_interval_min": 2.5,  # Fixed: Use faster speed
+            "scroll_interval_max": 5.0   # Fixed: Use faster speed
         })
         
         # Load click simulation configuration
@@ -56,7 +58,7 @@ class UndetectableSeleniumAutomation:
         self.traffic_config = self.human_behavior_config.get("traffic_generation", {
             "enabled": True,
             "natural_browsing_patterns": True,
-            "page_dwell_time": [30, 180],
+            "page_dwell_time": [300, 500],
             "scroll_behavior": "natural",
             "tab_switching": True,
             "bookmark_creation": True
@@ -74,9 +76,9 @@ class UndetectableSeleniumAutomation:
         
         # Load browsing behavior configuration from YAML
         self.browsing_config = selenium_config.get("browsing_behavior", {
-            "min_pages": 2,
-            "max_pages": 5,
-            "page_dwell_time": [30, 180],
+            "min_pages": 3,
+            "max_pages": 7,
+            "page_dwell_time": [300, 500],
             "navigation_probabilities": {
                 "category": 0.4,
                 "legal": 0.3,
@@ -253,71 +255,166 @@ class UndetectableSeleniumAutomation:
             self.logger.info("🌙 Night behavior: Very low energy, minimal activity")
     
     def _generate_user_personality(self) -> str:
-        """Generate consistent personality for each session using configuration weights"""
-        personalities = {
-            "explorer": {
-                "curiosity": "high",
-                "depth": "shallow", 
-                "speed": "fast",
-                "navigation_style": "random",
-                "attention_span": "short"
-            },
-            "researcher": {
-                "curiosity": "high",
-                "depth": "deep",
-                "speed": "slow", 
-                "navigation_style": "systematic",
-                "attention_span": "long"
-            },
-            "casual": {
-                "curiosity": "low",
-                "depth": "shallow",
-                "speed": "medium",
-                "navigation_style": "linear", 
-                "attention_span": "medium"
-            },
-            "professional": {
-                "curiosity": "medium",
-                "depth": "deep",
-                "speed": "medium",
-                "navigation_style": "efficient",
-                "attention_span": "long"
+        """Generate consistent personality based on profile ID hash"""
+        try:
+            # Get profile ID from session or generate a consistent one
+            profile_id = getattr(self, 'profile_id', None)
+            if not profile_id:
+                # Generate a consistent profile ID based on timestamp and random seed
+                import hashlib
+                profile_id = hashlib.md5(f"{datetime.now().strftime('%Y%m%d')}_{random.randint(1, 1000)}".encode()).hexdigest()
+            
+            # Clean profile ID by removing dashes and taking first 16 characters
+            clean_profile_id = profile_id.replace('-', '')[:16]
+            
+            # Ensure we have enough characters for hash calculation
+            if len(clean_profile_id) < 16:
+                # Pad with zeros if needed
+                clean_profile_id = clean_profile_id.ljust(16, '0')
+            
+            # Use profile ID hash to determine personality consistently
+            try:
+                hash_value = int(clean_profile_id[8:16], 16)  # Use next 8 characters of hash
+            except ValueError:
+                # If hex parsing fails, use simple hash of the string
+                hash_value = hash(clean_profile_id[8:16]) % 1000000
+            
+            personalities = {
+                "explorer": {
+                    "curiosity": "high",
+                    "depth": "shallow", 
+                    "speed": "fast",
+                    "navigation_style": "random",
+                    "attention_span": "short"
+                },
+                "researcher": {
+                    "curiosity": "high",
+                    "depth": "deep",
+                    "speed": "slow", 
+                    "navigation_style": "systematic",
+                    "attention_span": "long"
+                },
+                "casual": {
+                    "curiosity": "low",
+                    "depth": "shallow",
+                    "speed": "medium",
+                    "navigation_style": "linear", 
+                    "attention_span": "medium"
+                },
+                "professional": {
+                    "curiosity": "medium",
+                    "depth": "deep",
+                    "speed": "medium",
+                    "navigation_style": "efficient",
+                    "attention_span": "long"
+                }
             }
-        }
-        
-        # Use personality weights from configuration if available
-        personality_weights = self.advanced_config.get("personality_weights", {
-            "explorer": 0.25,
-            "researcher": 0.25,
-            "casual": 0.25,
-            "professional": 0.25
-        })
-        
-        # Generate personality based on weights
-        personality = random.choices(
-            list(personalities.keys()),
-            weights=list(personality_weights.values())
-        )[0]
-        
-        self.logger.info(f"🎭 Generated personality: {personality}")
-        return personality
+            
+            # Use personality weights from configuration if available
+            personality_weights = self.advanced_config.get("personality_weights", {
+                "explorer": 0.25,
+                "researcher": 0.25,
+                "casual": 0.25,
+                "professional": 0.25
+            })
+            
+            # Create weighted ranges for consistent personality assignment
+            personality_types = list(personalities.keys())
+            weights = list(personality_weights.values())
+            
+            # Normalize weights to 0-1 range
+            total_weight = sum(weights)
+            normalized_weights = [w/total_weight for w in weights]
+            
+            # Create cumulative ranges
+            cumulative_weights = []
+            cumulative = 0
+            for weight in normalized_weights:
+                cumulative += weight
+                cumulative_weights.append(cumulative)
+            
+            # Use hash value to determine personality consistently
+            hash_normalized = (hash_value % 1000) / 1000.0  # Normalize to 0-1
+            
+            # Find which range the hash falls into
+            for i, cumulative_weight in enumerate(cumulative_weights):
+                if hash_normalized <= cumulative_weight:
+                    personality = personality_types[i]
+                    break
+            else:
+                personality = personality_types[-1]  # Fallback to last personality
+            
+            self.logger.info(f"🎭 Profile-based personality: {personality} (hash: {hash_value}, clean_id: {clean_profile_id[:8]})")
+            return personality
+            
+        except Exception as e:
+            self.logger.error(f"Error in personality generation: {e}")
+            return "casual"  # Fallback
     
     def _detect_device_type(self) -> str:
-        """Detect device type from user agent or configuration using distribution weights"""
-        # Use device distribution from configuration
-        device_distribution = self.advanced_config.get("device_distribution", {
-            "desktop": 0.6,
-            "mobile": 0.3,
-            "tablet": 0.1
-        })
+        """Detect device type based on profile ID hash for consistent device assignment"""
+        try:
+            # Get profile ID from session or generate a consistent one
+            profile_id = getattr(self, 'profile_id', None)
+            if not profile_id:
+                # Generate a consistent profile ID based on timestamp and random seed
+                import hashlib
+                profile_id = hashlib.md5(f"{datetime.now().strftime('%Y%m%d')}_{random.randint(1, 1000)}".encode()).hexdigest()
+            
+            # Clean profile ID by removing dashes and taking first 16 characters
+            clean_profile_id = profile_id.replace('-', '')[:16]
+            
+            # Ensure we have enough characters for hash calculation
+            if len(clean_profile_id) < 16:
+                # Pad with zeros if needed
+                clean_profile_id = clean_profile_id.ljust(16, '0')
+            
+            # Use profile ID hash to determine device type consistently
+            try:
+                hash_value = int(clean_profile_id[:8], 16)  # Use first 8 characters of hash
+            except ValueError:
+                # If hex parsing fails, use simple hash of the string
+                hash_value = hash(clean_profile_id[:8]) % 1000000
+            
+            # Device distribution with profile-based consistency
+            device_distribution = self.advanced_config.get("device_distribution", {
+                "desktop": 0.6,
+                "mobile": 0.3,
+                "tablet": 0.1
+            })
+            
+            # Create weighted ranges for consistent device assignment
+            device_types = list(device_distribution.keys())
+            weights = list(device_distribution.values())
         
-        # Generate device type based on distribution weights
-        device_types = list(device_distribution.keys())
-        weights = list(device_distribution.values())
-        
-        device_type = random.choices(device_types, weights=weights)[0]
-        self.logger.info(f"📱 Detected device type: {device_type}")
-        return device_type
+            # Normalize weights to 0-1 range
+            total_weight = sum(weights)
+            normalized_weights = [w/total_weight for w in weights]
+            
+            # Create cumulative ranges
+            cumulative_weights = []
+            cumulative = 0
+            for weight in normalized_weights:
+                cumulative += weight
+                cumulative_weights.append(cumulative)
+            
+            # Use hash value to determine device type consistently
+            hash_normalized = (hash_value % 1000) / 1000.0  # Normalize to 0-1
+            
+            # Find which range the hash falls into
+            for i, cumulative_weight in enumerate(cumulative_weights):
+                if hash_normalized <= cumulative_weight:
+                    device_type = device_types[i]
+                    break
+            else:
+                device_type = device_types[-1]  # Fallback to last device type
+            
+            self.logger.info(f"📱 Profile-based device type: {device_type} (hash: {hash_value}, clean_id: {clean_profile_id[:8]})")
+            return device_type
+            
+        except Exception as e:
+            self.logger.error(f"Error in device type detection: {e}")
+            return "desktop"  # Fallback
     
     def _get_geo_specific_behavior(self, country: str) -> Dict:
         """Get behavior patterns specific to geographic location"""
@@ -455,7 +552,7 @@ class UndetectableSeleniumAutomation:
             self.logger.error(f"Error in mouse acceleration: {e}")
     
     def _simulate_attention_span_variation(self):
-        """Simulate realistic attention span variation"""
+        """Simulate realistic attention span variation based on device type and personality"""
         if not self.realistic_config.get("attention_span_variation", True):
             return
             
@@ -470,29 +567,52 @@ class UndetectableSeleniumAutomation:
             
             base_attention = personality_attention.get(self.user_personality, 0.5)
             
-            # Add random variation
-            attention_factor = base_attention + random.uniform(-0.2, 0.2)
+            # Device-specific attention adjustments
+            device_attention_modifier = {
+                "desktop": 1.0,       # Normal attention
+                "mobile": 0.7,        # Shorter attention (mobile users)
+                "tablet": 0.9         # Slightly shorter attention
+            }
+            
+            device_modifier = device_attention_modifier.get(self.device_type, 1.0)
+            
+            # Apply device modifier to base attention
+            adjusted_attention = base_attention * device_modifier
+            
+            # Add small random variation (±10% instead of ±20%)
+            attention_factor = adjusted_attention + random.uniform(-0.1, 0.1)
             attention_factor = max(0.1, min(1.0, attention_factor))
             
-            # Apply attention span to behavior
+            # Apply attention span to behavior with device-specific ranges
             if attention_factor < 0.3:
                 # Short attention - quick browsing
-                self.browsing_config["page_dwell_time"] = [10, 60]
-                self.logger.info("👁️ Short attention span: Quick browsing mode")
+                if self.device_type == "mobile":
+                    self.browsing_config["page_dwell_time"] = [5, 30]  # Even shorter for mobile
+                else:
+                    self.browsing_config["page_dwell_time"] = [10, 60]
+                self.logger.info(f"👁️ Short attention span: Quick browsing mode ({self.device_type})")
             elif attention_factor > 0.7:
                 # Long attention - detailed reading
-                self.browsing_config["page_dwell_time"] = [60, 300]
-                self.logger.info("👁️ Long attention span: Detailed reading mode")
+                if self.device_type == "desktop":
+                    self.browsing_config["page_dwell_time"] = [60, 300]  # Longer for desktop
+                else:
+                    self.browsing_config["page_dwell_time"] = [30, 180]  # Shorter for mobile/tablet
+                self.logger.info(f"👁️ Long attention span: Detailed reading mode ({self.device_type})")
             else:
                 # Medium attention - balanced
-                self.browsing_config["page_dwell_time"] = [30, 180]
-                self.logger.info("👁️ Medium attention span: Balanced mode")
+                if self.device_type == "mobile":
+                    self.browsing_config["page_dwell_time"] = [15, 90]  # Shorter for mobile
+                elif self.device_type == "tablet":
+                    self.browsing_config["page_dwell_time"] = [20, 120]  # Medium for tablet
+                else:
+                    self.browsing_config["page_dwell_time"] = [30, 180]  # Normal for desktop
+                self.logger.info(f"👁️ Medium attention span: Balanced mode ({self.device_type})")
                 
         except Exception as e:
             self.logger.error(f"Error in attention span variation: {e}")
     
     def _simulate_reading_speed_variation(self):
-        """Simulate realistic reading speed variation"""
+        """Simulate realistic reading speed variation based on device type and personality"""
         if not self.realistic_config.get("reading_speed_variation", True):
             return
             
@@ -507,23 +627,46 @@ class UndetectableSeleniumAutomation:
             
             base_speed = personality_speed.get(self.user_personality, 0.5)
             
-            # Add random variation
-            speed_factor = base_speed + random.uniform(-0.2, 0.2)
+            # Device-specific reading speed adjustments
+            device_speed_modifier = {
+                "desktop": 1.0,       # Normal reading speed
+                "mobile": 0.8,        # Slightly faster (mobile users scan more)
+                "tablet": 0.9         # Slightly faster than desktop
+            }
+            
+            device_modifier = device_speed_modifier.get(self.device_type, 1.0)
+            
+            # Apply device modifier to base speed
+            adjusted_speed = base_speed * device_modifier
+            
+            # Add small random variation (±10% instead of ±20%)
+            speed_factor = adjusted_speed + random.uniform(-0.1, 0.1)
             speed_factor = max(0.1, min(1.0, speed_factor))
             
-            # Apply reading speed to behavior
+            # Apply reading speed to behavior with device-specific characteristics
             if speed_factor < 0.3:
                 # Fast reader
-                self.browsing_config["reading_speed"] = "fast"
-                self.logger.info("📖 Fast reading speed: Quick scanning mode")
+                if self.device_type == "mobile":
+                    self.browsing_config["reading_speed"] = "very_fast"  # Mobile users scan quickly
+                else:
+                    self.browsing_config["reading_speed"] = "fast"
+                self.logger.info(f"📖 Fast reading speed: Quick scanning mode ({self.device_type})")
             elif speed_factor > 0.7:
                 # Slow reader
-                self.browsing_config["reading_speed"] = "slow"
-                self.logger.info("📖 Slow reading speed: Thorough reading mode")
+                if self.device_type == "desktop":
+                    self.browsing_config["reading_speed"] = "slow"  # Desktop users can read thoroughly
+                else:
+                    self.browsing_config["reading_speed"] = "medium"  # Mobile/tablet users don't read as slowly
+                self.logger.info(f"📖 Slow reading speed: Thorough reading mode ({self.device_type})")
             else:
                 # Medium speed
-                self.browsing_config["reading_speed"] = "medium"
-                self.logger.info("📖 Medium reading speed: Balanced mode")
+                if self.device_type == "mobile":
+                    self.browsing_config["reading_speed"] = "fast"  # Mobile users tend to read faster
+                elif self.device_type == "tablet":
+                    self.browsing_config["reading_speed"] = "medium"
+                else:
+                    self.browsing_config["reading_speed"] = "medium"
+                self.logger.info(f"📖 Medium reading speed: Balanced mode ({self.device_type})")
                 
         except Exception as e:
             self.logger.error(f"Error in reading speed variation: {e}")
@@ -534,6 +677,11 @@ class UndetectableSeleniumAutomation:
             return
             
         try:
+            # Check if driver is available and active
+            if not self.driver:
+                self.logger.debug("Browser navigation patterns skipped: No driver available")
+                return
+                
             # Simulate common browser navigation patterns
             navigation_patterns = [
                 "back_button_usage",
@@ -570,7 +718,7 @@ class UndetectableSeleniumAutomation:
             self.stealth_metrics["last_activity"] = datetime.now()
             
         except Exception as e:
-            self.logger.error(f"Error in browser navigation patterns: {e}")
+            self.logger.debug(f"Browser navigation patterns skipped: {e}")
     
     def _simulate_tab_switching(self):
         """Simulate realistic tab switching behavior"""
@@ -578,6 +726,11 @@ class UndetectableSeleniumAutomation:
             return
             
         try:
+            # Check if driver is available and active
+            if not self.driver:
+                self.logger.debug("Tab switching skipped: No driver available")
+                return
+                
             # Get current window handles
             handles = self.driver.window_handles
             
@@ -591,9 +744,11 @@ class UndetectableSeleniumAutomation:
                 
                 # Update stealth metrics
                 self.stealth_metrics["last_activity"] = datetime.now()
+            else:
+                self.logger.debug("Tab switching skipped: Only one tab available")
                 
         except Exception as e:
-            self.logger.error(f"Error in tab switching: {e}")
+            self.logger.debug(f"Tab switching skipped: {e}")
     
     def _simulate_bookmark_creation(self):
         """Simulate realistic bookmark creation behavior"""
@@ -601,6 +756,11 @@ class UndetectableSeleniumAutomation:
             return
             
         try:
+            # Check if driver is available and active
+            if not self.driver:
+                self.logger.debug("Bookmark creation skipped: No driver available")
+                return
+                
             # Simulate bookmark creation (5% chance)
             if random.random() < 0.05:
                 # Use keyboard shortcut Ctrl+D (or Cmd+D on Mac)
@@ -618,9 +778,11 @@ class UndetectableSeleniumAutomation:
                 
                 # Update stealth metrics
                 self.stealth_metrics["last_activity"] = datetime.now()
+            else:
+                self.logger.debug("Bookmark creation skipped: Random chance not met")
                 
         except Exception as e:
-            self.logger.error(f"Error in bookmark creation: {e}")
+            self.logger.debug(f"Bookmark creation skipped: {e}")
     
     def _detect_content_type(self) -> str:
         """Detect the type of content on the page"""
@@ -751,6 +913,1363 @@ class UndetectableSeleniumAutomation:
         except Exception as e:
             self.logger.debug(f"Error in smart ad interaction: {e}")
             return {"interaction_probability": 0.001, "dwell_time": "short", "relevance": "low"}
+    
+    def _smart_ad_interaction_for_rpm(self):
+        """Smart ad interaction to maximize RPM with commercial intent detection"""
+        try:
+            self.logger.info("💰 Smart ad interaction for RPM optimization...")
+            
+            # Analyze page content for commercial intent
+            page_text = self.driver.find_element(By.TAG_NAME, "body").text.lower()
+            page_title = self.driver.title.lower()
+            
+            # High-RPM commercial keywords
+            commercial_keywords = {
+                "finance": ["buy", "purchase", "apply", "quote", "compare", "best", "top", "review"],
+                "business": ["startup", "entrepreneur", "business plan", "funding", "investment"],
+                "healthcare": ["health insurance", "medical", "dental", "prescription", "coverage"],
+                "technology": ["software", "saas", "subscription", "premium", "enterprise"],
+                "legal": ["legal consultation", "attorney", "lawyer", "legal services", "advice"]
+            }
+            
+            # Calculate commercial intent score
+            commercial_score = 0
+            detected_category = None
+            
+            for category, keywords in commercial_keywords.items():
+                category_score = sum(1 for keyword in keywords if keyword in page_text or keyword in page_title)
+                if category_score > commercial_score:
+                    commercial_score = category_score
+                    detected_category = category
+            
+            self.logger.info(f"🎯 Commercial intent: {detected_category} (score: {commercial_score})")
+            
+            # Adjust click probability based on commercial intent
+            if commercial_score > 5:
+                click_probability = 0.15  # 15% for high commercial intent
+                dwell_time = "very_long"
+                engagement_level = "high"
+            elif commercial_score > 3:
+                click_probability = 0.10  # 10% for medium commercial intent
+                dwell_time = "long"
+                engagement_level = "medium"
+            elif commercial_score > 1:
+                click_probability = 0.05  # 5% for low commercial intent
+                dwell_time = "medium"
+                engagement_level = "low"
+            else:
+                click_probability = 0.02  # 2% for no commercial intent
+                dwell_time = "short"
+                engagement_level = "minimal"
+            
+            # Simulate realistic ad interaction based on commercial intent
+            if random.random() < click_probability:
+                self.logger.info(f"🎯 High-value ad interaction (commercial intent: {detected_category})")
+                self._simulate_high_value_ad_click(detected_category, engagement_level)
+            else:
+                self.logger.info(f"👀 Ad viewed but not clicked (commercial intent: {detected_category})")
+                self._simulate_ad_view_without_click(dwell_time)
+            
+            return {
+                "commercial_category": detected_category,
+                "commercial_score": commercial_score,
+                "click_probability": click_probability,
+                "dwell_time": dwell_time,
+                "engagement_level": engagement_level
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Error in smart ad interaction for RPM: {e}")
+            return {"error": str(e)}
+    
+    def _simulate_high_value_ad_click(self, category: str, engagement_level: str):
+        """Simulate high-value ad click behavior for RPM optimization"""
+        try:
+            self.logger.info(f"💎 Simulating high-value ad click for {category}...")
+            
+            # Pre-click behavior (extended engagement)
+            self._simulate_pre_click_engagement(engagement_level)
+            
+            # Click with realistic timing
+            time.sleep(random.uniform(3, 8))
+            
+            # Post-click behavior (landing page engagement)
+            self._simulate_landing_page_engagement(engagement_level)
+            
+            # Conversion intent simulation
+            self._simulate_conversion_behavior(category)
+            
+            # Return to original page with realistic timing
+            self._simulate_return_from_ad_click()
+            
+        except Exception as e:
+            self.logger.error(f"Error in high-value ad click: {e}")
+    
+    def _simulate_pre_click_engagement(self, engagement_level: str):
+        """Simulate pre-click engagement based on commercial intent"""
+        try:
+            self.logger.info(f"👀 Pre-click engagement ({engagement_level})...")
+            
+            # Engagement duration based on level
+            engagement_times = {
+                "high": random.uniform(15, 45),
+                "medium": random.uniform(8, 25),
+                "low": random.uniform(3, 12),
+                "minimal": random.uniform(1, 5)
+            }
+            
+            engagement_time = engagement_times.get(engagement_level, 10)
+            
+            # Simulate reading and scrolling
+            start_time = time.time()
+            while time.time() - start_time < engagement_time:
+                # Slow scrolling
+                scroll_amount = random.randint(50, 150)
+                self.driver.execute_script(f"window.scrollBy(0, {scroll_amount});")
+                time.sleep(random.uniform(1, 3))
+                
+                # Sometimes scroll back up (re-reading)
+                if random.random() < 0.3:
+                    self.driver.execute_script(f"window.scrollBy(0, -{scroll_amount//2});")
+                    time.sleep(random.uniform(1, 2))
+            
+        except Exception as e:
+            self.logger.error(f"Error in pre-click engagement: {e}")
+    
+    def _simulate_ad_view_without_click(self, dwell_time: str):
+        """Simulate ad view without click (realistic behavior)"""
+        try:
+            self.logger.info(f"👁️ Ad view without click ({dwell_time})...")
+            
+            # Dwell time based on commercial intent
+            dwell_times = {
+                "very_long": random.uniform(20, 60),
+                "long": random.uniform(10, 30),
+                "medium": random.uniform(5, 15),
+                "short": random.uniform(2, 8)
+            }
+            
+            view_time = dwell_times.get(dwell_time, 10)
+            
+            # Simulate viewing behavior
+            time.sleep(view_time)
+            
+            # Sometimes hover over ad (but don't click)
+            if random.random() < 0.4:  # 40% chance
+                self._simulate_ad_hover()
+            
+        except Exception as e:
+            self.logger.error(f"Error in ad view without click: {e}")
+    
+    def _simulate_ad_hover(self):
+        """Simulate hovering over ad without clicking"""
+        try:
+            self.logger.info("🖱️ Hovering over ad...")
+            
+            # Look for ad elements
+            ad_selectors = [
+                "ins.adsbygoogle",
+                "div[id*='google_ads']",
+                "div[class*='ad']",
+                "iframe[id*='google_ads']"
+            ]
+            
+            for selector in ad_selectors:
+                try:
+                    ad_elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if ad_elements:
+                        ad_element = random.choice(ad_elements)
+                        if ad_element.is_displayed():
+                            # Hover over ad
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(ad_element)
+                            actions.pause(random.uniform(2, 5))
+                            actions.perform()
+                            
+                            # Wait a bit then move away
+                            time.sleep(random.uniform(1, 3))
+                            break
+                except:
+                    continue
+            
+        except Exception as e:
+            self.logger.error(f"Error in ad hover: {e}")
+    
+    def _simulate_conversion_behavior(self, category: str):
+        """Simulate conversion intent behavior based on category"""
+        try:
+            self.logger.info(f"💰 Simulating conversion behavior for {category}...")
+            
+            # Category-specific conversion behaviors
+            conversion_behaviors = {
+                "finance": self._simulate_finance_conversion,
+                "business": self._simulate_business_conversion,
+                "healthcare": self._simulate_healthcare_conversion,
+                "technology": self._simulate_technology_conversion,
+                "legal": self._simulate_legal_conversion
+            }
+            
+            conversion_method = conversion_behaviors.get(category)
+            if conversion_method:
+                conversion_method()
+            
+        except Exception as e:
+            self.logger.error(f"Error in conversion behavior: {e}")
+    
+    def _simulate_finance_conversion(self):
+        """Simulate finance-related conversion behavior"""
+        try:
+            self.logger.info("💳 Simulating finance conversion...")
+            
+            # Look for finance-related elements
+            finance_selectors = [
+                "button[class*='apply']",
+                "button[class*='quote']",
+                "a[href*='apply']",
+                "a[href*='quote']",
+                "input[placeholder*='income']",
+                "input[placeholder*='credit']"
+            ]
+            
+            for selector in finance_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            # Hover over element
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(element)
+                            actions.pause(random.uniform(2, 4))
+                            actions.perform()
+                            
+                            # Sometimes click (low probability)
+                            if random.random() < 0.1:  # 10% chance
+                                self.logger.info("💳 Clicking finance conversion element")
+                                element.click()
+                                time.sleep(random.uniform(5, 10))
+                            break
+                except:
+                    continue
+            
+        except Exception as e:
+            self.logger.error(f"Error in finance conversion: {e}")
+    
+    def _simulate_business_conversion(self):
+        """Simulate business-related conversion behavior"""
+        try:
+            self.logger.info("🏢 Simulating business conversion...")
+            
+            # Look for business-related elements
+            business_selectors = [
+                "button[class*='start']",
+                "button[class*='plan']",
+                "a[href*='consultation']",
+                "a[href*='demo']",
+                "input[placeholder*='company']",
+                "input[placeholder*='business']"
+            ]
+            
+            for selector in business_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            # Hover over element
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(element)
+                            actions.pause(random.uniform(2, 4))
+                            actions.perform()
+                            
+                            # Sometimes click (low probability)
+                            if random.random() < 0.08:  # 8% chance
+                                self.logger.info("🏢 Clicking business conversion element")
+                                element.click()
+                                time.sleep(random.uniform(5, 10))
+                            break
+                except:
+                    continue
+            
+        except Exception as e:
+            self.logger.error(f"Error in business conversion: {e}")
+    
+    def _simulate_healthcare_conversion(self):
+        """Simulate healthcare-related conversion behavior"""
+        try:
+            self.logger.info("🏥 Simulating healthcare conversion...")
+            
+            # Look for healthcare-related elements
+            healthcare_selectors = [
+                "button[class*='enroll']",
+                "button[class*='coverage']",
+                "a[href*='quote']",
+                "a[href*='enroll']",
+                "input[placeholder*='medical']",
+                "input[placeholder*='health']"
+            ]
+            
+            for selector in healthcare_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            # Hover over element
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(element)
+                            actions.pause(random.uniform(2, 4))
+                            actions.perform()
+                            
+                            # Sometimes click (low probability)
+                            if random.random() < 0.12:  # 12% chance
+                                self.logger.info("🏥 Clicking healthcare conversion element")
+                                element.click()
+                                time.sleep(random.uniform(5, 10))
+                            break
+                except:
+                    continue
+            
+        except Exception as e:
+            self.logger.error(f"Error in healthcare conversion: {e}")
+    
+    def _simulate_technology_conversion(self):
+        """Simulate technology-related conversion behavior"""
+        try:
+            self.logger.info("💻 Simulating technology conversion...")
+            
+            # Look for technology-related elements
+            tech_selectors = [
+                "button[class*='trial']",
+                "button[class*='demo']",
+                "a[href*='trial']",
+                "a[href*='demo']",
+                "input[placeholder*='email']",
+                "input[placeholder*='company']"
+            ]
+            
+            for selector in tech_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            # Hover over element
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(element)
+                            actions.pause(random.uniform(2, 4))
+                            actions.perform()
+                            
+                            # Sometimes click (low probability)
+                            if random.random() < 0.15:  # 15% chance
+                                self.logger.info("💻 Clicking technology conversion element")
+                                element.click()
+                                time.sleep(random.uniform(5, 10))
+                            break
+                except:
+                    continue
+            
+        except Exception as e:
+            self.logger.error(f"Error in technology conversion: {e}")
+    
+    def _simulate_legal_conversion(self):
+        """Simulate legal-related conversion behavior"""
+        try:
+            self.logger.info("⚖️ Simulating legal conversion...")
+            
+            # Look for legal-related elements
+            legal_selectors = [
+                "button[class*='consultation']",
+                "button[class*='advice']",
+                "a[href*='consultation']",
+                "a[href*='advice']",
+                "input[placeholder*='case']",
+                "input[placeholder*='legal']"
+            ]
+            
+            for selector in legal_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            # Hover over element
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(element)
+                            actions.pause(random.uniform(2, 4))
+                            actions.perform()
+                            
+                            # Sometimes click (low probability)
+                            if random.random() < 0.06:  # 6% chance
+                                self.logger.info("⚖️ Clicking legal conversion element")
+                                element.click()
+                                time.sleep(random.uniform(5, 10))
+                            break
+                except:
+                    continue
+            
+        except Exception as e:
+            self.logger.error(f"Error in legal conversion: {e}")
+    
+    def _simulate_return_from_ad_click(self):
+        """Simulate realistic return from ad click"""
+        try:
+            self.logger.info("⬅️ Returning from ad click...")
+            
+            # Wait realistic time on landing page
+            landing_page_time = random.uniform(10, 30)
+            time.sleep(landing_page_time)
+            
+            # Return to original page
+            self.driver.back()
+            time.sleep(random.uniform(2, 5))
+            
+            # Continue browsing
+            self._simulate_continued_browsing()
+            
+        except Exception as e:
+            self.logger.error(f"Error in return from ad click: {e}")
+    
+    def _simulate_continued_browsing(self):
+        """Simulate continued browsing after ad interaction"""
+        try:
+            self.logger.info("📖 Continuing browsing after ad interaction...")
+            
+            # Continue reading content
+            reading_time = random.uniform(20, 60)
+            time.sleep(reading_time)
+            
+            # Sometimes navigate to related content
+            if random.random() < 0.3:  # 30% chance
+                self._simulate_related_content_navigation()
+            
+        except Exception as e:
+            self.logger.error(f"Error in continued browsing: {e}")
+    
+    def _simulate_related_content_navigation(self):
+        """Simulate navigation to related content"""
+        try:
+            self.logger.info("🔗 Navigating to related content...")
+            
+            # Look for related content links
+            related_selectors = [
+                "a[href*='related']",
+                "a[href*='similar']",
+                "a[href*='more']",
+                ".related-posts a",
+                ".similar-articles a"
+            ]
+            
+            for selector in related_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            # Click on related content
+                            element.click()
+                            time.sleep(random.uniform(15, 30))
+                            break
+                except:
+                    continue
+            
+        except Exception as e:
+            self.logger.error(f"Error in related content navigation: {e}")
+    
+    def _simulate_extended_session_behavior(self):
+        """Simulate extended session behavior for high-RPM optimization"""
+        try:
+            self.logger.info("⏰ Simulating extended session behavior...")
+            
+            # Extended session configuration
+            session_config = {
+                "duration": random.uniform(300, 1800),  # 5-30 minutes
+                "page_views": random.randint(8, 25),
+                "engagement_level": "high",
+                "return_visits": random.randint(1, 3)
+            }
+            
+            self.logger.info(f"📊 Extended session: {session_config['duration']/60:.1f}min, {session_config['page_views']} pages")
+            
+            # Start extended session
+            self._simulate_session_startup()
+            
+            # Core session activities
+            self._simulate_core_session_activities(session_config)
+            
+            # Break and return visits
+            self._simulate_session_breaks(session_config)
+            
+            # Session conclusion
+            self._simulate_session_conclusion()
+            
+            return session_config
+            
+        except Exception as e:
+            self.logger.error(f"Error in extended session behavior: {e}")
+            return {"error": str(e)}
+    
+    def _simulate_session_startup(self):
+        """Simulate realistic session startup behavior"""
+        try:
+            self.logger.info("🚀 Simulating session startup...")
+            
+            # Initial page load behavior
+            load_time = random.uniform(3, 8)
+            time.sleep(load_time)
+            
+            # Check for notifications or popups
+            self._simulate_notification_handling()
+            
+            # Initial page exploration
+            self._simulate_initial_exploration()
+            
+            # Set session mood/context
+            self._simulate_session_context_setting()
+            
+        except Exception as e:
+            self.logger.error(f"Error in session startup: {e}")
+    
+    def _simulate_notification_handling(self):
+        """Simulate handling notifications and popups"""
+        try:
+            self.logger.info("🔔 Handling notifications...")
+            
+            # Look for common notification elements
+            notification_selectors = [
+                ".notification",
+                ".popup",
+                ".modal",
+                ".alert",
+                ".cookie-banner",
+                ".newsletter-signup"
+            ]
+            
+            for selector in notification_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        for element in elements[:2]:  # Handle first 2 notifications
+                            if element.is_displayed():
+                                # Sometimes close notification
+                                if random.random() < 0.7:  # 70% chance
+                                    close_selectors = [
+                                        ".close",
+                                        ".dismiss",
+                                        ".cancel",
+                                        "[aria-label='Close']",
+                                        "button[type='button']"
+                                    ]
+                                    
+                                    for close_selector in close_selectors:
+                                        try:
+                                            close_btn = element.find_element(By.CSS_SELECTOR, close_selector)
+                                            if close_btn.is_displayed():
+                                                self.logger.info("❌ Closing notification")
+                                                close_btn.click()
+                                                time.sleep(random.uniform(1, 3))
+                                                break
+                                        except:
+                                            continue
+                                else:
+                                    # Sometimes interact with notification
+                                    self.logger.info("✅ Interacting with notification")
+                                    time.sleep(random.uniform(2, 5))
+                except:
+                    continue
+            
+        except Exception as e:
+            self.logger.error(f"Error in notification handling: {e}")
+    
+    def _simulate_initial_exploration(self):
+        """Simulate initial page exploration behavior"""
+        try:
+            self.logger.info("🔍 Initial page exploration...")
+            
+            # Quick scan of page content
+            scan_time = random.uniform(5, 15)
+            start_time = time.time()
+            
+            while time.time() - start_time < scan_time:
+                # Quick scrolling to understand page structure
+                scroll_amount = random.randint(100, 300)
+                self.driver.execute_script(f"window.scrollBy(0, {scroll_amount});")
+                time.sleep(random.uniform(0.5, 1.5))
+                
+                # Sometimes scroll back up
+                if random.random() < 0.2:
+                    self.driver.execute_script(f"window.scrollBy(0, -{scroll_amount//2});")
+                    time.sleep(random.uniform(0.5, 1))
+            
+            # Return to top
+            self.driver.execute_script("window.scrollTo(0, 0);")
+            time.sleep(random.uniform(1, 3))
+            
+        except Exception as e:
+            self.logger.error(f"Error in initial exploration: {e}")
+    
+    def _simulate_session_context_setting(self):
+        """Simulate setting session context and mood"""
+        try:
+            self.logger.info("🎭 Setting session context...")
+            
+            # Session context based on personality and time
+            contexts = {
+                "explorer": ["research", "discovery", "learning"],
+                "researcher": ["analysis", "comparison", "study"],
+                "casual": ["entertainment", "browsing", "relaxation"],
+                "professional": ["work", "business", "productivity"]
+            }
+            
+            available_contexts = contexts.get(self.user_personality, ["general"])
+            session_context = random.choice(available_contexts)
+            
+            self.logger.info(f"🎯 Session context: {session_context}")
+            
+            # Adjust behavior based on context
+            if session_context == "research":
+                self._simulate_research_context()
+            elif session_context == "work":
+                self._simulate_work_context()
+            elif session_context == "entertainment":
+                self._simulate_entertainment_context()
+            else:
+                self._simulate_general_context()
+            
+        except Exception as e:
+            self.logger.error(f"Error in session context setting: {e}")
+    
+    def _simulate_core_session_activities(self, session_config: Dict):
+        """Simulate core session activities for extended sessions"""
+        try:
+            self.logger.info("🎯 Core session activities...")
+            
+            target_pages = session_config["page_views"]
+            pages_visited = 0
+            
+            while pages_visited < target_pages:
+                # Page-specific behavior
+                self._simulate_page_specific_behavior()
+                
+                # Navigation decision
+                if pages_visited < target_pages - 1:
+                    navigation_result = self._simulate_intelligent_navigation()
+                    if navigation_result:
+                        pages_visited += 1
+                        self.logger.info(f"📄 Page {pages_visited}/{target_pages} completed")
+                    else:
+                        # If no navigation found, simulate staying on current page
+                        self._simulate_extended_page_engagement()
+                else:
+                    # Last page - extended engagement
+                    self._simulate_final_page_engagement()
+                    pages_visited += 1
+                
+                # Session breaks
+                if random.random() < 0.3:  # 30% chance of break
+                    self._simulate_mini_break()
+            
+        except Exception as e:
+            self.logger.error(f"Error in core session activities: {e}")
+    
+    def _simulate_page_specific_behavior(self):
+        """Simulate behavior specific to current page type"""
+        try:
+            self.logger.info("📖 Page-specific behavior...")
+            
+            # Detect page type
+            page_type = self._detect_page_type()
+            
+            # Apply page-specific behavior
+            if page_type == "article":
+                self._simulate_article_reading_behavior()
+            elif page_type == "product":
+                self._simulate_product_page_behavior()
+            elif page_type == "category":
+                self._simulate_category_page_behavior()
+            elif page_type == "landing":
+                self._simulate_landing_page_behavior()
+            else:
+                self._simulate_general_page_behavior()
+            
+        except Exception as e:
+            self.logger.error(f"Error in page-specific behavior: {e}")
+    
+    def _detect_page_type(self) -> str:
+        """Detect the type of current page"""
+        try:
+            current_url = self.driver.current_url.lower()
+            page_title = self.driver.title.lower()
+            
+            # Article indicators
+            if any(word in current_url for word in ["/article/", "/post/", "/blog/", "/news/"]):
+                return "article"
+            
+            # Product indicators
+            if any(word in current_url for word in ["/product/", "/item/", "/buy/", "/shop/"]):
+                return "product"
+            
+            # Category indicators
+            if any(word in current_url for word in ["/category/", "/tag/", "/listing/"]):
+                return "category"
+            
+            # Landing page indicators
+            if any(word in page_title for word in ["home", "welcome", "landing"]):
+                return "landing"
+            
+            return "general"
+            
+        except Exception as e:
+            self.logger.error(f"Error detecting page type: {e}")
+            return "general"
+    
+    def _simulate_article_reading_behavior(self):
+        """Simulate realistic article reading behavior"""
+        try:
+            self.logger.info("📰 Article reading behavior...")
+            
+            # Reading time based on content length
+            content_length = len(self.driver.find_element(By.TAG_NAME, "body").text)
+            reading_time = min(content_length / 100, 120)  # Max 2 minutes
+            
+            # Simulate reading with pauses
+            start_time = time.time()
+            while time.time() - start_time < reading_time:
+                # Slow scrolling
+                scroll_amount = random.randint(50, 150)
+                self.driver.execute_script(f"window.scrollBy(0, {scroll_amount});")
+                time.sleep(random.uniform(2, 4))
+                
+                # Reading pauses
+                if random.random() < 0.3:
+                    pause_time = random.uniform(3, 8)
+                    time.sleep(pause_time)
+                
+                # Sometimes highlight text (simulate)
+                if random.random() < 0.1:
+                    self._simulate_text_selection()
+            
+        except Exception as e:
+            self.logger.error(f"Error in article reading: {e}")
+    
+    def _simulate_product_page_behavior(self):
+        """Simulate product page interaction behavior"""
+        try:
+            self.logger.info("🛍️ Product page behavior...")
+            
+            # Look at product images
+            self._simulate_image_viewing()
+            
+            # Read product description
+            self._simulate_description_reading()
+            
+            # Check reviews/ratings
+            self._simulate_review_checking()
+            
+            # Sometimes add to cart (low probability)
+            if random.random() < 0.05:  # 5% chance
+                self._simulate_add_to_cart()
+            
+        except Exception as e:
+            self.logger.error(f"Error in product page behavior: {e}")
+    
+    def _simulate_category_page_behavior(self):
+        """Simulate category page browsing behavior"""
+        try:
+            self.logger.info("📋 Category page behavior...")
+            
+            # Browse through items
+            items_to_browse = random.randint(3, 8)
+            
+            for i in range(items_to_browse):
+                # Scroll to next item
+                scroll_amount = random.randint(200, 400)
+                self.driver.execute_script(f"window.scrollBy(0, {scroll_amount});")
+                time.sleep(random.uniform(1, 3))
+                
+                # Sometimes hover over item
+                if random.random() < 0.4:
+                    self._simulate_item_hover()
+                
+                # Sometimes click on item (low probability)
+                if random.random() < 0.1:
+                    self._simulate_item_click()
+                    break
+            
+        except Exception as e:
+            self.logger.error(f"Error in category page behavior: {e}")
+    
+    def _simulate_intelligent_navigation(self) -> bool:
+        """Simulate intelligent navigation between pages"""
+        try:
+            self.logger.info("🧭 Intelligent navigation...")
+            
+            # Try different navigation methods
+            navigation_methods = [
+                self._navigate_previous_next,
+                self._navigate_random_page,
+                self._navigate_related_content,
+                self._navigate_search_results
+            ]
+            
+            for method in navigation_methods:
+                try:
+                    result = method()
+                    if result:
+                        self.logger.info(f"✅ Navigation successful: {result[:50]}...")
+                        return True
+                except Exception as e:
+                    self.logger.debug(f"Navigation method failed: {e}")
+                    continue
+            
+            return False
+            
+        except Exception as e:
+            self.logger.error(f"Error in intelligent navigation: {e}")
+            return False
+    
+    def _navigate_related_content(self) -> Optional[str]:
+        """Navigate to related content on the page"""
+        try:
+            if not self.driver:
+                return None
+                
+            # Look for related content links
+            related_selectors = [
+                "a[href*='related']",
+                "a[href*='similar']", 
+                ".related-posts a",
+                ".similar-articles a",
+                ".related-content a",
+                ".more-articles a",
+                ".recommended a"
+            ]
+            
+            for selector in related_selectors:
+                try:
+                    related_links = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if related_links:
+                        # Click on a random related link
+                        random_link = random.choice(related_links)
+                        if random_link.is_displayed() and random_link.is_enabled():
+                            href = random_link.get_attribute('href')
+                            self.driver.execute_script("arguments[0].click();", random_link)
+                            self.logger.info(f"🔗 Navigated to related content: {href[:50]}...")
+                            return href
+                except Exception as e:
+                    self.logger.debug(f"Selector {selector} failed: {e}")
+                    continue
+            
+            return None
+            
+        except Exception as e:
+            self.logger.error(f"Error navigating to related content: {e}")
+            return None
+    
+    def _simulate_extended_page_engagement(self):
+        """Simulate extended engagement on current page"""
+        try:
+            self.logger.info("⏰ Extended page engagement...")
+            
+            # Extended reading time
+            extended_time = random.uniform(30, 90)
+            start_time = time.time()
+            
+            while time.time() - start_time < extended_time:
+                # Deep scrolling
+                scroll_amount = random.randint(30, 100)
+                self.driver.execute_script(f"window.scrollBy(0, {scroll_amount});")
+                time.sleep(random.uniform(2, 5))
+                
+                # Interactive elements
+                if random.random() < 0.2:
+                    self._simulate_interactive_element_interaction()
+                
+                # Content sharing (simulate)
+                if random.random() < 0.1:
+                    self._simulate_content_sharing()
+            
+        except Exception as e:
+            self.logger.error(f"Error in extended page engagement: {e}")
+    
+    def _simulate_final_page_engagement(self):
+        """Simulate final page engagement before session end"""
+        try:
+            self.logger.info("🏁 Final page engagement...")
+            
+            # Comprehensive page review
+            self._simulate_page_review()
+            
+            # Bookmark or save content
+            if random.random() < 0.3:
+                self._simulate_content_saving()
+            
+            # Share content (simulate)
+            if random.random() < 0.2:
+                self._simulate_content_sharing()
+            
+            # Return to top
+            self.driver.execute_script("window.scrollTo(0, 0);")
+            time.sleep(random.uniform(2, 5))
+            
+        except Exception as e:
+            self.logger.error(f"Error in final page engagement: {e}")
+    
+    def _simulate_session_breaks(self, session_config: Dict):
+        """Simulate realistic session breaks"""
+        try:
+            self.logger.info("☕ Session breaks...")
+            
+            num_breaks = session_config.get("return_visits", 1)
+            
+            for break_num in range(num_breaks):
+                # Simulate break
+                self._simulate_break_activity()
+                
+                # Return to browsing
+                if break_num < num_breaks - 1:
+                    self._simulate_return_from_break()
+            
+        except Exception as e:
+            self.logger.error(f"Error in session breaks: {e}")
+    
+    def _simulate_break_activity(self):
+        """Simulate realistic break activities"""
+        try:
+            self.logger.info("⏸️ Break activity...")
+            
+            # Break duration
+            break_time = random.uniform(60, 300)  # 1-5 minutes
+            self.logger.info(f"☕ Break time: {break_time/60:.1f} minutes")
+            
+            # Simulate break (just wait)
+            time.sleep(min(break_time, 10))  # Cap at 10 seconds for testing
+            
+            # Sometimes switch tabs (simulate other activities)
+            if random.random() < 0.3:
+                self._simulate_tab_switching()
+            
+        except Exception as e:
+            self.logger.error(f"Error in break activity: {e}")
+    
+    def _simulate_return_from_break(self):
+        """Simulate returning from break"""
+        try:
+            self.logger.info("🔄 Returning from break...")
+            
+            # Refresh page or navigate
+            if random.random() < 0.5:
+                self.driver.refresh()
+                time.sleep(random.uniform(3, 8))
+            else:
+                # Navigate to new page
+                new_url = self._navigate_random_page()
+                if new_url:
+                    self.driver.get(new_url)
+                    time.sleep(random.uniform(3, 8))
+            
+            # Resume browsing
+            self._simulate_resume_browsing()
+            
+        except Exception as e:
+            self.logger.error(f"Error in return from break: {e}")
+    
+    def _simulate_session_conclusion(self):
+        """Simulate realistic session conclusion"""
+        try:
+            self.logger.info("🏁 Session conclusion...")
+            
+            # Final page review
+            self._simulate_final_page_review()
+            
+            # Cleanup activities
+            self._simulate_session_cleanup()
+            
+            # Session summary
+            self._simulate_session_summary()
+            
+        except Exception as e:
+            self.logger.error(f"Error in session conclusion: {e}")
+    
+    def _simulate_final_page_review(self):
+        """Simulate final page review before ending session"""
+        try:
+            self.logger.info("👀 Final page review...")
+            
+            # Scroll to top
+            self.driver.execute_script("window.scrollTo(0, 0);")
+            time.sleep(random.uniform(2, 4))
+            
+            # Quick scan of page
+            scan_time = random.uniform(5, 15)
+            start_time = time.time()
+            
+            while time.time() - start_time < scan_time:
+                # Quick scrolling
+                scroll_amount = random.randint(100, 200)
+                self.driver.execute_script(f"window.scrollBy(0, {scroll_amount});")
+                time.sleep(random.uniform(1, 2))
+            
+            # Return to top
+            self.driver.execute_script("window.scrollTo(0, 0);")
+            time.sleep(random.uniform(1, 3))
+            
+        except Exception as e:
+            self.logger.error(f"Error in final page review: {e}")
+    
+    def _simulate_session_cleanup(self):
+        """Simulate session cleanup activities"""
+        try:
+            self.logger.info("🧹 Session cleanup...")
+            
+            # Close unnecessary tabs
+            if len(self.driver.window_handles) > 1:
+                self._simulate_tab_cleanup()
+            
+            # Clear some browser data (simulate)
+            if random.random() < 0.2:
+                self._simulate_browser_cleanup()
+            
+        except Exception as e:
+            self.logger.error(f"Error in session cleanup: {e}")
+    
+    def _simulate_session_summary(self):
+        """Simulate session summary and reflection"""
+        try:
+            self.logger.info("📊 Session summary...")
+            
+            # Session duration calculation
+            session_duration = random.uniform(300, 1800)  # 5-30 minutes
+            pages_visited = random.randint(8, 25)
+            
+            self.logger.info(f"✅ Session completed: {session_duration/60:.1f}min, {pages_visited} pages")
+            
+            # Sometimes bookmark final page
+            if random.random() < 0.3:
+                self._simulate_bookmark_creation()
+            
+        except Exception as e:
+            self.logger.error(f"Error in session summary: {e}")
+    
+    # Helper methods for extended session behavior
+    def _simulate_research_context(self):
+        """Simulate research-focused session context"""
+        try:
+            self.logger.info("🔬 Research context...")
+            # Research behavior is already implemented in other methods
+            time.sleep(random.uniform(2, 5))
+        except Exception as e:
+            self.logger.error(f"Error in research context: {e}")
+    
+    def _simulate_work_context(self):
+        """Simulate work-focused session context"""
+        try:
+            self.logger.info("💼 Work context...")
+            # Work behavior is already implemented in professional methods
+            time.sleep(random.uniform(2, 5))
+        except Exception as e:
+            self.logger.error(f"Error in work context: {e}")
+    
+    def _simulate_entertainment_context(self):
+        """Simulate entertainment-focused session context"""
+        try:
+            self.logger.info("🎮 Entertainment context...")
+            # Entertainment behavior - faster browsing, less engagement
+            time.sleep(random.uniform(1, 3))
+        except Exception as e:
+            self.logger.error(f"Error in entertainment context: {e}")
+    
+    def _simulate_general_context(self):
+        """Simulate general browsing context"""
+        try:
+            self.logger.info("🌐 General context...")
+            # General browsing behavior
+            time.sleep(random.uniform(2, 4))
+        except Exception as e:
+            self.logger.error(f"Error in general context: {e}")
+    
+    def _simulate_mini_break(self):
+        """Simulate mini break during session"""
+        try:
+            self.logger.info("☕ Mini break...")
+            break_time = random.uniform(10, 30)
+            time.sleep(min(break_time, 5))  # Cap at 5 seconds for testing
+        except Exception as e:
+            self.logger.error(f"Error in mini break: {e}")
+    
+    def _simulate_navigate_related_content(self):
+        """Navigate to related content"""
+        try:
+            return self._navigate_random_page()
+        except Exception as e:
+            self.logger.error(f"Error in related content navigation: {e}")
+            return None
+    
+    def _simulate_navigate_search_results(self):
+        """Navigate to search results"""
+        try:
+            # Simulate search behavior
+            search_queries = ["best", "top", "review", "guide", "how to"]
+            return None  # For now, return None as search navigation is complex
+        except Exception as e:
+            self.logger.error(f"Error in search navigation: {e}")
+            return None
+    
+    def _navigate_search_results(self) -> Optional[str]:
+        """Navigate to search results page"""
+        try:
+            if not self.driver:
+                return None
+                
+            # Look for search functionality
+            search_selectors = [
+                "input[type='search']",
+                "input[name*='search']",
+                "input[placeholder*='search']",
+                ".search-input",
+                "#search"
+            ]
+            
+            for selector in search_selectors:
+                try:
+                    search_inputs = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if search_inputs:
+                        search_input = search_inputs[0]
+                        if search_input.is_displayed() and search_input.is_enabled():
+                            # Type a search query
+                            search_queries = ["best", "top", "review", "guide", "how to"]
+                            query = random.choice(search_queries)
+                            search_input.clear()
+                            search_input.send_keys(query)
+                            time.sleep(random.uniform(1, 2))
+                            
+                            # Submit search
+                            search_input.send_keys(Keys.RETURN)
+                            self.logger.info(f"🔍 Searched for: {query}")
+                            return f"search_results_{query}"
+                except Exception as e:
+                    self.logger.debug(f"Search selector {selector} failed: {e}")
+                    continue
+            
+            return None
+            
+        except Exception as e:
+            self.logger.error(f"Error navigating to search results: {e}")
+            return None
+    
+    def _simulate_text_selection(self):
+        """Simulate text selection behavior"""
+        try:
+            self.logger.info("📝 Text selection...")
+            # Simulate text selection (just wait)
+            time.sleep(random.uniform(1, 3))
+        except Exception as e:
+            self.logger.error(f"Error in text selection: {e}")
+    
+    def _simulate_image_viewing(self):
+        """Simulate image viewing behavior"""
+        try:
+            self.logger.info("🖼️ Image viewing...")
+            # Look for images and simulate viewing
+            images = self.driver.find_elements(By.TAG_NAME, "img")
+            if images:
+                # Simulate viewing first few images
+                for img in images[:3]:
+                    if img.is_displayed():
+                        actions = ActionChains(self.driver)
+                        actions.move_to_element(img)
+                        actions.pause(random.uniform(1, 3))
+                        actions.perform()
+                        time.sleep(random.uniform(1, 2))
+        except Exception as e:
+            self.logger.error(f"Error in image viewing: {e}")
+    
+    def _simulate_description_reading(self):
+        """Simulate product description reading"""
+        try:
+            self.logger.info("📖 Description reading...")
+            # Simulate reading product description
+            reading_time = random.uniform(10, 30)
+            time.sleep(min(reading_time, 5))  # Cap for testing
+        except Exception as e:
+            self.logger.error(f"Error in description reading: {e}")
+    
+    def _simulate_review_checking(self):
+        """Simulate checking reviews and ratings"""
+        try:
+            self.logger.info("⭐ Review checking...")
+            # Look for review elements
+            review_selectors = [".review", ".rating", ".stars", "[class*='review']"]
+            for selector in review_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        time.sleep(random.uniform(2, 5))
+                        break
+                except:
+                    continue
+        except Exception as e:
+            self.logger.error(f"Error in review checking: {e}")
+    
+    def _simulate_add_to_cart(self):
+        """Simulate add to cart behavior"""
+        try:
+            self.logger.info("🛒 Add to cart...")
+            # Look for add to cart buttons
+            cart_selectors = ["button[class*='cart']", "button[class*='buy']", ".add-to-cart"]
+            for selector in cart_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            # Hover over button
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(element)
+                            actions.pause(random.uniform(1, 3))
+                            actions.perform()
+                            break
+                except:
+                    continue
+        except Exception as e:
+            self.logger.error(f"Error in add to cart: {e}")
+    
+    def _simulate_item_hover(self):
+        """Simulate hovering over items"""
+        try:
+            # Look for items to hover over
+            item_selectors = [".item", ".product", ".card", ".box"]
+            for selector in item_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(element)
+                            actions.pause(random.uniform(1, 3))
+                            actions.perform()
+                            break
+                except:
+                    continue
+        except Exception as e:
+            self.logger.error(f"Error in item hover: {e}")
+    
+    def _simulate_item_click(self):
+        """Simulate clicking on items"""
+        try:
+            self.logger.info("🖱️ Item click...")
+            # Look for clickable items
+            item_selectors = ["a", ".item a", ".product a", ".card a"]
+            for selector in item_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            element.click()
+                            time.sleep(random.uniform(5, 10))
+                            self.driver.back()
+                            time.sleep(random.uniform(2, 5))
+                            break
+                except:
+                    continue
+        except Exception as e:
+            self.logger.error(f"Error in item click: {e}")
+    
+    def _simulate_interactive_element_interaction(self):
+        """Simulate interaction with interactive elements"""
+        try:
+            # Look for interactive elements
+            interactive_selectors = ["button", "a", "input", ".interactive"]
+            for selector in interactive_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            # Hover over element
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(element)
+                            actions.pause(random.uniform(1, 2))
+                            actions.perform()
+                            break
+                except:
+                    continue
+        except Exception as e:
+            self.logger.error(f"Error in interactive element interaction: {e}")
+    
+    def _simulate_content_sharing(self):
+        """Simulate content sharing behavior"""
+        try:
+            self.logger.info("📤 Content sharing...")
+            # Look for share buttons
+            share_selectors = [".share", ".social", "[class*='share']"]
+            for selector in share_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        # Just hover over share button (don't actually share)
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(element)
+                            actions.pause(random.uniform(1, 3))
+                            actions.perform()
+                            break
+                except:
+                    continue
+        except Exception as e:
+            self.logger.error(f"Error in content sharing: {e}")
+    
+    def _simulate_page_review(self):
+        """Simulate page review behavior"""
+        try:
+            self.logger.info("👀 Page review...")
+            # Quick review of page content
+            review_time = random.uniform(5, 15)
+            time.sleep(min(review_time, 3))  # Cap for testing
+        except Exception as e:
+            self.logger.error(f"Error in page review: {e}")
+    
+    def _simulate_tab_cleanup(self):
+        """Simulate tab cleanup"""
+        try:
+            self.logger.info("🧹 Tab cleanup...")
+            # Close extra tabs (simulate)
+            if len(self.driver.window_handles) > 1:
+                # Switch to first tab
+                self.driver.switch_to.window(self.driver.window_handles[0])
+                time.sleep(random.uniform(1, 2))
+        except Exception as e:
+            self.logger.error(f"Error in tab cleanup: {e}")
+    
+    def _simulate_browser_cleanup(self):
+        """Simulate browser cleanup"""
+        try:
+            self.logger.info("🧹 Browser cleanup...")
+            # Simulate browser cleanup (just wait)
+            time.sleep(random.uniform(1, 3))
+        except Exception as e:
+            self.logger.error(f"Error in browser cleanup: {e}")
+    
+    def _simulate_resume_browsing(self):
+        """Simulate resuming browsing after break"""
+        try:
+            self.logger.info("🔄 Resuming browsing...")
+            # Resume normal browsing behavior
+            time.sleep(random.uniform(2, 5))
+        except Exception as e:
+            self.logger.error(f"Error in resume browsing: {e}")
+    
+    def _simulate_general_page_behavior(self):
+        """Simulate general page behavior"""
+        try:
+            self.logger.info("📄 General page behavior...")
+            # General page interaction
+            time.sleep(random.uniform(5, 15))
+        except Exception as e:
+            self.logger.error(f"Error in general page behavior: {e}")
     
     def _save_session_memory(self, session_data: Dict):
         """Save session data for future reference"""
@@ -907,6 +2426,9 @@ class UndetectableSeleniumAutomation:
                 });
             """)
             
+            # Clear browser data for fresh start
+            self._clear_browser_data()
+            
             self.wait = WebDriverWait(self.driver, 10)
             self.logger.info("Successfully setup undetectable Chrome driver")
             return True
@@ -914,6 +2436,85 @@ class UndetectableSeleniumAutomation:
         except Exception as e:
             self.logger.error(f"Error setting up driver: {e}")
             return False
+    
+    def _clear_browser_data(self):
+        """Clear all browser data for fresh start"""
+        try:
+            self.logger.info("🧹 Clearing browser data for fresh start...")
+            
+            # Clear browser cache
+            self.driver.execute_script("window.localStorage.clear();")
+            self.driver.execute_script("window.sessionStorage.clear();")
+            
+            # Clear cookies
+            self.driver.delete_all_cookies()
+            
+            # Clear cache using CDP (Chrome DevTools Protocol)
+            try:
+                self.driver.execute_cdp_cmd('Network.clearBrowserCache', {})
+                self.driver.execute_cdp_cmd('Network.clearBrowserCookies', {})
+                self.logger.info("✅ Browser cache and cookies cleared via CDP")
+            except Exception as e:
+                self.logger.debug(f"CDP clear failed (normal): {e}")
+            
+            # Clear IndexedDB
+            try:
+                self.driver.execute_script("""
+                    window.indexedDB.databases().then(function(databases) {
+                        databases.forEach(function(database) {
+                            window.indexedDB.deleteDatabase(database.name);
+                        });
+                    });
+                """)
+                self.logger.info("✅ IndexedDB cleared")
+            except Exception as e:
+                self.logger.debug(f"IndexedDB clear failed (normal): {e}")
+            
+            # Clear service workers
+            try:
+                self.driver.execute_script("""
+                    if ('serviceWorker' in navigator) {
+                        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                            for(let registration of registrations) {
+                                registration.unregister();
+                            }
+                        });
+                    }
+                """)
+                self.logger.info("✅ Service workers cleared")
+            except Exception as e:
+                self.logger.debug(f"Service worker clear failed (normal): {e}")
+            
+            # Navigate to about:blank to ensure clean state
+            self.driver.get("about:blank")
+            time.sleep(1)
+            
+            self.logger.info("✅ Browser data cleared successfully")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Failed to clear browser data: {e}")
+    
+    def force_fresh_start(self):
+        """Force a completely fresh start by clearing all data and navigating to blank page"""
+        try:
+            self.logger.info("🔄 Forcing fresh start...")
+            
+            # Clear all browser data
+            self._clear_browser_data()
+            
+            # Navigate to about:blank
+            self.driver.get("about:blank")
+            time.sleep(2)
+            
+            # Clear any remaining data
+            self.driver.execute_script("window.localStorage.clear();")
+            self.driver.execute_script("window.sessionStorage.clear();")
+            self.driver.delete_all_cookies()
+            
+            self.logger.info("✅ Fresh start completed")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Failed to force fresh start: {e}")
     
     def simulate_realistic_browsing(self, base_url: str) -> Dict:
         """Simulate realistic browsing behavior with multiple page visits"""
@@ -1301,6 +2902,14 @@ class UndetectableSeleniumAutomation:
     def _navigate_random_page(self) -> Optional[str]:
         """Navigate to a random page on the site"""
         try:
+            # First, check if current page is a category/listing page
+            if self._is_category_page():
+                self.logger.info("📋 Detected category page, looking for articles...")
+                article_url = self._select_random_article()
+                if article_url:
+                    self.logger.info(f"📄 Selected random article: {article_url[:60]}...")
+                    return article_url
+            
             # Look for internal links
             internal_link_selectors = [
                 "a[href^='/']",
@@ -1333,6 +2942,217 @@ class UndetectableSeleniumAutomation:
         except Exception as e:
             self.logger.error(f"Error navigating to random page: {e}")
             return None
+    
+    def _is_category_page(self) -> bool:
+        """Detect if current page is a category/listing page"""
+        try:
+            # Common indicators of category/listing pages
+            category_indicators = [
+                # URL patterns
+                "/category/",
+                "/tag/",
+                "/blog/",
+                "/news/",
+                "/articles/",
+                "/posts/",
+                "/listing/",
+                "/search",
+                "?cat=",
+                "?category=",
+                
+                # Page title patterns
+                "Category:",
+                "Tag:",
+                "Blog",
+                "News",
+                "Articles",
+                "Posts",
+                "Listing",
+                "Search Results"
+            ]
+            
+            current_url = self.driver.current_url.lower()
+            page_title = self.driver.title.lower()
+            
+            # Check URL patterns
+            for indicator in category_indicators:
+                if indicator.lower() in current_url:
+                    self.logger.debug(f"Category detected via URL: {indicator}")
+                    return True
+            
+            # Check title patterns
+            for indicator in category_indicators:
+                if indicator.lower() in page_title:
+                    self.logger.debug(f"Category detected via title: {indicator}")
+                    return True
+            
+            # Check for multiple article links (common in category pages)
+            article_selectors = [
+                "article a",
+                ".post a",
+                ".entry a",
+                ".article a",
+                ".blog-post a",
+                ".news-item a",
+                ".listing-item a",
+                "h2 a",
+                "h3 a",
+                ".title a",
+                ".post-title a"
+            ]
+            
+            article_links = []
+            for selector in article_selectors:
+                try:
+                    links = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    visible_links = [link for link in links if link.is_displayed()]
+                    article_links.extend(visible_links)
+                except Exception:
+                    continue
+            
+            # If we find multiple article links, it's likely a category page
+            if len(article_links) >= 3:
+                self.logger.debug(f"Category detected via multiple article links: {len(article_links)} found")
+                return True
+            
+            return False
+            
+        except Exception as e:
+            self.logger.error(f"Error detecting category page: {e}")
+            return False
+    
+    def _select_random_article(self) -> Optional[str]:
+        """Select a random article from category/listing page"""
+        try:
+            # Article link selectors (prioritized)
+            article_selectors = [
+                # WordPress/Common CMS
+                "article h2 a",
+                "article h3 a",
+                ".post h2 a",
+                ".post h3 a",
+                ".entry h2 a",
+                ".entry h3 a",
+                
+                # Blog/News specific
+                ".blog-post h2 a",
+                ".blog-post h3 a",
+                ".news-item h2 a",
+                ".news-item h3 a",
+                ".article h2 a",
+                ".article h3 a",
+                
+                # Generic article patterns
+                ".post-title a",
+                ".entry-title a",
+                ".article-title a",
+                ".title a",
+                "h2 a",
+                "h3 a",
+                
+                # Listing patterns
+                ".listing-item a",
+                ".item a",
+                ".card a",
+                ".box a",
+                
+                # Fallback: any link that looks like an article
+                "a[href*='/202']",  # Year-based URLs
+                "a[href*='/post']",
+                "a[href*='/article']",
+                "a[href*='/blog']",
+                "a[href*='/news']"
+            ]
+            
+            all_article_links = []
+            
+            for selector in article_selectors:
+                try:
+                    links = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    visible_links = []
+                    
+                    for link in links:
+                        if link.is_displayed():
+                            href = link.get_attribute("href")
+                            # Filter out category/tag links and ensure it's an article
+                            if href and self._is_article_url(href):
+                                visible_links.append(link)
+                    
+                    all_article_links.extend(visible_links)
+                    
+                except Exception as e:
+                    self.logger.debug(f"Error with article selector {selector}: {e}")
+            
+            if all_article_links:
+                # Remove duplicates
+                unique_links = list(set(all_article_links))
+                
+                # Choose random article
+                chosen_link = random.choice(unique_links)
+                href = chosen_link.get_attribute("href")
+                
+                if href and href != self.driver.current_url:
+                    self.logger.info(f"📄 Selected article from {len(unique_links)} available articles")
+                    return href
+            
+            self.logger.warning("No suitable articles found on category page")
+            return None
+            
+        except Exception as e:
+            self.logger.error(f"Error selecting random article: {e}")
+            return None
+    
+    def _is_article_url(self, url: str) -> bool:
+        """Check if URL looks like an article (not category/tag)"""
+        try:
+            url_lower = url.lower()
+            
+            # Exclude category/tag patterns
+            exclude_patterns = [
+                "/category/",
+                "/tag/",
+                "/author/",
+                "/page/",
+                "/search",
+                "?cat=",
+                "?category=",
+                "?tag=",
+                "?author=",
+                "?page=",
+                "?s=",  # search
+                "#"  # anchors
+            ]
+            
+            for pattern in exclude_patterns:
+                if pattern in url_lower:
+                    return False
+            
+            # Include article patterns
+            include_patterns = [
+                "/202",  # Year-based
+                "/post",
+                "/article",
+                "/blog",
+                "/news",
+                "/story",
+                "/entry"
+            ]
+            
+            for pattern in include_patterns:
+                if pattern in url_lower:
+                    return True
+            
+            # If URL has date-like structure, it's likely an article
+            import re
+            date_pattern = r'/\d{4}/\d{2}/'  # /2024/01/
+            if re.search(date_pattern, url_lower):
+                return True
+            
+            return False
+            
+        except Exception as e:
+            self.logger.error(f"Error checking article URL: {e}")
+            return False
     
     def _simulate_page_behavior(self, content_type: str = "general", content_quality: Dict = None):
         """Simulate realistic behavior on a single page with comprehensive configuration"""
@@ -2823,7 +4643,7 @@ class UndetectableSeleniumAutomation:
             self.logger.error(f"Error simulating mouse movement: {e}")
     
     def _simulate_natural_scrolling(self):
-        """Simulate natural scrolling behavior using configuration"""
+        """Simulate natural scrolling behavior with 50+ device-specific variations"""
         if not self.human_behavior_config.get("natural_scrolling", True):
             return
             
@@ -2833,42 +4653,448 @@ class UndetectableSeleniumAutomation:
             viewport_height = self.driver.execute_script("return window.innerHeight;")
             
             if page_height > viewport_height:
-                # Get scroll intervals from configuration
-                min_interval = self.human_behavior_config.get("scroll_interval_min", 0.5)
-                max_interval = self.human_behavior_config.get("scroll_interval_max", 1.5)
+                # 🔥 ADVANCED DEVICE-SPECIFIC SCROLLING BEHAVIORS (50+ VARIATIONS)
                 
-                # Scroll down gradually
-                current_scroll = 0
-                scroll_step = random.randint(100, 300)
+                # Desktop Scrolling Patterns (20+ variations) - REALISTIC TIMING
+                desktop_patterns = {
+                    "mouse_wheel_smooth": {
+                        "scroll_step": (120, 360), "interval": (1.5, 3.0), "pattern": "smooth",
+                        "back_scroll_prob": 0.05, "back_range": (20, 60), "description": "Smooth mouse wheel scrolling",
+                        "dwell_time": (2.0, 5.0), "reading_pause": (3.0, 8.0)
+                    },
+                    "mouse_wheel_clicky": {
+                        "scroll_step": (120, 180), "interval": (2.0, 4.0), "pattern": "clicky",
+                        "back_scroll_prob": 0.08, "back_range": (30, 80), "description": "Clicky mouse wheel scrolling",
+                        "dwell_time": (2.5, 6.0), "reading_pause": (4.0, 10.0)
+                    },
+                    "trackpad_smooth": {
+                        "scroll_step": (60, 100), "interval": (1.0, 2.5), "pattern": "smooth",
+                        "back_scroll_prob": 0.03, "back_range": (15, 40), "description": "Smooth trackpad scrolling",
+                        "dwell_time": (1.5, 4.0), "reading_pause": (2.5, 7.0)
+                    },
+                    "trackpad_inertia": {
+                        "scroll_step": (100, 200), "interval": (1.2, 2.8), "pattern": "inertia",
+                        "back_scroll_prob": 0.02, "back_range": (25, 70), "description": "Trackpad with inertia",
+                        "dwell_time": (2.0, 5.0), "reading_pause": (3.0, 8.0)
+                    },
+                    "keyboard_arrow": {
+                        "scroll_step": (50, 80), "interval": (2.5, 4.5), "pattern": "keyboard",
+                        "back_scroll_prob": 0.10, "back_range": (20, 50), "description": "Keyboard arrow key scrolling",
+                        "dwell_time": (3.0, 7.0), "reading_pause": (5.0, 12.0)
+                    },
+                    "keyboard_page": {
+                        "scroll_step": (400, 600), "interval": (3.0, 6.0), "pattern": "page",
+                        "back_scroll_prob": 0.15, "back_range": (100, 200), "description": "Page up/down scrolling",
+                        "dwell_time": (4.0, 10.0), "reading_pause": (8.0, 15.0)
+                    },
+                    "scrollbar_drag": {
+                        "scroll_step": (200, 400), "interval": (4.0, 8.0), "pattern": "drag",
+                        "back_scroll_prob": 0.20, "back_range": (80, 150), "description": "Scrollbar dragging",
+                        "dwell_time": (5.0, 12.0), "reading_pause": (10.0, 20.0)
+                    },
+                    "scrollbar_click": {
+                        "scroll_step": (300, 500), "interval": (2.5, 5.0), "pattern": "click",
+                        "back_scroll_prob": 0.12, "back_range": (60, 120), "description": "Scrollbar clicking",
+                        "dwell_time": (3.5, 8.0), "reading_pause": (6.0, 15.0)
+                    },
+                    "spacebar_scroll": {
+                        "scroll_step": (350, 450), "interval": (3.5, 6.5), "pattern": "spacebar",
+                        "back_scroll_prob": 0.08, "back_range": (40, 100), "description": "Spacebar scrolling",
+                        "dwell_time": (4.5, 10.0), "reading_pause": (7.0, 18.0)
+                    },
+                    "home_end_nav": {
+                        "scroll_step": (500, 800), "interval": (5.0, 10.0), "pattern": "navigation",
+                        "back_scroll_prob": 0.25, "back_range": (150, 300), "description": "Home/End navigation",
+                        "dwell_time": (6.0, 15.0), "reading_pause": (12.0, 25.0)
+                    },
+                    "reader_mode": {
+                        "scroll_step": (100, 150), "interval": (6.0, 12.0), "pattern": "reading",
+                        "back_scroll_prob": 0.05, "back_range": (30, 80), "description": "Reader mode scrolling",
+                        "dwell_time": (8.0, 20.0), "reading_pause": (15.0, 30.0)
+                    },
+                    "browser_zoom": {
+                        "scroll_step": (120, 180), "interval": (2.0, 4.5), "pattern": "zoom",
+                        "back_scroll_prob": 0.07, "back_range": (25, 60), "description": "Browser zoom scrolling",
+                        "dwell_time": (3.0, 7.0), "reading_pause": (5.0, 12.0)
+                    },
+                    "touchpad_precision": {
+                        "scroll_step": (40, 80), "interval": (1.8, 3.5), "pattern": "precision",
+                        "back_scroll_prob": 0.04, "back_range": (15, 35), "description": "Precision touchpad",
+                        "dwell_time": (2.5, 6.0), "reading_pause": (4.0, 10.0)
+                    },
+                    "gaming_mouse": {
+                        "scroll_step": (150, 250), "interval": (2.2, 4.8), "pattern": "gaming",
+                        "back_scroll_prob": 0.06, "back_range": (35, 90), "description": "Gaming mouse scrolling",
+                        "dwell_time": (3.5, 8.0), "reading_pause": (6.0, 15.0)
+                    },
+                    "ergonomic_mouse": {
+                        "scroll_step": (90, 140), "interval": (2.8, 5.5), "pattern": "ergonomic",
+                        "back_scroll_prob": 0.09, "back_range": (25, 70), "description": "Ergonomic mouse",
+                        "dwell_time": (4.0, 9.0), "reading_pause": (7.0, 16.0)
+                    },
+                    "wireless_mouse": {
+                        "scroll_step": (110, 170), "interval": (2.5, 5.2), "pattern": "wireless",
+                        "back_scroll_prob": 0.07, "back_range": (30, 75), "description": "Wireless mouse",
+                        "dwell_time": (3.8, 8.5), "reading_pause": (6.5, 14.0)
+                    },
+                    "bluetooth_trackpad": {
+                        "scroll_step": (70, 120), "interval": (2.0, 4.2), "pattern": "bluetooth",
+                        "back_scroll_prob": 0.05, "back_range": (20, 55), "description": "Bluetooth trackpad",
+                        "dwell_time": (3.0, 7.5), "reading_pause": (5.5, 13.0)
+                    },
+                    "external_keyboard": {
+                        "scroll_step": (80, 130), "interval": (3.2, 6.8), "pattern": "external",
+                        "back_scroll_prob": 0.11, "back_range": (35, 85), "description": "External keyboard",
+                        "dwell_time": (4.5, 10.5), "reading_pause": (8.0, 18.0)
+                    },
+                    "mechanical_keyboard": {
+                        "scroll_step": (100, 160), "interval": (2.8, 5.8), "pattern": "mechanical",
+                        "back_scroll_prob": 0.08, "back_range": (28, 72), "description": "Mechanical keyboard",
+                        "dwell_time": (4.2, 9.5), "reading_pause": (7.5, 16.5)
+                    },
+                    "office_mouse": {
+                        "scroll_step": (120, 180), "interval": (3.0, 6.2), "pattern": "office",
+                        "back_scroll_prob": 0.10, "back_range": (32, 78), "description": "Office mouse",
+                        "dwell_time": (4.8, 11.0), "reading_pause": (8.5, 19.0)
+                    }
+                }
                 
-                while current_scroll < page_height:
-                    # Random scroll amount
-                    scroll_amount = random.randint(scroll_step - 50, scroll_step + 50)
-                    current_scroll += scroll_amount
-                    
-                    # Smooth scroll
-                    self.driver.execute_script(f"window.scrollTo(0, {current_scroll});")
-                    
-                    # Random pause between scrolls based on configuration
-                    self._random_delay(min_interval, max_interval)
-                    
-                    # Sometimes scroll back up a bit (human behavior)
-                    if random.random() < 0.2:
-                        back_scroll = random.randint(50, 150)
-                        current_scroll -= back_scroll
-                        self.driver.execute_script(f"window.scrollTo(0, {current_scroll});")
-                        self._random_delay(0.5, 1.5)
+                # Mobile Scrolling Patterns (20+ variations) - REALISTIC TIMING
+                mobile_patterns = {
+                    "thumb_scroll": {
+                        "scroll_step": (30, 80), "interval": (1.2, 2.8), "pattern": "thumb",
+                        "back_scroll_prob": 0.15, "back_range": (10, 30), "description": "Thumb scrolling",
+                        "dwell_time": (2.5, 6.0), "reading_pause": (4.0, 10.0)
+                    },
+                    "index_finger": {
+                        "scroll_step": (50, 100), "interval": (1.5, 3.2), "pattern": "index",
+                        "back_scroll_prob": 0.12, "back_range": (15, 35), "description": "Index finger scrolling",
+                        "dwell_time": (3.0, 7.0), "reading_pause": (5.0, 12.0)
+                    },
+                    "swipe_gesture": {
+                        "scroll_step": (80, 150), "interval": (2.0, 4.0), "pattern": "swipe",
+                        "back_scroll_prob": 0.08, "back_range": (20, 50), "description": "Swipe gesture",
+                        "dwell_time": (3.5, 8.0), "reading_pause": (6.0, 15.0)
+                    },
+                    "momentum_scroll": {
+                        "scroll_step": (100, 200), "interval": (1.8, 3.5), "pattern": "momentum",
+                        "back_scroll_prob": 0.05, "back_range": (25, 60), "description": "Momentum scrolling",
+                        "dwell_time": (3.2, 7.5), "reading_pause": (5.5, 13.0)
+                    },
+                    "bounce_scroll": {
+                        "scroll_step": (60, 120), "interval": (2.5, 5.0), "pattern": "bounce",
+                        "back_scroll_prob": 0.20, "back_range": (15, 40), "description": "Bounce scrolling",
+                        "dwell_time": (4.0, 9.0), "reading_pause": (7.0, 16.0)
+                    },
+                    "rubber_band": {
+                        "scroll_step": (40, 90), "interval": (1.8, 3.8), "pattern": "rubber",
+                        "back_scroll_prob": 0.18, "back_range": (12, 35), "description": "Rubber band effect",
+                        "dwell_time": (3.8, 8.5), "reading_pause": (6.5, 14.5)
+                    },
+                    "pull_to_refresh": {
+                        "scroll_step": (70, 130), "interval": (2.2, 4.5), "pattern": "pull",
+                        "back_scroll_prob": 0.10, "back_range": (18, 45), "description": "Pull to refresh",
+                        "dwell_time": (3.5, 8.0), "reading_pause": (6.0, 15.0)
+                    },
+                    "overscroll": {
+                        "scroll_step": (90, 160), "interval": (2.0, 4.2), "pattern": "overscroll",
+                        "back_scroll_prob": 0.12, "back_range": (22, 55), "description": "Overscroll behavior",
+                        "dwell_time": (3.8, 8.5), "reading_pause": (6.5, 14.0)
+                    },
+                    "haptic_feedback": {
+                        "scroll_step": (45, 95), "interval": (1.5, 3.5), "pattern": "haptic",
+                        "back_scroll_prob": 0.14, "back_range": (14, 38), "description": "Haptic feedback",
+                        "dwell_time": (3.2, 7.5), "reading_pause": (5.5, 13.0)
+                    },
+                    "accessibility_scroll": {
+                        "scroll_step": (25, 60), "interval": (3.0, 6.0), "pattern": "accessibility",
+                        "back_scroll_prob": 0.25, "back_range": (8, 25), "description": "Accessibility scrolling",
+                        "dwell_time": (5.0, 12.0), "reading_pause": (8.0, 20.0)
+                    },
+                    "one_handed": {
+                        "scroll_step": (35, 75), "interval": (1.8, 3.8), "pattern": "one_handed",
+                        "back_scroll_prob": 0.16, "back_range": (11, 32), "description": "One-handed scrolling",
+                        "dwell_time": (3.5, 8.0), "reading_pause": (6.0, 14.0)
+                    },
+                    "reachability": {
+                        "scroll_step": (55, 105), "interval": (2.2, 4.5), "pattern": "reachability",
+                        "back_scroll_prob": 0.11, "back_range": (16, 42), "description": "Reachability mode",
+                        "dwell_time": (4.0, 9.0), "reading_pause": (7.0, 16.0)
+                    },
+                    "assistive_touch": {
+                        "scroll_step": (40, 85), "interval": (2.5, 5.2), "pattern": "assistive",
+                        "back_scroll_prob": 0.22, "back_range": (12, 30), "description": "Assistive touch",
+                        "dwell_time": (4.5, 10.0), "reading_pause": (8.0, 18.0)
+                    },
+                    "voice_control": {
+                        "scroll_step": (60, 110), "interval": (3.5, 7.0), "pattern": "voice",
+                        "back_scroll_prob": 0.08, "back_range": (20, 48), "description": "Voice control",
+                        "dwell_time": (6.0, 14.0), "reading_pause": (10.0, 25.0)
+                    },
+                    "switch_control": {
+                        "scroll_step": (30, 70), "interval": (4.0, 8.0), "pattern": "switch",
+                        "back_scroll_prob": 0.30, "back_range": (10, 28), "description": "Switch control",
+                        "dwell_time": (7.0, 16.0), "reading_pause": (12.0, 30.0)
+                    },
+                    "guided_access": {
+                        "scroll_step": (50, 100), "interval": (2.8, 5.5), "pattern": "guided",
+                        "back_scroll_prob": 0.13, "back_range": (15, 40), "description": "Guided access",
+                        "dwell_time": (4.8, 11.0), "reading_pause": (8.5, 19.0)
+                    },
+                    "screen_reader": {
+                        "scroll_step": (20, 50), "interval": (5.0, 10.0), "pattern": "screen_reader",
+                        "back_scroll_prob": 0.35, "back_range": (5, 20), "description": "Screen reader",
+                        "dwell_time": (8.0, 20.0), "reading_pause": (15.0, 35.0)
+                    },
+                    "magnifier": {
+                        "scroll_step": (25, 60), "interval": (3.5, 7.0), "pattern": "magnifier",
+                        "back_scroll_prob": 0.28, "back_range": (8, 25), "description": "Magnifier mode",
+                        "dwell_time": (6.0, 14.0), "reading_pause": (10.0, 25.0)
+                    },
+                    "high_contrast": {
+                        "scroll_step": (45, 90), "interval": (2.5, 5.5), "pattern": "high_contrast",
+                        "back_scroll_prob": 0.17, "back_range": (13, 35), "description": "High contrast mode",
+                        "dwell_time": (4.5, 10.0), "reading_pause": (8.0, 18.0)
+                    },
+                    "reduced_motion": {
+                        "scroll_step": (35, 75), "interval": (3.0, 6.5), "pattern": "reduced_motion",
+                        "back_scroll_prob": 0.19, "back_range": (10, 30), "description": "Reduced motion",
+                        "dwell_time": (5.5, 12.0), "reading_pause": (9.0, 22.0)
+                    }
+                }
                 
-                # Scroll back to top
-                self.driver.execute_script("window.scrollTo(0, 0);")
-                self._random_delay(1, 2)
+                # Tablet Scrolling Patterns (15+ variations) - REALISTIC TIMING
+                tablet_patterns = {
+                    "stylus_precision": {
+                        "scroll_step": (40, 90), "interval": (1.8, 3.5), "pattern": "stylus",
+                        "back_scroll_prob": 0.10, "back_range": (15, 35), "description": "Stylus precision",
+                        "dwell_time": (3.5, 8.0), "reading_pause": (6.0, 15.0)
+                    },
+                    "multi_touch": {
+                        "scroll_step": (60, 120), "interval": (1.5, 3.2), "pattern": "multi_touch",
+                        "back_scroll_prob": 0.08, "back_range": (20, 45), "description": "Multi-touch scrolling",
+                        "dwell_time": (3.0, 7.0), "reading_pause": (5.0, 12.0)
+                    },
+                    "palm_rejection": {
+                        "scroll_step": (50, 100), "interval": (2.0, 4.2), "pattern": "palm_rejection",
+                        "back_scroll_prob": 0.12, "back_range": (18, 42), "description": "Palm rejection",
+                        "dwell_time": (3.8, 8.5), "reading_pause": (6.5, 14.0)
+                    },
+                    "pen_tilt": {
+                        "scroll_step": (45, 95), "interval": (2.2, 4.5), "pattern": "pen_tilt",
+                        "back_scroll_prob": 0.11, "back_range": (16, 38), "description": "Pen tilt scrolling",
+                        "dwell_time": (4.0, 9.0), "reading_pause": (7.0, 16.0)
+                    },
+                    "pressure_sensitive": {
+                        "scroll_step": (35, 80), "interval": (1.8, 3.8), "pattern": "pressure",
+                        "back_scroll_prob": 0.09, "back_range": (14, 36), "description": "Pressure sensitive",
+                        "dwell_time": (3.5, 8.0), "reading_pause": (6.0, 14.0)
+                    },
+                    "hover_preview": {
+                        "scroll_step": (55, 110), "interval": (2.5, 5.0), "pattern": "hover",
+                        "back_scroll_prob": 0.07, "back_range": (22, 50), "description": "Hover preview",
+                        "dwell_time": (4.5, 10.0), "reading_pause": (8.0, 18.0)
+                    },
+                    "gesture_navigation": {
+                        "scroll_step": (70, 140), "interval": (2.0, 4.0), "pattern": "gesture",
+                        "back_scroll_prob": 0.06, "back_range": (25, 55), "description": "Gesture navigation",
+                        "dwell_time": (4.0, 9.0), "reading_pause": (7.0, 16.0)
+                    },
+                    "split_screen": {
+                        "scroll_step": (40, 85), "interval": (2.2, 4.5), "pattern": "split",
+                        "back_scroll_prob": 0.13, "back_range": (17, 40), "description": "Split screen mode",
+                        "dwell_time": (4.2, 9.5), "reading_pause": (7.5, 17.0)
+                    },
+                    "picture_in_picture": {
+                        "scroll_step": (50, 100), "interval": (2.8, 5.5), "pattern": "pip",
+                        "back_scroll_prob": 0.10, "back_range": (19, 43), "description": "Picture in picture",
+                        "dwell_time": (4.8, 11.0), "reading_pause": (8.5, 19.0)
+                    },
+                    "floating_window": {
+                        "scroll_step": (45, 90), "interval": (2.5, 5.2), "pattern": "floating",
+                        "back_scroll_prob": 0.11, "back_range": (16, 39), "description": "Floating window",
+                        "dwell_time": (4.5, 10.0), "reading_pause": (8.0, 18.0)
+                    },
+                    "desktop_mode": {
+                        "scroll_step": (80, 150), "interval": (1.8, 3.5), "pattern": "desktop",
+                        "back_scroll_prob": 0.08, "back_range": (25, 60), "description": "Desktop mode",
+                        "dwell_time": (3.5, 8.0), "reading_pause": (6.0, 15.0)
+                    },
+                    "landscape_orientation": {
+                        "scroll_step": (60, 120), "interval": (2.0, 4.2), "pattern": "landscape",
+                        "back_scroll_prob": 0.09, "back_range": (20, 48), "description": "Landscape orientation",
+                        "dwell_time": (4.0, 9.0), "reading_pause": (7.0, 16.0)
+                    },
+                    "portrait_orientation": {
+                        "scroll_step": (50, 100), "interval": (2.2, 4.5), "pattern": "portrait",
+                        "back_scroll_prob": 0.12, "back_range": (18, 42), "description": "Portrait orientation",
+                        "dwell_time": (4.2, 9.5), "reading_pause": (7.5, 17.0)
+                    },
+                    "keyboard_attached": {
+                        "scroll_step": (70, 130), "interval": (1.8, 3.8), "pattern": "keyboard",
+                        "back_scroll_prob": 0.07, "back_range": (22, 52), "description": "Keyboard attached",
+                        "dwell_time": (3.5, 8.0), "reading_pause": (6.0, 14.0)
+                    },
+                    "stand_mode": {
+                        "scroll_step": (55, 110), "interval": (2.5, 5.2), "pattern": "stand",
+                        "back_scroll_prob": 0.10, "back_range": (19, 45), "description": "Stand mode",
+                        "dwell_time": (4.5, 10.0), "reading_pause": (8.0, 18.0)
+                    }
+                }
+                
+                # Select device-specific patterns
+                if self.device_type == "desktop":
+                    available_patterns = desktop_patterns
+                elif self.device_type == "mobile":
+                    available_patterns = mobile_patterns
+                elif self.device_type == "tablet":
+                    available_patterns = tablet_patterns
+                else:
+                    available_patterns = desktop_patterns  # Fallback
+                
+                # 🔥 RANDOMLY SELECT ONE OF 50+ SCROLLING PATTERNS
+                pattern_name = random.choice(list(available_patterns.keys()))
+                scroll_config = available_patterns[pattern_name]
+                
+                self.logger.info(f"📱 Using {self.device_type} scroll pattern: {pattern_name} - {scroll_config['description']}")
+                
+                # Execute the selected scrolling pattern
+                self._execute_scroll_pattern(scroll_config, page_height, viewport_height)
                 
                 # Update stealth metrics
                 self.stealth_metrics["scrolls"] += 1
                 self.stealth_metrics["last_activity"] = datetime.now()
                 
+                self.logger.debug(f"📱 Advanced device-specific scrolling completed ({self.device_type} - {pattern_name})")
+                
         except Exception as e:
             self.logger.error(f"Error simulating natural scrolling: {e}")
+    
+    def _execute_scroll_pattern(self, scroll_config: Dict, page_height: int, viewport_height: int):
+        """Execute a specific scrolling pattern with advanced behavior and realistic timing"""
+        try:
+            current_scroll = 0
+            scroll_step_min, scroll_step_max = scroll_config["scroll_step"]
+            
+            # Get dwell time and reading pause from config
+            dwell_time_min, dwell_time_max = scroll_config.get("dwell_time", (2.0, 5.0))
+            reading_pause_min, reading_pause_max = scroll_config.get("reading_pause", (3.0, 8.0))
+            
+            # Pattern-specific adjustments
+            pattern = scroll_config["pattern"]
+            
+            self.logger.info(f"📱 Executing {pattern} pattern with dwell: {dwell_time_min}-{dwell_time_max}s, reading: {reading_pause_min}-{reading_pause_max}s")
+            
+            # Special pattern behaviors
+            if pattern == "momentum":
+                # Momentum scrolling with acceleration/deceleration
+                momentum_factor = 1.0
+                while current_scroll < page_height:
+                    # Accelerate
+                    momentum_factor = min(momentum_factor * 1.1, 2.0)
+                    scroll_amount = int(random.randint(scroll_step_min, scroll_step_max) * momentum_factor)
+                    current_scroll += scroll_amount
+                    
+                    self.driver.execute_script(f"window.scrollTo(0, {current_scroll});")
+                    
+                    # Realistic dwell time between scrolls
+                    dwell_time = random.uniform(dwell_time_min, dwell_time_max)
+                    self._random_delay(dwell_time * 0.8, dwell_time * 1.2)
+                    
+                    # Sometimes pause for reading (human behavior)
+                    if random.random() < 0.3:
+                        reading_pause = random.uniform(reading_pause_min, reading_pause_max)
+                        self.logger.debug(f"📖 Reading pause: {reading_pause:.1f}s")
+                        time.sleep(reading_pause)
+                    
+                    # Sometimes decelerate (human behavior)
+                    if random.random() < 0.3:
+                        momentum_factor = max(momentum_factor * 0.8, 0.5)
+            
+            elif pattern == "bounce":
+                # Bounce scrolling with overshoot
+                while current_scroll < page_height:
+                    scroll_amount = random.randint(scroll_step_min, scroll_step_max)
+                    current_scroll += scroll_amount
+                    
+                    # Sometimes overshoot
+                    if random.random() < 0.2:
+                        overshoot = random.randint(20, 60)
+                        current_scroll += overshoot
+                    
+                        self.driver.execute_script(f"window.scrollTo(0, {current_scroll});")
+                    
+                    # Realistic dwell time
+                    dwell_time = random.uniform(dwell_time_min, dwell_time_max)
+                    self._random_delay(dwell_time * 0.8, dwell_time * 1.2)
+                    
+                    # Reading pauses
+                    if random.random() < 0.25:
+                        reading_pause = random.uniform(reading_pause_min, reading_pause_max)
+                        self.logger.debug(f"📖 Reading pause: {reading_pause:.1f}s")
+                        time.sleep(reading_pause)
+                    
+                    # Bounce back if overshot
+                    if current_scroll > page_height:
+                        current_scroll = page_height - random.randint(10, 30)
+                        self.driver.execute_script(f"window.scrollTo(0, {current_scroll});")
+            
+            elif pattern == "reading":
+                # Reading mode with extended pauses at content
+                while current_scroll < page_height:
+                    scroll_amount = random.randint(scroll_step_min, scroll_step_max)
+                    current_scroll += scroll_amount
+                    
+                    self.driver.execute_script(f"window.scrollTo(0, {current_scroll});")
+                    
+                    # Extended dwell time for reading
+                    dwell_time = random.uniform(dwell_time_min * 1.5, dwell_time_max * 2.0)
+                    self._random_delay(dwell_time * 0.8, dwell_time * 1.2)
+                    
+                    # Frequent reading pauses
+                    if random.random() < 0.6:
+                        reading_pause = random.uniform(reading_pause_min * 1.5, reading_pause_max * 2.0)
+                        self.logger.debug(f"📖 Extended reading pause: {reading_pause:.1f}s")
+                        time.sleep(reading_pause)
+            
+            else:
+                # Standard pattern execution with realistic timing
+                while current_scroll < page_height:
+                    scroll_amount = random.randint(scroll_step_min, scroll_step_max)
+                    current_scroll += scroll_amount
+                    
+                    self.driver.execute_script(f"window.scrollTo(0, {current_scroll});")
+                    
+                    # Realistic dwell time between scrolls
+                    dwell_time = random.uniform(dwell_time_min, dwell_time_max)
+                    self._random_delay(dwell_time * 0.8, dwell_time * 1.2)
+                    
+                    # Sometimes pause for reading (realistic human behavior)
+                    if random.random() < 0.2:
+                        reading_pause = random.uniform(reading_pause_min, reading_pause_max)
+                        self.logger.debug(f"📖 Reading pause: {reading_pause:.1f}s")
+                        time.sleep(reading_pause)
+            
+            # Back scrolling behavior with realistic timing
+            if random.random() < scroll_config["back_scroll_prob"]:
+                back_min, back_max = scroll_config["back_range"]
+                back_scroll = random.randint(back_min, back_max)
+                current_scroll = max(0, current_scroll - back_scroll)
+                self.driver.execute_script(f"window.scrollTo(0, {current_scroll});")
+                
+                # Realistic pause after back scroll
+                back_pause = random.uniform(1.5, 3.0)
+                self.logger.debug(f"⬅️ Back scroll pause: {back_pause:.1f}s")
+                time.sleep(back_pause)
+            
+            # Final scroll to top with realistic timing
+            self.driver.execute_script("window.scrollTo(0, 0);")
+            final_pause = random.uniform(2.0, 4.0)
+            self.logger.debug(f"⬆️ Final scroll pause: {final_pause:.1f}s")
+            time.sleep(final_pause)
+                
+        except Exception as e:
+            self.logger.error(f"Error executing scroll pattern: {e}")
     
     def _simulate_realistic_typing(self):
         """Simulate realistic typing behavior"""
@@ -3255,7 +5481,7 @@ class UndetectableSeleniumAutomation:
             return {"impressions": 0, "clicks": 0, "hover_events": 0, "context_relevance": "low"}
     
     def _handle_post_ad_click_behavior(self, ad_element, context_relevance: str):
-        """Handle realistic behavior after clicking an ad"""
+        """Handle realistic behavior after clicking an ad for Google AdSense validation"""
         try:
             # Check if post-ad click behavior is enabled
             post_click_config = self.advanced_config.get("post_ad_click_behavior", {})
@@ -3267,6 +5493,666 @@ class UndetectableSeleniumAutomation:
             
             # Wait for page to load after click
             time.sleep(random.uniform(2, 4))
+            
+            # 🔥 GOOGLE ADSENSE VALIDATION BEHAVIORS
+            
+            # 1. Check if we're on a new page (ad landing page)
+            current_url = self.driver.current_url
+            self.logger.info(f"📍 Current URL after ad click: {current_url}")
+            
+            # 2. Simulate realistic landing page behavior
+            self._simulate_landing_page_behavior(context_relevance)
+            
+            # 3. Simulate engagement with landing page content
+            self._simulate_landing_page_engagement(context_relevance)
+            
+            # 4. Simulate conversion intent (if high relevance)
+            if context_relevance == "high":
+                self._simulate_conversion_intent()
+            
+            # 5. Simulate realistic exit behavior
+            self._simulate_realistic_exit_behavior()
+            
+            self.logger.info("✅ Post-ad click behavior simulation completed")
+            
+        except Exception as e:
+            self.logger.error(f"Error in post-ad click behavior: {e}")
+    
+    def _simulate_landing_page_behavior(self, context_relevance: str):
+        """Simulate realistic behavior on ad landing page"""
+        try:
+            self.logger.info("📄 Simulating landing page behavior...")
+            
+            # Get page title and content
+            page_title = self.driver.title
+            self.logger.info(f"📋 Landing page title: {page_title}")
+            
+            # Simulate reading behavior based on context relevance
+            if context_relevance == "high":
+                # High relevance = longer engagement
+                reading_time = random.uniform(15, 45)
+                scroll_behavior = "thorough"
+            elif context_relevance == "medium":
+                # Medium relevance = moderate engagement
+                reading_time = random.uniform(8, 25)
+                scroll_behavior = "selective"
+            else:
+                # Low relevance = quick scan
+                reading_time = random.uniform(3, 12)
+                scroll_behavior = "quick"
+            
+            self.logger.info(f"⏱️ Simulating {reading_time:.1f}s reading time ({scroll_behavior} scroll)")
+            
+            # Simulate reading with scrolling
+            start_time = time.time()
+            while time.time() - start_time < reading_time:
+                # Scroll behavior based on relevance
+                if scroll_behavior == "thorough":
+                    # Read thoroughly - slow scrolling
+                    self.driver.execute_script("window.scrollBy(0, 100);")
+                    time.sleep(random.uniform(1.5, 3.0))
+                elif scroll_behavior == "selective":
+                    # Read selectively - medium scrolling
+                    self.driver.execute_script("window.scrollBy(0, 200);")
+                    time.sleep(random.uniform(1.0, 2.0))
+                else:
+                    # Quick scan - fast scrolling
+                    self.driver.execute_script("window.scrollBy(0, 300);")
+                    time.sleep(random.uniform(0.5, 1.5))
+                
+                # Sometimes scroll back up (human behavior)
+                if random.random() < 0.2:
+                    self.driver.execute_script("window.scrollBy(0, -50);")
+                    time.sleep(random.uniform(0.5, 1.0))
+            
+        except Exception as e:
+            self.logger.error(f"Error simulating landing page behavior: {e}")
+    
+    def _simulate_landing_page_engagement(self, context_relevance: str):
+        """Simulate engagement with landing page content"""
+        try:
+            self.logger.info("🎯 Simulating landing page engagement...")
+            
+            # Look for interactive elements
+            interactive_selectors = [
+                "button", "a", "input", "select", "textarea",
+                "[onclick]", "[data-action]", "[role='button']"
+            ]
+            
+            engagement_elements = []
+            for selector in interactive_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    for element in elements:
+                        if element.is_displayed() and element.is_enabled():
+                            engagement_elements.append(element)
+                except:
+                    continue
+            
+            # Simulate engagement based on context relevance
+            if context_relevance == "high" and engagement_elements:
+                # High relevance = more engagement
+                num_interactions = random.randint(1, 3)
+                for i in range(min(num_interactions, len(engagement_elements))):
+                    element = random.choice(engagement_elements)
+                    try:
+                        # Hover over element
+                        actions = ActionChains(self.driver)
+                        actions.move_to_element(element)
+                        actions.pause(random.uniform(0.5, 1.5))
+                        actions.perform()
+                        
+                        # Sometimes click (low probability)
+                        if random.random() < 0.1:  # 10% chance
+                            element.click()
+                            time.sleep(random.uniform(2, 4))
+                        
+                        self.logger.info(f"🎯 Engaged with element {i+1}/{num_interactions}")
+                    except:
+                        continue
+            
+        except Exception as e:
+            self.logger.error(f"Error simulating landing page engagement: {e}")
+    
+    def _simulate_conversion_intent(self):
+        """Simulate conversion intent behavior"""
+        try:
+            self.logger.info("💰 Simulating conversion intent...")
+            
+            # Look for conversion-related elements
+            conversion_selectors = [
+                "button[class*='buy']", "button[class*='purchase']", "button[class*='order']",
+                "a[href*='buy']", "a[href*='purchase']", "a[href*='order']",
+                "input[type='submit']", "button[type='submit']",
+                "[class*='checkout']", "[class*='cart']", "[class*='buy-now']"
+            ]
+            
+            for selector in conversion_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    for element in elements:
+                        if element.is_displayed() and element.is_enabled():
+                            # Hover over conversion element
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(element)
+                            actions.pause(random.uniform(1, 2))
+                            actions.perform()
+                            
+                            # Very low probability of actual click (realistic)
+                            if random.random() < 0.05:  # 5% chance
+                                self.logger.info("💰 Simulating conversion intent click")
+                                element.click()
+                                time.sleep(random.uniform(3, 6))
+                            
+                            return  # Found one conversion element, that's enough
+                except:
+                    continue
+            
+        except Exception as e:
+            self.logger.error(f"Error simulating conversion intent: {e}")
+    
+    def _simulate_realistic_exit_behavior(self):
+        """Simulate realistic exit behavior from landing page"""
+        try:
+            self.logger.info("🚪 Simulating realistic exit behavior...")
+            
+            # Different exit behaviors based on personality
+            exit_behaviors = {
+                "explorer": ["back_button", "new_tab", "close_tab"],
+                "researcher": ["back_button", "bookmark", "new_tab"],
+                "casual": ["back_button", "close_tab"],
+                "professional": ["back_button", "new_tab"]
+            }
+            
+            available_behaviors = exit_behaviors.get(self.user_personality, ["back_button"])
+            chosen_behavior = random.choice(available_behaviors)
+            
+            if chosen_behavior == "back_button":
+                self.logger.info("⬅️ Using back button to exit")
+                self.driver.back()
+                time.sleep(random.uniform(2, 4))
+            elif chosen_behavior == "new_tab":
+                self.logger.info("🆕 Opening new tab")
+                self.driver.execute_script("window.open('');")
+                time.sleep(random.uniform(1, 2))
+            elif chosen_behavior == "bookmark":
+                self.logger.info("🔖 Simulating bookmark")
+                # Simulate Ctrl+D (bookmark shortcut)
+                actions = ActionChains(self.driver)
+                actions.key_down(Keys.COMMAND if os.name == 'posix' else Keys.CONTROL)
+                actions.send_keys('d')
+                actions.key_up(Keys.COMMAND if os.name == 'posix' else Keys.CONTROL)
+                actions.perform()
+                time.sleep(random.uniform(1, 2))
+            
+        except Exception as e:
+            self.logger.error(f"Error simulating exit behavior: {e}")
+    
+    def _simulate_professional_user_behavior(self):
+        """Simulate behavior of high-value professional users for RPM optimization"""
+        try:
+            self.logger.info("👔 Simulating professional user behavior...")
+            
+            # Professional browsing patterns
+            self._simulate_business_research_behavior()
+            
+            # Multiple tab usage
+            self._simulate_multi_tab_browsing()
+            
+            # Bookmark and save content
+            self._simulate_content_saving()
+            
+            # Return visits with different devices
+            self._simulate_cross_device_behavior()
+            
+            # Professional engagement patterns
+            self._simulate_professional_engagement()
+            
+        except Exception as e:
+            self.logger.error(f"Error in professional user behavior: {e}")
+    
+    def _simulate_business_research_behavior(self):
+        """Simulate business research behavior for high-RPM content"""
+        try:
+            self.logger.info("📊 Simulating business research behavior...")
+            
+            # Longer dwell time on business content
+            dwell_time = random.uniform(60, 300)  # 1-5 minutes
+            self.logger.info(f"⏱️ Business research dwell time: {dwell_time:.1f}s")
+            
+            # Multiple page navigation
+            pages_visited = random.randint(5, 15)
+            self.logger.info(f"📄 Business research pages: {pages_visited}")
+            
+            # Form interaction (lead generation)
+            self._simulate_form_interaction()
+            
+            # Comparison shopping behavior
+            self._simulate_comparison_behavior()
+            
+            # Professional reading patterns
+            self._simulate_professional_reading()
+            
+        except Exception as e:
+            self.logger.error(f"Error in business research behavior: {e}")
+    
+    def _simulate_multi_tab_browsing(self):
+        """Simulate professional multi-tab browsing behavior"""
+        try:
+            self.logger.info("📑 Simulating multi-tab browsing...")
+            
+            # Open 2-4 additional tabs
+            num_tabs = random.randint(2, 4)
+            
+            for i in range(num_tabs):
+                # Open new tab
+                self.driver.execute_script("window.open('');")
+                time.sleep(random.uniform(1, 3))
+                
+                # Switch to new tab
+                self.driver.switch_to.window(self.driver.window_handles[-1])
+                
+                # Navigate to related content
+                related_urls = [
+                    "https://www.google.com/search?q=business+strategy",
+                    "https://www.google.com/search?q=investment+guide",
+                    "https://www.google.com/search?q=financial+planning",
+                    "https://www.google.com/search?q=entrepreneurship+tips"
+                ]
+                
+                if related_urls:
+                    url = random.choice(related_urls)
+                    self.driver.get(url)
+                    time.sleep(random.uniform(10, 30))
+                
+                # Switch back to original tab
+                self.driver.switch_to.window(self.driver.window_handles[0])
+                time.sleep(random.uniform(2, 5))
+            
+        except Exception as e:
+            self.logger.error(f"Error in multi-tab browsing: {e}")
+    
+    def _simulate_content_saving(self):
+        """Simulate professional content saving behavior"""
+        try:
+            self.logger.info("💾 Simulating content saving...")
+            
+            # Bookmark current page
+            if random.random() < 0.4:  # 40% chance
+                self.logger.info("🔖 Bookmarking page")
+                actions = ActionChains(self.driver)
+                actions.key_down(Keys.COMMAND if os.name == 'posix' else Keys.CONTROL)
+                actions.send_keys('d')
+                actions.key_up(Keys.COMMAND if os.name == 'posix' else Keys.CONTROL)
+                actions.perform()
+                time.sleep(random.uniform(1, 3))
+            
+            # Copy text for notes
+            if random.random() < 0.3:  # 30% chance
+                self.logger.info("📝 Copying text for notes")
+                # Select some text
+                self.driver.execute_script("""
+                    var selection = window.getSelection();
+                    var range = document.createRange();
+                    var element = document.querySelector('p, h1, h2, h3');
+                    if (element) {
+                        range.selectNodeContents(element);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                """)
+                time.sleep(random.uniform(1, 2))
+                
+                # Copy (Ctrl+C)
+                actions = ActionChains(self.driver)
+                actions.key_down(Keys.COMMAND if os.name == 'posix' else Keys.CONTROL)
+                actions.send_keys('c')
+                actions.key_up(Keys.COMMAND if os.name == 'posix' else Keys.CONTROL)
+                actions.perform()
+                time.sleep(random.uniform(1, 2))
+            
+        except Exception as e:
+            self.logger.error(f"Error in content saving: {e}")
+    
+    def _simulate_cross_device_behavior(self):
+        """Simulate cross-device professional behavior"""
+        try:
+            self.logger.info("📱 Simulating cross-device behavior...")
+            
+            # Professional users often use multiple devices
+            if random.random() < 0.2:  # 20% chance
+                self.logger.info("🔄 Simulating device switch")
+                
+                # Simulate mobile view (professional checking on phone)
+                self.driver.execute_script("""
+                    document.body.style.width = '375px';
+                    document.body.style.height = '667px';
+                """)
+                time.sleep(random.uniform(5, 15))
+                
+                # Return to desktop view
+                self.driver.execute_script("""
+                    document.body.style.width = '100%';
+                    document.body.style.height = '100%';
+                """)
+                time.sleep(random.uniform(2, 5))
+            
+        except Exception as e:
+            self.logger.error(f"Error in cross-device behavior: {e}")
+    
+    def _simulate_professional_engagement(self):
+        """Simulate professional engagement patterns"""
+        try:
+            self.logger.info("🎯 Simulating professional engagement...")
+            
+            # Professional users engage more deeply
+            engagement_actions = [
+                self._simulate_professional_reading,
+                self._simulate_form_interaction,
+                self._simulate_comparison_behavior,
+                self._simulate_research_behavior
+            ]
+            
+            # Perform 2-4 engagement actions
+            num_actions = random.randint(2, 4)
+            selected_actions = random.sample(engagement_actions, num_actions)
+            
+            for action in selected_actions:
+                action()
+                time.sleep(random.uniform(3, 8))
+            
+        except Exception as e:
+            self.logger.error(f"Error in professional engagement: {e}")
+    
+    def _simulate_form_interaction(self):
+        """Simulate professional form interaction"""
+        try:
+            self.logger.info("📋 Simulating form interaction...")
+            
+            # Look for forms
+            forms = self.driver.find_elements(By.TAG_NAME, "form")
+            inputs = self.driver.find_elements(By.TAG_NAME, "input")
+            
+            if forms or inputs:
+                # Hover over form elements
+                for element in inputs[:3]:  # First 3 inputs
+                    if element.is_displayed():
+                        actions = ActionChains(self.driver)
+                        actions.move_to_element(element)
+                        actions.pause(random.uniform(1, 3))
+                        actions.perform()
+                        
+                        # Sometimes click (but don't submit)
+                        if random.random() < 0.3:  # 30% chance
+                            element.click()
+                            time.sleep(random.uniform(2, 5))
+            
+        except Exception as e:
+            self.logger.error(f"Error in form interaction: {e}")
+    
+    def _simulate_comparison_behavior(self):
+        """Simulate comparison shopping/research behavior"""
+        try:
+            self.logger.info("⚖️ Simulating comparison behavior...")
+            
+            # Look for comparison elements
+            comparison_selectors = [
+                "a[href*='compare']",
+                "a[href*='vs']", 
+                "a[href*='alternative']",
+                ".compare",
+                ".comparison"
+            ]
+            
+            for selector in comparison_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            # Hover over comparison link
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(element)
+                            actions.pause(random.uniform(2, 4))
+                            actions.perform()
+                            
+                            # Sometimes click (30% chance)
+                            if random.random() < 0.3:
+                                self.logger.info("🔗 Clicking comparison link")
+                                element.click()
+                                time.sleep(random.uniform(10, 20))
+                                self.driver.back()
+                                time.sleep(random.uniform(2, 5))
+                            break
+                except:
+                    continue
+            
+        except Exception as e:
+            self.logger.error(f"Error in comparison behavior: {e}")
+    
+    def _simulate_professional_reading(self):
+        """Simulate professional reading patterns"""
+        try:
+            self.logger.info("📖 Simulating professional reading...")
+            
+            # Professional reading is slower and more thorough
+            reading_time = random.uniform(45, 120)  # 45 seconds to 2 minutes
+            self.logger.info(f"⏱️ Professional reading time: {reading_time:.1f}s")
+            
+            # Scroll slowly while reading
+            start_time = time.time()
+            while time.time() - start_time < reading_time:
+                # Slow, deliberate scrolling
+                scroll_amount = random.randint(50, 150)
+                self.driver.execute_script(f"window.scrollBy(0, {scroll_amount});")
+                time.sleep(random.uniform(2, 4))
+                
+                # Sometimes scroll back up (re-reading)
+                if random.random() < 0.2:  # 20% chance
+                    self.driver.execute_script(f"window.scrollBy(0, -{scroll_amount//2});")
+                    time.sleep(random.uniform(1, 3))
+            
+        except Exception as e:
+            self.logger.error(f"Error in professional reading: {e}")
+    
+    def _simulate_research_behavior(self):
+        """Simulate research behavior for professional users"""
+        try:
+            self.logger.info("🔍 Simulating research behavior...")
+            
+            # Research involves multiple sources
+            research_actions = [
+                "search_related_topics",
+                "check_references", 
+                "look_for_more_info",
+                "verify_information"
+            ]
+            
+            # Perform 1-3 research actions
+            num_actions = random.randint(1, 3)
+            selected_actions = random.sample(research_actions, num_actions)
+            
+            for action in selected_actions:
+                if action == "search_related_topics":
+                    self._simulate_related_search()
+                elif action == "check_references":
+                    self._simulate_reference_checking()
+                elif action == "look_for_more_info":
+                    self._simulate_info_gathering()
+                elif action == "verify_information":
+                    self._simulate_information_verification()
+                
+                time.sleep(random.uniform(3, 8))
+            
+        except Exception as e:
+            self.logger.error(f"Error in research behavior: {e}")
+    
+    def _simulate_related_search(self):
+        """Simulate searching for related topics"""
+        try:
+            self.logger.info("🔎 Simulating related search...")
+            
+            # Look for search functionality
+            search_selectors = [
+                "input[type='search']",
+                "input[name*='search']",
+                "input[placeholder*='search']",
+                ".search-input",
+                "#search"
+            ]
+            
+            for selector in search_selectors:
+                try:
+                    search_box = self.driver.find_element(By.CSS_SELECTOR, selector)
+                    if search_box.is_displayed():
+                        # Click on search box
+                        search_box.click()
+                        time.sleep(random.uniform(1, 2))
+                        
+                        # Type search query
+                        search_queries = [
+                            "best practices",
+                            "comparison guide", 
+                            "expert tips",
+                            "industry analysis"
+                        ]
+                        
+                        query = random.choice(search_queries)
+                        search_box.send_keys(query)
+                        time.sleep(random.uniform(2, 4))
+                        
+                        # Press Enter
+                        search_box.send_keys(Keys.RETURN)
+                        time.sleep(random.uniform(5, 15))
+                        break
+                except:
+                    continue
+            
+        except Exception as e:
+            self.logger.error(f"Error in related search: {e}")
+    
+    def _simulate_reference_checking(self):
+        """Simulate checking references and sources"""
+        try:
+            self.logger.info("📚 Simulating reference checking...")
+            
+            # Look for links that might be references
+            reference_selectors = [
+                "a[href*='source']",
+                "a[href*='reference']",
+                "a[href*='study']",
+                "a[href*='research']",
+                "a[href*='pdf']",
+                "a[href*='.edu']",
+                "a[href*='.gov']"
+            ]
+            
+            for selector in reference_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            # Hover over reference
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(element)
+                            actions.pause(random.uniform(2, 4))
+                            actions.perform()
+                            
+                            # Sometimes open in new tab (20% chance)
+                            if random.random() < 0.2:
+                                self.logger.info("🔗 Opening reference in new tab")
+                                actions.key_down(Keys.COMMAND if os.name == 'posix' else Keys.CONTROL)
+                                actions.click(element)
+                                actions.key_up(Keys.COMMAND if os.name == 'posix' else Keys.CONTROL)
+                                actions.perform()
+                                time.sleep(random.uniform(5, 10))
+                            break
+                except:
+                    continue
+            
+        except Exception as e:
+            self.logger.error(f"Error in reference checking: {e}")
+    
+    def _simulate_info_gathering(self):
+        """Simulate gathering more information"""
+        try:
+            self.logger.info("📖 Simulating info gathering...")
+            
+            # Look for "read more" or "learn more" links
+            info_selectors = [
+                "a[href*='read-more']",
+                "a[href*='learn-more']",
+                "a[href*='details']",
+                "a[href*='full-article']",
+                ".read-more",
+                ".learn-more"
+            ]
+            
+            for selector in info_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            # Hover over link
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(element)
+                            actions.pause(random.uniform(2, 4))
+                            actions.perform()
+                            
+                            # Sometimes click (25% chance)
+                            if random.random() < 0.25:
+                                self.logger.info("📖 Clicking for more info")
+                                element.click()
+                                time.sleep(random.uniform(10, 20))
+                                self.driver.back()
+                                time.sleep(random.uniform(2, 5))
+                            break
+                except:
+                    continue
+            
+        except Exception as e:
+            self.logger.error(f"Error in info gathering: {e}")
+    
+    def _simulate_information_verification(self):
+        """Simulate verifying information from multiple sources"""
+        try:
+            self.logger.info("✅ Simulating information verification...")
+            
+            # Look for verification elements
+            verification_selectors = [
+                "a[href*='verify']",
+                "a[href*='fact-check']",
+                "a[href*='source']",
+                "a[href*='citation']"
+            ]
+            
+            for selector in verification_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    if elements:
+                        element = random.choice(elements)
+                        if element.is_displayed():
+                            # Hover over verification link
+                            actions = ActionChains(self.driver)
+                            actions.move_to_element(element)
+                            actions.pause(random.uniform(2, 4))
+                            actions.perform()
+                            
+                            # Sometimes click (15% chance)
+                            if random.random() < 0.15:
+                                self.logger.info("✅ Clicking verification link")
+                                element.click()
+                                time.sleep(random.uniform(8, 15))
+                                self.driver.back()
+                                time.sleep(random.uniform(2, 5))
+                            break
+                except:
+                    continue
+            
+        except Exception as e:
+            self.logger.error(f"Error in information verification: {e}")
             
             # 1. LANDING PAGE BEHAVIOR
             if post_click_config.get("landing_page_behavior", True):

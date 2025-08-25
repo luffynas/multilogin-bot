@@ -11,7 +11,10 @@ import time
 import logging
 import json
 import random
+import argparse
+import concurrent.futures
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Add src to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
@@ -22,8 +25,74 @@ from url_helper import setup_url_for_automation
 
 # Configuration
 CONFIG_PATH = "../config/config.yaml"
+PROFILE_DATA_PATH = "../config/profile.json"
 FOLDER_ID = "94caeb51-cc7f-477d-a6db-c79e696b5530"
 PROFILE_ID = "2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6"
+
+random_urls = [
+    "https://maxgaming.biz.id/crypto-investment-product-for-gamers-the-future-of-digital-wealth-in-the-united-states/",
+    "https://maxgaming.biz.id/order-nft-characters-in-p2e-games-the-complete-guide-for-u-s-gamers-and-investors/",
+    "https://maxgaming.biz.id/checkout-p2e-game-marketplace-a-complete-guide-for-u-s-gamers-and-investors/",
+    "https://maxgaming.biz.id/cart-nft-items-play-to-earn-the-ultimate-guide-for-u-s-gamers-and-investors/",
+    "https://maxgaming.biz.id/crypto-trading-service-for-play-to-earn-a-comprehensive-guide-for-u-s-gamers-and-investors/",
+    "https://maxgaming.biz.id/defi-solution-for-nft-games-unlocking-the-future-of-play-to-earn-in-the-united-states/",
+    "https://maxgaming.biz.id/purchase-ethereum-for-gaming-a-complete-guide-for-u-s-gamers-and-investors/",
+    "https://maxgaming.biz.id/play-to-earn-insurance-service-protecting-u-s-gamers-in-the-blockchain-era/",
+    "https://maxgaming.biz.id/crypto-gaming-marketing-advertising-solution-driving-growth-for-play-to-earn-platforms-in-the-u-s/",
+    "https://maxgaming.biz.id/lawyer-service-for-nft-scams-protecting-your-digital-assets-in-the-united-states/",
+    "https://maxgaming.biz.id/online-banking-for-play-to-earn-payments-a-secure-financial-future-for-u-s-gamers/",
+]
+
+def load_profile_data():
+    """Load profile data from JSON file"""
+    try:
+        with open(PROFILE_DATA_PATH, 'r') as f:
+            profiles = json.load(f)
+        return profiles
+    except Exception as e:
+        print(f"❌ Error loading profile data: {e}")
+        return []
+
+def select_profiles_for_testing(profiles, count=3):
+    """Select diverse profiles for testing"""
+    # Filter profiles by different characteristics
+    mobile_profiles = [p for p in profiles if p.get('os_type') == 'android']
+    desktop_profiles = [p for p in profiles if p.get('os_type') in ['windows', 'macos']]
+    
+    selected_profiles = []
+    
+    # Select 1 mobile profile
+    if mobile_profiles:
+        selected_profiles.append(mobile_profiles[0])
+    
+    # Select 2 desktop profiles (different OS)
+    windows_profiles = [p for p in desktop_profiles if p.get('os_type') == 'windows']
+    macos_profiles = [p for p in desktop_profiles if p.get('os_type') == 'macos']
+    
+    if windows_profiles:
+        selected_profiles.append(windows_profiles[0])
+    if macos_profiles and len(selected_profiles) < count:
+        selected_profiles.append(macos_profiles[0])
+    
+    # Fill remaining slots if needed
+    while len(selected_profiles) < count and desktop_profiles:
+        for profile in desktop_profiles:
+            if profile not in selected_profiles:
+                selected_profiles.append(profile)
+                break
+    
+    return selected_profiles[:count]
+
+def parse_arguments():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(description='Clean Automation Example')
+    parser.add_argument('--profile', type=str, help='Profile ID to use for automation')
+    parser.add_argument('--folder', type=str, help='Folder ID to use for automation')
+    parser.add_argument('--config', type=str, default=CONFIG_PATH, help='Path to config file')
+    parser.add_argument('--concurrent', action='store_true', help='Run concurrent automation with multiple profiles')
+    parser.add_argument('--workers', type=int, default=3, help='Number of concurrent workers')
+    parser.add_argument('--profiles', nargs='+', help='Specific profile IDs for concurrent mode')
+    return parser.parse_args()
 
 # Load config for launcher and localhost
 import yaml
@@ -32,10 +101,11 @@ with open(CONFIG_PATH, 'r') as f:
     MLX_LAUNCHER_V2 = config['multilogin']['launcher_url']
     LOCALHOST = config['multilogin']['localhost']
 
-def signin():
+def signin(config_path=None):
     """Authenticate with Multilogin API"""
     try:
-        api = MultiloginXAPI(CONFIG_PATH)
+        config_path = config_path or CONFIG_PATH
+        api = MultiloginXAPI(config_path)
         if not api.authenticate():
             raise Exception("Authentication failed")
         return api.bearer_token
@@ -43,15 +113,39 @@ def signin():
         print(f"❌ Login error: {e}")
         return None
 
-def start_profile(token):
-    """Start Multilogin profile"""
+def start_profile(token, folder_id, profile_id, fresh_start=True, use_start_url=True):
+    """Start Multilogin profile with optional fresh start and start URL"""
     try:
         headers = {"Accept": "application/json", "Content-Type": "application/json"}
         headers["Authorization"] = f"Bearer {token}"
-        start_url = f"{MLX_LAUNCHER_V2}/profile/f/{FOLDER_ID}/p/{PROFILE_ID}/start?automation_type=selenium"
+        
+        # Add fresh start parameters
+        params = {
+            "automation_type": "selenium"
+        }
+        
+        if fresh_start:
+            params.update({
+                "clear_cache": "true",
+                "clear_cookies": "true",
+                "clear_storage": "true",
+                "reset_state": "true"
+            })
+            print(f"🔄 Starting profile with fresh state: {profile_id}")
+        else:
+            print(f"📂 Starting profile with existing state: {profile_id}")
+        
+        # Add parameter to use Start URL from Multilogin profile
+        if use_start_url:
+            params.update({
+                "use_start_url": "true"
+            })
+            print(f"🌐 Using Start URL from Multilogin profile: {profile_id}")
+        
+        start_url = f"{MLX_LAUNCHER_V2}/profile/f/{folder_id}/p/{profile_id}/start"
         
         import requests
-        response = requests.get(start_url, headers=headers)
+        response = requests.get(start_url, headers=headers, params=params)
         if response.status_code != 200:
             return None
         
@@ -66,11 +160,199 @@ def start_profile(token):
         print(f"❌ Start profile error: {e}")
         return None
 
+def run_single_profile_concurrent(profile_data, config_path, session_id, folder_id):
+    """Run automation for a single profile in concurrent mode"""
+    profile_id = profile_data['id']
+    profile_name = profile_data['name']
+    os_type = profile_data.get('os_type', 'unknown')
+    
+    print(f"🚀 Starting Profile {session_id}: {profile_name} ({os_type})")
+    print(f"   📋 Profile ID: {profile_id}")
+    
+    try:
+        # Step 1: Authenticate
+        token = signin(config_path)
+        if not token:
+            raise Exception("Authentication failed")
+        
+        # Step 2: Start profile with fresh start and use Start URL from Multilogin
+        debugging_url = start_profile(token, folder_id, profile_id, fresh_start=True, use_start_url=True)
+        if not debugging_url:
+            raise Exception("Failed to start profile")
+        
+        # Step 3: Setup automation
+        automation = UndetectableSeleniumAutomation(config_path, profile_id)
+        if not automation.setup_driver(debugging_url):
+            raise Exception("Failed to setup driver")
+        
+        # Load config for fallback URL
+        with open(config_path, 'r') as f:
+            config_data = yaml.safe_load(f)
+        
+        # Setup URL with stealth navigation - use random URL from list
+        fallback_url = random.choice(random_urls)
+        current_url, message = setup_url_for_automation(automation, fallback_url, stealth_mode=True)
+        
+        if not current_url:
+            raise Exception(f"Failed to setup URL: {message}")
+        
+        print(f"   ✅ Automation setup successful: {current_url}")
+        print(f"   🎲 Random URL selected: {fallback_url}")
+        
+        # Step 4: Run automation demos
+        print(f"   🎭 Running automation demos...")
+        
+        # Demo personality system
+        print(f"   🎭 Testing personality system...")
+        automation._simulate_attention_span_variation()
+        automation._simulate_reading_speed_variation()
+        
+        # Demo navigation with multiple pages
+        print(f"   🧭 Testing navigation with multiple pages...")
+        automation._simulate_natural_scrolling()
+        
+        # Navigate to multiple pages (3-5 pages total)
+        pages_visited = 1  # Current page
+        max_pages = random.randint(3, 5)
+        
+        print(f"   📄 Target: {max_pages} pages total")
+        
+        while pages_visited < max_pages:
+            # Try to navigate to next/previous page
+            next_url = automation._navigate_previous_next()
+            
+            if next_url:
+                print(f"   🔄 Navigating to page {pages_visited + 1}/{max_pages}")
+                automation.driver.get(next_url)
+                time.sleep(random.uniform(2, 4))  # Wait for page load
+                
+                # Simulate behavior on new page
+                automation._simulate_natural_scrolling()
+                automation._simulate_mouse_movement()
+                
+                pages_visited += 1
+            else:
+                # Try random navigation if prev/next not available
+                random_url = automation._navigate_random_page()
+                if random_url:
+                    print(f"   🎲 Navigating to random page {pages_visited + 1}/{max_pages}")
+                    automation.driver.get(random_url)
+                    time.sleep(random.uniform(2, 4))
+                    
+                    # Simulate behavior on new page
+                    automation._simulate_natural_scrolling()
+                    automation._simulate_mouse_movement()
+                    
+                    pages_visited += 1
+                else:
+                    print(f"   ⚠️ No more navigation links found, stopping at {pages_visited} pages")
+                    break
+        
+        print(f"   ✅ Visited {pages_visited} pages total")
+        
+        # Demo AdSense integration with RPM optimization
+        print(f"   💰 Testing AdSense integration with RPM optimization...")
+        adsense_results = automation.test_adsense_ads()
+        if "error" not in adsense_results:
+            ads_found = adsense_results.get('ads_detected', 0)
+            print(f"   ✅ Found {ads_found} ads")
+            
+            # Smart Ad Interaction for RPM
+            print(f"   🎯 Testing Smart Ad Interaction for RPM...")
+            rpm_results = automation._smart_ad_interaction_for_rpm()
+            if "error" not in rpm_results:
+                commercial_category = rpm_results.get('commercial_category', 'none')
+                commercial_score = rpm_results.get('commercial_score', 0)
+                click_probability = rpm_results.get('click_probability', 0)
+                print(f"   💎 Commercial intent: {commercial_category} (score: {commercial_score})")
+                print(f"   🎯 Click probability: {click_probability*100:.1f}%")
+        
+        # Demo Professional User Behavior
+        print(f"   👔 Testing Professional User Behavior...")
+        automation._simulate_professional_user_behavior()
+        
+        # Demo Extended Session Behavior
+        print(f"   ⏰ Testing Extended Session Behavior...")
+        session_config = automation._simulate_extended_session_behavior()
+        if "error" not in session_config:
+            duration = session_config.get('duration', 0)
+            page_views = session_config.get('page_views', 0)
+            print(f"   📊 Extended session: {duration/60:.1f}min, {page_views} pages")
+        
+        # Demo advanced features
+        print(f"   🚀 Testing advanced features...")
+        automation._simulate_mouse_movement()
+        automation._simulate_link_hovering()
+        
+        # Demo click simulation
+        print(f"   🖱️ Testing click simulation...")
+        automation._simulate_natural_click()
+        
+        # Demo ad interaction with realistic click probability
+        if adsense_results and adsense_results.get('ads_detected', 0) > 0:
+            print(f"   🎯 Testing ad interaction...")
+            # Very low probability click (realistic)
+            click_probability = 0.001  # 0.1% chance
+            if random.random() < click_probability:
+                print(f"   ✅ Deciding to click ad (realistic probability)")
+                # Note: Actual click is handled in selenium_automation.py
+            else:
+                print(f"   ❌ Deciding not to click (realistic behavior)")
+        
+        # Record session data
+        session_data = {
+            "profile_id": profile_id,
+            "profile_name": profile_name,
+            "os_type": os_type,
+            "device_type": automation.device_type,
+            "personality": automation.user_personality,
+            "session_id": session_id,
+            "timestamp": datetime.now().isoformat(),
+            "status": "completed",
+            "url": current_url
+        }
+        
+        # Save session data
+        os.makedirs("../data", exist_ok=True)
+        session_file = f"../data/concurrent_session_{session_id}_{profile_id[:8]}.json"
+        with open(session_file, 'w') as f:
+            json.dump(session_data, f, indent=2)
+        
+        print(f"   ✅ Profile {session_id} completed successfully!")
+        print(f"   💾 Session data saved: {session_file}")
+        
+        # Cleanup
+        if automation.driver:
+            automation.close_driver()
+        
+        return {
+            "session_id": session_id,
+            "profile_id": profile_id,
+            "profile_name": profile_name,
+            "device_type": automation.device_type,
+            "personality": automation.user_personality,
+            "status": "success"
+        }
+        
+    except Exception as e:
+        print(f"   ❌ Profile {session_id} failed: {e}")
+        return {
+            "session_id": session_id,
+            "profile_id": profile_id,
+            "profile_name": profile_name,
+            "status": "failed",
+            "error": str(e)
+        }
+
 class CleanAutomation:
     """Clean automation example with simplified structure"""
     
-    def __init__(self):
-        """Initialize automation"""
+    def __init__(self, profile_id=None, folder_id=None, config_path=None):
+        """Initialize automation with optional parameters"""
+        self.profile_id = profile_id or PROFILE_ID
+        self.folder_id = folder_id or FOLDER_ID
+        self.config_path = config_path or CONFIG_PATH
+        
         self.api = None
         self.automation = None
         self.debugging_url = None
@@ -101,13 +383,13 @@ class CleanAutomation:
         try:
             self.logger.info("🔐 Authenticating with Multilogin API...")
             
-            # Use the signin function
-            token = signin()
+            # Use the signin function with config path
+            token = signin(self.config_path)
             if not token:
                 raise Exception("Authentication failed")
             
             # Create API instance
-            self.api = MultiloginXAPI(CONFIG_PATH)
+            self.api = MultiloginXAPI(self.config_path)
             self.api.bearer_token = token
             
             self.logger.info("✅ Authentication successful")
@@ -121,11 +403,11 @@ class CleanAutomation:
         """Start Multilogin profile"""
         try:
             self.logger.info("🚀 Starting Multilogin profile...")
-            self.logger.info(f"Using Profile ID: {PROFILE_ID}")
-            self.logger.info(f"Using Folder ID: {FOLDER_ID}")
+            self.logger.info(f"Using Profile ID: {self.profile_id}")
+            self.logger.info(f"Using Folder ID: {self.folder_id}")
             
-            # Use the start_profile function with token
-            self.debugging_url = start_profile(self.api.bearer_token)
+            # Use the start_profile function with token and parameters (fresh start enabled, use Start URL)
+            self.debugging_url = start_profile(self.api.bearer_token, self.folder_id, self.profile_id, fresh_start=True, use_start_url=True)
             
             if not self.debugging_url:
                 raise Exception("Failed to start profile")
@@ -142,14 +424,22 @@ class CleanAutomation:
         try:
             self.logger.info("🔧 Setting up Selenium automation...")
             
-            self.automation = UndetectableSeleniumAutomation(CONFIG_PATH)
+            # Pass profile ID to automation for consistent behavior
+            self.automation = UndetectableSeleniumAutomation(self.config_path, self.profile_id)
             
             if not self.automation.setup_driver(self.debugging_url):
                 raise Exception("Failed to setup driver")
             
-            # Setup URL with helper - get fallback URL from config
-            fallback_url = config.get('adsense_testing', {}).get('fallback_url', "https://gengsego.com")
-            current_url, message = setup_url_for_automation(self.automation, fallback_url)
+            # Force fresh start to ensure clean state
+            self.automation.force_fresh_start()
+            
+            # Load config for fallback URL
+            with open(self.config_path, 'r') as f:
+                config_data = yaml.safe_load(f)
+            
+            # Setup URL with stealth navigation - use random URL from list
+            fallback_url = random.choice(random_urls)
+            current_url, message = setup_url_for_automation(self.automation, fallback_url, stealth_mode=True)
             
             if not current_url:
                 raise Exception(f"Failed to setup URL: {message}")
@@ -163,6 +453,7 @@ class CleanAutomation:
             })
             
             self.logger.info(f"✅ Automation setup successful: {current_url}")
+            self.logger.info(f"🎲 Random URL selected: {fallback_url}")
             return True
             
         except Exception as e:
@@ -227,32 +518,66 @@ class CleanAutomation:
                 self.logger.error(f"    ❌ {behavior_type} failed: {e}")
     
     def demo_navigation(self):
-        """Demo navigation functionality"""
+        """Demo navigation functionality with multiple pages"""
         try:
             self.logger.info("🧭 Demo: Navigation System")
             
-            # Test previous/next navigation
-            new_url = self.automation._navigate_previous_next()
+            # Navigate to multiple pages (3-5 pages total)
+            pages_visited = 1  # Current page
+            max_pages = random.randint(3, 5)
             
-            if new_url:
-                self.logger.info(f"✅ Found navigation link: {new_url[:60]}...")
+            self.logger.info(f"📄 Target: {max_pages} pages total")
+            
+            while pages_visited < max_pages:
+                # Try to navigate to next/previous page
+                new_url = self.automation._navigate_previous_next()
                 
-                # Navigate to new URL
-                self.automation.driver.get(new_url)
-                time.sleep(3)
-                
-                # Record navigation
-                self.session_data["pages_visited"].append({
-                    "url": new_url,
-                    "timestamp": datetime.now().isoformat(),
-                    "title": self.automation.driver.title
-                })
-                
-                # Simulate behavior on new page
-                self._demo_post_navigation_behavior()
-                
-            else:
-                self.logger.info("⚠️ No navigation links found")
+                if new_url:
+                    self.logger.info(f"🔄 Navigating to page {pages_visited + 1}/{max_pages}")
+                    self.logger.info(f"✅ Found navigation link: {new_url[:60]}...")
+                    
+                    # Navigate to new URL
+                    self.automation.driver.get(new_url)
+                    time.sleep(random.uniform(2, 4))
+                    
+                    # Record navigation
+                    self.session_data["pages_visited"].append({
+                        "url": new_url,
+                        "timestamp": datetime.now().isoformat(),
+                        "title": self.automation.driver.title
+                    })
+                    
+                    # Simulate behavior on new page
+                    self._demo_post_navigation_behavior()
+                    
+                    pages_visited += 1
+                else:
+                    # Try random navigation if prev/next not available
+                    random_url = self.automation._navigate_random_page()
+                    if random_url:
+                        self.logger.info(f"🎲 Navigating to random page {pages_visited + 1}/{max_pages}")
+                        self.logger.info(f"✅ Found random link: {random_url[:60]}...")
+                        
+                        # Navigate to random URL
+                        self.automation.driver.get(random_url)
+                        time.sleep(random.uniform(2, 4))
+                        
+                        # Record navigation
+                        self.session_data["pages_visited"].append({
+                            "url": random_url,
+                            "timestamp": datetime.now().isoformat(),
+                            "title": self.automation.driver.title
+                        })
+                        
+                        # Simulate behavior on new page
+                        self._demo_post_navigation_behavior()
+                        
+                        pages_visited += 1
+                    else:
+                        self.logger.info(f"⚠️ No more navigation links found, stopping at {pages_visited} pages")
+                        break
+            
+            self.logger.info(f"✅ Visited {pages_visited} pages total")
             
         except Exception as e:
             self.logger.error(f"❌ Navigation demo failed: {e}")
@@ -276,9 +601,9 @@ class CleanAutomation:
             self.logger.error(f"    ❌ Post-navigation behavior failed: {e}")
     
     def demo_adsense_integration(self):
-        """Demo AdSense detection and interaction"""
+        """Demo AdSense detection and interaction with RPM optimization"""
         try:
-            self.logger.info("💰 Demo: AdSense Integration")
+            self.logger.info("💰 Demo: AdSense Integration with RPM Optimization")
             
             # Test AdSense detection on current page
             adsense_results = self.automation.test_adsense_ads()
@@ -287,14 +612,25 @@ class CleanAutomation:
                 ads_found = adsense_results.get('ads_detected', 0)
                 self.logger.info(f"✅ Found {ads_found} ads")
                 
+                # Smart Ad Interaction for RPM
+                self.logger.info("🎯 Testing Smart Ad Interaction for RPM...")
+                rpm_results = self.automation._smart_ad_interaction_for_rpm()
+                if "error" not in rpm_results:
+                    commercial_category = rpm_results.get('commercial_category', 'none')
+                    commercial_score = rpm_results.get('commercial_score', 0)
+                    click_probability = rpm_results.get('click_probability', 0)
+                    self.logger.info(f"💎 Commercial intent: {commercial_category} (score: {commercial_score})")
+                    self.logger.info(f"🎯 Click probability: {click_probability*100:.1f}%")
+                
                 if ads_found > 0:
                     self.logger.info("🖱️ Safe ad interaction demo...")
                     self._demo_safe_ad_interaction(adsense_results.get('details', []))
                 
-                # Record AdSense results
+                # Record AdSense results with RPM data
                 self.session_data["interactions"].append({
                     "type": "adsense",
                     "ads_found": ads_found,
+                    "rpm_optimization": rpm_results,
                     "timestamp": datetime.now().isoformat()
                 })
             else:
@@ -303,6 +639,57 @@ class CleanAutomation:
         except Exception as e:
             self.logger.error(f"❌ AdSense demo failed: {e}")
             self.session_data["errors"].append({"type": "adsense", "error": str(e)})
+    
+    def demo_professional_behavior(self):
+        """Demo Professional User Behavior for RPM optimization"""
+        try:
+            self.logger.info("👔 Demo: Professional User Behavior")
+            
+            # Simulate professional user behavior
+            self.automation._simulate_professional_user_behavior()
+            
+            # Record professional behavior data
+            self.session_data["interactions"].append({
+                "type": "professional_behavior",
+                "personality": self.automation.user_personality,
+                "device_type": self.automation.device_type,
+                "timestamp": datetime.now().isoformat()
+            })
+            
+        except Exception as e:
+            self.logger.error(f"❌ Professional behavior demo failed: {e}")
+            self.session_data["errors"].append({"type": "professional_behavior", "error": str(e)})
+    
+    def demo_extended_session(self):
+        """Demo Extended Session Behavior for RPM optimization"""
+        try:
+            self.logger.info("⏰ Demo: Extended Session Behavior")
+            
+            # Simulate extended session behavior
+            session_config = self.automation._simulate_extended_session_behavior()
+            
+            if "error" not in session_config:
+                duration = session_config.get('duration', 0)
+                page_views = session_config.get('page_views', 0)
+                engagement_level = session_config.get('engagement_level', 'medium')
+                
+                self.logger.info(f"📊 Extended session: {duration/60:.1f}min, {page_views} pages")
+                self.logger.info(f"🎯 Engagement level: {engagement_level}")
+                
+                # Record extended session data
+                self.session_data["interactions"].append({
+                    "type": "extended_session",
+                    "duration_minutes": duration / 60,
+                    "page_views": page_views,
+                    "engagement_level": engagement_level,
+                    "timestamp": datetime.now().isoformat()
+                })
+            else:
+                self.logger.warning(f"⚠️ Extended session error: {session_config.get('error')}")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Extended session demo failed: {e}")
+            self.session_data["errors"].append({"type": "extended_session", "error": str(e)})
     
     def _demo_safe_ad_interaction(self, ads):
         """Demo safe ad interaction"""
@@ -435,6 +822,8 @@ class CleanAutomation:
             self.demo_personality_system()
             self.demo_navigation()
             self.demo_adsense_integration()
+            self.demo_professional_behavior()
+            self.demo_extended_session()
             self.demo_advanced_features()
             
             # Step 5: Save and summarize
@@ -456,30 +845,248 @@ class CleanAutomation:
                 except Exception as e:
                     self.logger.error(f"⚠️ Error closing browser: {e}")
 
+def run_concurrent_automation(profile_ids=None, max_workers=3, config_path=CONFIG_PATH, folder_id=FOLDER_ID):
+    """Run concurrent automation with queue system - process all profiles with 1-5 concurrent workers"""
+    print("🎯 Concurrent Queue Automation")
+    print("=" * 60)
+    print(f"⏰ Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"🔧 Max Workers: {max_workers}")
+    
+    # Load ALL profile data
+    all_profiles = load_profile_data()
+    if not all_profiles:
+        print("❌ No profiles found!")
+        return False
+    
+    # Select profiles for processing
+    if profile_ids:
+        # Use specified profile IDs
+        profiles_to_process = [p for p in all_profiles if p['id'] in profile_ids]
+        if len(profiles_to_process) != len(profile_ids):
+            print(f"⚠️ Warning: Only {len(profiles_to_process)} of {len(profile_ids)} profiles found")
+    else:
+        # Use ALL profiles from the file
+        profiles_to_process = all_profiles
+        print(f"📋 Processing ALL {len(profiles_to_process)} profiles from profile.json")
+    
+    if not profiles_to_process:
+        print("❌ No profiles to process!")
+        return False
+    
+    print(f"\n📋 Profiles to Process:")
+    for i, profile in enumerate(profiles_to_process, 1):
+        print(f"   {i:2d}. {profile['name']} ({profile.get('os_type', 'unknown')}) - {profile['id']}")
+    
+    print(f"\n🚀 Starting queue processing with {max_workers} concurrent workers...")
+    print(f"📊 Queue Strategy: Process {len(profiles_to_process)} profiles, {max_workers} at a time")
+    
+    # Queue system with ThreadPoolExecutor
+    results = []
+    completed_count = 0
+    start_time = time.time()
+    
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Submit initial batch of tasks
+        future_to_profile = {}
+        active_profiles = min(max_workers, len(profiles_to_process))
+        
+        print(f"\n🔄 Submitting initial batch of {active_profiles} profiles...")
+        for i in range(active_profiles):
+            profile = profiles_to_process[i]
+            future = executor.submit(
+                run_single_profile_concurrent, 
+                profile, 
+                config_path, 
+                f"session_{i+1:02d}",
+                folder_id
+            )
+            future_to_profile[future] = profile
+            print(f"   🚀 Started: {profile['name']} (session_{i+1:02d})")
+        
+        # Process remaining profiles as workers become available
+        next_profile_index = active_profiles
+        
+        while future_to_profile:
+            # Wait for any task to complete
+            done, _ = concurrent.futures.wait(
+                future_to_profile.keys(), 
+                return_when=concurrent.futures.FIRST_COMPLETED
+            )
+            
+            # Process completed tasks
+            for future in done:
+                profile = future_to_profile.pop(future)
+                completed_count += 1
+                
+                try:
+                    result = future.result()
+                    results.append(result)
+                    status_icon = "✅" if result['status'] == 'success' else "❌"
+                    print(f"\n{status_icon} Completed ({completed_count}/{len(profiles_to_process)}): {result['profile_name']} ({result['status']})")
+                    
+                    if result['status'] == 'success':
+                        print(f"   📱 Device: {result['device_type']}")
+                        print(f"   🎭 Personality: {result['personality']}")
+                    else:
+                        print(f"   💥 Error: {result.get('error', 'Unknown error')}")
+                        
+                except Exception as e:
+                    print(f"\n❌ Exception in {profile['name']}: {e}")
+                    results.append({
+                        "session_id": "unknown",
+                        "profile_id": profile['id'],
+                        "profile_name": profile['name'],
+                        "status": "exception",
+                        "error": str(e)
+                    })
+                
+                # Submit next profile if available
+                if next_profile_index < len(profiles_to_process):
+                    next_profile = profiles_to_process[next_profile_index]
+                    future = executor.submit(
+                        run_single_profile_concurrent, 
+                        next_profile, 
+                        config_path, 
+                        f"session_{next_profile_index+1:02d}",
+                        folder_id
+                    )
+                    future_to_profile[future] = next_profile
+                    print(f"   🚀 Started: {next_profile['name']} (session_{next_profile_index+1:02d})")
+                    next_profile_index += 1
+                else:
+                    print(f"   📊 Queue: {len(future_to_profile)} profiles still running, {len(profiles_to_process) - completed_count} completed")
+    
+    # Calculate execution time
+    execution_time = time.time() - start_time
+    
+    # Print summary
+    print(f"\n📊 QUEUE AUTOMATION SUMMARY")
+    print("=" * 60)
+    print(f"⏱️  Total Execution Time: {execution_time:.2f} seconds")
+    print(f"📋 Total Profiles Processed: {len(profiles_to_process)}")
+    print(f"🔧 Concurrent Workers: {max_workers}")
+    print(f"✅ Successful: {len([r for r in results if r['status'] == 'success'])}")
+    print(f"❌ Failed: {len([r for r in results if r['status'] != 'success'])}")
+    print(f"📈 Success Rate: {len([r for r in results if r['status'] == 'success'])/len(profiles_to_process)*100:.1f}%")
+    
+    print(f"\n📈 Individual Results:")
+    for i, result in enumerate(results, 1):
+        status_icon = "✅" if result['status'] == 'success' else "❌"
+        print(f"   {i:2d}. {status_icon} {result['profile_name']}")
+        if result['status'] == 'success':
+            print(f"      📱 Device: {result['device_type']}")
+            print(f"      🎭 Personality: {result['personality']}")
+        else:
+            print(f"      💥 Error: {result.get('error', 'Unknown error')}")
+    
+    # Save overall results
+    summary_data = {
+        "timestamp": datetime.now().isoformat(),
+        "execution_time": execution_time,
+        "total_profiles": len(profiles_to_process),
+        "concurrent_workers": max_workers,
+        "successful": len([r for r in results if r['status'] == 'success']),
+        "failed": len([r for r in results if r['status'] != 'success']),
+        "success_rate": len([r for r in results if r['status'] == 'success'])/len(profiles_to_process)*100,
+        "results": results
+    }
+    
+    summary_file = f"../data/queue_summary_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    with open(summary_file, 'w') as f:
+        json.dump(summary_data, f, indent=2)
+    
+    print(f"\n💾 Summary saved: {summary_file}")
+    print(f"\n🎉 Queue automation completed!")
+    
+    return len([r for r in results if r['status'] == 'success']) > 0
+
 def main():
     """Main function"""
-    print("🎯 Clean Automation Example")
-    print("=" * 50)
-    print("Simplified automation with clean structure")
+    # Parse command line arguments
+    args = parse_arguments()
     
-    # Create and run automation
-    automation = CleanAutomation()
-    success = automation.run_automation()
-    
-    if success:
-        print("\n🏆 Automation completed successfully!")
-        print("📋 Features demonstrated:")
-        print("  ✅ Authentication & Profile Management")
-        print("  ✅ Selenium Automation Setup")
-        print("  ✅ Personality System")
-        print("  ✅ Navigation System")
-        print("  ✅ AdSense Integration")
-        print("  ✅ Advanced Features")
-        print("  ✅ Session Data Management")
+    # Check if concurrent mode is requested
+    if args.concurrent:
+        print("🎯 Concurrent Queue Automation")
+        print("=" * 60)
+        print("Processing ALL profiles with queue system (1-5 concurrent workers)")
+        print("📊 Strategy: When one profile finishes, next profile starts automatically")
+        
+        # Show parameters being used
+        if args.profiles:
+            print(f"📋 Using Profile IDs: {args.profiles}")
+        else:
+            print(f"📋 Using ALL profiles from profile.json")
+        if args.workers:
+            print(f"🔧 Max Workers: {args.workers}")
+        if args.config != CONFIG_PATH:
+            print(f"⚙️ Using Config: {args.config}")
+        
+        # Run concurrent automation with queue system
+        success = run_concurrent_automation(
+            profile_ids=args.profiles,
+            max_workers=args.workers,
+            config_path=args.config,
+            folder_id=args.folder or FOLDER_ID
+        )
+        
+        if success:
+            print("\n🏆 Queue automation completed successfully!")
+            print("📋 Features demonstrated:")
+            print("  ✅ Queue System (1-5 concurrent workers)")
+            print("  ✅ Automatic Profile Rotation")
+            print("  ✅ Multi-Profile Authentication")
+            print("  ✅ Concurrent Browser Sessions")
+            print("  ✅ Device-Specific Behavior")
+            print("  ✅ Personality System")
+            print("  ✅ Navigation System")
+            print("  ✅ AdSense Integration with RPM Optimization")
+            print("  ✅ Professional User Behavior")
+            print("  ✅ Extended Session Behavior")
+            print("  ✅ Advanced Features")
+            print("  ✅ Session Data Management")
+        else:
+            print("\n❌ Queue automation failed")
+        
+        return success
     else:
-        print("\n❌ Automation failed")
-    
-    return success
+        # Single profile mode (original functionality)
+        print("🎯 Clean Automation Example")
+        print("=" * 50)
+        print("Simplified automation with clean structure")
+        
+        # Show parameters being used
+        if args.profile:
+            print(f"📋 Using Profile ID: {args.profile}")
+        if args.folder:
+            print(f"📁 Using Folder ID: {args.folder}")
+        if args.config != CONFIG_PATH:
+            print(f"⚙️ Using Config: {args.config}")
+        
+        # Create and run automation with parameters
+        automation = CleanAutomation(
+            profile_id=args.profile,
+            folder_id=args.folder,
+            config_path=args.config
+        )
+        success = automation.run_automation()
+        
+        if success:
+            print("\n🏆 Automation completed successfully!")
+            print("📋 Features demonstrated:")
+            print("  ✅ Authentication & Profile Management")
+            print("  ✅ Selenium Automation Setup")
+            print("  ✅ Personality System")
+            print("  ✅ Navigation System")
+            print("  ✅ AdSense Integration with RPM Optimization")
+            print("  ✅ Professional User Behavior")
+            print("  ✅ Extended Session Behavior")
+            print("  ✅ Advanced Features")
+            print("  ✅ Session Data Management")
+        else:
+            print("\n❌ Automation failed")
+        
+        return success
 
 if __name__ == "__main__":
     success = main()

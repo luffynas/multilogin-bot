@@ -561,7 +561,7 @@ class MultiloginXAPI:
             self.logger.error(f"Error getting profile: {e}")
             return None
     
-    def start_profile(self, profile_id: str, folder_id: str = "default") -> Optional[str]:
+    def start_profile(self, profile_id: str, folder_id: str = "default", fresh_start: bool = True, use_start_url: bool = True) -> Optional[str]:
         """Start a profile and return the debugging URL"""
         try:
             if not self.bearer_token:
@@ -573,6 +573,25 @@ class MultiloginXAPI:
                 "automation_type": "selenium",
                 "headless_mode": "false"
             }
+            
+            # Add fresh start parameters if requested
+            if fresh_start:
+                params.update({
+                    "clear_cache": "true",
+                    "clear_cookies": "true",
+                    "clear_storage": "true",
+                    "reset_state": "true"
+                })
+                self.logger.info(f"Starting profile with fresh state: {profile_id}")
+            else:
+                self.logger.info(f"Starting profile with existing state: {profile_id}")
+            
+            # Add parameter to use Start URL from Multilogin profile
+            if use_start_url:
+                params.update({
+                    "use_start_url": "true"
+                })
+                self.logger.info(f"Using Start URL from Multilogin profile: {profile_id}")
             
             response = self.session.get(start_url, params=params)
             response.raise_for_status()
@@ -597,14 +616,73 @@ class MultiloginXAPI:
             self.logger.error(f"Profile start error: {e}")
             return None
     
-    def stop_profile(self, profile_id: str, folder_id: str = "default") -> bool:
-        """Stop a running profile"""
+    def clear_profile_data(self, profile_id: str, folder_id: str = "default") -> bool:
+        """Clear all profile data (cache, cookies, storage)"""
         try:
             if not self.bearer_token:
                 if not self.authenticate():
                     return False
             
-            stop_url = f"{self.launcher_url}/profile/f/{folder_id}/p/{profile_id}/stop"
+            clear_url = f"{self.launcher_url}/profile/f/{folder_id}/p/{profile_id}/clear"
+            params = {
+                "clear_cache": "true",
+                "clear_cookies": "true", 
+                "clear_local_storage": "true",
+                "clear_session_storage": "true",
+                "clear_indexed_db": "true",
+                "clear_service_workers": "true"
+            }
+            
+            response = self.session.get(clear_url, params=params)
+            response.raise_for_status()
+            
+            clear_response = response.json()
+            
+            if clear_response.get('status', {}).get('http_code') == 200:
+                self.logger.info(f"Successfully cleared profile data: {profile_id}")
+                return True
+            else:
+                self.logger.error(f"Profile clear failed: {clear_response}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Profile clear error: {e}")
+            return False
+    
+    def reset_profile_state(self, profile_id: str, folder_id: str = "default") -> bool:
+        """Reset profile to initial state"""
+        try:
+            if not self.bearer_token:
+                if not self.authenticate():
+                    return False
+            
+            reset_url = f"{self.launcher_url}/profile/f/{folder_id}/p/{profile_id}/reset"
+            
+            response = self.session.get(reset_url)
+            response.raise_for_status()
+            
+            reset_response = response.json()
+            
+            if reset_response.get('status', {}).get('http_code') == 200:
+                self.logger.info(f"Successfully reset profile state: {profile_id}")
+                return True
+            else:
+                self.logger.error(f"Profile reset failed: {reset_response}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Profile reset error: {e}")
+            return False
+    
+    def stop_profile(self, profile_id: str, folder_id: str = "default") -> bool:
+        """Stop a running profile using the correct endpoint"""
+        try:
+            if not self.bearer_token:
+                if not self.authenticate():
+                    return False
+            
+            # Use the correct endpoint format as provided
+            stop_url = f"{self.launcher_url}/profile/stop/p/{profile_id}"
             
             response = self.session.get(stop_url)
             response.raise_for_status()
