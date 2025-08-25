@@ -21,13 +21,14 @@ import os
 import json
 
 class UndetectableSeleniumAutomation:
-    def __init__(self, config_path: str = "../config/config.yaml", profile_id: str = None):
+    def __init__(self, config_path: str = "../config/config.yaml", profile_id: str = None, os_type: str = "windows"):
         """Initialize undetectable Selenium automation with comprehensive configuration"""
         self.config = self._load_config(config_path)
         self.logger = logging.getLogger(__name__)
         self.driver = None
         self.wait = None
         self.profile_id = profile_id  # Store profile ID for consistent behavior
+        self.os_type = os_type  # Store OS type for OS-specific behavior
         
         # Load all selenium configurations from YAML
         selenium_config = self.config.get("selenium", {})
@@ -127,6 +128,9 @@ class UndetectableSeleniumAutomation:
         self.device_type = self._detect_device_type()
         self.geo_location = "US"  # Default, will be updated from fingerprint
         
+        # Log OS type for debugging
+        self.logger.info(f"🖥️ OS Type: {self.os_type}")
+        
         # Initialize stealth behavior tracking
         self.stealth_metrics = {
             "mouse_movements": 0,
@@ -164,6 +168,7 @@ class UndetectableSeleniumAutomation:
                 self.session_memory.update({
                     "personality": self.user_personality,
                     "device_type": self.device_type,
+                    "os_type": self.os_type,
                     "geo_location": self.geo_location,
                     "session_start": datetime.now().isoformat(),
                     "behavior_patterns": {
@@ -193,6 +198,7 @@ class UndetectableSeleniumAutomation:
                 "last_activity": self.stealth_metrics["last_activity"].isoformat(),
                 "personality": self.user_personality,
                 "device_type": self.device_type,
+                "os_type": self.os_type,
                 "geo_location": self.geo_location,
                 "behavior_config": {
                     "human_behavior_enabled": self.human_behavior_config.get("enabled", True),
@@ -352,64 +358,57 @@ class UndetectableSeleniumAutomation:
             return "casual"  # Fallback
     
     def _detect_device_type(self) -> str:
-        """Detect device type based on profile ID hash for consistent device assignment"""
+        """Detect device type based on OS type and profile ID for consistent device assignment"""
         try:
-            # Get profile ID from session or generate a consistent one
-            profile_id = getattr(self, 'profile_id', None)
-            if not profile_id:
-                # Generate a consistent profile ID based on timestamp and random seed
-                import hashlib
-                profile_id = hashlib.md5(f"{datetime.now().strftime('%Y%m%d')}_{random.randint(1, 1000)}".encode()).hexdigest()
+            # First, try to determine device type based on OS type
+            os_type = getattr(self, 'os_type', 'windows')
             
-            # Clean profile ID by removing dashes and taking first 16 characters
-            clean_profile_id = profile_id.replace('-', '')[:16]
+            # OS-based device type mapping
+            os_device_mapping = {
+                'windows': 'desktop',
+                'macos': 'desktop', 
+                'linux': 'desktop',
+                'android': 'mobile',
+                'ios': 'mobile'
+            }
             
-            # Ensure we have enough characters for hash calculation
-            if len(clean_profile_id) < 16:
-                # Pad with zeros if needed
-                clean_profile_id = clean_profile_id.ljust(16, '0')
+            # Get base device type from OS
+            base_device_type = os_device_mapping.get(os_type.lower(), 'desktop')
             
-            # Use profile ID hash to determine device type consistently
-            try:
-                hash_value = int(clean_profile_id[:8], 16)  # Use first 8 characters of hash
-            except ValueError:
-                # If hex parsing fails, use simple hash of the string
-                hash_value = hash(clean_profile_id[:8]) % 1000000
-            
-            # Device distribution with profile-based consistency
-            device_distribution = self.advanced_config.get("device_distribution", {
-                "desktop": 0.6,
-                "mobile": 0.3,
-                "tablet": 0.1
-            })
-            
-            # Create weighted ranges for consistent device assignment
-            device_types = list(device_distribution.keys())
-            weights = list(device_distribution.values())
-        
-            # Normalize weights to 0-1 range
-            total_weight = sum(weights)
-            normalized_weights = [w/total_weight for w in weights]
-            
-            # Create cumulative ranges
-            cumulative_weights = []
-            cumulative = 0
-            for weight in normalized_weights:
-                cumulative += weight
-                cumulative_weights.append(cumulative)
-            
-            # Use hash value to determine device type consistently
-            hash_normalized = (hash_value % 1000) / 1000.0  # Normalize to 0-1
-            
-            # Find which range the hash falls into
-            for i, cumulative_weight in enumerate(cumulative_weights):
-                if hash_normalized <= cumulative_weight:
-                    device_type = device_types[i]
-                    break
+            # If OS indicates desktop, we can add some variation based on profile ID
+            if base_device_type == 'desktop':
+                # Get profile ID for additional variation
+                profile_id = getattr(self, 'profile_id', None)
+                if profile_id:
+                    # Clean profile ID by removing dashes and taking first 8 characters
+                    clean_profile_id = profile_id.replace('-', '')[:8]
+                    
+                    # Ensure we have enough characters for hash calculation
+                    if len(clean_profile_id) < 8:
+                        clean_profile_id = clean_profile_id.ljust(8, '0')
+                    
+                    # Use profile ID hash to add variation within desktop
+                    try:
+                        hash_value = int(clean_profile_id, 16)  # Use all 8 characters
+                    except ValueError:
+                        # If hex parsing fails, use simple hash of the string
+                        hash_value = hash(clean_profile_id) % 1000000
+                    
+                    # Use hash to determine if it should be tablet (10% chance for desktop OS)
+                    if (hash_value % 100) < 10:  # 10% chance
+                        device_type = 'tablet'
+                        self.logger.info(f"📱 OS-based device type: {device_type} (OS: {os_type}, hash variation: {hash_value})")
+                    else:
+                        device_type = 'desktop'
+                        self.logger.info(f"🖥️ OS-based device type: {device_type} (OS: {os_type}, hash: {hash_value})")
+                else:
+                    device_type = 'desktop'
+                    self.logger.info(f"🖥️ OS-based device type: {device_type} (OS: {os_type})")
             else:
-                device_type = device_types[-1]  # Fallback to last device type
+                # For mobile OS, keep as mobile
+                device_type = 'mobile'
+                self.logger.info(f"📱 OS-based device type: {device_type} (OS: {os_type})")
             
-            self.logger.info(f"📱 Profile-based device type: {device_type} (hash: {hash_value}, clean_id: {clean_profile_id[:8]})")
             return device_type
             
         except Exception as e:
@@ -2451,9 +2450,12 @@ class UndetectableSeleniumAutomation:
             
             # Clear cache using CDP (Chrome DevTools Protocol)
             try:
-                self.driver.execute_cdp_cmd('Network.clearBrowserCache', {})
-                self.driver.execute_cdp_cmd('Network.clearBrowserCookies', {})
-                self.logger.info("✅ Browser cache and cookies cleared via CDP")
+                if hasattr(self.driver, 'execute_cdp_cmd'):
+                    self.driver.execute_cdp_cmd('Network.clearBrowserCache', {})
+                    self.driver.execute_cdp_cmd('Network.clearBrowserCookies', {})
+                    self.logger.info("✅ Browser cache and cookies cleared via CDP")
+                else:
+                    self.logger.debug("CDP not available, using alternative methods")
             except Exception as e:
                 self.logger.debug(f"CDP clear failed (normal): {e}")
             
@@ -4713,9 +4715,9 @@ class UndetectableSeleniumAutomation:
                         "dwell_time": (8.0, 20.0), "reading_pause": (15.0, 30.0)
                     },
                     "browser_zoom": {
-                        "scroll_step": (120, 180), "interval": (2.0, 4.5), "pattern": "zoom",
+                        "scroll_step": (120, 180), "interval": (1.0, 2.0), "pattern": "zoom",
                         "back_scroll_prob": 0.07, "back_range": (25, 60), "description": "Browser zoom scrolling",
-                        "dwell_time": (3.0, 7.0), "reading_pause": (5.0, 12.0)
+                        "dwell_time": (2.0, 4.0), "reading_pause": (3.0, 6.0)
                     },
                     "touchpad_precision": {
                         "scroll_step": (40, 80), "interval": (1.8, 3.5), "pattern": "precision",
@@ -4723,19 +4725,19 @@ class UndetectableSeleniumAutomation:
                         "dwell_time": (2.5, 6.0), "reading_pause": (4.0, 10.0)
                     },
                     "gaming_mouse": {
-                        "scroll_step": (150, 250), "interval": (2.2, 4.8), "pattern": "gaming",
+                        "scroll_step": (200, 350), "interval": (0.6, 1.2), "pattern": "gaming",
                         "back_scroll_prob": 0.06, "back_range": (35, 90), "description": "Gaming mouse scrolling",
-                        "dwell_time": (3.5, 8.0), "reading_pause": (6.0, 15.0)
+                        "dwell_time": (1.0, 2.5), "reading_pause": (1.5, 4.0)
                     },
                     "ergonomic_mouse": {
-                        "scroll_step": (90, 140), "interval": (2.8, 5.5), "pattern": "ergonomic",
+                        "scroll_step": (90, 140), "interval": (1.5, 3.0), "pattern": "ergonomic",
                         "back_scroll_prob": 0.09, "back_range": (25, 70), "description": "Ergonomic mouse",
-                        "dwell_time": (4.0, 9.0), "reading_pause": (7.0, 16.0)
+                        "dwell_time": (2.5, 5.0), "reading_pause": (4.0, 8.0)
                     },
                     "wireless_mouse": {
-                        "scroll_step": (110, 170), "interval": (2.5, 5.2), "pattern": "wireless",
+                        "scroll_step": (160, 240), "interval": (1.2, 2.5), "pattern": "wireless",
                         "back_scroll_prob": 0.07, "back_range": (30, 75), "description": "Wireless mouse",
-                        "dwell_time": (3.8, 8.5), "reading_pause": (6.5, 14.0)
+                        "dwell_time": (2.5, 5.0), "reading_pause": (4.0, 8.0)
                     },
                     "bluetooth_trackpad": {
                         "scroll_step": (70, 120), "interval": (2.0, 4.2), "pattern": "bluetooth",
@@ -4743,19 +4745,19 @@ class UndetectableSeleniumAutomation:
                         "dwell_time": (3.0, 7.5), "reading_pause": (5.5, 13.0)
                     },
                     "external_keyboard": {
-                        "scroll_step": (80, 130), "interval": (3.2, 6.8), "pattern": "external",
+                        "scroll_step": (80, 130), "interval": (1.8, 3.5), "pattern": "external",
                         "back_scroll_prob": 0.11, "back_range": (35, 85), "description": "External keyboard",
-                        "dwell_time": (4.5, 10.5), "reading_pause": (8.0, 18.0)
+                        "dwell_time": (3.0, 6.0), "reading_pause": (5.0, 10.0)
                     },
                     "mechanical_keyboard": {
-                        "scroll_step": (100, 160), "interval": (2.8, 5.8), "pattern": "mechanical",
+                        "scroll_step": (150, 220), "interval": (1.5, 3.0), "pattern": "mechanical",
                         "back_scroll_prob": 0.08, "back_range": (28, 72), "description": "Mechanical keyboard",
-                        "dwell_time": (4.2, 9.5), "reading_pause": (7.5, 16.5)
+                        "dwell_time": (2.5, 5.0), "reading_pause": (4.0, 8.0)
                     },
                     "office_mouse": {
-                        "scroll_step": (120, 180), "interval": (3.0, 6.2), "pattern": "office",
+                        "scroll_step": (180, 280), "interval": (1.0, 2.0), "pattern": "office",
                         "back_scroll_prob": 0.10, "back_range": (32, 78), "description": "Office mouse",
-                        "dwell_time": (4.8, 11.0), "reading_pause": (8.5, 19.0)
+                        "dwell_time": (2.0, 4.0), "reading_pause": (3.0, 7.0)
                     }
                 }
                 
@@ -4916,9 +4918,9 @@ class UndetectableSeleniumAutomation:
                         "dwell_time": (4.5, 10.0), "reading_pause": (8.0, 18.0)
                     },
                     "desktop_mode": {
-                        "scroll_step": (80, 150), "interval": (1.8, 3.5), "pattern": "desktop",
+                        "scroll_step": (120, 250), "interval": (0.8, 1.5), "pattern": "desktop",
                         "back_scroll_prob": 0.08, "back_range": (25, 60), "description": "Desktop mode",
-                        "dwell_time": (3.5, 8.0), "reading_pause": (6.0, 15.0)
+                        "dwell_time": (1.5, 3.0), "reading_pause": (2.0, 5.0)
                     },
                     "landscape_orientation": {
                         "scroll_step": (60, 120), "interval": (2.0, 4.2), "pattern": "landscape",

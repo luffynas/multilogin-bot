@@ -22,6 +22,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 from multilogin_api import MultiloginXAPI
 from selenium_automation import UndetectableSeleniumAutomation
 from url_helper import setup_url_for_automation
+from referer_simulator import RefererSimulator
 
 # Configuration
 CONFIG_PATH = "../config/config.yaml"
@@ -42,6 +43,17 @@ random_urls = [
     "https://maxgaming.biz.id/lawyer-service-for-nft-scams-protecting-your-digital-assets-in-the-united-states/",
     "https://maxgaming.biz.id/online-banking-for-play-to-earn-payments-a-secure-financial-future-for-u-s-gamers/",
 ]
+
+# Load config for launcher and localhost
+import yaml
+with open(CONFIG_PATH, 'r') as f:
+    config = yaml.safe_load(f)
+
+MLX_LAUNCHER_V2 = config.get('multilogin', {}).get('launcher_v2', 'https://launcher.mlx.yt:45001/api/v1')
+LOCALHOST = config.get('multilogin', {}).get('localhost', 'http://127.0.0.1:19995')
+
+# Initialize referer simulator
+referer_simulator = RefererSimulator(config)
 
 def load_profile_data():
     """Load profile data from JSON file"""
@@ -94,12 +106,106 @@ def parse_arguments():
     parser.add_argument('--profiles', nargs='+', help='Specific profile IDs for concurrent mode')
     return parser.parse_args()
 
-# Load config for launcher and localhost
-import yaml
-with open(CONFIG_PATH, 'r') as f:
-    config = yaml.safe_load(f)
-    MLX_LAUNCHER_V2 = config['multilogin']['launcher_url']
-    LOCALHOST = config['multilogin']['localhost']
+def generate_referer_for_profile(profile_data, target_url=None):
+    """Generate realistic referer for profile"""
+    try:
+        # Extract profile information
+        profile_name = profile_data.get('name', 'Unknown Profile')
+        os_type = profile_data.get('os_type', 'windows')
+        geo_location = profile_data.get('geo', 'US')
+        
+        # Determine personality based on profile characteristics
+        personality = 'casual'  # default
+        if 'business' in profile_name.lower() or 'professional' in profile_name.lower():
+            personality = 'professional'
+        elif 'research' in profile_name.lower() or 'study' in profile_name.lower():
+            personality = 'researcher'
+        elif 'explore' in profile_name.lower() or 'adventure' in profile_name.lower():
+            personality = 'explorer'
+        
+        # Extract keywords from target URL for better referer generation
+        target_keyword = None
+        if target_url:
+            # Extract domain keywords
+            domain = target_url.split('/')[2] if len(target_url.split('/')) > 2 else ''
+            if 'maxgaming' in domain:
+                target_keyword = random.choice(['gaming', 'crypto', 'nft', 'blockchain', 'p2e'])
+            elif 'tech' in domain or 'digital' in domain:
+                target_keyword = random.choice(['technology', 'digital', 'innovation', 'startup'])
+            else:
+                target_keyword = random.choice(['business', 'news', 'entertainment', 'lifestyle'])
+        
+        # Generate referer configuration
+        referer_config = referer_simulator.generate_referer_for_profile(
+            profile_personality=personality,
+            geo_location=geo_location,
+            target_keyword=target_keyword
+        )
+        
+        print(f"🔗 Generated {referer_config['type']} referer: {referer_config.get('referer', 'Direct traffic')}")
+        return referer_config
+        
+    except Exception as e:
+        print(f"⚠️ Error generating referer: {e}")
+        return {
+            "type": "direct",
+            "referer": None,
+            "description": "Fallback - direct traffic"
+        }
+
+def apply_referer_to_driver(driver, referer_config):
+    """Apply referer to Selenium driver"""
+    try:
+        if not referer_config or not referer_config.get('referer'):
+            print("ℹ️ No referer to apply (direct traffic)")
+            return True
+        
+        referer_url = referer_config['referer']
+        referer_type = referer_config['type']
+        
+        # Method 1: Set referer via JavaScript
+        driver.execute_script(f"""
+            Object.defineProperty(document, 'referrer', {{
+                get: function() {{
+                    return '{referer_url}';
+                }}
+            }});
+        """)
+        
+        # Method 2: Set referer via CDP (Chrome DevTools Protocol)
+        try:
+            # Check if CDP is available
+            if hasattr(driver, 'execute_cdp_cmd'):
+                driver.execute_cdp_cmd('Network.setExtraHTTPHeaders', {
+                    'headers': {
+                        'Referer': referer_url
+                    }
+                })
+                print(f"✅ CDP referer set successfully: {referer_url}")
+            else:
+                print(f"⚠️ CDP not available, using JavaScript fallback")
+        except Exception as e:
+            print(f"⚠️ CDP referer setting failed: {e}")
+            print(f"   Using JavaScript fallback instead")
+        
+        # Method 3: Simulate navigation from referer
+        if referer_type == 'google':
+            # Simulate Google search behavior
+            driver.execute_script(f"""
+                // Simulate Google search page
+                var googlePage = document.createElement('div');
+                googlePage.id = 'google-search-simulation';
+                googlePage.style.display = 'none';
+                googlePage.innerHTML = '<a href="{referer_url}">Google Search</a>';
+                document.body.appendChild(googlePage);
+            """)
+        
+        print(f"✅ Applied {referer_type} referer: {referer_url}")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error applying referer: {e}")
+        return False
 
 def signin(config_path=None):
     """Authenticate with Multilogin API"""
@@ -146,22 +252,68 @@ def start_profile(token, folder_id, profile_id, fresh_start=True, use_start_url=
         
         import requests
         response = requests.get(start_url, headers=headers, params=params)
+        
+        print(f"🔍 Response status: {response.status_code}")
+        print(f"🔍 Response content: {response.text[:200]}...")
+        
         if response.status_code != 200:
+            print(f"❌ API Error: {response.status_code} - {response.text}")
             return None
         
-        profile_data = response.json()
-        selenium_port = profile_data["data"]["port"]
-        debugging_url = f"{LOCALHOST}:{selenium_port}"
-        
-        print(f"✅ Profile started: {debugging_url}")
-        return debugging_url
+        try:
+            profile_data = response.json()
+            print(f"🔍 Profile data keys: {list(profile_data.keys())}")
+            
+            # Handle different response structures
+            if "data" in profile_data and "port" in profile_data["data"]:
+                selenium_port = profile_data["data"]["port"]
+            elif "port" in profile_data:
+                selenium_port = profile_data["port"]
+            elif "status" in profile_data and "message" in profile_data["status"]:
+                # Port is in status.message
+                selenium_port = profile_data["status"]["message"]
+            else:
+                print(f"❌ No port found in response: {profile_data}")
+                return None
+            
+            debugging_url = f"{LOCALHOST}:{selenium_port}"
+            
+            print(f"✅ Profile started: {debugging_url}")
+            return debugging_url
+            
+        except Exception as e:
+            print(f"❌ Error parsing response: {e}")
+            print(f"🔍 Raw response: {response.text}")
+            return None
         
     except Exception as e:
         print(f"❌ Start profile error: {e}")
         return None
 
+def stop_profile(token, profile_id):
+    """Stop Multilogin profile properly"""
+    try:
+        headers = {"Accept": "application/json", "Content-Type": "application/json"}
+        headers["Authorization"] = f"Bearer {token}"
+        
+        stop_url = f"{MLX_LAUNCHER_V2}/profile/stop/p/{profile_id}"
+        
+        import requests
+        response = requests.get(stop_url, headers=headers)
+        
+        if response.status_code == 200:
+            print(f"✅ Profile stopped successfully: {profile_id}")
+            return True
+        else:
+            print(f"⚠️ Warning: Failed to stop profile {profile_id} (status: {response.status_code})")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Error stopping profile {profile_id}: {e}")
+        return False
+
 def run_single_profile_concurrent(profile_data, config_path, session_id, folder_id):
-    """Run automation for a single profile in concurrent mode"""
+    """Run automation for a single profile in concurrent mode with enhanced error handling"""
     profile_id = profile_data['id']
     profile_name = profile_data['name']
     os_type = profile_data.get('os_type', 'unknown')
@@ -169,135 +321,211 @@ def run_single_profile_concurrent(profile_data, config_path, session_id, folder_
     print(f"🚀 Starting Profile {session_id}: {profile_name} ({os_type})")
     print(f"   📋 Profile ID: {profile_id}")
     
+    token = None
+    automation = None
+    
     try:
-        # Step 1: Authenticate
+        # Step 1: Authenticate with retry
         token = signin(config_path)
         if not token:
             raise Exception("Authentication failed")
         
-        # Step 2: Start profile with fresh start and use Start URL from Multilogin
-        debugging_url = start_profile(token, folder_id, profile_id, fresh_start=True, use_start_url=True)
+        # Step 2: Start profile without fresh start to preserve existing URL
+        debugging_url = start_profile(token, folder_id, profile_id, fresh_start=False, use_start_url=True)
         if not debugging_url:
             raise Exception("Failed to start profile")
         
-        # Step 3: Setup automation
-        automation = UndetectableSeleniumAutomation(config_path, profile_id)
-        if not automation.setup_driver(debugging_url):
-            raise Exception("Failed to setup driver")
+        # Step 3: Setup automation with retry mechanism
+        automation = UndetectableSeleniumAutomation(config_path, profile_id, os_type)
+        
+        # Retry setup driver up to 3 times
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                if automation.setup_driver(debugging_url):
+                    break
+                else:
+                    if attempt < max_retries - 1:
+                        print(f"   🔄 Retry {attempt + 1}/{max_retries}: Setup driver failed, retrying...")
+                        time.sleep(2)
+                    else:
+                        raise Exception("Failed to setup driver after all retries")
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    print(f"   🔄 Retry {attempt + 1}/{max_retries}: {e}, retrying...")
+                    time.sleep(2)
+                else:
+                    raise e
         
         # Load config for fallback URL
         with open(config_path, 'r') as f:
             config_data = yaml.safe_load(f)
         
-        # Setup URL with stealth navigation - use random URL from list
-        fallback_url = random.choice(random_urls)
-        current_url, message = setup_url_for_automation(automation, fallback_url, stealth_mode=True)
+        # Setup URL - check current URL first
+        current_url, message = setup_url_for_automation(automation, fallback_url=None, stealth_mode=False)
+        
+        # If profile is blank or invalid, then use random URL
+        if not current_url or "about:blank" in str(current_url) or "devtools://" in str(current_url):
+            print(f"   📄 Profile is blank, using random URL...")
+            fallback_url = random.choice(random_urls)
+            current_url, message = setup_url_for_automation(automation, fallback_url, stealth_mode=True)
+            print(f"   🎲 Random URL selected: {fallback_url}")
+        else:
+            print(f"   ✅ Using existing profile URL: {current_url}")
         
         if not current_url:
             raise Exception(f"Failed to setup URL: {message}")
         
         print(f"   ✅ Automation setup successful: {current_url}")
-        print(f"   🎲 Random URL selected: {fallback_url}")
         
-        # Step 4: Run automation demos
+        # Step 3.5: Generate and apply referer for realistic traffic
+        print(f"   🔗 Generating referer for profile...")
+        referer_config = generate_referer_for_profile(profile_data, current_url)
+        
+        # Apply referer to driver
+        print(f"   🔗 Applying referer to driver...")
+        referer_success = apply_referer_to_driver(automation.driver, referer_config)
+        if referer_success:
+            print(f"   ✅ Referer applied successfully: {referer_config.get('type', 'unknown')}")
+        else:
+            print(f"   ⚠️ Referer application failed, continuing without referer")
+        
+        # Step 4: Run automation demos with error handling
         print(f"   🎭 Running automation demos...")
         
         # Demo personality system
         print(f"   🎭 Testing personality system...")
-        automation._simulate_attention_span_variation()
-        automation._simulate_reading_speed_variation()
+        try:
+            automation._simulate_attention_span_variation()
+            automation._simulate_reading_speed_variation()
+        except Exception as e:
+            print(f"   ⚠️ Personality system error (non-critical): {e}")
         
         # Demo navigation with multiple pages
         print(f"   🧭 Testing navigation with multiple pages...")
-        automation._simulate_natural_scrolling()
+        try:
+            automation._simulate_natural_scrolling()
+        except Exception as e:
+            print(f"   ⚠️ Navigation error (non-critical): {e}")
         
-        # Navigate to multiple pages (3-5 pages total)
+        # Navigate to multiple pages (3-5 pages total) with error handling
         pages_visited = 1  # Current page
         max_pages = random.randint(3, 5)
         
         print(f"   📄 Target: {max_pages} pages total")
         
         while pages_visited < max_pages:
-            # Try to navigate to next/previous page
-            next_url = automation._navigate_previous_next()
-            
-            if next_url:
-                print(f"   🔄 Navigating to page {pages_visited + 1}/{max_pages}")
-                automation.driver.get(next_url)
-                time.sleep(random.uniform(2, 4))  # Wait for page load
+            try:
+                # Try to navigate to next/previous page
+                next_url = automation._navigate_previous_next()
                 
-                # Simulate behavior on new page
-                automation._simulate_natural_scrolling()
-                automation._simulate_mouse_movement()
-                
-                pages_visited += 1
-            else:
-                # Try random navigation if prev/next not available
-                random_url = automation._navigate_random_page()
-                if random_url:
-                    print(f"   🎲 Navigating to random page {pages_visited + 1}/{max_pages}")
-                    automation.driver.get(random_url)
-                    time.sleep(random.uniform(2, 4))
+                if next_url:
+                    print(f"   🔄 Navigating to page {pages_visited + 1}/{max_pages}")
+                    automation.driver.get(next_url)
+                    time.sleep(random.uniform(2, 4))  # Wait for page load
                     
                     # Simulate behavior on new page
-                    automation._simulate_natural_scrolling()
-                    automation._simulate_mouse_movement()
+                    try:
+                        automation._simulate_natural_scrolling()
+                        automation._simulate_mouse_movement()
+                    except Exception as e:
+                        print(f"   ⚠️ Page behavior error (non-critical): {e}")
                     
                     pages_visited += 1
                 else:
-                    print(f"   ⚠️ No more navigation links found, stopping at {pages_visited} pages")
-                    break
+                    # Try random navigation if prev/next not available
+                    random_url = automation._navigate_random_page()
+                    if random_url:
+                        print(f"   🎲 Navigating to random page {pages_visited + 1}/{max_pages}")
+                        automation.driver.get(random_url)
+                        time.sleep(random.uniform(2, 4))
+                        
+                        # Simulate behavior on new page
+                        try:
+                            automation._simulate_natural_scrolling()
+                            automation._simulate_mouse_movement()
+                        except Exception as e:
+                            print(f"   ⚠️ Random page behavior error (non-critical): {e}")
+                        
+                        pages_visited += 1
+                    else:
+                        print(f"   ⚠️ No more navigation links found, stopping at {pages_visited} pages")
+                        break
+            except Exception as e:
+                print(f"   ⚠️ Navigation error (non-critical): {e}")
+                break
         
         print(f"   ✅ Visited {pages_visited} pages total")
         
         # Demo AdSense integration with RPM optimization
         print(f"   💰 Testing AdSense integration with RPM optimization...")
-        adsense_results = automation.test_adsense_ads()
-        if "error" not in adsense_results:
-            ads_found = adsense_results.get('ads_detected', 0)
-            print(f"   ✅ Found {ads_found} ads")
-            
-            # Smart Ad Interaction for RPM
-            print(f"   🎯 Testing Smart Ad Interaction for RPM...")
-            rpm_results = automation._smart_ad_interaction_for_rpm()
-            if "error" not in rpm_results:
-                commercial_category = rpm_results.get('commercial_category', 'none')
-                commercial_score = rpm_results.get('commercial_score', 0)
-                click_probability = rpm_results.get('click_probability', 0)
-                print(f"   💎 Commercial intent: {commercial_category} (score: {commercial_score})")
-                print(f"   🎯 Click probability: {click_probability*100:.1f}%")
+        try:
+            adsense_results = automation.test_adsense_ads()
+            if "error" not in adsense_results:
+                ads_found = adsense_results.get('ads_detected', 0)
+                print(f"   ✅ Found {ads_found} ads")
+                
+                # Smart Ad Interaction for RPM
+                print(f"   🎯 Testing Smart Ad Interaction for RPM...")
+                try:
+                    rpm_results = automation._smart_ad_interaction_for_rpm()
+                    if "error" not in rpm_results:
+                        commercial_category = rpm_results.get('commercial_category', 'none')
+                        commercial_score = rpm_results.get('commercial_score', 0)
+                        click_probability = rpm_results.get('click_probability', 0)
+                        print(f"   💎 Commercial intent: {commercial_category} (score: {commercial_score})")
+                        print(f"   🎯 Click probability: {click_probability*100:.1f}%")
+                except Exception as e:
+                    print(f"   ⚠️ RPM interaction error (non-critical): {e}")
+        except Exception as e:
+            print(f"   ⚠️ AdSense integration error (non-critical): {e}")
         
         # Demo Professional User Behavior
         print(f"   👔 Testing Professional User Behavior...")
-        automation._simulate_professional_user_behavior()
+        try:
+            automation._simulate_professional_user_behavior()
+        except Exception as e:
+            print(f"   ⚠️ Professional behavior error (non-critical): {e}")
         
         # Demo Extended Session Behavior
         print(f"   ⏰ Testing Extended Session Behavior...")
-        session_config = automation._simulate_extended_session_behavior()
-        if "error" not in session_config:
-            duration = session_config.get('duration', 0)
-            page_views = session_config.get('page_views', 0)
-            print(f"   📊 Extended session: {duration/60:.1f}min, {page_views} pages")
+        try:
+            session_config = automation._simulate_extended_session_behavior()
+            if "error" not in session_config:
+                duration = session_config.get('duration', 0)
+                page_views = session_config.get('page_views', 0)
+                print(f"   📊 Extended session: {duration/60:.1f}min, {page_views} pages")
+        except Exception as e:
+            print(f"   ⚠️ Extended session error (non-critical): {e}")
         
         # Demo advanced features
         print(f"   🚀 Testing advanced features...")
-        automation._simulate_mouse_movement()
-        automation._simulate_link_hovering()
+        try:
+            automation._simulate_mouse_movement()
+            automation._simulate_link_hovering()
+        except Exception as e:
+            print(f"   ⚠️ Advanced features error (non-critical): {e}")
         
         # Demo click simulation
         print(f"   🖱️ Testing click simulation...")
-        automation._simulate_natural_click()
+        try:
+            automation._simulate_natural_click()
+        except Exception as e:
+            print(f"   ⚠️ Click simulation error (non-critical): {e}")
         
         # Demo ad interaction with realistic click probability
-        if adsense_results and adsense_results.get('ads_detected', 0) > 0:
-            print(f"   🎯 Testing ad interaction...")
-            # Very low probability click (realistic)
-            click_probability = 0.001  # 0.1% chance
-            if random.random() < click_probability:
-                print(f"   ✅ Deciding to click ad (realistic probability)")
-                # Note: Actual click is handled in selenium_automation.py
-            else:
-                print(f"   ❌ Deciding not to click (realistic behavior)")
+        try:
+            if adsense_results and adsense_results.get('ads_detected', 0) > 0:
+                print(f"   🎯 Testing ad interaction...")
+                # Very low probability click (realistic)
+                click_probability = 0.001  # 0.1% chance
+                if random.random() < click_probability:
+                    print(f"   ✅ Deciding to click ad (realistic probability)")
+                    # Note: Actual click is handled in selenium_automation.py
+                else:
+                    print(f"   ❌ Deciding not to click (realistic behavior)")
+        except Exception as e:
+            print(f"   ⚠️ Ad interaction error (non-critical): {e}")
         
         # Record session data
         session_data = {
@@ -309,7 +537,9 @@ def run_single_profile_concurrent(profile_data, config_path, session_id, folder_
             "session_id": session_id,
             "timestamp": datetime.now().isoformat(),
             "status": "completed",
-            "url": current_url
+            "url": current_url,
+            "pages_visited": pages_visited,
+            "referer": referer_config
         }
         
         # Save session data
@@ -321,17 +551,14 @@ def run_single_profile_concurrent(profile_data, config_path, session_id, folder_
         print(f"   ✅ Profile {session_id} completed successfully!")
         print(f"   💾 Session data saved: {session_file}")
         
-        # Cleanup
-        if automation.driver:
-            automation.close_driver()
-        
         return {
             "session_id": session_id,
             "profile_id": profile_id,
             "profile_name": profile_name,
             "device_type": automation.device_type,
             "personality": automation.user_personality,
-            "status": "success"
+            "status": "success",
+            "pages_visited": pages_visited
         }
         
     except Exception as e:
@@ -343,15 +570,41 @@ def run_single_profile_concurrent(profile_data, config_path, session_id, folder_
             "status": "failed",
             "error": str(e)
         }
+        
+    finally:
+        # Enhanced cleanup - always execute
+        print(f"   🧹 Cleaning up Profile {session_id}...")
+        
+        # Cleanup automation driver
+        if automation and automation.driver:
+            try:
+                automation.close_driver()
+                print(f"   ✅ Driver closed for Profile {session_id}")
+            except Exception as e:
+                print(f"   ⚠️ Error closing driver for Profile {session_id}: {e}")
+        
+        # Stop profile in Multilogin
+        if token and profile_id:
+            try:
+                stop_success = stop_profile(token, profile_id)
+                if stop_success:
+                    print(f"   ✅ Profile stopped in Multilogin: {profile_id}")
+                else:
+                    print(f"   ⚠️ Failed to stop profile in Multilogin: {profile_id}")
+            except Exception as e:
+                print(f"   ⚠️ Error stopping profile in Multilogin: {e}")
+        
+        print(f"   ✅ Cleanup completed for Profile {session_id}")
 
 class CleanAutomation:
     """Clean automation example with simplified structure"""
     
-    def __init__(self, profile_id=None, folder_id=None, config_path=None):
+    def __init__(self, profile_id=None, folder_id=None, config_path=None, os_type="windows"):
         """Initialize automation with optional parameters"""
         self.profile_id = profile_id or PROFILE_ID
         self.folder_id = folder_id or FOLDER_ID
         self.config_path = config_path or CONFIG_PATH
+        self.os_type = os_type  # Add OS type parameter
         
         self.api = None
         self.automation = None
@@ -406,8 +659,8 @@ class CleanAutomation:
             self.logger.info(f"Using Profile ID: {self.profile_id}")
             self.logger.info(f"Using Folder ID: {self.folder_id}")
             
-            # Use the start_profile function with token and parameters (fresh start enabled, use Start URL)
-            self.debugging_url = start_profile(self.api.bearer_token, self.folder_id, self.profile_id, fresh_start=True, use_start_url=True)
+            # Use the start_profile function with token and parameters (no fresh start to preserve existing URL)
+            self.debugging_url = start_profile(self.api.bearer_token, self.folder_id, self.profile_id, fresh_start=False, use_start_url=True)
             
             if not self.debugging_url:
                 raise Exception("Failed to start profile")
@@ -424,8 +677,8 @@ class CleanAutomation:
         try:
             self.logger.info("🔧 Setting up Selenium automation...")
             
-            # Pass profile ID to automation for consistent behavior
-            self.automation = UndetectableSeleniumAutomation(self.config_path, self.profile_id)
+            # Pass profile ID and OS type to automation for consistent behavior
+            self.automation = UndetectableSeleniumAutomation(self.config_path, self.profile_id, self.os_type)
             
             if not self.automation.setup_driver(self.debugging_url):
                 raise Exception("Failed to setup driver")
@@ -437,9 +690,17 @@ class CleanAutomation:
             with open(self.config_path, 'r') as f:
                 config_data = yaml.safe_load(f)
             
-            # Setup URL with stealth navigation - use random URL from list
-            fallback_url = random.choice(random_urls)
-            current_url, message = setup_url_for_automation(self.automation, fallback_url, stealth_mode=True)
+            # Setup URL - check current URL first
+            current_url, message = setup_url_for_automation(self.automation, fallback_url=None, stealth_mode=False)
+            
+            # If profile is blank or invalid, then use random URL
+            if not current_url or "about:blank" in str(current_url) or "devtools://" in str(current_url):
+                self.logger.info("📄 Profile is blank, using random URL...")
+                fallback_url = random.choice(random_urls)
+                current_url, message = setup_url_for_automation(self.automation, fallback_url, stealth_mode=True)
+                self.logger.info(f"🎲 Random URL selected: {fallback_url}")
+            else:
+                self.logger.info(f"✅ Using existing profile URL: {current_url}")
             
             if not current_url:
                 raise Exception(f"Failed to setup URL: {message}")
@@ -454,6 +715,29 @@ class CleanAutomation:
             
             self.logger.info(f"✅ Automation setup successful: {current_url}")
             self.logger.info(f"🎲 Random URL selected: {fallback_url}")
+            
+            # Generate and apply referer for realistic traffic
+            self.logger.info("🔗 Generating referer for profile...")
+            
+            # Create profile data for referer generation
+            profile_data = {
+                'name': f"Profile-{self.profile_id[:8]}",
+                'os_type': self.os_type,  # Use actual OS type from profile
+                'geo': 'US'  # Default, can be enhanced
+            }
+            
+            referer_config = generate_referer_for_profile(profile_data, current_url)
+            
+            # Apply referer to driver
+            self.logger.info("🔗 Applying referer to driver...")
+            referer_success = apply_referer_to_driver(self.automation.driver, referer_config)
+            if referer_success:
+                self.logger.info(f"✅ Referer applied successfully: {referer_config.get('type', 'unknown')}")
+                # Store referer config in session data
+                self.session_data["referer"] = referer_config
+            else:
+                self.logger.warning("⚠️ Referer application failed, continuing without referer")
+            
             return True
             
         except Exception as e:
@@ -927,6 +1211,8 @@ def run_concurrent_automation(profile_ids=None, max_workers=3, config_path=CONFI
                     if result['status'] == 'success':
                         print(f"   📱 Device: {result['device_type']}")
                         print(f"   🎭 Personality: {result['personality']}")
+                        if 'pages_visited' in result:
+                            print(f"   📄 Pages visited: {result['pages_visited']}")
                     else:
                         print(f"   💥 Error: {result.get('error', 'Unknown error')}")
                         
@@ -968,6 +1254,25 @@ def run_concurrent_automation(profile_ids=None, max_workers=3, config_path=CONFI
     print(f"✅ Successful: {len([r for r in results if r['status'] == 'success'])}")
     print(f"❌ Failed: {len([r for r in results if r['status'] != 'success'])}")
     print(f"📈 Success Rate: {len([r for r in results if r['status'] == 'success'])/len(profiles_to_process)*100:.1f}%")
+    
+    # Enhanced statistics
+    successful_results = [r for r in results if r['status'] == 'success']
+    if successful_results:
+        avg_pages = sum(r.get('pages_visited', 0) for r in successful_results) / len(successful_results)
+        print(f"📄 Average Pages per Session: {avg_pages:.1f}")
+    
+    # Error analysis
+    failed_results = [r for r in results if r['status'] != 'success']
+    if failed_results:
+        print(f"\n🔍 Error Analysis:")
+        error_types = {}
+        for result in failed_results:
+            error = result.get('error', 'Unknown')
+            error_key = error.split(':')[0] if ':' in error else error
+            error_types[error_key] = error_types.get(error_key, 0) + 1
+        
+        for error_type, count in error_types.items():
+            print(f"   • {error_type}: {count} occurrences")
     
     print(f"\n📈 Individual Results:")
     for i, result in enumerate(results, 1):
@@ -1043,6 +1348,7 @@ def main():
             print("  ✅ AdSense Integration with RPM Optimization")
             print("  ✅ Professional User Behavior")
             print("  ✅ Extended Session Behavior")
+            print("  ✅ Referer Simulation (Google, Facebook, Social)")
             print("  ✅ Advanced Features")
             print("  ✅ Session Data Management")
         else:
@@ -1063,11 +1369,24 @@ def main():
         if args.config != CONFIG_PATH:
             print(f"⚙️ Using Config: {args.config}")
         
+        # Get OS type from profile data if profile is specified
+        os_type = "windows"  # Default
+        if args.profile:
+            # Try to get OS type from profile data
+            try:
+                profiles = load_profile_data()
+                profile_data = next((p for p in profiles if p['id'] == args.profile), None)
+                if profile_data:
+                    os_type = profile_data.get('os_type', 'windows')
+            except Exception as e:
+                print(f"⚠️ Could not get OS type from profile data: {e}")
+        
         # Create and run automation with parameters
         automation = CleanAutomation(
             profile_id=args.profile,
             folder_id=args.folder,
-            config_path=args.config
+            config_path=args.config,
+            os_type=os_type
         )
         success = automation.run_automation()
         
@@ -1081,6 +1400,7 @@ def main():
             print("  ✅ AdSense Integration with RPM Optimization")
             print("  ✅ Professional User Behavior")
             print("  ✅ Extended Session Behavior")
+            print("  ✅ Referer Simulation (Google, Facebook, Social)")
             print("  ✅ Advanced Features")
             print("  ✅ Session Data Management")
         else:
