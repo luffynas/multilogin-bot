@@ -2426,7 +2426,7 @@ class UndetectableSeleniumAutomation:
             """)
             
             # Clear browser data for fresh start
-            self._clear_browser_data()
+            # self._clear_browser_data()
             
             self.wait = WebDriverWait(self.driver, 10)
             self.logger.info("Successfully setup undetectable Chrome driver")
@@ -4660,7 +4660,7 @@ class UndetectableSeleniumAutomation:
                 # Desktop Scrolling Patterns (20+ variations) - REALISTIC TIMING
                 desktop_patterns = {
                     "mouse_wheel_smooth": {
-                        "scroll_step": (120, 360), "interval": (1.5, 3.0), "pattern": "smooth",
+                        "scroll_step": (120, 360), "interval": (0.8, 2.0), "pattern": "smooth",  # ⚡ Lebih cepat
                         "back_scroll_prob": 0.05, "back_range": (20, 60), "description": "Smooth mouse wheel scrolling",
                         "dwell_time": (2.0, 5.0), "reading_pause": (3.0, 8.0)
                     },

@@ -163,42 +163,46 @@ def apply_referer_to_driver(driver, referer_config):
         referer_url = referer_config['referer']
         referer_type = referer_config['type']
         
-        # Method 1: Set referer via JavaScript
+        # Method 1: Set referer via JavaScript (SAFE MODE - read-only)
+        # Note: This only affects document.referrer reading, doesn't cause navigation
         driver.execute_script(f"""
+            // Safe referer override - only affects reading, not navigation
             Object.defineProperty(document, 'referrer', {{
                 get: function() {{
                     return '{referer_url}';
-                }}
+                }},
+                configurable: true
             }});
         """)
         
-        # Method 2: Set referer via CDP (Chrome DevTools Protocol)
+        # Method 2: Set referer via CDP (Chrome DevTools Protocol) - SAFE MODE
         try:
             # Check if CDP is available
             if hasattr(driver, 'execute_cdp_cmd'):
+                # Only set referer for future requests, not current page
                 driver.execute_cdp_cmd('Network.setExtraHTTPHeaders', {
                     'headers': {
                         'Referer': referer_url
                     }
                 })
-                print(f"✅ CDP referer set successfully: {referer_url}")
+                print(f"✅ CDP referer set successfully (future requests): {referer_url}")
             else:
                 print(f"⚠️ CDP not available, using JavaScript fallback")
         except Exception as e:
             print(f"⚠️ CDP referer setting failed: {e}")
             print(f"   Using JavaScript fallback instead")
         
-        # Method 3: Simulate navigation from referer
-        if referer_type == 'google':
-            # Simulate Google search behavior
-            driver.execute_script(f"""
-                // Simulate Google search page
-                var googlePage = document.createElement('div');
-                googlePage.id = 'google-search-simulation';
-                googlePage.style.display = 'none';
-                googlePage.innerHTML = '<a href="{referer_url}">Google Search</a>';
-                document.body.appendChild(googlePage);
-            """)
+        # Method 3: Simulate navigation from referer (DISABLED - causes unwanted navigation)
+        # if referer_type == 'google':
+        #     # Simulate Google search behavior
+        #     driver.execute_script(f"""
+        #         // Simulate Google search page
+        #         var googlePage = document.createElement('div');
+        #         googlePage.id = 'google-search-simulation';
+        #         googlePage.style.display = 'none';
+        #         googlePage.innerHTML = '<a href="{referer_url}">Google Search</a>';
+        #         document.body.appendChild(googlePage);
+        #     """)
         
         print(f"✅ Applied {referer_type} referer: {referer_url}")
         return True
