@@ -22,13 +22,14 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 from multilogin_api import MultiloginXAPI
 from selenium_automation import UndetectableSeleniumAutomation
 from url_helper import setup_url_for_automation
-from referer_simulator import RefererSimulator
+
 
 # Configuration
 CONFIG_PATH = "../config/config.yaml"
 PROFILE_DATA_PATH = "../config/profile.json"
 FOLDER_ID = "94caeb51-cc7f-477d-a6db-c79e696b5530"
 PROFILE_ID = "2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6"
+GOOGLE_SEARCH_QUERY = "site:maxgaming.biz.id play smart"
 
 random_urls = [
     "https://maxgaming.biz.id/crypto-investment-product-for-gamers-the-future-of-digital-wealth-in-the-united-states/",
@@ -52,8 +53,7 @@ with open(CONFIG_PATH, 'r') as f:
 MLX_LAUNCHER_V2 = config.get('multilogin', {}).get('launcher_v2', 'https://launcher.mlx.yt:45001/api/v1')
 LOCALHOST = config.get('multilogin', {}).get('localhost', 'http://127.0.0.1:19995')
 
-# Initialize referer simulator
-referer_simulator = RefererSimulator(config)
+
 
 def load_profile_data():
     """Load profile data from JSON file"""
@@ -106,110 +106,7 @@ def parse_arguments():
     parser.add_argument('--profiles', nargs='+', help='Specific profile IDs for concurrent mode')
     return parser.parse_args()
 
-def generate_referer_for_profile(profile_data, target_url=None):
-    """Generate realistic referer for profile"""
-    try:
-        # Extract profile information
-        profile_name = profile_data.get('name', 'Unknown Profile')
-        os_type = profile_data.get('os_type', 'windows')
-        geo_location = profile_data.get('geo', 'US')
-        
-        # Determine personality based on profile characteristics
-        personality = 'casual'  # default
-        if 'business' in profile_name.lower() or 'professional' in profile_name.lower():
-            personality = 'professional'
-        elif 'research' in profile_name.lower() or 'study' in profile_name.lower():
-            personality = 'researcher'
-        elif 'explore' in profile_name.lower() or 'adventure' in profile_name.lower():
-            personality = 'explorer'
-        
-        # Extract keywords from target URL for better referer generation
-        target_keyword = None
-        if target_url:
-            # Extract domain keywords
-            domain = target_url.split('/')[2] if len(target_url.split('/')) > 2 else ''
-            if 'maxgaming' in domain:
-                target_keyword = random.choice(['gaming', 'crypto', 'nft', 'blockchain', 'p2e'])
-            elif 'tech' in domain or 'digital' in domain:
-                target_keyword = random.choice(['technology', 'digital', 'innovation', 'startup'])
-            else:
-                target_keyword = random.choice(['business', 'news', 'entertainment', 'lifestyle'])
-        
-        # Generate referer configuration
-        referer_config = referer_simulator.generate_referer_for_profile(
-            profile_personality=personality,
-            geo_location=geo_location,
-            target_keyword=target_keyword
-        )
-        
-        print(f"🔗 Generated {referer_config['type']} referer: {referer_config.get('referer', 'Direct traffic')}")
-        return referer_config
-        
-    except Exception as e:
-        print(f"⚠️ Error generating referer: {e}")
-        return {
-            "type": "direct",
-            "referer": None,
-            "description": "Fallback - direct traffic"
-        }
 
-def apply_referer_to_driver(driver, referer_config):
-    """Apply referer to Selenium driver"""
-    try:
-        if not referer_config or not referer_config.get('referer'):
-            print("ℹ️ No referer to apply (direct traffic)")
-            return True
-        
-        referer_url = referer_config['referer']
-        referer_type = referer_config['type']
-        
-        # Method 1: Set referer via JavaScript (SAFE MODE - read-only)
-        # Note: This only affects document.referrer reading, doesn't cause navigation
-        driver.execute_script(f"""
-            // Safe referer override - only affects reading, not navigation
-            Object.defineProperty(document, 'referrer', {{
-                get: function() {{
-                    return '{referer_url}';
-                }},
-                configurable: true
-            }});
-        """)
-        
-        # Method 2: Set referer via CDP (Chrome DevTools Protocol) - SAFE MODE
-        try:
-            # Check if CDP is available
-            if hasattr(driver, 'execute_cdp_cmd'):
-                # Only set referer for future requests, not current page
-                driver.execute_cdp_cmd('Network.setExtraHTTPHeaders', {
-                    'headers': {
-                        'Referer': referer_url
-                    }
-                })
-                print(f"✅ CDP referer set successfully (future requests): {referer_url}")
-            else:
-                print(f"⚠️ CDP not available, using JavaScript fallback")
-        except Exception as e:
-            print(f"⚠️ CDP referer setting failed: {e}")
-            print(f"   Using JavaScript fallback instead")
-        
-        # Method 3: Simulate navigation from referer (DISABLED - causes unwanted navigation)
-        # if referer_type == 'google':
-        #     # Simulate Google search behavior
-        #     driver.execute_script(f"""
-        #         // Simulate Google search page
-        #         var googlePage = document.createElement('div');
-        #         googlePage.id = 'google-search-simulation';
-        #         googlePage.style.display = 'none';
-        #         googlePage.innerHTML = '<a href="{referer_url}">Google Search</a>';
-        #         document.body.appendChild(googlePage);
-        #     """)
-        
-        print(f"✅ Applied {referer_type} referer: {referer_url}")
-        return True
-        
-    except Exception as e:
-        print(f"❌ Error applying referer: {e}")
-        return False
 
 def signin(config_path=None):
     """Authenticate with Multilogin API"""
@@ -365,34 +262,22 @@ def run_single_profile_concurrent(profile_data, config_path, session_id, folder_
         with open(config_path, 'r') as f:
             config_data = yaml.safe_load(f)
         
-        # Setup URL - check current URL first
-        current_url, message = setup_url_for_automation(automation, fallback_url=None, stealth_mode=False)
-        
-        # If profile is blank or invalid, then use random URL
-        if not current_url or "about:blank" in str(current_url) or "devtools://" in str(current_url):
-            print(f"   📄 Profile is blank, using random URL...")
-            fallback_url = random.choice(random_urls)
-            current_url, message = setup_url_for_automation(automation, fallback_url, stealth_mode=True)
-            print(f"   🎲 Random URL selected: {fallback_url}")
-        else:
-            print(f"   ✅ Using existing profile URL: {current_url}")
+        # Start with realistic Google search simulation
+        print(f"   🚀 Starting with Google search simulation...")
+        target_url = random.choice(random_urls)
+        current_url = automation.simulate_google_search_and_click(GOOGLE_SEARCH_QUERY, target_url)
+        if not current_url:
+            print(f"   ⚠️ Google search simulation failed")
+            raise Exception("Failed to reach target site")
         
         if not current_url:
-            raise Exception(f"Failed to setup URL: {message}")
+            raise Exception("Failed to reach target site")
+        
+        print(f"   ✅ Successfully reached target site: {current_url}")
         
         print(f"   ✅ Automation setup successful: {current_url}")
         
-        # Step 3.5: Generate and apply referer for realistic traffic
-        print(f"   🔗 Generating referer for profile...")
-        referer_config = generate_referer_for_profile(profile_data, current_url)
-        
-        # Apply referer to driver
-        print(f"   🔗 Applying referer to driver...")
-        referer_success = apply_referer_to_driver(automation.driver, referer_config)
-        if referer_success:
-            print(f"   ✅ Referer applied successfully: {referer_config.get('type', 'unknown')}")
-        else:
-            print(f"   ⚠️ Referer application failed, continuing without referer")
+
         
         # Step 4: Run automation demos with error handling
         print(f"   🎭 Running automation demos...")
@@ -543,7 +428,7 @@ def run_single_profile_concurrent(profile_data, config_path, session_id, folder_
             "status": "completed",
             "url": current_url,
             "pages_visited": pages_visited,
-            "referer": referer_config
+    
         }
         
         # Save session data
@@ -687,27 +572,23 @@ class CleanAutomation:
             if not self.automation.setup_driver(self.debugging_url):
                 raise Exception("Failed to setup driver")
             
-            # Force fresh start to ensure clean state
-            self.automation.force_fresh_start()
+            # Start with realistic Google search simulation
+            self.logger.info("🚀 Starting with Google search simulation...")
+            target_url = random.choice(random_urls)
+            final_url = self.automation.simulate_google_search_and_click(GOOGLE_SEARCH_QUERY, target_url)
+            if not final_url:
+                self.logger.warning("⚠️ Google search simulation failed, using fallback")
+                # Fallback to direct navigation
+                self.automation.driver.get("https://maxgaming.biz.id")
+                final_url = "https://maxgaming.biz.id"
             
-            # Load config for fallback URL
-            with open(self.config_path, 'r') as f:
-                config_data = yaml.safe_load(f)
-            
-            # Setup URL - check current URL first
-            current_url, message = setup_url_for_automation(self.automation, fallback_url=None, stealth_mode=False)
-            
-            # If profile is blank or invalid, then use random URL
-            if not current_url or "about:blank" in str(current_url) or "devtools://" in str(current_url):
-                self.logger.info("📄 Profile is blank, using random URL...")
-                fallback_url = random.choice(random_urls)
-                current_url, message = setup_url_for_automation(self.automation, fallback_url, stealth_mode=True)
-                self.logger.info(f"🎲 Random URL selected: {fallback_url}")
-            else:
-                self.logger.info(f"✅ Using existing profile URL: {current_url}")
+            # Use the final URL from Google search simulation
+            current_url = final_url
             
             if not current_url:
-                raise Exception(f"Failed to setup URL: {message}")
+                raise Exception("Failed to reach target site")
+            
+            self.logger.info(f"✅ Successfully reached target site: {current_url}")
             
             # Record session data
             self.session_data["personality"] = self.automation.user_personality
@@ -718,29 +599,8 @@ class CleanAutomation:
             })
             
             self.logger.info(f"✅ Automation setup successful: {current_url}")
-            self.logger.info(f"🎲 Random URL selected: {fallback_url}")
             
-            # Generate and apply referer for realistic traffic
-            self.logger.info("🔗 Generating referer for profile...")
-            
-            # Create profile data for referer generation
-            profile_data = {
-                'name': f"Profile-{self.profile_id[:8]}",
-                'os_type': self.os_type,  # Use actual OS type from profile
-                'geo': 'US'  # Default, can be enhanced
-            }
-            
-            referer_config = generate_referer_for_profile(profile_data, current_url)
-            
-            # Apply referer to driver
-            self.logger.info("🔗 Applying referer to driver...")
-            referer_success = apply_referer_to_driver(self.automation.driver, referer_config)
-            if referer_success:
-                self.logger.info(f"✅ Referer applied successfully: {referer_config.get('type', 'unknown')}")
-                # Store referer config in session data
-                self.session_data["referer"] = referer_config
-            else:
-                self.logger.warning("⚠️ Referer application failed, continuing without referer")
+
             
             return True
             
@@ -1352,7 +1212,6 @@ def main():
             print("  ✅ AdSense Integration with RPM Optimization")
             print("  ✅ Professional User Behavior")
             print("  ✅ Extended Session Behavior")
-            print("  ✅ Referer Simulation (Google, Facebook, Social)")
             print("  ✅ Advanced Features")
             print("  ✅ Session Data Management")
         else:
@@ -1404,7 +1263,6 @@ def main():
             print("  ✅ AdSense Integration with RPM Optimization")
             print("  ✅ Professional User Behavior")
             print("  ✅ Extended Session Behavior")
-            print("  ✅ Referer Simulation (Google, Facebook, Social)")
             print("  ✅ Advanced Features")
             print("  ✅ Session Data Management")
         else:

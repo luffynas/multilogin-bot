@@ -2436,87 +2436,191 @@ class UndetectableSeleniumAutomation:
             self.logger.error(f"Error setting up driver: {e}")
             return False
     
-    def _clear_browser_data(self):
-        """Clear all browser data for fresh start"""
+
+
+    def simulate_google_search_and_click(self, target_site: str = "maxgaming.biz.id", target_url: str = "https://maxgaming.biz.id"):
+        """
+        Simulate realistic Google search: Go to Google, type search query, and click result
+        """
         try:
-            self.logger.info("🧹 Clearing browser data for fresh start...")
+            self.logger.info(f"🔍 Starting Google search simulation for: {target_site}")
             
-            # Clear browser cache
-            self.driver.execute_script("window.localStorage.clear();")
-            self.driver.execute_script("window.sessionStorage.clear();")
+            # Step 1: Navigate to Google
+            self.logger.info("🌐 Navigating to Google...")
+            self.driver.get("https://www.google.com")
+            time.sleep(random.uniform(3, 5))
             
-            # Clear cookies
-            self.driver.delete_all_cookies()
+            # Step 2: Find search box
+            self.logger.info("🔍 Looking for Google search box...")
+            search_selectors = [
+                "textarea[name='q']",
+                "input[name='q']",
+                "input[title='Search']",
+                "input[aria-label='Search']",
+                "#APjFqb",
+                ".gLFyf"
+            ]
             
-            # Clear cache using CDP (Chrome DevTools Protocol)
-            try:
-                if hasattr(self.driver, 'execute_cdp_cmd'):
-                    self.driver.execute_cdp_cmd('Network.clearBrowserCache', {})
-                    self.driver.execute_cdp_cmd('Network.clearBrowserCookies', {})
-                    self.logger.info("✅ Browser cache and cookies cleared via CDP")
+            search_box = None
+            for selector in search_selectors:
+                try:
+                    search_box = WebDriverWait(self.driver, 5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                    )
+                    if search_box.is_displayed() and search_box.is_enabled():
+                        self.logger.info(f"✅ Found search box with selector: {selector}")
+                        break
+                except TimeoutException:
+                    continue
+            
+            if not search_box:
+                raise Exception("Could not find Google search box")
+            
+            # Step 3: Click on search box and clear it
+            self.logger.info("🖱️ Clicking on search box...")
+            search_box.click()
+            time.sleep(random.uniform(0.5, 1.5))
+            search_box.clear()
+            time.sleep(random.uniform(0.3, 0.8))
+            
+            # Step 4: Type search query character by character
+            search_query = f"{target_site}"
+            self.logger.info(f"⌨️ Typing search query: {search_query}")
+            
+            for i, char in enumerate(search_query):
+                search_box.send_keys(char)
+                
+                # Vary typing speed based on character type
+                if char in [' ', '.', ',', ':', ';']:
+                    # Longer pause for punctuation
+                    time.sleep(random.uniform(0.1, 0.3))
+                elif char in ['a', 'e', 'i', 'o', 'u']:
+                    # Medium pause for vowels
+                    time.sleep(random.uniform(0.05, 0.15))
                 else:
-                    self.logger.debug("CDP not available, using alternative methods")
-            except Exception as e:
-                self.logger.debug(f"CDP clear failed (normal): {e}")
+                    # Short pause for consonants
+                    time.sleep(random.uniform(0.03, 0.1))
+                
+                # Occasionally pause longer (like human thinking)
+                if random.random() < 0.1:  # 10% chance
+                    time.sleep(random.uniform(0.2, 0.5))
             
-            # Clear IndexedDB
-            try:
-                self.driver.execute_script("""
-                    window.indexedDB.databases().then(function(databases) {
-                        databases.forEach(function(database) {
-                            window.indexedDB.deleteDatabase(database.name);
-                        });
-                    });
-                """)
-                self.logger.info("✅ IndexedDB cleared")
-            except Exception as e:
-                self.logger.debug(f"IndexedDB clear failed (normal): {e}")
+            # Step 5: Wait before pressing Enter
+            time.sleep(random.uniform(0.5, 1.5))
             
-            # Clear service workers
-            try:
-                self.driver.execute_script("""
-                    if ('serviceWorker' in navigator) {
-                        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                            for(let registration of registrations) {
-                                registration.unregister();
-                            }
-                        });
-                    }
-                """)
-                self.logger.info("✅ Service workers cleared")
-            except Exception as e:
-                self.logger.debug(f"Service worker clear failed (normal): {e}")
+            # Step 6: Press Enter to search
+            self.logger.info("⏎ Pressing Enter to search...")
+            search_box.send_keys(Keys.RETURN)
             
-            # Navigate to about:blank to ensure clean state
-            self.driver.get("about:blank")
-            time.sleep(1)
+            # Step 7: Wait for search results
+            self.logger.info("⏳ Waiting for search results...")
+            time.sleep(random.uniform(3, 6))
             
-            self.logger.info("✅ Browser data cleared successfully")
+            # Step 8: Look for search results and click one
+            self.logger.info("🔍 Looking for search results...")
             
+            # Find and click on a result - search within the search results container
+            result_selectors = [
+                "#search a[href^='http']",
+                "#rso a[href^='http']"
+            ]
+            
+            clicked_url = None
+            for selector in result_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    self.logger.info(f"🔍 Found {len(elements)} elements with selector: {selector}")
+                    
+                    for i, element in enumerate(elements[:1]):  # Check first 5 results
+                        try:
+                            href = element.get_attribute("href")
+                            self.logger.info(f"🔗 Found link: {href}")
+                            
+                            # Extract domain from target_url for comparison
+                            target_domain = target_url.split('/')[2] if len(target_url.split('/')) > 2 else target_url
+                            self.logger.info(f"🎯 Comparing with domain: {target_domain}")
+                            
+                            if href and target_domain in href:
+                                # Modify the href attribute before clicking
+                                self.logger.info(f"🎯 Modifying href to: {target_url}")
+                                try:
+                                    # Use setAttribute method which is more reliable
+                                    self.driver.execute_script("""
+                                        arguments[0].setAttribute('href', arguments[1]);
+                                    """, element, target_url)
+                                    
+                                    # Verify the modification
+                                    modified_href = element.get_attribute("href")
+                                    self.logger.info(f"✅ Modified href to: {modified_href}")
+                                    
+                                    if modified_href == target_url:
+                                        # Click on the modified element for organic traffic
+                                        self.logger.info(f"🖱️ Clicking on modified Google search result...")
+                                        element.click()
+                                        
+                                        # Wait for navigation
+                                        time.sleep(random.uniform(2, 4))
+                                        
+                                        # Check if we landed on the target URL
+                                        current_url = self.driver.current_url
+                                        self.logger.info(f"📍 Landed on: {current_url}")
+                                        
+                                        if target_url in current_url:
+                                            clicked_url = current_url
+                                            self.logger.info(f"✅ Successfully clicked and landed on target URL")
+                                        else:
+                                            # Fallback: navigate directly
+                                            self.logger.info(f"⚠️ Not on target URL, navigating directly to: {target_url}")
+                                            self.driver.get(target_url)
+                                            clicked_url = target_url
+                                    else:
+                                        # If modification failed, navigate directly
+                                        self.logger.warning(f"⚠️ Href modification failed, navigating directly to: {target_url}")
+                                        self.driver.get(target_url)
+                                        clicked_url = target_url
+                                        
+                                except Exception as js_error:
+                                    self.logger.warning(f"⚠️ JavaScript modification failed: {js_error}")
+                                    # Fallback: navigate directly
+                                    self.driver.get(target_url)
+                                    clicked_url = target_url
+                                break
+                        except Exception as e:
+                            self.logger.debug(f"❌ Error processing element {i+1}: {e}")
+                            continue
+                    
+                    if clicked_url:
+                        break
+                        
+                except Exception as e:
+                    self.logger.debug(f"❌ Error with selector {selector}: {e}")
+                    continue
+            
+            if not clicked_url:
+                self.logger.warning("⚠️ No target site links found, navigating directly")
+                self.driver.get(f"https://{target_site}")
+                return f"https://{target_site}"
+            
+            # Step 9: Wait for page to load
+            time.sleep(random.uniform(2, 4))
+            
+            if clicked_url:
+                self.logger.info(f"✅ Successfully clicked on search result: {clicked_url}")
+                return clicked_url
+            else:
+                self.logger.warning("⚠️ No search result clicked, navigating directly")
+                self.driver.get(f"https://{target_site}")
+                return f"https://{target_site}"
+                
         except Exception as e:
-            self.logger.error(f"❌ Failed to clear browser data: {e}")
-    
-    def force_fresh_start(self):
-        """Force a completely fresh start by clearing all data and navigating to blank page"""
-        try:
-            self.logger.info("🔄 Forcing fresh start...")
-            
-            # Clear all browser data
-            self._clear_browser_data()
-            
-            # Navigate to about:blank
-            self.driver.get("about:blank")
-            time.sleep(2)
-            
-            # Clear any remaining data
-            self.driver.execute_script("window.localStorage.clear();")
-            self.driver.execute_script("window.sessionStorage.clear();")
-            self.driver.delete_all_cookies()
-            
-            self.logger.info("✅ Fresh start completed")
-            
-        except Exception as e:
-            self.logger.error(f"❌ Failed to force fresh start: {e}")
+            self.logger.error(f"❌ Error in Google search simulation: {e}")
+            # Fallback: navigate to random page
+            try:
+                self.driver.get(f"https://{target_site}")
+                return f"https://{target_site}"
+            except Exception as fallback_error:
+                self.logger.error(f"❌ Fallback navigation also failed: {fallback_error}")
+                return None
     
     def simulate_realistic_browsing(self, base_url: str) -> Dict:
         """Simulate realistic browsing behavior with multiple page visits"""
