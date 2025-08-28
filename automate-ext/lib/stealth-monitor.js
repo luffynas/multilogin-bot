@@ -29,10 +29,12 @@ class StealthMonitor {
         
         this.stealthConfig = {
             enabled: true,
-            monitoringInterval: 5000, // 5 seconds
-            maxPatternHistory: 1000,
-            riskThreshold: 0.7,
-            humanThreshold: 0.8
+            monitoringInterval: 15000, // 15 seconds - reduced frequency
+            maxPatternHistory: 500, // Reduced history for better performance
+            riskThreshold: 0.85, // Increased threshold to reduce false positives
+            humanThreshold: 0.5, // Lowered threshold for more realistic assessment
+            suspiciousPatternThreshold: 0.9, // Higher threshold for suspicious patterns
+            debugMode: false // Disable debug logging for stealth
         };
         
         this.monitoringTimer = null;
@@ -421,48 +423,65 @@ class StealthMonitor {
     }
 
     /**
-     * Detect suspicious patterns
+     * Detect suspicious patterns with improved thresholds
      */
     detectSuspiciousPatterns() {
         const suspiciousPatterns = [];
         
-        // Check for too-perfect timing
+        // Only analyze if we have enough data
+        const totalPatterns = this.behaviorPatterns.mouseMovements.length + 
+                            this.behaviorPatterns.clicks.length + 
+                            this.behaviorPatterns.scrolls.length + 
+                            this.behaviorPatterns.typing.length + 
+                            this.behaviorPatterns.navigation.length;
+        
+        if (totalPatterns < 20) {
+            // Not enough data to make meaningful analysis
+            this.detectionSignals.suspiciousPatterns = suspiciousPatterns;
+            return;
+        }
+        
+        // Check for too-perfect timing with higher threshold
         const perfectTiming = this.detectPerfectTiming();
-        if (perfectTiming) {
+        if (perfectTiming && perfectTiming.detected && perfectTiming.confidence > this.stealthConfig.suspiciousPatternThreshold) {
             suspiciousPatterns.push({
                 type: 'perfect_timing',
-                severity: 'high',
-                description: 'Too consistent timing patterns'
+                severity: 'medium',
+                description: 'Consistent timing patterns detected',
+                confidence: perfectTiming.confidence
             });
         }
         
-        // Check for too-fast interactions
+        // Check for too-fast interactions with more realistic thresholds
         const tooFast = this.detectTooFastInteractions();
-        if (tooFast) {
+        if (tooFast && tooFast.detected && tooFast.confidence > 0.95) { // Very high threshold
             suspiciousPatterns.push({
                 type: 'too_fast',
                 severity: 'medium',
-                description: 'Interactions too fast for human capability'
+                description: 'Very fast interactions detected',
+                confidence: tooFast.confidence
             });
         }
         
-        // Check for repetitive patterns
+        // Check for repetitive patterns with higher threshold
         const repetitive = this.detectRepetitivePatterns();
-        if (repetitive) {
+        if (repetitive && repetitive.detected && repetitive.confidence > this.stealthConfig.suspiciousPatternThreshold) {
             suspiciousPatterns.push({
                 type: 'repetitive',
-                severity: 'medium',
-                description: 'Highly repetitive behavior patterns'
+                severity: 'low',
+                description: 'Some repetitive patterns detected',
+                confidence: repetitive.confidence
             });
         }
         
-        // Check for lack of natural variation
+        // Check for lack of natural variation with more lenient threshold
         const noVariation = this.detectNoVariation();
-        if (noVariation) {
+        if (noVariation && noVariation.detected && noVariation.confidence > 0.95) { // Very high threshold
             suspiciousPatterns.push({
                 type: 'no_variation',
-                severity: 'high',
-                description: 'No natural variation in behavior'
+                severity: 'medium',
+                description: 'Limited variation in behavior',
+                confidence: noVariation.confidence
             });
         }
         
@@ -561,8 +580,10 @@ class StealthMonitor {
         
         this.detectionSignals.riskFactors.push(alert);
         
-        // Log alert
-        console.warn('Stealth Monitor: High bot detection risk detected', alert);
+        // Stealth logging - only log if debug mode is enabled
+        if (this.stealthConfig.debugMode) {
+            console.warn('Stealth Monitor: High bot detection risk detected', alert);
+        }
         
         // Could trigger additional actions here
         // - Slow down automation
@@ -833,7 +854,13 @@ class StealthMonitor {
         }
         
         const variation = this.calculateVariation(intervals);
-        return variation < 0.1; // Too consistent
+        const confidence = Math.max(0, (0.1 - variation) / 0.1); // Higher confidence for lower variation
+        
+        return {
+            detected: variation < 0.1,
+            confidence: confidence,
+            variation: variation
+        };
     }
 
     detectTooFastInteractions() {
@@ -853,7 +880,13 @@ class StealthMonitor {
         }
         
         const avgInterval = intervals.reduce((sum, val) => sum + val, 0) / intervals.length;
-        return avgInterval < 50; // Too fast (less than 50ms average)
+        const confidence = Math.max(0, (50 - avgInterval) / 50); // Higher confidence for faster interactions
+        
+        return {
+            detected: avgInterval < 50,
+            confidence: confidence,
+            avgInterval: avgInterval
+        };
     }
 
     detectRepetitivePatterns() {
@@ -877,7 +910,14 @@ class StealthMonitor {
         });
         
         const maxCount = Math.max(...Object.values(typeCounts));
-        return maxCount > 15; // More than 75% same type
+        const repetitionRatio = maxCount / recentPatterns.length;
+        const confidence = Math.max(0, (repetitionRatio - 0.75) / 0.25); // Higher confidence for higher repetition
+        
+        return {
+            detected: maxCount > 15,
+            confidence: confidence,
+            repetitionRatio: repetitionRatio
+        };
     }
 
     detectNoVariation() {
@@ -898,13 +938,19 @@ class StealthMonitor {
         }
         
         const variation = this.calculateVariation(intervals);
-        return variation < 0.05; // Very low variation
+        const confidence = Math.max(0, (0.05 - variation) / 0.05); // Higher confidence for lower variation
+        
+        return {
+            detected: variation < 0.05,
+            confidence: confidence,
+            variation: variation
+        };
     }
 }
 
-// Export for use in other modules
+// Export for use in other modules with enhanced stealth protection
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = StealthMonitor;
-} else {
+} else if (typeof window !== 'undefined' && !window.StealthMonitor) {
     window.StealthMonitor = StealthMonitor;
 }

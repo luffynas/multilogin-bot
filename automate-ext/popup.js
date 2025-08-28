@@ -9,8 +9,11 @@ class PopupManager {
         this.currentTab = null;
         this.status = {
             isInitialized: false,
-            isRunning: false,
-            config: {},
+            isRunning: true,
+            config: {
+                autoStart: true,
+                enabled: true
+            },
             personality: null,
             session: null,
             stealth: null,
@@ -195,7 +198,10 @@ class PopupManager {
         const automationText = document.getElementById('automationText');
         const toggleBtn = document.getElementById('toggleBtn');
         
-        if (this.status.isRunning) {
+        // Default to running state
+        const isRunning = this.status.isRunning !== false;
+        
+        if (isRunning) {
             automationText.textContent = 'Running';
             toggleBtn.textContent = 'Stop';
             toggleBtn.classList.add('running');
@@ -245,9 +251,9 @@ class PopupManager {
         const stealthCheckbox = document.getElementById('stealthMode');
         stealthCheckbox.checked = config.stealthMode !== false;
         
-        // Auto start
+        // Auto start - default to true
         const autoStartCheckbox = document.getElementById('autoStart');
-        autoStartCheckbox.checked = config.autoStart || false;
+        autoStartCheckbox.checked = config.autoStart !== false;
     }
 
     /**

@@ -5,23 +5,18 @@
 
 class AdSenseDetector {
     constructor() {
+        // Stealth: Use less obvious selectors to avoid detection
         this.adSelectors = [
-            // Google AdSense selectors
-            'ins.adsbygoogle',
-            'div[id*="google_ads"]',
-            'div[id*="div-gpt-ad"]',
-            'div[class*="adsbygoogle"]',
-            'div[class*="ad-container"]',
-            'div[class*="advertisement"]',
-            'div[class*="ad-wrapper"]',
-            'div[class*="ad-unit"]',
-            'div[class*="ad-box"]',
-            'div[class*="ad-banner"]',
-            'iframe[src*="googleadservices"]',
+            // Natural-looking selectors
+            'ins[class*="ads"]',
+            'div[id*="google"]',
+            'div[class*="ad"]',
+            'div[class*="banner"]',
+            'div[class*="sponsor"]',
+            'div[class*="promo"]',
+            'iframe[src*="google"]',
             'iframe[src*="doubleclick"]',
-            'iframe[src*="googlesyndication"]',
-            'iframe[id*="google_ads"]',
-            'iframe[class*="adsbygoogle"]'
+            'iframe[src*="googlesyndication"]'
         ];
 
         this.highValueCategories = [
@@ -56,19 +51,33 @@ class AdSenseDetector {
     }
 
     /**
-     * Detect all AdSense ads on the page
+     * Detect all AdSense ads on the page with stealth protection
      */
     detectAdSenseAds() {
         const ads = [];
         
-        this.adSelectors.forEach(selector => {
-            const elements = document.querySelectorAll(selector);
-            elements.forEach(element => {
-                const adInfo = this.analyzeAd(element);
-                if (adInfo.isAdSense) {
-                    ads.push(adInfo);
-                }
-            });
+        // Stealth: Use more natural selectors and avoid obvious patterns
+        const stealthSelectors = [
+            'ins[class*="ads"]',
+            'div[id*="google"]',
+            'div[class*="ad"]',
+            'iframe[src*="google"]',
+            'div[class*="banner"]',
+            'div[class*="sponsor"]'
+        ];
+        
+        stealthSelectors.forEach(selector => {
+            try {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(element => {
+                    const adInfo = this.analyzeAd(element);
+                    if (adInfo.isAdSense) {
+                        ads.push(adInfo);
+                    }
+                });
+            } catch (error) {
+                // Silent error handling for stealth
+            }
         });
 
         this.adMetrics.totalAds = ads.length;
@@ -575,9 +584,9 @@ class AdSenseDetector {
     }
 }
 
-// Export for use in other modules
+// Export for use in other modules with enhanced stealth protection
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = AdSenseDetector;
-} else {
+} else if (typeof window !== 'undefined' && !window.AdSenseDetector) {
     window.AdSenseDetector = AdSenseDetector;
 }

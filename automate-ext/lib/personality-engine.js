@@ -283,9 +283,9 @@ class PersonalityEngine {
     }
 }
 
-// Export for use in other modules
+// Export for use in other modules with enhanced stealth protection
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = PersonalityEngine;
-} else {
+} else if (typeof window !== 'undefined' && !window.PersonalityEngine) {
     window.PersonalityEngine = PersonalityEngine;
 }

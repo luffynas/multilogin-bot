@@ -441,9 +441,9 @@ class KeyboardSimulator {
     }
 }
 
-// Export for use in other modules
+// Export for use in other modules with enhanced stealth protection
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = KeyboardSimulator;
-} else {
+} else if (typeof window !== 'undefined' && !window.KeyboardSimulator) {
     window.KeyboardSimulator = KeyboardSimulator;
 }

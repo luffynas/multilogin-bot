@@ -9,7 +9,7 @@ class BackgroundManager {
         this.activeTabs = new Map();
         this.extensionConfig = {
             enabled: true,
-            autoStart: false,
+            autoStart: true,
             notifications: true
         };
     }
@@ -288,12 +288,18 @@ class BackgroundManager {
     }
 
     /**
-     * Inject content script into tab
+     * Inject content script into tab with enhanced stealth protection
      */
     async injectContentScript(tabId) {
         try {
-            // Check if content script is already injected
-            if (this.activeTabs.has(tabId)) return;
+            // Enhanced check if content script is already injected
+            if (this.activeTabs.has(tabId)) {
+                const tabInfo = this.activeTabs.get(tabId);
+                if (tabInfo.injected && (Date.now() - tabInfo.timestamp) < 300000) { // 5 minutes
+                    console.log(`Content script already active in tab ${tabId} (injected ${Math.round((Date.now() - tabInfo.timestamp) / 1000)}s ago)`);
+                    return;
+                }
+            }
             
             // Get tab information to check URL
             const tab = await chrome.tabs.get(tabId);
@@ -314,27 +320,50 @@ class BackgroundManager {
                 return;
             }
             
-            // Inject content script
-            await chrome.scripting.executeScript({
-                target: { tabId: tabId },
-                files: [
-                    'lib/personality-engine.js',
-                    'lib/behavior-simulator.js',
-                    'lib/adsense-detector.js',
-                    'lib/mouse-simulator.js',
-                    'lib/keyboard-simulator.js',
-                    'lib/reading-simulator.js',
-                    'lib/navigation-simulator.js',
-                    'lib/session-manager.js',
-                    'lib/stealth-monitor.js',
-                    'content-script.js'
-                ]
-            });
+            // First, check if automation is already running in the tab
+            try {
+                const response = await chrome.tabs.sendMessage(tabId, { action: 'ping' });
+                if (response && response.status === 'success') {
+                    console.log(`Automation already running in tab ${tabId}, skipping injection`);
+                    this.activeTabs.set(tabId, { injected: true, timestamp: Date.now() });
+                    return;
+                }
+            } catch (pingError) {
+                // Ping failed, proceed with injection
+                console.log(`No existing automation found in tab ${tabId}, proceeding with injection`);
+            }
+            
+            // Inject content script with individual file injection for better error handling
+            const scriptFiles = [
+                'lib/personality-engine.js',
+                'lib/behavior-simulator.js',
+                'lib/adsense-detector.js',
+                'lib/mouse-simulator.js',
+                'lib/keyboard-simulator.js',
+                'lib/reading-simulator.js',
+                'lib/navigation-simulator.js',
+                'lib/session-manager.js',
+                'lib/stealth-monitor.js',
+                'content-script.js'
+            ];
+            
+            for (const scriptFile of scriptFiles) {
+                try {
+                    await chrome.scripting.executeScript({
+                        target: { tabId: tabId },
+                        files: [scriptFile]
+                    });
+                    console.log(`Injected ${scriptFile} into tab ${tabId}`);
+                } catch (scriptError) {
+                    console.warn(`Failed to inject ${scriptFile} into tab ${tabId}:`, scriptError);
+                    // Continue with other scripts
+                }
+            }
             
             // Mark tab as active
             this.activeTabs.set(tabId, { injected: true, timestamp: Date.now() });
             
-            console.log(`Content script injected into tab ${tabId} (${tab.url})`);
+            console.log(`Content script injection completed for tab ${tabId} (${tab.url})`);
             
         } catch (error) {
             console.error(`Failed to inject content script into tab ${tabId}:`, error);
@@ -532,7 +561,7 @@ class BackgroundManager {
         try {
             const defaultConfig = {
                 enabled: true,
-                autoStart: false,
+                autoStart: true,
                 notifications: true,
                 targetRPM: 0,
                 personalityType: 'auto',

@@ -37,6 +37,11 @@
         "lib/navigation-simulator.js",
         "lib/session-manager.js",
         "lib/stealth-monitor.js",
+        "lib/ml-behavior-engine.js",
+        "lib/advanced-mouse-physics.js",
+        "lib/network-traffic-simulator.js",
+        "lib/advanced-bot-evasion.js",
+        "lib/multilogin-optimizer.js",
         "content-script.js"
       ],
       "run_at": "document_end"

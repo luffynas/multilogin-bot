@@ -30,6 +30,9 @@ class SessionManager {
             this.startAutoSave();
         }
         
+        // Listen for extension context invalidation
+        this.setupContextInvalidationListener();
+        
         return this.currentSession;
     }
 
@@ -256,6 +259,13 @@ class SessionManager {
         if (!this.currentSession) return;
         
         try {
+            // Check if extension context is still valid
+            if (!this.isExtensionContextValid()) {
+                console.warn('Extension context invalid, skipping session save');
+                this.stopAutoSave();
+                return;
+            }
+            
             const sessionData = {
                 ...this.currentSession,
                 lastSaved: Date.now()
@@ -272,7 +282,13 @@ class SessionManager {
             
             console.log('Session saved:', this.currentSession.id);
         } catch (error) {
-            console.error('Error saving session:', error);
+            if (error.message.includes('Extension context invalidated')) {
+                console.warn('Extension context invalidated, stopping session management');
+                this.stopAutoSave();
+                this.isActive = false;
+            } else {
+                console.error('Error saving session:', error);
+            }
         }
     }
 
@@ -281,6 +297,12 @@ class SessionManager {
      */
     async loadSession() {
         try {
+            // Check if extension context is still valid
+            if (!this.isExtensionContextValid()) {
+                console.warn('Extension context invalid, skipping session load');
+                return;
+            }
+            
             const result = await chrome.storage.local.get(['currentSession']);
             
             if (result.currentSession) {
@@ -295,7 +317,11 @@ class SessionManager {
                 console.log('Session loaded:', this.currentSession.id);
             }
         } catch (error) {
-            console.error('Error loading session:', error);
+            if (error.message.includes('Extension context invalidated')) {
+                console.warn('Extension context invalidated, skipping session load');
+            } else {
+                console.error('Error loading session:', error);
+            }
         }
     }
 
@@ -304,6 +330,12 @@ class SessionManager {
      */
     async loadSessionHistory() {
         try {
+            // Check if extension context is still valid
+            if (!this.isExtensionContextValid()) {
+                console.warn('Extension context invalid, skipping session history load');
+                return [];
+            }
+            
             const result = await chrome.storage.local.get(null);
             const sessions = [];
             
@@ -321,8 +353,13 @@ class SessionManager {
             
             return this.sessionHistory;
         } catch (error) {
-            console.error('Error loading session history:', error);
-            return [];
+            if (error.message.includes('Extension context invalidated')) {
+                console.warn('Extension context invalidated, skipping session history load');
+                return [];
+            } else {
+                console.error('Error loading session history:', error);
+                return [];
+            }
         }
     }
 
@@ -346,9 +383,23 @@ class SessionManager {
             clearInterval(this.saveTimer);
         }
         
-        this.saveTimer = setInterval(() => {
-            if (this.isActive && this.currentSession) {
-                this.saveSession();
+        this.saveTimer = setInterval(async () => {
+            try {
+                if (this.isActive && this.currentSession && this.isExtensionContextValid()) {
+                    await this.saveSession();
+                } else if (!this.isExtensionContextValid()) {
+                    console.warn('Extension context invalid, stopping auto-save');
+                    this.stopAutoSave();
+                    this.isActive = false;
+                }
+            } catch (error) {
+                if (error.message.includes('Extension context invalidated')) {
+                    console.warn('Extension context invalidated, stopping auto-save');
+                    this.stopAutoSave();
+                    this.isActive = false;
+                } else {
+                    console.error('Auto-save error:', error);
+                }
             }
         }, this.sessionConfig.saveInterval);
     }
@@ -383,6 +434,12 @@ class SessionManager {
      */
     async cleanupOldSessions() {
         try {
+            // Check if extension context is still valid
+            if (!this.isExtensionContextValid()) {
+                console.warn('Extension context invalid, skipping session cleanup');
+                return;
+            }
+            
             const cutoffTime = Date.now() - this.sessionConfig.dataRetention;
             const result = await chrome.storage.local.get(null);
             const keysToDelete = [];
@@ -398,7 +455,11 @@ class SessionManager {
                 console.log(`Cleaned up ${keysToDelete.length} old sessions`);
             }
         } catch (error) {
-            console.error('Error cleaning up old sessions:', error);
+            if (error.message.includes('Extension context invalidated')) {
+                console.warn('Extension context invalidated, skipping session cleanup');
+            } else {
+                console.error('Error cleaning up old sessions:', error);
+            }
         }
     }
 
@@ -424,6 +485,57 @@ class SessionManager {
             navigationData: session.navigationData,
             personality: session.personality?.type || 'unknown'
         };
+    }
+
+    /**
+     * Check if extension context is still valid
+     */
+    isExtensionContextValid() {
+        try {
+            // Try to access chrome.runtime to check if context is valid
+            return typeof chrome !== 'undefined' && 
+                   chrome.runtime && 
+                   chrome.runtime.id;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    /**
+     * Setup listener for extension context invalidation
+     */
+    setupContextInvalidationListener() {
+        try {
+            // Listen for runtime.onSuspend event
+            if (chrome.runtime && chrome.runtime.onSuspend) {
+                chrome.runtime.onSuspend.addListener(() => {
+                    console.warn('Extension context suspending, stopping session management');
+                    this.stopAutoSave();
+                    this.isActive = false;
+                });
+            }
+            
+            // Listen for page unload
+            window.addEventListener('beforeunload', () => {
+                console.warn('Page unloading, stopping session management');
+                this.stopAutoSave();
+                this.isActive = false;
+            });
+            
+            // Listen for visibility change
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') {
+                    console.warn('Page hidden, pausing session management');
+                    this.stopAutoSave();
+                } else if (document.visibilityState === 'visible' && this.isActive) {
+                    console.log('Page visible, resuming session management');
+                    this.startAutoSave();
+                }
+            });
+            
+        } catch (error) {
+            console.warn('Could not setup context invalidation listener:', error);
+        }
     }
 
     /**
@@ -543,9 +655,9 @@ class SessionManager {
     }
 }
 
-// Export for use in other modules
+// Export for use in other modules with enhanced stealth protection
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = SessionManager;
-} else {
+} else if (typeof window !== 'undefined' && !window.SessionManager) {
     window.SessionManager = SessionManager;
 }

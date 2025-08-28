@@ -693,9 +693,9 @@ class NavigationSimulator {
     }
 }
 
-// Export for use in other modules
+// Export for use in other modules with enhanced stealth protection
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = NavigationSimulator;
-} else {
+} else if (typeof window !== 'undefined' && !window.NavigationSimulator) {
     window.NavigationSimulator = NavigationSimulator;
 }

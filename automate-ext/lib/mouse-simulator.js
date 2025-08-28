@@ -395,9 +395,9 @@ class MouseSimulator {
     }
 }
 
-// Export for use in other modules
+// Export for use in other modules with enhanced stealth protection
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = MouseSimulator;
-} else {
+} else if (typeof window !== 'undefined' && !window.MouseSimulator) {
     window.MouseSimulator = MouseSimulator;
 }

@@ -9,11 +9,12 @@ class AdSenseAutomationPro {
         this.isRunning = false;
         this.automationConfig = {
             enabled: true,
-            autoStart: false,
+            autoStart: true,
             targetRPM: 0,
             personalityType: 'auto',
             automationLevel: 'medium',
-            stealthMode: true
+            stealthMode: true,
+            debugMode: false // Disable debug logging for stealth
         };
         
         // Initialize all components
@@ -27,11 +28,34 @@ class AdSenseAutomationPro {
         this.sessionManager = new SessionManager();
         this.stealthMonitor = new StealthMonitor();
         
+        // Initialize Multilogin Optimizer for RPM enhancement
+        this.multiloginOptimizer = null;
+        this.initializeMultiloginOptimizer();
+        
         // Event listeners
         this.eventListeners = [];
         
         // Message handling
         this.setupMessageHandling();
+    }
+
+    /**
+     * Initialize Multilogin Optimizer with retry mechanism
+     */
+    async initializeMultiloginOptimizer() {
+        try {
+            // Wait for MultiloginOptimizer to be available
+            const isAvailable = await this.waitForMultiloginOptimizer();
+            
+            if (isAvailable && typeof MultiloginOptimizer !== 'undefined') {
+                this.multiloginOptimizer = new MultiloginOptimizer();
+                console.log('MultiloginOptimizer initialized successfully');
+            } else {
+                console.warn('MultiloginOptimizer not available, continuing without it');
+            }
+        } catch (error) {
+            console.warn('Failed to initialize MultiloginOptimizer:', error);
+        }
     }
 
     /**
@@ -41,7 +65,10 @@ class AdSenseAutomationPro {
         if (this.isInitialized) return;
         
         try {
-            console.log('AdSense Automation Pro: Initializing...');
+            // Stealth logging - minimal console output
+            if (this.automationConfig.debugMode) {
+                console.log('Initializing automation system...');
+            }
             
             // Initialize all components
             await this.personalityEngine.loadPersonality();
@@ -51,19 +78,25 @@ class AdSenseAutomationPro {
             this.stealthMonitor.initialize();
             this.navigationSimulator.initialize();
             
+            // Initialize Multilogin Optimizer
+            if (this.multiloginOptimizer) {
+                await this.multiloginOptimizer.initialize();
+            }
+            
             // Load configuration
             await this.loadConfiguration();
             
             // Setup event listeners
             this.setupEventListeners();
             
-            // Start session if auto-start is enabled
-            if (this.automationConfig.autoStart) {
-                await this.startAutomation();
-            }
+            // Start automation immediately after initialization
+            await this.startAutomation();
             
             this.isInitialized = true;
-            console.log('AdSense Automation Pro: Initialized successfully');
+            // Stealth logging - minimal console output
+            if (this.automationConfig.debugMode) {
+                console.log('Automation system ready');
+            }
             
             // Send initialization complete message
             this.sendMessage('initializationComplete', {
@@ -72,7 +105,10 @@ class AdSenseAutomationPro {
             });
             
         } catch (error) {
-            console.error('AdSense Automation Pro: Initialization failed', error);
+            // Stealth error handling - minimal console output
+            if (this.automationConfig.debugMode) {
+                console.warn('Initialization issue detected');
+            }
             this.sendMessage('initializationComplete', {
                 status: 'error',
                 error: error.message
@@ -169,6 +205,12 @@ class AdSenseAutomationPro {
      */
     setupMessageHandling() {
         chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+            // Add ping handler for injection detection
+            if (message.action === 'ping') {
+                sendResponse({ status: 'success', data: { isRunning: this.isRunning } });
+                return true;
+            }
+            
             this.handleMessage(message, sender, sendResponse);
             return true; // Keep message channel open for async responses
         });
@@ -311,6 +353,14 @@ class AdSenseAutomationPro {
      * Main automation loop
      */
     async automationLoop(options = {}) {
+        // Stealth logging - minimal console output
+        if (this.automationConfig.debugMode) {
+            console.log('Starting automation process...');
+        }
+        
+        // Start with immediate scrolling
+        await this.startImmediateScrolling();
+        
         while (this.isRunning) {
             try {
                 // Check stealth status
@@ -386,6 +436,67 @@ class AdSenseAutomationPro {
         }
         
         return interactions;
+    }
+
+    /**
+     * Start immediate scrolling when page loads
+     */
+    async startImmediateScrolling() {
+        try {
+            // Stealth logging - minimal console output
+            if (this.automationConfig.debugMode) {
+                console.log('Starting page interaction...');
+            }
+            
+            // Get page height
+            const pageHeight = document.documentElement.scrollHeight;
+            const viewportHeight = window.innerHeight;
+            const maxScroll = pageHeight - viewportHeight;
+            
+            // Start scrolling immediately
+            let currentScroll = 0;
+            const scrollStep = 100 + Math.random() * 200; // Random scroll step
+            
+            while (currentScroll < maxScroll && this.isRunning) {
+                // Natural scrolling with easing
+                const progress = currentScroll / maxScroll;
+                const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+                
+                window.scrollTo({
+                    top: currentScroll,
+                    behavior: 'smooth'
+                });
+                
+                // Random pause at content
+                if (Math.random() < 0.3) {
+                    await this.delay(1000 + Math.random() * 2000);
+                }
+                
+                currentScroll += scrollStep;
+                await this.delay(500 + Math.random() * 1000);
+            }
+            
+            // Scroll back up partially
+            if (this.isRunning) {
+                const scrollBackAmount = maxScroll * 0.3;
+                window.scrollTo({
+                    top: scrollBackAmount,
+                    behavior: 'smooth'
+                });
+                await this.delay(2000);
+            }
+            
+            // Stealth logging - minimal console output
+            if (this.automationConfig.debugMode) {
+                console.log('Page interaction completed');
+            }
+            
+        } catch (error) {
+            // Stealth error handling - minimal console output
+            if (this.automationConfig.debugMode) {
+                console.warn('Page interaction issue detected');
+            }
+        }
     }
 
     /**
@@ -559,6 +670,23 @@ class AdSenseAutomationPro {
     }
 
     /**
+     * Wait for MultiloginOptimizer to be available
+     */
+    async waitForMultiloginOptimizer() {
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        while (attempts < maxAttempts) {
+            if (typeof MultiloginOptimizer !== 'undefined') {
+                return true;
+            }
+            await this.delay(500);
+            attempts++;
+        }
+        return false;
+    }
+
+    /**
      * Cleanup resources
      */
     cleanup() {
@@ -577,18 +705,38 @@ class AdSenseAutomationPro {
     }
 }
 
-// Initialize automation when content script loads
+// Initialize automation when content script loads with enhanced stealth protection
 let automationPro = null;
 
-// Wait for DOM to be ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        automationPro = new AdSenseAutomationPro();
-        automationPro.initialize();
-    });
+// Enhanced check if already initialized to prevent duplication
+if (typeof window !== 'undefined' && window.AdSenseAutomationProInstance) {
+    console.log('Automation already initialized, skipping...');
+    automationPro = window.AdSenseAutomationProInstance;
 } else {
-    automationPro = new AdSenseAutomationPro();
-    automationPro.initialize();
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof window !== 'undefined' && !window.AdSenseAutomationProInstance) {
+                try {
+                    automationPro = new AdSenseAutomationPro();
+                    window.AdSenseAutomationProInstance = automationPro;
+                    automationPro.initialize();
+                } catch (error) {
+                    console.warn('Failed to initialize automation:', error);
+                }
+            }
+        });
+    } else {
+        if (typeof window !== 'undefined' && !window.AdSenseAutomationProInstance) {
+            try {
+                automationPro = new AdSenseAutomationPro();
+                window.AdSenseAutomationProInstance = automationPro;
+                automationPro.initialize();
+            } catch (error) {
+                console.warn('Failed to initialize automation:', error);
+            }
+        }
+    }
 }
 
 // Cleanup on page unload
