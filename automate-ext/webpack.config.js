@@ -6,9 +6,26 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 module.exports = {
     mode: 'production',
     entry: {
+        // Main scripts
         'content-script': './content-script.js',
         'background': './background.js',
-        'popup': './popup.js'
+        'popup': './popup.js',
+        
+        // Library files
+        'lib/personality-engine': './lib/personality-engine.js',
+        'lib/adsense-detector': './lib/adsense-detector.js',
+        'lib/behavior-simulator': './lib/behavior-simulator.js',
+        'lib/mouse-simulator': './lib/mouse-simulator.js',
+        'lib/keyboard-simulator': './lib/keyboard-simulator.js',
+        'lib/reading-simulator': './lib/reading-simulator.js',
+        'lib/navigation-simulator': './lib/navigation-simulator.js',
+        'lib/session-manager': './lib/session-manager.js',
+        'lib/stealth-monitor': './lib/stealth-monitor.js',
+        'lib/ml-behavior-engine': './lib/ml-behavior-engine.js',
+        'lib/advanced-mouse-physics': './lib/advanced-mouse-physics.js',
+        'lib/network-traffic-simulator': './lib/network-traffic-simulator.js',
+        'lib/advanced-bot-evasion': './lib/advanced-bot-evasion.js',
+        'lib/multilogin-optimizer': './lib/multilogin-optimizer.js'
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -62,7 +79,17 @@ module.exports = {
                     mangle: {
                         // Mangle variable names for obfuscation
                         toplevel: true,
-                        reserved: ['chrome', 'window', 'document']
+                        reserved: [
+                            'chrome', 'window', 'document', 'navigator', 'location',
+                            'chrome.runtime', 'chrome.tabs', 'chrome.storage', 
+                            'chrome.action', 'chrome.scripting', 'chrome.notifications',
+                            'BackgroundManager', 'AdSenseAutomationPro', 'PersonalityEngine',
+                            'AdSenseDetector', 'BehaviorSimulator', 'MouseSimulator',
+                            'KeyboardSimulator', 'ReadingSimulator', 'NavigationSimulator',
+                            'SessionManager', 'StealthMonitor', 'MLBehaviorEngine',
+                            'AdvancedMousePhysics', 'NetworkTrafficSimulator',
+                            'AdvancedBotEvasion', 'MultiloginOptimizer'
+                        ]
                     },
                     format: {
                         // Remove all comments
@@ -94,7 +121,6 @@ module.exports = {
                 // Copy manifest files
                 { from: 'manifest.json', to: 'manifest.json' },
                 { from: 'manifest-firefox.json', to: 'manifest-firefox.json' },
-                { from: 'manifest-pwa.json', to: 'manifest-pwa.json' },
                 
                 // Copy HTML files
                 { from: 'popup.html', to: 'popup.html' },

@@ -129,13 +129,34 @@ class ReadingSimulator {
             const text = randomElement.textContent;
             
             if (text && text.length > 10) {
-                // Select random portion of text
-                const start = Math.floor(Math.random() * (text.length - 10));
-                const end = start + 5 + Math.floor(Math.random() * 10);
-                
                 try {
-                    range.setStart(randomElement.firstChild || randomElement, start);
-                    range.setEnd(randomElement.firstChild || randomElement, end);
+                    // Get the text node to work with
+                    const textNode = this.getTextNode(randomElement);
+                    if (!textNode) {
+                        return; // No valid text node found
+                    }
+                    
+                    // Calculate safe start and end positions
+                    const maxLength = textNode.length;
+                    const minSelectionLength = 5;
+                    const maxSelectionLength = Math.min(20, maxLength - 1);
+                    
+                    if (maxLength < minSelectionLength) {
+                        return; // Text too short for selection
+                    }
+                    
+                    const start = Math.floor(Math.random() * (maxLength - minSelectionLength));
+                    const selectionLength = minSelectionLength + Math.floor(Math.random() * (maxSelectionLength - minSelectionLength));
+                    const end = Math.min(start + selectionLength, maxLength);
+                    
+                    // Set range with proper bounds checking
+                    range.setStart(textNode, start);
+                    range.setEnd(textNode, end);
+                    
+                    // Verify range is valid
+                    if (range.collapsed) {
+                        return; // Range is collapsed, skip selection
+                    }
                     
                     selection.removeAllRanges();
                     selection.addRange(range);
@@ -146,11 +167,39 @@ class ReadingSimulator {
                     // Clear selection
                     selection.removeAllRanges();
                 } catch (error) {
-                    // Handle selection errors gracefully
-                    console.warn('Text selection failed:', error);
+                    // Handle selection errors gracefully - don't log in production
+                    if (typeof console !== 'undefined' && console.warn) {
+                        console.warn('Text selection failed:', error.message);
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * Get the first text node from an element
+     */
+    getTextNode(element) {
+        if (!element) return null;
+        
+        // If element itself is a text node
+        if (element.nodeType === Node.TEXT_NODE) {
+            return element.textContent.trim() ? element : null;
+        }
+        
+        // Find first text node in the element
+        const walker = document.createTreeWalker(
+            element,
+            NodeFilter.SHOW_TEXT,
+            {
+                acceptNode: function(node) {
+                    return node.textContent.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+                }
+            }
+        );
+        
+        const textNode = walker.nextNode();
+        return textNode;
     }
 
     /**
