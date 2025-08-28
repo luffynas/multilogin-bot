@@ -1,0 +1,145 @@
+{
+  "name": "adsense-automation-pro",
+  "version": "1.0.0",
+  "description": "A sophisticated browser extension for Chrome and Firefox that automates website content interaction to increase Google AdSense revenue and improve RPM",
+  "main": "background.js",
+  "scripts": {
+    "build": "npm run build:chrome && npm run build:firefox",
+    "build:chrome": "cp manifest.json manifest-chrome.json && echo 'Chrome build ready'",
+    "build:firefox": "cp manifest.json manifest-firefox.json && echo 'Firefox build ready'",
+    "dev": "npm run watch",
+    "watch": "echo 'Watching for changes...' && nodemon --watch . --ext js,html,css,json --exec 'npm run build'",
+    "test": "echo 'No tests specified'",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix",
+    "package": "npm run build && zip -r adsense-automation-pro.zip . -x '*.git*' 'node_modules/*' '*.log'",
+    "clean": "rm -rf dist/ *.zip",
+    "install:chrome": "echo 'To install in Chrome: 1. Open chrome://extensions/ 2. Enable Developer mode 3. Click Load unpacked 4. Select this folder'",
+    "install:firefox": "echo 'To install in Firefox: 1. Open about:debugging 2. Click This Firefox 3. Click Load Temporary Add-on 4. Select manifest.json'"
+  },
+  "keywords": [
+    "browser-extension",
+    "chrome-extension",
+    "firefox-extension",
+    "adsense",
+    "automation",
+    "selenium",
+    "multilogin",
+    "mimic-x",
+    "stealthfox",
+    "rpm",
+    "revenue",
+    "bot-detection",
+    "human-behavior",
+    "personality-engine"
+  ],
+  "author": {
+    "name": "AdSense Automation Pro Team",
+    "email": "support@adsense-automation-pro.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-repo/adsense-automation-pro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-repo/adsense-automation-pro/issues"
+  },
+  "homepage": "https://github.com/your-repo/adsense-automation-pro#readme",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "nodemon": "^3.0.0"
+  },
+  "browserslist": [
+    "Chrome >= 88",
+    "Firefox >= 78"
+  ],
+  "manifest": {
+    "chrome": {
+      "version": 3,
+      "permissions": [
+        "activeTab",
+        "storage",
+        "scripting",
+        "tabs",
+        "webNavigation",
+        "webRequest",
+        "cookies",
+        "geolocation",
+        "notifications"
+      ]
+    },
+    "firefox": {
+      "version": 2,
+      "permissions": [
+        "activeTab",
+        "storage",
+        "tabs",
+        "webNavigation",
+        "webRequest",
+        "cookies",
+        "geolocation",
+        "notifications"
+      ]
+    }
+  },
+  "features": {
+    "personality-types": [
+      "explorer",
+      "researcher", 
+      "casual",
+      "professional",
+      "auto"
+    ],
+    "automation-levels": [
+      "low",
+      "medium",
+      "high",
+      "custom"
+    ],
+    "stealth-modes": [
+      "basic",
+      "enhanced",
+      "maximum"
+    ]
+  },
+  "metrics": {
+    "tracked": [
+      "rpm-score",
+      "ads-detected",
+      "ad-clicks",
+      "high-value-clicks",
+      "stealth-score",
+      "human-behavior-score",
+      "bot-detection-risk",
+      "session-duration",
+      "pages-visited",
+      "total-interactions"
+    ]
+  },
+  "compatibility": {
+    "browsers": {
+      "chrome": ">=88.0.0",
+      "firefox": ">=78.0.0",
+      "edge": ">=88.0.0"
+    },
+    "multilogin": {
+      "mimic-x": ">=3.0.0",
+      "stealthfox": ">=2.0.0"
+    }
+  },
+  "security": {
+    "data-collection": "minimal",
+    "storage": "local-only",
+    "permissions": "minimal-required",
+    "compliance": [
+      "GDPR",
+      "CCPA",
+      "website-tos"
+    ]
+  }
+}

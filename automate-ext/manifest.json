@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "AdSense Automation Pro",
+  "version": "1.0.0",
+  "description": "Advanced automation extension for AdSense optimization and RPM improvement",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "tabs",
+    "webNavigation",
+    "webRequest",
+    "cookies",
+    "geolocation",
+    "notifications"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "https://*.google.com/*",
+    "https://*.googleadservices.com/*",
+    "https://*.doubleclick.net/*",
+    "https://*.googlesyndication.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "lib/personality-engine.js",
+        "lib/behavior-simulator.js",
+        "lib/adsense-detector.js",
+        "lib/mouse-simulator.js",
+        "lib/keyboard-simulator.js",
+        "lib/reading-simulator.js",
+        "lib/navigation-simulator.js",
+        "lib/session-manager.js",
+        "lib/stealth-monitor.js",
+        "content-script.js"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AdSense Automation Pro"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/*", "data/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

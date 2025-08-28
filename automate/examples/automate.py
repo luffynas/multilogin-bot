@@ -27,10 +27,29 @@ from url_helper import setup_url_for_automation
 # Configuration
 CONFIG_PATH = "../config/config.yaml"
 PROFILE_DATA_PATH = "../config/profile.json"
-FOLDER_ID = "94caeb51-cc7f-477d-a6db-c79e696b5530" #selenium
+# FOLDER_ID = "94caeb51-cc7f-477d-a6db-c79e696b5530" #selenium
 # FOLDER_ID = "b3797848-7aad-4aae-8926-f45832bb269a" #mobile
+FOLDER_ID = "54a459aa-bd4e-4fbf-a0db-8d43d83b40fd" #indo
 PROFILE_ID = "2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6"
-GOOGLE_SEARCH_QUERY = "site:maxgaming.biz.id play smart"
+GOOGLE_SEARCH_QUERIES = [
+    "site:primecapitalaid.web.id prime capital",
+    "site:primecapitalaid.web.id pinjaman modal",
+    "site:primecapitalaid.web.id bantuan usaha",
+    "site:primecapitalaid.web.id kredit usaha",
+    "site:primecapitalaid.web.id modal kerja",
+    "site:primecapitalaid.web.id pinjaman umkm",
+    "site:primecapitalaid.web.id bantuan modal pemerintah",
+    "site:primecapitalaid.web.id koperasi pinjaman",
+    "site:primecapitalaid.web.id investasi aman",
+    "site:primecapitalaid.web.id literasi keuangan",
+    "site:primecapitalaid.web.id proposal bantuan",
+    "site:primecapitalaid.web.id dokumen pinjaman",
+    "site:primecapitalaid.web.id syarat kredit",
+    "site:primecapitalaid.web.id cara mengajukan pinjaman",
+    "site:primecapitalaid.web.id program pemerintah umkm"
+]
+
+MODE_BY = "Search" #Search or Direct
 
 # Global token cache for authentication optimization
 TOKEN_CACHE = {
@@ -40,17 +59,22 @@ TOKEN_CACHE = {
 }
 
 random_urls = [
-    "https://maxgaming.biz.id/crypto-investment-product-for-gamers-the-future-of-digital-wealth-in-the-united-states/",
-    "https://maxgaming.biz.id/order-nft-characters-in-p2e-games-the-complete-guide-for-u-s-gamers-and-investors/",
-    "https://maxgaming.biz.id/checkout-p2e-game-marketplace-a-complete-guide-for-u-s-gamers-and-investors/",
-    "https://maxgaming.biz.id/cart-nft-items-play-to-earn-the-ultimate-guide-for-u-s-gamers-and-investors/",
-    "https://maxgaming.biz.id/crypto-trading-service-for-play-to-earn-a-comprehensive-guide-for-u-s-gamers-and-investors/",
-    "https://maxgaming.biz.id/defi-solution-for-nft-games-unlocking-the-future-of-play-to-earn-in-the-united-states/",
-    "https://maxgaming.biz.id/purchase-ethereum-for-gaming-a-complete-guide-for-u-s-gamers-and-investors/",
-    "https://maxgaming.biz.id/play-to-earn-insurance-service-protecting-u-s-gamers-in-the-blockchain-era/",
-    "https://maxgaming.biz.id/crypto-gaming-marketing-advertising-solution-driving-growth-for-play-to-earn-platforms-in-the-u-s/",
-    "https://maxgaming.biz.id/lawyer-service-for-nft-scams-protecting-your-digital-assets-in-the-united-states/",
-    "https://maxgaming.biz.id/online-banking-for-play-to-earn-payments-a-secure-financial-future-for-u-s-gamers/",
+    "https://primecapitalaid.web.id/cara-mengajukan-kur-bri-syarat-dan-proses-terbaru-2025/",
+    "https://primecapitalaid.web.id/pinjaman-koperasi-legal-apakah-masih-relevan-untuk-modal-usaha-di-2025/",
+    "https://primecapitalaid.web.id/program-pnm-mekaar-pinjaman-legal-untuk-perempuan-produktif-aman-terpercaya-2025/",
+    "https://primecapitalaid.web.id/panduan-pinjaman-modal-kerja-umkm-tanpa-jaminan-legal-cepat-aman-2025/",
+    "https://primecapitalaid.web.id/program-pinjaman-legal-dari-pemerintah-untuk-umkm-2025/",
+    "https://primecapitalaid.web.id/pinjaman-untuk-umkm-usaha-kecil-rekomendasi-pinjaman-legal-terdaftar-ojk-2025/",
+    "https://primecapitalaid.web.id/bagaimana-menulis-proposal-bantuan-modal-yang-meyakinkan-panduan-praktis-struktur-dan-tips-lolos-hibah-2025/",
+    "https://primecapitalaid.web.id/dokumen-penting-yang-harus-disiapkan-untuk-mengakses-bantuan-usaha-2025-panduan-checklist-dan-tips-lolos-seleksi/",
+    "https://primecapitalaid.web.id/langkah-langkah-mengajukan-bantuan-modal-pemerintah-2025-syarat-cara-daftar-jadwal-dan-nominal-dana/",
+    "https://primecapitalaid.web.id/apa-itu-pinjaman-legal-ini-ciri-cirinya-yang-harus-anda-ketahui/",
+    "https://primecapitalaid.web.id/apa-itu-investasi-panduan-lengkap-untuk-pemula-yang-ingin-merdeka-finansial-di-2025/",
+    "https://primecapitalaid.web.id/apa-itu-literasi-keuangan-dan-mengapa-penting-panduan-komprehensif-melek-finansial-di-era-digital/",
+    "https://primecapitalaid.web.id/cara-mendapatkan-bantuan-modal-usaha-umkm-tahun-2025-ulasan-teknis-uji-lapangan-dan-tips-lolos-seleksi/",
+    "https://primecapitalaid.web.id/program-bantuan-modal-untuk-usaha-mikro-kecil-syarat-cara-pengajuan/",
+    "https://primecapitalaid.web.id/bantuan-modal-umkm-khusus-perempuan-program-dan-syaratnya/",
+    "https://primecapitalaid.web.id/bantuan-modal-dari-kementerian-koperasi-dan-ukm-ini-cara-daftarnya/",
 ]
 
 # Load config for launcher and localhost
@@ -106,6 +130,31 @@ def clear_token_cache():
     print("🧹 Token cache cleared")
 
 
+def get_random_search_query():
+    """Get a random search query from the predefined list"""
+    return random.choice(GOOGLE_SEARCH_QUERIES)
+
+
+def navigate_to_target(automation, target_url, mode_by=MODE_BY):
+    """Navigate to target URL based on mode (Search or Direct)"""
+    if mode_by.upper() == "SEARCH":
+        # Use Google search to find and click on target URL
+        search_query = get_random_search_query()
+        print(f"   🔍 Using search query: {search_query}")
+        current_url = automation.simulate_google_search_and_click(search_query, target_url)
+        if not current_url:
+            print(f"   ⚠️ Google search simulation failed, falling back to direct navigation")
+            automation.driver.get(target_url)
+            current_url = target_url
+    else:
+        # Direct navigation to target URL
+        print(f"   🎯 Direct navigation to: {target_url}")
+        automation.driver.get(target_url)
+        current_url = target_url
+    
+    return current_url
+
+
 def load_profile_data():
     """Load profile data from JSON file"""
     try:
@@ -155,6 +204,8 @@ def parse_arguments():
     parser.add_argument('--concurrent', action='store_true', help='Run concurrent automation with multiple profiles')
     parser.add_argument('--workers', type=int, default=3, help='Number of concurrent workers')
     parser.add_argument('--profiles', nargs='+', help='Specific profile IDs for concurrent mode')
+    parser.add_argument('--mode', type=str, choices=['Search', 'Direct'], default=MODE_BY, 
+                       help='Navigation mode: Search (Google search) or Direct (direct URL)')
     return parser.parse_args()
 
 
@@ -172,7 +223,8 @@ def start_profile(token, folder_id, profile_id, fresh_start=True, use_start_url=
         
         # Add fresh start parameters
         params = {
-            "automation_type": "selenium"
+            "automation_type": "selenium",
+            'headless_mode': False,
         }
         
         if fresh_start:
@@ -326,12 +378,12 @@ def run_single_profile_concurrent(profile_data, config_path, session_id, folder_
         with open(config_path, 'r') as f:
             config_data = yaml.safe_load(f)
         
-        # Start with realistic Google search simulation
-        print(f"   🚀 Starting with Google search simulation...")
+        # Start with navigation based on mode
+        print(f"   🚀 Starting navigation (Mode: {MODE_BY})...")
         target_url = random.choice(random_urls)
-        current_url = automation.simulate_google_search_and_click(GOOGLE_SEARCH_QUERY, target_url)
+        current_url = navigate_to_target(automation, target_url, MODE_BY)
         if not current_url:
-            print(f"   ⚠️ Google search simulation failed")
+            print(f"   ⚠️ Navigation failed")
             raise Exception("Failed to reach target site")
         
         if not current_url:
@@ -636,15 +688,15 @@ class CleanAutomation:
             if not self.automation.setup_driver(self.debugging_url):
                 raise Exception("Failed to setup driver")
             
-            # Start with realistic Google search simulation
-            self.logger.info("🚀 Starting with Google search simulation...")
+            # Start with navigation based on mode
+            self.logger.info(f"🚀 Starting navigation (Mode: {MODE_BY})...")
             target_url = random.choice(random_urls)
-            final_url = self.automation.simulate_google_search_and_click(GOOGLE_SEARCH_QUERY, target_url)
+            final_url = navigate_to_target(self.automation, target_url, MODE_BY)
             if not final_url:
-                self.logger.warning("⚠️ Google search simulation failed, using fallback")
+                self.logger.warning("⚠️ Navigation failed, using fallback")
                 # Fallback to direct navigation
-                self.automation.driver.get("https://maxgaming.biz.id")
-                final_url = "https://maxgaming.biz.id"
+                self.automation.driver.get("https://primecapitalaid.web.id")
+                final_url = "https://primecapitalaid.web.id"
             
             # Use the final URL from Google search simulation
             current_url = final_url
@@ -1063,6 +1115,7 @@ def run_concurrent_automation(profile_ids=None, max_workers=3, config_path=CONFI
     print("=" * 60)
     print(f"⏰ Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"🔧 Max Workers: {max_workers}")
+    print(f"🎯 Navigation Mode: {MODE_BY}")
     
     # Pre-authenticate once for all profiles
     print("🔐 Pre-authenticating for all profiles...")
@@ -1246,6 +1299,12 @@ def main():
     # Parse command line arguments
     args = parse_arguments()
     
+    # Update global mode if specified
+    global MODE_BY
+    if args.mode != MODE_BY:
+        MODE_BY = args.mode
+        print(f"🎯 Navigation mode changed to: {MODE_BY}")
+    
     # Check if concurrent mode is requested
     if args.concurrent:
         print("🎯 Concurrent Queue Automation")
@@ -1262,6 +1321,7 @@ def main():
             print(f"🔧 Max Workers: {args.workers}")
         if args.config != CONFIG_PATH:
             print(f"⚙️ Using Config: {args.config}")
+        print(f"🎯 Navigation Mode: {MODE_BY}")
         
         # Run concurrent automation with queue system
         success = run_concurrent_automation(
@@ -1278,6 +1338,8 @@ def main():
             print("  ✅ Automatic Profile Rotation")
             print("  ✅ Optimized Authentication (Single Login)")
             print("  ✅ Token Caching & Management")
+            print(f"  ✅ Navigation Mode: {MODE_BY}")
+            print("  ✅ Random Search Queries (when using Search mode)")
             print("  ✅ Concurrent Browser Sessions")
             print("  ✅ Device-Specific Behavior")
             print("  ✅ Personality System")
@@ -1333,6 +1395,8 @@ def main():
             print("  ✅ Token Caching & Management")
             print("  ✅ Profile Management")
             print("  ✅ Selenium Automation Setup")
+            print(f"  ✅ Navigation Mode: {MODE_BY}")
+            print("  ✅ Random Search Queries (when using Search mode)")
             print("  ✅ Personality System")
             print("  ✅ Navigation System")
             print("  ✅ AdSense Integration with RPM Optimization")
