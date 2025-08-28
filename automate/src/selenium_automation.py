@@ -5803,7 +5803,7 @@ class UndetectableSeleniumAutomation:
             self._simulate_business_research_behavior()
             
             # Multiple tab usage
-            self._simulate_multi_tab_browsing()
+            # self._simulate_multi_tab_browsing()
             
             # Bookmark and save content
             self._simulate_content_saving()

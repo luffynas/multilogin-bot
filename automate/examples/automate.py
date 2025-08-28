@@ -13,7 +13,7 @@ import json
 import random
 import argparse
 import concurrent.futures
-from datetime import datetime
+from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Add src to path
@@ -27,9 +27,17 @@ from url_helper import setup_url_for_automation
 # Configuration
 CONFIG_PATH = "../config/config.yaml"
 PROFILE_DATA_PATH = "../config/profile.json"
-FOLDER_ID = "94caeb51-cc7f-477d-a6db-c79e696b5530"
+FOLDER_ID = "94caeb51-cc7f-477d-a6db-c79e696b5530" #selenium
+# FOLDER_ID = "b3797848-7aad-4aae-8926-f45832bb269a" #mobile
 PROFILE_ID = "2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6"
 GOOGLE_SEARCH_QUERY = "site:maxgaming.biz.id play smart"
+
+# Global token cache for authentication optimization
+TOKEN_CACHE = {
+    "token": None,
+    "expires_at": None,
+    "config_path": None
+}
 
 random_urls = [
     "https://maxgaming.biz.id/crypto-investment-product-for-gamers-the-future-of-digital-wealth-in-the-united-states/",
@@ -53,6 +61,49 @@ with open(CONFIG_PATH, 'r') as f:
 MLX_LAUNCHER_V2 = config.get('multilogin', {}).get('launcher_v2', 'https://launcher.mlx.yt:45001/api/v1')
 LOCALHOST = config.get('multilogin', {}).get('localhost', 'http://127.0.0.1:19995')
 
+
+def get_cached_token(config_path):
+    """Get cached token if valid, otherwise authenticate and cache"""
+    global TOKEN_CACHE
+    
+    # Check if we have a valid cached token for this config
+    if (TOKEN_CACHE["token"] and 
+        TOKEN_CACHE["config_path"] == config_path and 
+        TOKEN_CACHE["expires_at"] and 
+        datetime.now() < TOKEN_CACHE["expires_at"]):
+        
+        print(f"🔄 Using cached token (expires: {TOKEN_CACHE['expires_at'].strftime('%H:%M:%S')})")
+        return TOKEN_CACHE["token"]
+    
+    # Need to authenticate
+    print(f"🔐 Authenticating with Multilogin API...")
+    try:
+        api = MultiloginXAPI(config_path)
+        if not api.authenticate():
+            raise Exception("Authentication failed")
+        
+        # Cache the token with 1 hour expiration
+        TOKEN_CACHE["token"] = api.bearer_token
+        TOKEN_CACHE["expires_at"] = datetime.now() + timedelta(hours=1)
+        TOKEN_CACHE["config_path"] = config_path
+        
+        print(f"✅ Authentication successful, token cached until {TOKEN_CACHE['expires_at'].strftime('%H:%M:%S')}")
+        return api.bearer_token
+        
+    except Exception as e:
+        print(f"❌ Authentication failed: {e}")
+        return None
+
+
+def clear_token_cache():
+    """Clear the token cache (useful for testing or when token becomes invalid)"""
+    global TOKEN_CACHE
+    TOKEN_CACHE = {
+        "token": None,
+        "expires_at": None,
+        "config_path": None
+    }
+    print("🧹 Token cache cleared")
 
 
 def load_profile_data():
@@ -109,16 +160,9 @@ def parse_arguments():
 
 
 def signin(config_path=None):
-    """Authenticate with Multilogin API"""
-    try:
-        config_path = config_path or CONFIG_PATH
-        api = MultiloginXAPI(config_path)
-        if not api.authenticate():
-            raise Exception("Authentication failed")
-        return api.bearer_token
-    except Exception as e:
-        print(f"❌ Login error: {e}")
-        return None
+    """Authenticate with Multilogin API (now uses cached token)"""
+    config_path = config_path or CONFIG_PATH
+    return get_cached_token(config_path)
 
 def start_profile(token, folder_id, profile_id, fresh_start=True, use_start_url=True):
     """Start Multilogin profile with optional fresh start and start URL"""
@@ -157,7 +201,12 @@ def start_profile(token, folder_id, profile_id, fresh_start=True, use_start_url=
         print(f"🔍 Response status: {response.status_code}")
         print(f"🔍 Response content: {response.text[:200]}...")
         
-        if response.status_code != 200:
+        # Handle authentication errors
+        if response.status_code == 401:
+            print(f"❌ Token expired, clearing cache and retrying...")
+            clear_token_cache()
+            return None
+        elif response.status_code != 200:
             print(f"❌ API Error: {response.status_code} - {response.text}")
             return None
         
@@ -202,7 +251,12 @@ def stop_profile(token, profile_id):
         import requests
         response = requests.get(stop_url, headers=headers)
         
-        if response.status_code == 200:
+        # Handle authentication errors
+        if response.status_code == 401:
+            print(f"❌ Token expired when stopping profile {profile_id}")
+            clear_token_cache()
+            return False
+        elif response.status_code == 200:
             print(f"✅ Profile stopped successfully: {profile_id}")
             return True
         else:
@@ -226,15 +280,25 @@ def run_single_profile_concurrent(profile_data, config_path, session_id, folder_
     automation = None
     
     try:
-        # Step 1: Authenticate with retry
-        token = signin(config_path)
+        # Step 1: Get cached token (no need to authenticate again)
+        token = get_cached_token(config_path)
         if not token:
             raise Exception("Authentication failed")
         
         # Step 2: Start profile without fresh start to preserve existing URL
         debugging_url = start_profile(token, folder_id, profile_id, fresh_start=False, use_start_url=True)
         if not debugging_url:
-            raise Exception("Failed to start profile")
+            # If start_profile returned None due to token expiration, retry once
+            if TOKEN_CACHE["token"] is None:  # Token was cleared
+                print(f"   🔄 Token expired, retrying with new authentication...")
+                token = get_cached_token(config_path)
+                if not token:
+                    raise Exception("Authentication failed on retry")
+                debugging_url = start_profile(token, folder_id, profile_id, fresh_start=False, use_start_url=True)
+                if not debugging_url:
+                    raise Exception("Failed to start profile after token refresh")
+            else:
+                raise Exception("Failed to start profile")
         
         # Step 3: Setup automation with retry mechanism
         automation = UndetectableSeleniumAutomation(config_path, profile_id, os_type)
@@ -521,11 +585,11 @@ class CleanAutomation:
         return logging.getLogger(__name__)
     
     def authenticate(self):
-        """Authenticate with Multilogin API"""
+        """Authenticate with Multilogin API (now uses cached token)"""
         try:
-            self.logger.info("🔐 Authenticating with Multilogin API...")
+            self.logger.info("🔐 Getting authentication token...")
             
-            # Use the signin function with config path
+            # Use the cached signin function
             token = signin(self.config_path)
             if not token:
                 raise Exception("Authentication failed")
@@ -534,7 +598,7 @@ class CleanAutomation:
             self.api = MultiloginXAPI(self.config_path)
             self.api.bearer_token = token
             
-            self.logger.info("✅ Authentication successful")
+            self.logger.info("✅ Authentication successful (using cached token)")
             return True
             
         except Exception as e:
@@ -1000,6 +1064,14 @@ def run_concurrent_automation(profile_ids=None, max_workers=3, config_path=CONFI
     print(f"⏰ Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"🔧 Max Workers: {max_workers}")
     
+    # Pre-authenticate once for all profiles
+    print("🔐 Pre-authenticating for all profiles...")
+    token = get_cached_token(config_path)
+    if not token:
+        print("❌ Initial authentication failed!")
+        return False
+    print("✅ Pre-authentication successful - all profiles will use cached token")
+    
     # Load ALL profile data
     all_profiles = load_profile_data()
     if not all_profiles:
@@ -1204,7 +1276,8 @@ def main():
             print("📋 Features demonstrated:")
             print("  ✅ Queue System (1-5 concurrent workers)")
             print("  ✅ Automatic Profile Rotation")
-            print("  ✅ Multi-Profile Authentication")
+            print("  ✅ Optimized Authentication (Single Login)")
+            print("  ✅ Token Caching & Management")
             print("  ✅ Concurrent Browser Sessions")
             print("  ✅ Device-Specific Behavior")
             print("  ✅ Personality System")
@@ -1256,7 +1329,9 @@ def main():
         if success:
             print("\n🏆 Automation completed successfully!")
             print("📋 Features demonstrated:")
-            print("  ✅ Authentication & Profile Management")
+            print("  ✅ Optimized Authentication (Single Login)")
+            print("  ✅ Token Caching & Management")
+            print("  ✅ Profile Management")
             print("  ✅ Selenium Automation Setup")
             print("  ✅ Personality System")
             print("  ✅ Navigation System")
