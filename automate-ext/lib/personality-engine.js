@@ -14,10 +14,10 @@ class PersonalityEngine {
         
         this.currentPersonality = null;
         this.personalityWeights = {
-            explorer: 0.25,
-            researcher: 0.25,
-            casual: 0.25,
-            professional: 0.25
+            explorer: 0.25,    // Balanced distribution
+            researcher: 0.25,  // Balanced distribution
+            casual: 0.25,      // Balanced distribution
+            professional: 0.25 // Balanced distribution
         };
     }
 
@@ -61,7 +61,7 @@ class PersonalityEngine {
                     engagementLevel: 'high',
                     dwellTime: { min: 30, max: 120 },
                     scrollBehavior: 'continuous',
-                    clickProbability: 0.7,
+                    clickProbability: 0.12, // Reduced to 12%
                     hoverProbability: 0.8,
                     tabSwitching: 'frequent',
                     searchBehavior: 'broad'
@@ -76,7 +76,7 @@ class PersonalityEngine {
                     engagementLevel: 'very_high',
                     dwellTime: { min: 120, max: 300 },
                     scrollBehavior: 'analytical',
-                    clickProbability: 0.9,
+                    clickProbability: 0.15, // Reduced to 15%
                     hoverProbability: 0.6,
                     tabSwitching: 'rare',
                     searchBehavior: 'specific'
@@ -91,7 +91,7 @@ class PersonalityEngine {
                     engagementLevel: 'low',
                     dwellTime: { min: 15, max: 60 },
                     scrollBehavior: 'quick',
-                    clickProbability: 0.3,
+                    clickProbability: 0.08, // Reduced to 8%
                     hoverProbability: 0.4,
                     tabSwitching: 'moderate',
                     searchBehavior: 'general'
@@ -106,7 +106,7 @@ class PersonalityEngine {
                     engagementLevel: 'high',
                     dwellTime: { min: 60, max: 180 },
                     scrollBehavior: 'methodical',
-                    clickProbability: 0.6,
+                    clickProbability: 0.10, // Reduced to 10%
                     hoverProbability: 0.5,
                     tabSwitching: 'strategic',
                     searchBehavior: 'targeted'
