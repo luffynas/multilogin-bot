@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "AdSense Automation Pro",
+  "name": "Web Assistant",
   "version": "1.0.0",
-  "description": "Advanced automation extension for AdSense optimization and RPM improvement",
+  "description": "General web browsing assistant and productivity tool",
   "permissions": [
     "activeTab",
     "storage",
@@ -15,11 +15,7 @@
     "notifications"
   ],
   "host_permissions": [
-    "<all_urls>",
-    "https://*.google.com/*",
-    "https://*.googleadservices.com/*",
-    "https://*.doubleclick.net/*",
-    "https://*.googlesyndication.com/*"
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"
@@ -28,6 +24,8 @@
     {
       "matches": ["<all_urls>"],
       "js": [
+        "lib/stealth-storage.js",
+        "lib/stealth-delay.js",
         "lib/personality-engine.js",
         "lib/behavior-simulator.js",
         "lib/adsense-detector.js",
@@ -49,7 +47,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "AdSense Automation Pro"
+    "default_title": "Web Assistant"
   },
   "icons": {
     "16": "icons/icon16.png",

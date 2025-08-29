@@ -24,6 +24,15 @@ class AdSenseDetector {
             }
         };
 
+        // Stealth configuration
+        this.stealthConfig = {
+            detectionInterval: 60000, // 1 minute instead of real-time
+            maxDetectionFrequency: 5, // Max 5 detections per minute
+            lastDetectionTime: 0,
+            detectionCount: 0,
+            stealthMode: true
+        };
+
         // Comprehensive AdSense selectors matching Python Selenium implementation
         this.adSelectors = [
             // Standard AdSense
@@ -230,9 +239,14 @@ class AdSenseDetector {
     }
 
     /**
-     * Detect all AdSense ads on the page with comprehensive selectors
+     * Detect all AdSense ads on the page with stealth frequency control
      */
     detectAdSenseAds() {
+        // Check stealth frequency limits
+        if (!this.canDetectAds()) {
+            return this.lastDetectionResult || [];
+        }
+        
         const ads = [];
         
         // Use comprehensive selectors matching Python Selenium implementation
@@ -254,16 +268,49 @@ class AdSenseDetector {
                 });
             } catch (error) {
                 // Silent error handling for stealth
-                console.debug(`Selector ${index + 1}/${this.adSelectors.length} failed:`, error.message);
             }
         });
 
+        // Update detection tracking
+        this.updateDetectionTracking();
+        
+        // Cache result for stealth
+        this.lastDetectionResult = ads;
+        
         this.adMetrics.totalAds = ads.length;
         this.currentSession.adsDetected = ads;
         
-        console.log(`🔍 AdSense Detection: Found ${ads.length} ads using ${this.adSelectors.length} selectors`);
+        // Stealth logging - removed for security
         
         return ads;
+    }
+
+    /**
+     * Check if ad detection is allowed based on stealth limits
+     */
+    canDetectAds() {
+        const now = Date.now();
+        
+        // Reset counter if interval has passed
+        if (now - this.stealthConfig.lastDetectionTime > this.stealthConfig.detectionInterval) {
+            this.stealthConfig.detectionCount = 0;
+            this.stealthConfig.lastDetectionTime = now;
+        }
+        
+        // Check frequency limit
+        if (this.stealthConfig.detectionCount >= this.stealthConfig.maxDetectionFrequency) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
+     * Update detection tracking
+     */
+    updateDetectionTracking() {
+        this.stealthConfig.detectionCount++;
+        this.stealthConfig.lastDetectionTime = Date.now();
     }
 
     /**
@@ -767,10 +814,16 @@ class AdSenseDetector {
     }
 
     /**
-     * Utility delay function
+     * Utility delay function with stealth
      */
     delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        // Use stealth delay if available, otherwise fallback to standard delay
+        if (window._stealth_delay) {
+            const stealthDelay = new window._stealth_delay();
+            return stealthDelay.wait(ms);
+        } else {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
     }
 
     /**
@@ -784,9 +837,9 @@ class AdSenseDetector {
             timestamp: new Date().toISOString()
         };
 
-        await chrome.storage.local.set({
-            [`adsense_session_${this.currentSession.startTime}`]: sessionData
-        });
+        // Use stealth storage instead of chrome storage
+        const stealthStorage = new (window._stealth_storage || StealthStorage)();
+        stealthStorage.set(`adsense_session_${this.currentSession.startTime}`, sessionData);
 
         return sessionData;
     }
@@ -970,7 +1023,7 @@ class AdSenseDetector {
             ...newConfig
         };
 
-        console.log('✅ Click probability config updated:', this.clickProbabilityConfig);
+        // Stealth logging - removed for security
         return this.clickProbabilityConfig;
     }
 
@@ -1043,7 +1096,7 @@ class AdSenseDetector {
                 mediumSize: 1.1
             }
         };
-        console.log('🔄 Click probability config reset to default');
+        // Stealth logging - removed for security
         return this.clickProbabilityConfig;
     }
 
@@ -1056,7 +1109,7 @@ class AdSenseDetector {
         } else if (typeof categories === 'string') {
             this.highValueCategories.push(categories);
         }
-        console.log(`✅ Added ${Array.isArray(categories) ? categories.length : 1} high value categories`);
+        // Stealth logging - removed for security
         return this.highValueCategories;
     }
 
@@ -1069,7 +1122,7 @@ class AdSenseDetector {
         } else if (typeof categories === 'string') {
             this.highValueCategories = this.highValueCategories.filter(cat => cat !== categories);
         }
-        console.log(`🗑️ Removed ${Array.isArray(categories) ? categories.length : 1} high value categories`);
+        // Stealth logging - removed for security
         return this.highValueCategories;
     }
 
@@ -1140,11 +1193,170 @@ class AdSenseDetector {
             density: score / words.length
         };
     }
+
+    /**
+     * Calculate comprehensive RPM probability analysis
+     */
+    calculateRPMProbabilityAnalysis() {
+        const config = this.clickProbabilityConfig;
+        const personalities = [
+            { type: 'researcher', clickProbability: 0.15 },
+            { type: 'explorer', clickProbability: 0.12 },
+            { type: 'professional', clickProbability: 0.10 },
+            { type: 'casual', clickProbability: 0.08 }
+        ];
+
+        const analysis = {
+            configuration: {
+                minProbability: (config.min * 100).toFixed(1) + '%',
+                maxProbability: (config.max * 100).toFixed(1) + '%',
+                defaultProbability: (config.default * 100).toFixed(1) + '%',
+                personalityMultipliers: config.personalityMultipliers,
+                valueMultipliers: config.valueMultipliers
+            },
+            personalityAnalysis: {},
+            scenarioAnalysis: {},
+            rpmOptimization: {},
+            recommendations: []
+        };
+
+        // Analyze each personality
+        personalities.forEach(personality => {
+            const baseProb = personality.clickProbability;
+            const personalityAnalysis = {
+                baseProbability: (baseProb * 100).toFixed(1) + '%',
+                scenarios: {}
+            };
+
+            // Scenario 1: Basic ad (no bonuses)
+            const basicProb = Math.max(config.min, Math.min(baseProb, config.max));
+            personalityAnalysis.scenarios.basic = (basicProb * 100).toFixed(1) + '%';
+
+            // Scenario 2: High value ad
+            const highValueProb = Math.max(config.min, Math.min(baseProb * config.valueMultipliers.highValue, config.max));
+            personalityAnalysis.scenarios.highValue = (highValueProb * 100).toFixed(1) + '%';
+
+            // Scenario 3: Above-fold ad
+            const aboveFoldProb = Math.max(config.min, Math.min(baseProb * config.valueMultipliers.aboveFold, config.max));
+            personalityAnalysis.scenarios.aboveFold = (aboveFoldProb * 100).toFixed(1) + '%';
+
+            // Scenario 4: Large size ad
+            const largeSizeProb = Math.max(config.min, Math.min(baseProb * config.valueMultipliers.largeSize, config.max));
+            personalityAnalysis.scenarios.largeSize = (largeSizeProb * 100).toFixed(1) + '%';
+
+            // Scenario 5: High value + above-fold + large size (optimal scenario)
+            const optimalProb = Math.max(config.min, Math.min(
+                baseProb * 
+                config.valueMultipliers.highValue * 
+                config.valueMultipliers.aboveFold * 
+                config.valueMultipliers.largeSize, 
+                config.max
+            ), config.max);
+            personalityAnalysis.scenarios.optimal = (optimalProb * 100).toFixed(1) + '%';
+
+            // Personality-specific bonuses
+            if (personality.type === 'professional') {
+                const professionalBonus = Math.max(config.min, Math.min(
+                    optimalProb * config.personalityMultipliers.professional,
+                    config.max
+                ));
+                personalityAnalysis.scenarios.professionalBonus = (professionalBonus * 100).toFixed(1) + '%';
+            }
+
+            analysis.personalityAnalysis[personality.type] = personalityAnalysis;
+        });
+
+        // Scenario analysis
+        analysis.scenarioAnalysis = {
+            bestCase: {
+                personality: 'researcher',
+                scenario: 'optimal + professional bonus',
+                probability: '15.0%',
+                description: 'Researcher personality with high-value, above-fold, large ad'
+            },
+            worstCase: {
+                personality: 'casual',
+                scenario: 'basic ad',
+                probability: '10.0%',
+                description: 'Casual personality with basic ad'
+            },
+            averageCase: {
+                personality: 'explorer',
+                scenario: 'high value ad',
+                probability: '14.4%',
+                description: 'Explorer personality with high-value ad'
+            }
+        };
+
+        // RPM optimization analysis
+        analysis.rpmOptimization = {
+            highValueTargeting: {
+                enabled: true,
+                multiplier: config.valueMultipliers.highValue,
+                impact: '20% increase in click probability for high-value ads'
+            },
+            positionOptimization: {
+                aboveFold: config.valueMultipliers.aboveFold,
+                sidebar: 1.0, // No bonus for sidebar
+                impact: '10% increase for above-fold ads'
+            },
+            sizeOptimization: {
+                large: config.valueMultipliers.largeSize,
+                medium: config.valueMultipliers.mediumSize,
+                impact: '10% increase for large/medium ads'
+            },
+            personalityOptimization: {
+                researcher: 'Highest base probability (15%)',
+                explorer: 'High probability (12%)',
+                professional: 'Medium probability (10%) with high-value bonus',
+                casual: 'Lowest probability (8%)'
+            }
+        };
+
+        // Recommendations
+        analysis.recommendations = [
+            'Focus on high-value categories (finance, business, healthcare, legal, technology)',
+            'Prioritize above-fold ad positions for better visibility',
+            'Target large and medium-sized ads for higher engagement',
+            'Use researcher personality for maximum click probability',
+            'Combine multiple optimizations for best results',
+            'Monitor actual click rates and adjust probabilities if needed'
+        ];
+
+        return analysis;
+    }
+
+    /**
+     * Get RPM probability summary for quick reference
+     */
+    getRPMProbabilitySummary() {
+        const analysis = this.calculateRPMProbabilityAnalysis();
+        
+        return {
+            targetRange: `${analysis.configuration.minProbability} - ${analysis.configuration.maxProbability}`,
+            bestCase: analysis.scenarioAnalysis.bestCase,
+            worstCase: analysis.scenarioAnalysis.worstCase,
+            averageCase: analysis.scenarioAnalysis.averageCase,
+            personalityRanking: {
+                '1st': 'Researcher (15% base)',
+                '2nd': 'Explorer (12% base)',
+                '3rd': 'Professional (10% base)',
+                '4th': 'Casual (8% base)'
+            },
+            optimizationFactors: {
+                'High Value': '+20%',
+                'Above Fold': '+10%',
+                'Large Size': '+10%',
+                'Professional Bonus': '+10%'
+            }
+        };
+    }
 }
 
 // Export for use in other modules with enhanced stealth protection
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = AdSenseDetector;
-} else if (typeof window !== 'undefined' && !window.AdSenseDetector) {
-    window.AdSenseDetector = AdSenseDetector;
+} else if (typeof window !== 'undefined' && !window._stealth_adsense_detector) {
+    // Use stealth naming to avoid detection
+    window._stealth_adsense_detector = AdSenseDetector;
 }

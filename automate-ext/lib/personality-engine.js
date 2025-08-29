@@ -260,23 +260,25 @@ class PersonalityEngine {
     }
 
     /**
-     * Save personality to storage
+     * Save personality to stealth storage
      */
     async savePersonality() {
         if (this.currentPersonality) {
-            await chrome.storage.local.set({
-                'currentPersonality': this.currentPersonality
-            });
+            // Use stealth storage instead of chrome storage
+            const stealthStorage = new (window._stealth_storage || StealthStorage)();
+            stealthStorage.set('currentPersonality', this.currentPersonality);
         }
     }
 
     /**
-     * Load personality from storage
+     * Load personality from stealth storage
      */
     async loadPersonality() {
-        const result = await chrome.storage.local.get(['currentPersonality']);
-        if (result.currentPersonality) {
-            this.currentPersonality = result.currentPersonality;
+        // Use stealth storage instead of chrome storage
+        const stealthStorage = new (window._stealth_storage || StealthStorage)();
+        const currentPersonality = stealthStorage.get('currentPersonality');
+        if (currentPersonality) {
+            this.currentPersonality = currentPersonality;
             return this.currentPersonality;
         }
         return null;

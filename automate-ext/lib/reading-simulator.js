@@ -15,6 +15,9 @@ class ReadingSimulator {
             contentAnalysis: true,
             readingPatterns: true
         };
+        
+        // Initialize stealth delay system
+        this.stealthDelay = new (window._stealth_delay || StealthDelay)();
     }
 
     /**
@@ -694,10 +697,10 @@ class ReadingSimulator {
     }
 
     /**
-     * Utility delay function
+     * Utility delay function with stealth
      */
     delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        return this.stealthDelay.wait(ms);
     }
 }
 

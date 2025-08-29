@@ -184,11 +184,19 @@ class NavigationSimulator {
             'a[href*="more"]',
             'a[href*="next"]',
             'a[href*="continue"]',
+            'a[href*="read-more"]',
+            'a[href*="full-story"]',
             '.related a',
             '.similar a',
             '.recommended a',
             '.more a',
-            '.next a'
+            '.next a',
+            '.read-more a',
+            '.full-story a',
+            '.continue-reading a',
+            '.related-posts a',
+            '.similar-posts a',
+            '.recommended-posts a'
         ];
         
         selectors.forEach(selector => {
@@ -225,16 +233,34 @@ class NavigationSimulator {
         const links = [];
         const selectors = [
             'a[href*="category"]',
+            'a[href*="cat"]',
             'a[href*="tag"]',
             'a[href*="section"]',
             'a[href*="topic"]',
-            '.category a',
-            '.tag a',
-            '.section a',
-            '.topic a',
+            'a[href*="subject"]',
+            'a[href*="department"]',
+            'a[href*="genre"]',
             'nav a',
+            '.category a',
+            '.categories a',
+            '.tag a',
+            '.tags a',
+            '.section a',
+            '.sections a',
+            '.topic a',
+            '.topics a',
+            '.subject a',
+            '.subjects a',
             '.navigation a',
-            '.menu a'
+            '.menu a',
+            '.main-menu a',
+            '.primary-menu a',
+            '.secondary-menu a',
+            '.sidebar-menu a',
+            '.footer-menu a',
+            'ul.menu a',
+            '.categories-menu a',
+            '.tag-cloud a'
         ];
         
         selectors.forEach(selector => {
@@ -297,15 +323,83 @@ class NavigationSimulator {
      * Navigate to random page
      */
     async navigateRandomPage() {
-        const allLinks = this.findAllValidLinks();
+        // First, check if current page is a category/listing page
+        if (this.isCategoryPage()) {
+            // Stealth logging - removed for security
+            const articleLink = this.selectRandomArticle();
+            if (articleLink) {
+                // Stealth logging - removed for security
+                await this.clickLink(articleLink);
+                return;
+            }
+        }
         
-        if (allLinks.length > 0) {
-            const randomLink = allLinks[Math.floor(Math.random() * allLinks.length)];
+        // Look for internal links
+        const internalLinks = this.findInternalLinks();
+        
+        if (internalLinks.length > 0) {
+            const randomLink = internalLinks[Math.floor(Math.random() * internalLinks.length)];
             await this.clickLink(randomLink);
         } else {
             // Fallback to search
             await this.navigateSearchResults();
         }
+    }
+
+    /**
+     * Navigate to legal/info page
+     */
+    async navigateToLegalPage() {
+        const legalLinks = this.findLegalLinks();
+        
+        if (legalLinks.length > 0) {
+            const selectedLink = this.selectBestLink(legalLinks);
+            await this.clickLink(selectedLink);
+        } else {
+            // Fallback to random navigation
+            await this.navigateRandomPage();
+        }
+    }
+
+    /**
+     * Find legal/info page links
+     */
+    findLegalLinks() {
+        const links = [];
+        const selectors = [
+            'a[href*="about"]',
+            'a[href*="contact"]',
+            'a[href*="privacy"]',
+            'a[href*="terms"]',
+            'a[href*="disclaimer"]',
+            'a[href*="faq"]',
+            'a[href*="help"]',
+            'a[href*="support"]',
+            'a[href*="legal"]',
+            'a[href*="policy"]',
+            'a[href*="cookies"]',
+            'a[href*="sitemap"]',
+            '.about a',
+            '.contact a',
+            '.privacy a',
+            '.terms a',
+            '.legal a',
+            '.footer a',
+            '.footer-links a',
+            '.legal-links a',
+            '.info-links a'
+        ];
+        
+        selectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(element => {
+                if (this.isValidLink(element)) {
+                    links.push(element);
+                }
+            });
+        });
+        
+        return links;
     }
 
     /**
@@ -686,10 +780,244 @@ class NavigationSimulator {
     }
 
     /**
-     * Utility delay function
+     * Check if current page is a category/listing page
+     */
+    isCategoryPage() {
+        const currentUrl = window.location.href.toLowerCase();
+        const pageTitle = document.title.toLowerCase();
+        
+        // Common indicators of category/listing pages
+        const categoryIndicators = [
+            // URL patterns
+            '/category/',
+            '/tag/',
+            '/blog/',
+            '/news/',
+            '/articles/',
+            '/posts/',
+            '/listing/',
+            '/search',
+            '?cat=',
+            '?category=',
+            '?tag=',
+            '?section=',
+            
+            // Page title patterns
+            'category:',
+            'tag:',
+            'blog',
+            'news',
+            'articles',
+            'posts',
+            'listing',
+            'search results',
+            'archives',
+            'all posts'
+        ];
+        
+        // Check URL patterns
+        for (const indicator of categoryIndicators) {
+            if (currentUrl.includes(indicator)) {
+                console.log(`Category detected via URL: ${indicator}`);
+                return true;
+            }
+        }
+        
+        // Check title patterns
+        for (const indicator of categoryIndicators) {
+            if (pageTitle.includes(indicator)) {
+                console.log(`Category detected via title: ${indicator}`);
+                return true;
+            }
+        }
+        
+        // Check for multiple article links (common in category pages)
+        const articleSelectors = [
+            'article a',
+            '.post a',
+            '.entry a',
+            '.article a',
+            '.blog-post a',
+            '.news-item a',
+            '.listing-item a'
+        ];
+        
+        let articleLinkCount = 0;
+        articleSelectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            articleLinkCount += elements.length;
+        });
+        
+        if (articleLinkCount >= 3) {
+            console.log(`Category detected via article count: ${articleLinkCount} articles`);
+            return true;
+        }
+        
+        return false;
+    }
+
+    /**
+     * Select random article from category page
+     */
+    selectRandomArticle() {
+        const articleSelectors = [
+            'article a',
+            '.post a',
+            '.entry a',
+            '.article a',
+            '.blog-post a',
+            '.news-item a',
+            '.listing-item a',
+            '.item a',
+            '.content a',
+            '.main-content a'
+        ];
+        
+        const articleLinks = [];
+        
+        articleSelectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(element => {
+                if (this.isValidLink(element) && this.isArticleLink(element)) {
+                    articleLinks.push(element);
+                }
+            });
+        });
+        
+        if (articleLinks.length > 0) {
+            return articleLinks[Math.floor(Math.random() * articleLinks.length)];
+        }
+        
+        return null;
+    }
+
+    /**
+     * Check if link is an article link
+     */
+    isArticleLink(link) {
+        const href = link.href.toLowerCase();
+        const text = link.textContent.toLowerCase();
+        
+        // Article URL patterns
+        const articlePatterns = [
+            '/article/',
+            '/post/',
+            '/entry/',
+            '/blog/',
+            '/news/',
+            '/story/',
+            '/read/',
+            '/view/',
+            '.html',
+            '.php',
+            '?p=',
+            '?post=',
+            '?article='
+        ];
+        
+        // Article text patterns
+        const articleTextPatterns = [
+            'read more',
+            'continue reading',
+            'full story',
+            'read full',
+            'view article',
+            'read article',
+            'read post'
+        ];
+        
+        // Check URL patterns
+        for (const pattern of articlePatterns) {
+            if (href.includes(pattern)) {
+                return true;
+            }
+        }
+        
+        // Check text patterns
+        for (const pattern of articleTextPatterns) {
+            if (text.includes(pattern)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * Find internal links (same domain)
+     */
+    findInternalLinks() {
+        const links = [];
+        const currentDomain = window.location.hostname;
+        
+        const allLinks = document.querySelectorAll('a[href]');
+        
+        allLinks.forEach(link => {
+            if (this.isValidLink(link)) {
+                const href = link.href;
+                const linkDomain = new URL(href).hostname;
+                
+                // Check if it's same domain or relative link
+                if (linkDomain === currentDomain || href.startsWith('/') || href.startsWith('./') || href.startsWith('../')) {
+                    links.push(link);
+                }
+            }
+        });
+        
+        return links;
+    }
+
+    /**
+     * Get navigation maturity summary
+     */
+    getNavigationMaturitySummary() {
+        return {
+            features: {
+                intelligentNavigation: true,
+                personalityBasedWeights: true,
+                categoryDetection: true,
+                articleSelection: true,
+                legalPageNavigation: true,
+                searchBehavior: true,
+                backForwardNavigation: true,
+                tabSwitching: true,
+                bookmarkBehavior: true,
+                linkValidation: true,
+                fallbackMechanisms: true
+            },
+            navigationTypes: {
+                relatedContent: 'Find and navigate to related content',
+                category: 'Navigate to category pages',
+                legal: 'Navigate to legal/info pages',
+                previousNext: 'Use pagination navigation',
+                random: 'Random page navigation with article detection',
+                search: 'Search behavior simulation',
+                back: 'Browser back navigation',
+                forward: 'Browser forward navigation'
+            },
+            selectors: {
+                related: 18, // Number of related content selectors
+                category: 25, // Number of category selectors
+                legal: 20, // Number of legal page selectors
+                article: 10, // Number of article selectors
+                pagination: 9 // Number of pagination selectors
+            },
+            maturity: 'Advanced',
+            comparison: 'Matches Python Selenium implementation'
+        };
+    }
+
+    /**
+     * Utility delay function with stealth
      */
     delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        // Use stealth delay if available, otherwise fallback to standard delay
+        if (window._stealth_delay) {
+            const stealthDelay = new window._stealth_delay();
+            return stealthDelay.wait(ms);
+        } else {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
     }
 }
 

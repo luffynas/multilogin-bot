@@ -29,12 +29,16 @@ class StealthMonitor {
         
         this.stealthConfig = {
             enabled: true,
-            monitoringInterval: 15000, // 15 seconds - reduced frequency
-            maxPatternHistory: 500, // Reduced history for better performance
-            riskThreshold: 0.85, // Increased threshold to reduce false positives
-            humanThreshold: 0.5, // Lowered threshold for more realistic assessment
-            suspiciousPatternThreshold: 0.9, // Higher threshold for suspicious patterns
-            debugMode: false // Disable debug logging for stealth
+            monitoringInterval: 30000, // 30 seconds - increased for stealth
+            maxPatternHistory: 200, // Reduced history for better stealth
+            riskThreshold: 0.95, // Very high threshold to reduce false positives
+            humanThreshold: 0.3, // Lowered threshold for more realistic assessment
+            suspiciousPatternThreshold: 0.98, // Very high threshold for suspicious patterns
+            debugMode: false, // Disable debug logging for stealth
+            stealthMode: true, // Enable enhanced stealth mode
+            consoleLogging: false, // Disable all console logging
+            windowExposure: false, // Disable window object exposure
+            chromeStorage: false // Disable chrome storage usage
         };
         
         this.monitoringTimer = null;

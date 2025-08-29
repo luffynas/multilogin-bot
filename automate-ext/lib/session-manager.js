@@ -16,6 +16,9 @@ class SessionManager {
         };
         
         this.saveTimer = null;
+        
+        // Initialize stealth storage
+        this.stealthStorage = new (window._stealth_storage || StealthStorage)();
     }
 
     /**
@@ -271,16 +274,11 @@ class SessionManager {
                 lastSaved: Date.now()
             };
             
-            await chrome.storage.local.set({
-                [`session_${this.currentSession.id}`]: sessionData
-            });
+            // Save to stealth storage instead of chrome storage
+            this.stealthStorage.set(`session_${this.currentSession.id}`, sessionData);
+            this.stealthStorage.set('currentSession', sessionData);
             
-            // Also save as current session
-            await chrome.storage.local.set({
-                'currentSession': sessionData
-            });
-            
-            console.log('Session saved:', this.currentSession.id);
+            // Stealth logging - removed for security
         } catch (error) {
             if (error.message.includes('Extension context invalidated')) {
                 console.warn('Extension context invalidated, stopping session management');
@@ -303,10 +301,11 @@ class SessionManager {
                 return;
             }
             
-            const result = await chrome.storage.local.get(['currentSession']);
+            // Load from stealth storage instead of chrome storage
+            const currentSession = this.stealthStorage.get('currentSession');
             
-            if (result.currentSession) {
-                this.currentSession = result.currentSession;
+            if (currentSession) {
+                this.currentSession = currentSession;
                 this.isActive = this.currentSession.status === 'active';
                 
                 // Resume auto-save if session is active
@@ -314,7 +313,7 @@ class SessionManager {
                     this.startAutoSave();
                 }
                 
-                console.log('Session loaded:', this.currentSession.id);
+                // Stealth logging - removed for security
             }
         } catch (error) {
             if (error.message.includes('Extension context invalidated')) {

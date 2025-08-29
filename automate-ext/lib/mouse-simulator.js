@@ -388,10 +388,16 @@ class MouseSimulator {
     }
 
     /**
-     * Utility delay function
+     * Utility delay function with stealth
      */
     delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        // Use stealth delay if available, otherwise fallback to standard delay
+        if (window._stealth_delay) {
+            const stealthDelay = new window._stealth_delay();
+            return stealthDelay.wait(ms);
+        } else {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
     }
 }
 

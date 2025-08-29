@@ -10,6 +10,7 @@ class BehaviorSimulator {
         this.mousePosition = { x: 0, y: 0 };
         this.scrollPosition = 0;
         this.isSimulating = false;
+        this.deviceType = this.detectDeviceType();
         
         this.behaviorConfig = {
             mouseMovement: {
@@ -35,8 +36,90 @@ class BehaviorSimulator {
                 intelligentLinks: true,
                 backForward: true,
                 tabSwitching: true
+            },
+            device: {
+                type: this.deviceType,
+                viewport: this.getViewportInfo(),
+                touchCapable: this.isTouchCapable(),
+                orientation: this.getOrientation()
             }
         };
+        
+        // Initialize stealth delay system
+        this.stealthDelay = new (window._stealth_delay || StealthDelay)();
+    }
+
+    /**
+     * Detect device type based on user agent and screen size
+     */
+    detectDeviceType() {
+        const userAgent = navigator.userAgent.toLowerCase();
+        const screenWidth = window.screen.width;
+        const screenHeight = window.screen.height;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        // Mobile detection
+        if (/android|iphone|ipad|ipod|blackberry|windows phone/i.test(userAgent)) {
+            if (/ipad/i.test(userAgent) || (screenWidth >= 768 && screenHeight >= 1024)) {
+                return 'tablet';
+            } else {
+                return 'mobile';
+            }
+        }
+
+        // Tablet detection by screen size
+        if (screenWidth >= 768 && screenHeight >= 1024) {
+            return 'tablet';
+        }
+
+        // Desktop detection
+        if (screenWidth >= 1024) {
+            return 'desktop';
+        }
+
+        // Fallback based on viewport
+        if (viewportWidth >= 768) {
+            return 'tablet';
+        } else if (viewportWidth >= 480) {
+            return 'mobile';
+        } else {
+            return 'desktop';
+        }
+    }
+
+    /**
+     * Get viewport information
+     */
+    getViewportInfo() {
+        return {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            screenWidth: window.screen.width,
+            screenHeight: window.screen.height,
+            pixelRatio: window.devicePixelRatio || 1,
+            orientation: this.getOrientation()
+        };
+    }
+
+    /**
+     * Check if device is touch capable
+     */
+    isTouchCapable() {
+        return 'ontouchstart' in window || 
+               navigator.maxTouchPoints > 0 || 
+               navigator.msMaxTouchPoints > 0;
+    }
+
+    /**
+     * Get device orientation
+     */
+    getOrientation() {
+        if (window.innerHeight > window.innerWidth) {
+            return 'portrait';
+        } else {
+            return 'landscape';
+        }
     }
 
     /**
@@ -53,25 +136,76 @@ class BehaviorSimulator {
     }
 
     /**
-     * Update behavior configuration based on personality
+     * Update behavior configuration based on personality and device
      */
     updateBehaviorConfig() {
         if (!this.currentPersonality) return;
 
         const personality = this.currentPersonality;
         const patterns = this.personalityEngine.getBehaviorPatterns();
+        const deviceBehavior = this.getDeviceSpecificBehavior();
 
-        // Adjust mouse movement based on personality
+        // Adjust mouse movement based on personality and device
         this.behaviorConfig.mouseMovement.speed = patterns.mouseMovement.speed;
         this.behaviorConfig.mouseMovement.precision = patterns.mouseMovement.precision;
+        this.behaviorConfig.mouseMovement.pattern = deviceBehavior.scrollPattern;
 
-        // Adjust scrolling based on personality
+        // Adjust scrolling based on personality and device
         this.behaviorConfig.scrolling.speed = patterns.scrolling.speed;
         this.behaviorConfig.scrolling.pauseFrequency = patterns.scrolling.pauseFrequency;
+        this.behaviorConfig.scrolling.pattern = deviceBehavior.scrollPattern;
 
-        // Adjust reading based on personality
+        // Adjust reading based on personality and device
         this.behaviorConfig.reading.speed = patterns.reading.speed;
         this.behaviorConfig.reading.comprehension = patterns.reading.comprehension;
+        this.behaviorConfig.reading.typingSpeed = deviceBehavior.typingSpeed;
+
+        // Adjust navigation based on device
+        this.behaviorConfig.navigation.hoverProbability = deviceBehavior.hoverProbability;
+        this.behaviorConfig.navigation.viewportBehavior = deviceBehavior.viewportBehavior;
+    }
+
+    /**
+     * Get device-specific behavior patterns
+     */
+    getDeviceSpecificBehavior() {
+        const deviceBehaviors = {
+            "mobile": {
+                scrollPattern: "touch_scroll",
+                clickPattern: "touch_tap",
+                viewportBehavior: "mobile_viewport",
+                typingSpeed: "slow",
+                hoverProbability: 0.1, // Less hovering on mobile
+                pageDwellTime: { min: 15, max: 120 },
+                maxPages: 4,
+                scrollSpeed: 0.8,
+                pauseFrequency: 0.4
+            },
+            "tablet": {
+                scrollPattern: "touch_scroll",
+                clickPattern: "touch_tap",
+                viewportBehavior: "tablet_viewport",
+                typingSpeed: "medium",
+                hoverProbability: 0.2,
+                pageDwellTime: { min: 20, max: 180 },
+                maxPages: 6,
+                scrollSpeed: 0.9,
+                pauseFrequency: 0.3
+            },
+            "desktop": {
+                scrollPattern: "mouse_scroll",
+                clickPattern: "mouse_click",
+                viewportBehavior: "desktop_viewport",
+                typingSpeed: "fast",
+                hoverProbability: 0.4,
+                pageDwellTime: { min: 30, max: 300 },
+                maxPages: 8,
+                scrollSpeed: 1.0,
+                pauseFrequency: 0.2
+            }
+        };
+
+        return deviceBehaviors[this.deviceType] || deviceBehaviors["desktop"];
     }
 
     /**
@@ -164,37 +298,630 @@ class BehaviorSimulator {
     }
 
     /**
-     * Simulate natural scrolling
+     * Simulate natural scrolling with comprehensive patterns (matching Python Selenium)
      */
-    async simulateNaturalScrolling(targetScrollY, duration = 2000) {
+    async simulateNaturalScrolling(targetScrollY, duration = 2000, contentType = 'general') {
         if (!this.behaviorConfig.scrolling.enabled) {
             window.scrollTo(0, targetScrollY);
             return;
         }
 
+        const personality = this.currentPersonality;
+        const scrollConfig = this.getScrollConfig(contentType, personality);
+        const deviceBehavior = this.getDeviceSpecificBehavior();
+        
+        // Get page dimensions
+        const pageHeight = document.body.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        const startScrollY = window.pageYOffset;
+        const scrollDistance = targetScrollY - startScrollY;
+
+        // Apply device-specific adjustments
+        const adjustedScrollConfig = this.applyDeviceSpecificScrollAdjustments(scrollConfig, deviceBehavior);
+
+        if (pageHeight > viewportHeight) {
+            await this.simulateComprehensiveScrollPattern(scrollDistance, adjustedScrollConfig, personality);
+        } else {
+            // Simple scroll for short pages
+            await this.simulateSimpleScroll(targetScrollY, duration);
+        }
+    }
+
+    /**
+     * Apply device-specific adjustments to scroll configuration
+     */
+    applyDeviceSpecificScrollAdjustments(scrollConfig, deviceBehavior) {
+        const adjustedConfig = { ...scrollConfig };
+
+        // Adjust scroll speed based on device
+        adjustedConfig.speedMultiplier *= deviceBehavior.scrollSpeed;
+
+        // Adjust pause frequency based on device
+        adjustedConfig.thoroughnessMultiplier *= deviceBehavior.pauseFrequency;
+
+        // Adjust pattern based on device type
+        if (this.deviceType === 'mobile') {
+            adjustedConfig.pattern = 'touch_scroll';
+            adjustedConfig.scrollStep = Math.floor(adjustedConfig.scrollStep * 0.8); // Smaller steps on mobile
+        } else if (this.deviceType === 'tablet') {
+            adjustedConfig.pattern = 'touch_scroll';
+            adjustedConfig.scrollStep = Math.floor(adjustedConfig.scrollStep * 0.9);
+        } else {
+            adjustedConfig.pattern = 'mouse_scroll';
+        }
+
+        return adjustedConfig;
+    }
+
+    /**
+     * Get scroll configuration based on content type and personality
+     */
+    getScrollConfig(contentType, personality) {
+        // Base scroll adjustments by content type
+        const contentTypeConfigs = {
+            "news": { speed: "fast", thoroughness: "medium", pattern: "linear" },
+            "blog": { speed: "medium", thoroughness: "high", pattern: "exploratory" },
+            "technology": { speed: "slow", thoroughness: "high", pattern: "careful" },
+            "business": { speed: "medium", thoroughness: "medium", pattern: "efficient" },
+            "product": { speed: "fast", thoroughness: "low", pattern: "scanning" },
+            "entertainment": { speed: "fast", thoroughness: "low", pattern: "casual" },
+            "general": { speed: "medium", thoroughness: "medium", pattern: "balanced" }
+        };
+
+        const baseConfig = contentTypeConfigs[contentType] || contentTypeConfigs["general"];
+
+        // Personality adjustments
+        const personalityAdjustments = {
+            "explorer": { speedMult: 1.2, thoroughnessMult: 0.8, pattern: "exploratory" },
+            "researcher": { speedMult: 0.7, thoroughnessMult: 1.3, pattern: "careful" },
+            "casual": { speedMult: 1.0, thoroughnessMult: 0.9, pattern: "casual" },
+            "professional": { speedMult: 1.1, thoroughnessMult: 1.1, pattern: "efficient" }
+        };
+
+        const personalityConfig = personalityAdjustments[personality.type] || personalityAdjustments["casual"];
+
+        return {
+            speed: baseConfig.speed,
+            thoroughness: baseConfig.thoroughness,
+            pattern: personalityConfig.pattern,
+            speedMultiplier: personalityConfig.speedMult,
+            thoroughnessMultiplier: personalityConfig.thoroughnessMult
+        };
+    }
+
+    /**
+     * Simulate comprehensive scroll pattern with real-time ad detection
+     */
+    async simulateComprehensiveScrollPattern(totalDistance, config, personality) {
+        const baseStep = Math.random() * 250 + 150; // 150-400px base step
+        const speedAdjustments = { fast: 0.6, medium: 1.0, slow: 1.5 };
+        const speedAdj = speedAdjustments[config.speed] * config.speedMultiplier;
+        const scrollStep = Math.floor(baseStep * speedAdj);
+
+        // Calculate number of scroll actions
+        let numScrolls = Math.max(3, Math.floor(totalDistance / scrollStep));
+        
+        // Adjust based on thoroughness
+        if (config.thoroughness === "high") {
+            numScrolls = Math.floor(numScrolls * 1.5);
+        } else if (config.thoroughness === "low") {
+            numScrolls = Math.floor(numScrolls * 0.7);
+        }
+
+        let currentPosition = window.pageYOffset;
+        const detectedAds = new Set();
+        const adInteractions = [];
+
+        // Stealth logging - removed for security
+
+        for (let i = 0; i < numScrolls; i++) {
+            // Calculate scroll amount based on pattern
+            const scrollAmount = this.calculatePatternScrollAmount(
+                i, numScrolls, scrollStep, config.pattern, currentPosition, totalDistance
+            );
+
+            // Apply scroll
+            currentPosition += scrollAmount;
+            currentPosition = Math.min(currentPosition, totalDistance);
+
+            // Stealth logging - removed for security
+
+            // Smooth scroll to position
+            window.scrollTo({ top: currentPosition, behavior: 'smooth' });
+
+            // Real-time ad detection during scroll
+            await this.delay(1000);
+            const newAds = await this.detectNewAdsInViewport(detectedAds);
+            
+            if (newAds.length > 0) {
+                // Stealth logging - removed for security
+                
+                for (const adInfo of newAds) {
+                    detectedAds.add(adInfo.uniqueId);
+                    const interaction = await this.handleRealtimeAdInteraction(adInfo);
+                    if (interaction) {
+                        adInteractions.push({
+                            scrollPosition: currentPosition,
+                            adInfo: adInfo,
+                            interaction: interaction,
+                            timestamp: new Date().toISOString()
+                        });
+                    }
+                }
+            }
+
+            // Pause based on pattern
+            const pauseTime = this.calculateScrollPause(i, numScrolls, config.pattern, config);
+            await this.delay(pauseTime * 1000);
+
+            // Reading pause (30% chance)
+            if (Math.random() < 0.3) {
+                const readingPause = (2 + Math.random() * 3) * config.thoroughnessMultiplier;
+                console.log(`📖 Reading pause: ${readingPause.toFixed(1)}s`);
+                
+                // Additional ad check during reading
+                const additionalAds = await this.detectNewAdsInViewport(detectedAds);
+                if (additionalAds.length > 0) {
+                    console.log(`🎯 READING PAUSE: Found ${additionalAds.length} additional ads`);
+                }
+                
+                await this.delay(readingPause * 1000);
+            }
+
+            // Scroll back (15% chance) - human behavior
+            if (Math.random() < 0.15) {
+                const backAmount = Math.random() * 150 + 50;
+                currentPosition = Math.max(0, currentPosition - backAmount);
+                console.log(`⬅️ Scroll back: ${backAmount.toFixed(0)}px → Position: ${currentPosition}px`);
+                
+                window.scrollTo({ top: currentPosition, behavior: 'smooth' });
+                await this.delay(1000);
+                
+                const backAds = await this.detectNewAdsInViewport(detectedAds);
+                if (backAds.length > 0) {
+                    console.log(`🎯 SCROLL BACK: Found ${backAds.length} ads`);
+                }
+                
+                await this.delay(Math.random() * 1000 + 1000);
+            }
+        }
+
+        // Final scroll to top
+        console.log("⬆️ Final scroll to top");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        await this.delay(2000);
+
+        // Final ad detection
+        const finalAds = await this.detectNewAdsInViewport(detectedAds);
+        if (finalAds.length > 0) {
+            console.log(`🎯 FINAL CHECK: Found ${finalAds.length} ads at top`);
+        }
+
+        console.log(`✅ Comprehensive scroll completed: ${detectedAds.size} ads detected, ${adInteractions.length} interactions`);
+
+        return {
+            totalAdsDetected: detectedAds.size,
+            totalInteractions: adInteractions.length,
+            adInteractions: adInteractions,
+            scrollPositions: numScrolls
+        };
+    }
+
+    /**
+     * Calculate scroll amount based on pattern
+     */
+    calculatePatternScrollAmount(step, totalSteps, baseStep, pattern, currentPos, totalDistance) {
+        switch (pattern) {
+            case "linear":
+                return baseStep + Math.random() * 100 - 50;
+            
+            case "exploratory":
+                if (step % 3 === 0) {
+                    return baseStep * 1.5 + Math.random() * 60 - 30;
+                } else {
+                    return baseStep * 0.7 + Math.random() * 80 - 40;
+                }
+            
+            case "careful":
+                return baseStep * 0.8 + Math.random() * 40 - 20;
+            
+            case "efficient":
+                return baseStep * 1.2 + Math.random() * 60 - 30;
+            
+            case "scanning":
+                if (step % 4 === 0) {
+                    return baseStep * 0.5 + Math.random() * 40 - 20;
+                } else {
+                    return baseStep * 1.3 + Math.random() * 80 - 40;
+                }
+            
+            case "casual":
+                return baseStep + Math.random() * 160 - 80;
+            
+            default: // balanced
+                return baseStep + Math.random() * 120 - 60;
+        }
+    }
+
+    /**
+     * Calculate pause time between scrolls
+     */
+    calculateScrollPause(step, totalSteps, pattern, config) {
+        const basePause = 1 + Math.random() * 2; // 1-3 seconds
+        
+        const patternAdjustments = {
+            linear: 1.0,
+            exploratory: 1.3,
+            careful: 1.5,
+            efficient: 0.8,
+            scanning: 0.6,
+            casual: 1.2,
+            balanced: 1.0
+        };
+
+        const patternAdj = patternAdjustments[pattern] || 1.0;
+        return basePause * patternAdj * config.thoroughnessMultiplier;
+    }
+
+    /**
+     * Simulate simple scroll for short pages
+     */
+    async simulateSimpleScroll(targetScrollY, duration) {
         const startScrollY = window.pageYOffset;
         const scrollDistance = targetScrollY - startScrollY;
         const steps = Math.floor(duration / 16);
-        const personality = this.currentPersonality;
 
         for (let i = 0; i <= steps; i++) {
             const progress = i / steps;
-            
-            // Easing function for natural scrolling
             const easeProgress = this.easeInOutQuad(progress);
             const currentScrollY = startScrollY + (scrollDistance * easeProgress);
 
             window.scrollTo(0, currentScrollY);
             this.scrollPosition = currentScrollY;
 
-            // Check for content to pause at
-            if (this.shouldPauseAtContent(personality)) {
-                await this.simulateContentPause();
+            await this.delay(16);
+        }
+    }
+
+    /**
+     * Detect new ads in viewport during scrolling
+     */
+    async detectNewAdsInViewport(detectedAds) {
+        const adSelectors = [
+            'ins.adsbygoogle',
+            'div[class*="adsbygoogle"]',
+            'div[id*="google_ads"]',
+            'div[id*="div-gpt-ad"]',
+            'div[data-google-ad-client]',
+            'div[data-ad-slot]',
+            'div[class*="ad-"]',
+            'div[id*="ad-"]',
+            'iframe[src*="googleads"]',
+            'iframe[src*="doubleclick"]'
+        ];
+
+        const newAds = [];
+        const viewportRect = {
+            top: window.pageYOffset,
+            bottom: window.pageYOffset + window.innerHeight,
+            left: 0,
+            right: window.innerWidth
+        };
+
+        for (const selector of adSelectors) {
+            try {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(element => {
+                    const rect = element.getBoundingClientRect();
+                    const elementTop = rect.top + window.pageYOffset;
+                    const elementBottom = rect.bottom + window.pageYOffset;
+
+                    // Check if ad is in viewport
+                    if (elementTop < viewportRect.bottom && elementBottom > viewportRect.top) {
+                        const uniqueId = element.id || element.className || `ad-${Date.now()}-${Math.random()}`;
+                        
+                        if (!detectedAds.has(uniqueId)) {
+                            newAds.push({
+                                element: element,
+                                uniqueId: uniqueId,
+                                rect: rect,
+                                selector: selector,
+                                timestamp: Date.now()
+                            });
+                        }
+                    }
+                });
+            } catch (error) {
+                console.debug(`Error detecting ads with selector ${selector}:`, error.message);
+            }
+        }
+
+        return newAds;
+    }
+
+    /**
+     * Handle real-time ad interaction during scrolling
+     */
+    async handleRealtimeAdInteraction(adInfo) {
+        try {
+            // Basic interaction simulation
+            const interaction = {
+                type: 'scroll_detection',
+                adId: adInfo.uniqueId,
+                timestamp: Date.now(),
+                position: {
+                    x: adInfo.rect.left + adInfo.rect.width / 2,
+                    y: adInfo.rect.top + adInfo.rect.height / 2
+                }
+            };
+
+            // Simulate hover (20% chance)
+            if (Math.random() < 0.2) {
+                interaction.action = 'hover';
+                await this.simulateHover(adInfo.element);
             }
 
-            const delay = this.getScrollingDelay(personality);
-            await this.delay(delay);
+            // Simulate view (always track)
+            interaction.action = interaction.action || 'view';
+            
+            return interaction;
+        } catch (error) {
+            console.error('Error handling real-time ad interaction:', error);
+            return null;
         }
+    }
+
+    /**
+     * Setup real-time ad detection observer
+     */
+    setupRealtimeAdObserver() {
+        if (window.adDetectionObserver) {
+            return; // Already setup
+        }
+
+        try {
+            // Create intersection observer for real-time ad detection
+            window.detectedAds = new Set();
+            window.newAdsFound = [];
+
+            window.adDetectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const element = entry.target;
+                        const adId = element.id || element.className || `ad-${Date.now()}`;
+                        
+                        if (!window.detectedAds.has(adId)) {
+                            window.detectedAds.add(adId);
+                            window.newAdsFound.push({
+                                element: element,
+                                id: adId,
+                                rect: entry.boundingClientRect,
+                                timestamp: Date.now()
+                            });
+                        }
+                    }
+                });
+            }, {
+                threshold: 0.1,  // Trigger when 10% visible
+                rootMargin: '50px'  // Detect ads 50px before they enter viewport
+            });
+
+            // Observe all potential ad elements
+            const adSelectors = [
+                'ins.adsbygoogle',
+                'div[class*="adsbygoogle"]',
+                'div[id*="google_ads"]',
+                'div[id*="div-gpt-ad"]',
+                'div[data-google-ad-client]',
+                'div[data-ad-slot]',
+                'div[class*="ad-"]',
+                'div[id*="ad-"]',
+                'iframe[src*="googleads"]',
+                'iframe[src*="doubleclick"]'
+            ];
+
+            adSelectors.forEach(selector => {
+                try {
+                    const elements = document.querySelectorAll(selector);
+                    elements.forEach(element => {
+                        window.adDetectionObserver.observe(element);
+                    });
+                } catch (error) {
+                    console.debug(`Error observing ads with selector ${selector}:`, error.message);
+                }
+            });
+
+            console.log('✅ Real-time ad detection observer setup complete');
+        } catch (error) {
+            console.error('Error setting up real-time ad observer:', error);
+        }
+    }
+
+    /**
+     * Get scroll behavior summary
+     */
+    getScrollBehaviorSummary() {
+        return {
+            patterns: {
+                linear: 'Consistent scrolling speed',
+                exploratory: 'Variable speed with pauses',
+                careful: 'Slow, deliberate scrolling',
+                efficient: 'Fast, purposeful scrolling',
+                scanning: 'Quick scanning with stops',
+                casual: 'Relaxed, variable scrolling',
+                balanced: 'Moderate, natural scrolling',
+                touch_scroll: 'Touch-based scrolling',
+                mouse_scroll: 'Mouse-based scrolling'
+            },
+            contentTypes: {
+                news: 'Fast, linear pattern',
+                blog: 'Medium speed, exploratory',
+                technology: 'Slow, careful pattern',
+                business: 'Medium speed, efficient',
+                product: 'Fast, scanning pattern',
+                entertainment: 'Fast, casual pattern',
+                general: 'Medium speed, balanced'
+            },
+            personalityAdjustments: {
+                explorer: 'Faster, less thorough',
+                researcher: 'Slower, more thorough',
+                casual: 'Standard speed, less thorough',
+                professional: 'Slightly faster, balanced'
+            },
+            deviceTypes: {
+                mobile: 'Touch-based, smaller viewport, shorter sessions',
+                tablet: 'Touch-based, medium viewport, moderate sessions',
+                desktop: 'Mouse-based, large viewport, longer sessions'
+            }
+        };
+    }
+
+    /**
+     * Get device information and behavior
+     */
+    getDeviceInfo() {
+        const deviceBehavior = this.getDeviceSpecificBehavior();
+        return {
+            type: this.deviceType,
+            viewport: this.behaviorConfig.device.viewport,
+            touchCapable: this.behaviorConfig.device.touchCapable,
+            orientation: this.behaviorConfig.device.orientation,
+            behavior: deviceBehavior,
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            language: navigator.language
+        };
+    }
+
+    /**
+     * Simulate device-specific scrolling
+     */
+    async simulateDeviceSpecificScrolling(targetScrollY, contentType = 'general') {
+        const deviceBehavior = this.getDeviceSpecificBehavior();
+        
+        if (this.deviceType === 'mobile') {
+            return await this.simulateMobileScrolling(targetScrollY, contentType);
+        } else if (this.deviceType === 'tablet') {
+            return await this.simulateTabletScrolling(targetScrollY, contentType);
+        } else {
+            return await this.simulateDesktopScrolling(targetScrollY, contentType);
+        }
+    }
+
+    /**
+     * Simulate mobile-specific scrolling
+     */
+    async simulateMobileScrolling(targetScrollY, contentType) {
+        console.log('📱 Simulating mobile scrolling behavior');
+        
+        // Mobile-specific adjustments
+        const scrollStep = 100; // Smaller steps for mobile
+        const pauseTime = 0.5; // Shorter pauses
+        const maxScrolls = 10; // Fewer scroll actions
+        
+        let currentPosition = window.pageYOffset;
+        const scrollDistance = targetScrollY - currentPosition;
+        const numScrolls = Math.min(maxScrolls, Math.ceil(Math.abs(scrollDistance) / scrollStep));
+        
+        for (let i = 0; i < numScrolls; i++) {
+            const scrollAmount = scrollStep * (scrollDistance > 0 ? 1 : -1);
+            currentPosition += scrollAmount;
+            
+            // Smooth scroll with touch behavior
+            window.scrollTo({ top: currentPosition, behavior: 'smooth' });
+            
+            // Shorter pause for mobile
+            await this.delay(pauseTime * 1000);
+            
+            // Occasional longer pause (mobile users pause to read)
+            if (Math.random() < 0.2) {
+                await this.delay(1000 + Math.random() * 2000);
+            }
+        }
+        
+        return { deviceType: 'mobile', scrolls: numScrolls };
+    }
+
+    /**
+     * Simulate tablet-specific scrolling
+     */
+    async simulateTabletScrolling(targetScrollY, contentType) {
+        console.log('📱 Simulating tablet scrolling behavior');
+        
+        // Tablet-specific adjustments
+        const scrollStep = 150; // Medium steps for tablet
+        const pauseTime = 0.8; // Medium pauses
+        const maxScrolls = 15; // Moderate scroll actions
+        
+        let currentPosition = window.pageYOffset;
+        const scrollDistance = targetScrollY - currentPosition;
+        const numScrolls = Math.min(maxScrolls, Math.ceil(Math.abs(scrollDistance) / scrollStep));
+        
+        for (let i = 0; i < numScrolls; i++) {
+            const scrollAmount = scrollStep * (scrollDistance > 0 ? 1 : -1);
+            currentPosition += scrollAmount;
+            
+            // Smooth scroll with touch behavior
+            window.scrollTo({ top: currentPosition, behavior: 'smooth' });
+            
+            // Medium pause for tablet
+            await this.delay(pauseTime * 1000);
+            
+            // Reading pauses (tablet users read more)
+            if (Math.random() < 0.3) {
+                await this.delay(1500 + Math.random() * 3000);
+            }
+        }
+        
+        return { deviceType: 'tablet', scrolls: numScrolls };
+    }
+
+    /**
+     * Simulate desktop-specific scrolling
+     */
+    async simulateDesktopScrolling(targetScrollY, contentType) {
+        console.log('🖥️ Simulating desktop scrolling behavior');
+        
+        // Use comprehensive scrolling for desktop
+        return await this.simulateNaturalScrolling(targetScrollY, 2000, contentType);
+    }
+
+    /**
+     * Get device comparison summary
+     */
+    getDeviceComparisonSummary() {
+        return {
+            mobile: {
+                scrollPattern: 'touch_scroll',
+                clickPattern: 'touch_tap',
+                hoverProbability: 0.1,
+                pageDwellTime: { min: 15, max: 120 },
+                maxPages: 4,
+                scrollSpeed: 0.8,
+                pauseFrequency: 0.4,
+                characteristics: 'Small viewport, touch interface, shorter attention span'
+            },
+            tablet: {
+                scrollPattern: 'touch_scroll',
+                clickPattern: 'touch_tap',
+                hoverProbability: 0.2,
+                pageDwellTime: { min: 20, max: 180 },
+                maxPages: 6,
+                scrollSpeed: 0.9,
+                pauseFrequency: 0.3,
+                characteristics: 'Medium viewport, touch interface, moderate engagement'
+            },
+            desktop: {
+                scrollPattern: 'mouse_scroll',
+                clickPattern: 'mouse_click',
+                hoverProbability: 0.4,
+                pageDwellTime: { min: 30, max: 300 },
+                maxPages: 8,
+                scrollSpeed: 1.0,
+                pauseFrequency: 0.2,
+                characteristics: 'Large viewport, mouse interface, longer engagement'
+            }
+        };
     }
 
     /**
@@ -243,7 +970,7 @@ class BehaviorSimulator {
     }
 
     /**
-     * Simulate natural click
+     * Simulate natural click with device-specific behavior
      */
     async simulateNaturalClick(element, x, y) {
         if (!element) return false;
@@ -251,9 +978,22 @@ class BehaviorSimulator {
         const rect = element.getBoundingClientRect();
         const clickX = x || rect.left + rect.width / 2;
         const clickY = y || rect.top + rect.height / 2;
+        const deviceBehavior = this.getDeviceSpecificBehavior();
 
+        // Device-specific click simulation
+        if (this.deviceType === 'mobile' || this.deviceType === 'tablet') {
+            return await this.simulateTouchTap(element, clickX, clickY);
+        } else {
+            return await this.simulateMouseClick(element, clickX, clickY);
+        }
+    }
+
+    /**
+     * Simulate mouse click for desktop
+     */
+    async simulateMouseClick(element, x, y) {
         // Move mouse to element first
-        await this.simulateMouseMovement(clickX, clickY, 800);
+        await this.simulateMouseMovement(x, y, 800);
 
         // Simulate hover
         if (this.behaviorConfig.mouseMovement.hoverEffects) {

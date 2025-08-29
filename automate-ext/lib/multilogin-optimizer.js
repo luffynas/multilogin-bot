@@ -42,7 +42,7 @@ class MultiloginOptimizer {
      */
     async initialize() {
         try {
-            console.log('Multilogin Optimizer: Initializing...');
+            // Stealth logging - removed for security
             
             // Initialize sub-components
             this.viewabilitySimulator = new ViewabilitySimulator();
