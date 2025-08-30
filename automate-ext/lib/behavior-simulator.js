@@ -46,7 +46,13 @@ class BehaviorSimulator {
         };
         
         // Initialize stealth delay system
-        this.stealthDelay = new (window._stealth_delay || StealthDelay)();
+        this.stealthDelay = new (window._stealth_delay || (() => {
+            // Fallback delay function if stealth delay is not available
+            return {
+                wait: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
+                waitRandom: (min, max) => new Promise(resolve => setTimeout(resolve, Math.random() * (max - min) + min))
+            };
+        })());
     }
 
     /**
@@ -160,9 +166,42 @@ class BehaviorSimulator {
         this.behaviorConfig.reading.comprehension = patterns.reading.comprehension;
         this.behaviorConfig.reading.typingSpeed = deviceBehavior.typingSpeed;
 
-        // Adjust navigation based on device
-        this.behaviorConfig.navigation.hoverProbability = deviceBehavior.hoverProbability;
+        // Adjust navigation based on personality and device
+        this.behaviorConfig.navigation.hoverProbability = this.adjustHoverProbabilityForPersonality(personality.hoverProbability, deviceBehavior.hoverProbability);
         this.behaviorConfig.navigation.viewportBehavior = deviceBehavior.viewportBehavior;
+        this.behaviorConfig.navigation.style = patterns.navigation.style;
+        this.behaviorConfig.navigation.tabUsage = patterns.navigation.tabUsage;
+        // this.behaviorConfig.navigation.backForwardUsage = patterns.navigation.backForwardUsage;
+        this.behaviorConfig.navigation.bookmarkUsage = patterns.navigation.bookmarkUsage;
+        this.behaviorConfig.navigation.searchUsage = patterns.navigation.searchUsage;
+
+        // Store personality-specific configurations
+        this.behaviorConfig.personality = {
+            type: personality.type,
+            clickProbability: personality.clickProbability,
+            hoverProbability: personality.hoverProbability,
+            readingSpeed: personality.readingSpeed,
+            attentionSpan: personality.attentionSpan,
+            navigationStyle: personality.navigationStyle,
+            scrollBehavior: personality.scrollBehavior,
+            searchBehavior: personality.searchBehavior,
+            tabSwitching: personality.tabSwitching
+        };
+
+        console.log(`🎭 Updated behavior config for ${personality.type} personality on ${this.deviceType} device`);
+    }
+
+    /**
+     * Adjust hover probability based on personality and device
+     */
+    adjustHoverProbabilityForPersonality(personalityHoverProbability, deviceHoverProbability) {
+        // Combine personality and device hover probabilities
+        const combinedProbability = (personalityHoverProbability + deviceHoverProbability) / 2;
+        
+        // Add some randomness for realism
+        const variation = (Math.random() - 0.5) * 0.1; // ±5% variation
+        
+        return Math.max(0, Math.min(1, combinedProbability + variation));
     }
 
     /**
@@ -298,11 +337,11 @@ class BehaviorSimulator {
     }
 
     /**
-     * Simulate natural scrolling with comprehensive patterns (matching Python Selenium)
+     * Simulate natural scrolling with browser compatibility
      */
     async simulateNaturalScrolling(targetScrollY, duration = 2000, contentType = 'general') {
         if (!this.behaviorConfig.scrolling.enabled) {
-            window.scrollTo(0, targetScrollY);
+            this.safeScrollTo(0, targetScrollY);
             return;
         }
 
@@ -324,6 +363,71 @@ class BehaviorSimulator {
         } else {
             // Simple scroll for short pages
             await this.simulateSimpleScroll(targetScrollY, duration);
+        }
+    }
+
+    /**
+     * Safe scroll method with browser compatibility
+     */
+    safeScrollTo(x, y) {
+        try {
+            // Try modern smooth scrolling first
+            if (window.scrollTo && typeof window.scrollTo === 'function') {
+                if (window.scrollTo.length >= 2) {
+                    // Modern browsers support options object
+                    window.scrollTo({ top: y, left: x, behavior: 'smooth' });
+                } else {
+                    // Fallback for older browsers
+                    window.scrollTo(x, y);
+                }
+            } else {
+                // Fallback for very old browsers
+                window.scrollTop = y;
+                window.scrollLeft = x;
+            }
+        } catch (error) {
+            console.debug('Smooth scrolling not supported, using fallback:', error.message);
+            // Ultimate fallback
+            try {
+                window.scrollTo(x, y);
+            } catch (fallbackError) {
+                console.warn('All scrolling methods failed:', fallbackError.message);
+            }
+        }
+    }
+
+    /**
+     * Safe touch event creation with fallbacks
+     */
+    createSafeTouchEvent(type, element, x, y, options = {}) {
+        try {
+            // Try modern TouchEvent constructor
+            if (typeof TouchEvent !== 'undefined') {
+                return new TouchEvent(type, {
+                    bubbles: true,
+                    cancelable: true,
+                    touches: options.touches || [],
+                    changedTouches: options.changedTouches || [],
+                    ...options
+                });
+            } else {
+                // Fallback for browsers without TouchEvent support
+                const event = document.createEvent('Event');
+                event.initEvent(type, true, true);
+                event.touches = options.touches || [];
+                event.changedTouches = options.changedTouches || [];
+                return event;
+            }
+        } catch (error) {
+            console.debug('TouchEvent creation failed, using mouse event fallback:', error.message);
+            // Fallback to mouse events
+            return new MouseEvent(type === 'touchstart' ? 'mousedown' : 
+                                type === 'touchend' ? 'mouseup' : 'mousemove', {
+                bubbles: true,
+                cancelable: true,
+                clientX: x,
+                clientY: y
+            });
         }
     }
 
@@ -398,33 +502,46 @@ class BehaviorSimulator {
         const speedAdj = speedAdjustments[config.speed] * config.speedMultiplier;
         const scrollStep = Math.floor(baseStep * speedAdj);
 
-        // Calculate number of scroll actions
-        let numScrolls = Math.max(3, Math.floor(totalDistance / scrollStep));
+        // Calculate number of scroll actions to cover entire page
+        const pageHeight = document.body.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        const maxScrollDistance = pageHeight - viewportHeight;
+        
+        // Ensure we scroll through the entire page content
+        let numScrolls = Math.max(5, Math.floor(maxScrollDistance / scrollStep));
         
         // Adjust based on thoroughness
         if (config.thoroughness === "high") {
-            numScrolls = Math.floor(numScrolls * 1.5);
+            numScrolls = Math.floor(numScrolls * 1.8); // Increased from 1.5 to 1.8
         } else if (config.thoroughness === "low") {
-            numScrolls = Math.floor(numScrolls * 0.7);
+            numScrolls = Math.floor(numScrolls * 0.8); // Increased from 0.7 to 0.8
         }
 
         let currentPosition = window.pageYOffset;
         const detectedAds = new Set();
         const adInteractions = [];
+        let hasReachedBottom = false;
+        let hasReachedTop = false;
 
-        // Stealth logging - removed for security
+        console.log(`📖 Starting comprehensive reading: ${numScrolls} scrolls, ${maxScrollDistance}px total distance`);
 
         for (let i = 0; i < numScrolls; i++) {
-            // Calculate scroll amount based on pattern
-            const scrollAmount = this.calculatePatternScrollAmount(
-                i, numScrolls, scrollStep, config.pattern, currentPosition, totalDistance
+            // Calculate scroll amount based on pattern and current position
+            const scrollAmount = this.calculateReadingScrollAmount(
+                i, numScrolls, scrollStep, config.pattern, currentPosition, maxScrollDistance
             );
 
             // Apply scroll
             currentPosition += scrollAmount;
-            currentPosition = Math.min(currentPosition, totalDistance);
-
-            // Stealth logging - removed for security
+            
+            // Ensure we don't go beyond page boundaries
+            if (currentPosition >= maxScrollDistance) {
+                currentPosition = maxScrollDistance;
+                hasReachedBottom = true;
+            } else if (currentPosition <= 0) {
+                currentPosition = 0;
+                hasReachedTop = true;
+            }
 
             // Smooth scroll to position
             window.scrollTo({ top: currentPosition, behavior: 'smooth' });
@@ -434,7 +551,7 @@ class BehaviorSimulator {
             const newAds = await this.detectNewAdsInViewport(detectedAds);
             
             if (newAds.length > 0) {
-                // Stealth logging - removed for security
+                console.log(`🎯 Found ${newAds.length} new ads at position ${currentPosition}px`);
                 
                 for (const adInfo of newAds) {
                     detectedAds.add(adInfo.uniqueId);
@@ -450,14 +567,14 @@ class BehaviorSimulator {
                 }
             }
 
-            // Pause based on pattern
-            const pauseTime = this.calculateScrollPause(i, numScrolls, config.pattern, config);
+            // Pause based on pattern and content
+            const pauseTime = this.calculateReadingPause(i, numScrolls, config.pattern, config, currentPosition, maxScrollDistance);
             await this.delay(pauseTime * 1000);
 
-            // Reading pause (30% chance)
-            if (Math.random() < 0.3) {
-                const readingPause = (2 + Math.random() * 3) * config.thoroughnessMultiplier;
-                console.log(`📖 Reading pause: ${readingPause.toFixed(1)}s`);
+            // Reading pause (increased frequency for better content consumption)
+            if (Math.random() < 0.5) { // Increased from 30% to 50% chance
+                const readingPause = (3 + Math.random() * 5) * config.thoroughnessMultiplier; // Increased from 2-3s to 3-5s
+                console.log(`📖 Reading pause at ${currentPosition}px: ${readingPause.toFixed(1)}s`);
                 
                 // Additional ad check during reading
                 const additionalAds = await this.detectNewAdsInViewport(detectedAds);
@@ -468,11 +585,11 @@ class BehaviorSimulator {
                 await this.delay(readingPause * 1000);
             }
 
-            // Scroll back (15% chance) - human behavior
-            if (Math.random() < 0.15) {
-                const backAmount = Math.random() * 150 + 50;
+            // Occasional scroll back for re-reading (reduced frequency)
+            if (Math.random() < 0.1 && !hasReachedBottom) { // Reduced from 15% to 10% chance
+                const backAmount = Math.random() * 100 + 50; // Reduced from 150+50 to 100+50
                 currentPosition = Math.max(0, currentPosition - backAmount);
-                console.log(`⬅️ Scroll back: ${backAmount.toFixed(0)}px → Position: ${currentPosition}px`);
+                console.log(`⬅️ Re-reading scroll back: ${backAmount.toFixed(0)}px → Position: ${currentPosition}px`);
                 
                 window.scrollTo({ top: currentPosition, behavior: 'smooth' });
                 await this.delay(1000);
@@ -484,10 +601,28 @@ class BehaviorSimulator {
                 
                 await this.delay(Math.random() * 1000 + 1000);
             }
+
+            // Progress logging
+            if (i % Math.floor(numScrolls / 4) === 0) {
+                const progress = ((i / numScrolls) * 100).toFixed(1);
+                console.log(`📊 Reading progress: ${progress}% (${currentPosition}/${maxScrollDistance}px)`);
+            }
         }
 
-        // Final scroll to top
-        console.log("⬆️ Final scroll to top");
+        // Ensure we reach the bottom of the page
+        if (!hasReachedBottom) {
+            console.log("⬇️ Final scroll to bottom of page");
+            window.scrollTo({ top: maxScrollDistance, behavior: 'smooth' });
+            await this.delay(2000);
+            
+            // Final reading pause at bottom
+            const finalReadingPause = 5000 + Math.random() * 5000; // 5-10 seconds
+            console.log(`📖 Final reading pause at bottom: ${Math.round(finalReadingPause/1000)}s`);
+            await this.delay(finalReadingPause);
+        }
+
+        // Scroll back to top for navigation
+        console.log("⬆️ Scroll back to top for navigation");
         window.scrollTo({ top: 0, behavior: 'smooth' });
         await this.delay(2000);
 
@@ -497,56 +632,66 @@ class BehaviorSimulator {
             console.log(`🎯 FINAL CHECK: Found ${finalAds.length} ads at top`);
         }
 
-        console.log(`✅ Comprehensive scroll completed: ${detectedAds.size} ads detected, ${adInteractions.length} interactions`);
+        console.log(`✅ Comprehensive reading completed: ${detectedAds.size} ads detected, ${adInteractions.length} interactions, ${currentPosition}px covered`);
 
         return {
             totalAdsDetected: detectedAds.size,
             totalInteractions: adInteractions.length,
             adInteractions: adInteractions,
-            scrollPositions: numScrolls
+            scrollPositions: numScrolls,
+            pageCoverage: `${currentPosition}/${maxScrollDistance}px`
         };
     }
 
     /**
-     * Calculate scroll amount based on pattern
+     * Calculate reading scroll amount to ensure complete page coverage
      */
-    calculatePatternScrollAmount(step, totalSteps, baseStep, pattern, currentPos, totalDistance) {
-        switch (pattern) {
-            case "linear":
-                return baseStep + Math.random() * 100 - 50;
-            
-            case "exploratory":
-                if (step % 3 === 0) {
-                    return baseStep * 1.5 + Math.random() * 60 - 30;
-                } else {
-                    return baseStep * 0.7 + Math.random() * 80 - 40;
-                }
-            
-            case "careful":
-                return baseStep * 0.8 + Math.random() * 40 - 20;
-            
-            case "efficient":
-                return baseStep * 1.2 + Math.random() * 60 - 30;
-            
-            case "scanning":
-                if (step % 4 === 0) {
-                    return baseStep * 0.5 + Math.random() * 40 - 20;
-                } else {
-                    return baseStep * 1.3 + Math.random() * 80 - 40;
-                }
-            
-            case "casual":
-                return baseStep + Math.random() * 160 - 80;
-            
-            default: // balanced
-                return baseStep + Math.random() * 120 - 60;
+    calculateReadingScrollAmount(step, totalSteps, baseStep, pattern, currentPos, maxDistance) {
+        const progress = step / totalSteps;
+        const remainingDistance = maxDistance - currentPos;
+        
+        // Ensure we move forward most of the time
+        if (remainingDistance > 0) {
+            switch (pattern) {
+                case "linear":
+                    return baseStep + Math.random() * 100 - 50;
+                
+                case "exploratory":
+                    if (step % 3 === 0) {
+                        return baseStep * 1.5 + Math.random() * 60 - 30;
+                    } else {
+                        return baseStep * 0.7 + Math.random() * 80 - 40;
+                    }
+                
+                case "careful":
+                    return baseStep * 0.8 + Math.random() * 40 - 20;
+                
+                case "efficient":
+                    return baseStep * 1.2 + Math.random() * 60 - 30;
+                
+                case "scanning":
+                    if (step % 4 === 0) {
+                        return baseStep * 0.5 + Math.random() * 40 - 20;
+                    } else {
+                        return baseStep * 1.3 + Math.random() * 80 - 40;
+                    }
+                
+                case "casual":
+                    return baseStep + Math.random() * 160 - 80;
+                
+                default: // balanced
+                    return baseStep + Math.random() * 120 - 60;
+            }
+        } else {
+            // If we're at the bottom, occasionally scroll back up for re-reading
+            return -(baseStep * 0.5 + Math.random() * 100);
         }
     }
 
     /**
-     * Calculate pause time between scrolls
+     * Calculate reading pause time based on content and position
      */
-    calculateScrollPause(step, totalSteps, pattern, config) {
+    calculateReadingPause(step, totalSteps, pattern, config, currentPos, maxDistance) {
         const basePause = 1 + Math.random() * 2; // 1-3 seconds
         
         const patternAdjustments = {
@@ -560,7 +705,58 @@ class BehaviorSimulator {
         };
 
         const patternAdj = patternAdjustments[pattern] || 1.0;
-        return basePause * patternAdj * config.thoroughnessMultiplier;
+        let pauseTime = basePause * patternAdj * config.thoroughnessMultiplier;
+        
+        // Add extra pause when reading important content (headings, etc.)
+        if (this.isReadingImportantContent(currentPos)) {
+            pauseTime *= 1.5;
+        }
+        
+        // Add extra pause near the end of the page
+        const progress = currentPos / maxDistance;
+        if (progress > 0.8) {
+            pauseTime *= 1.3; // 30% longer pause near the end
+        }
+        
+        return pauseTime;
+    }
+
+    /**
+     * Check if we're reading important content at current position
+     */
+    isReadingImportantContent(currentPos) {
+        try {
+            const viewportRect = {
+                top: currentPos,
+                bottom: currentPos + window.innerHeight
+            };
+            
+            // Check for headings in viewport
+            const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+            for (const heading of headings) {
+                const rect = heading.getBoundingClientRect();
+                const headingTop = rect.top + window.pageYOffset;
+                
+                if (headingTop >= viewportRect.top && headingTop <= viewportRect.bottom) {
+                    return true;
+                }
+            }
+            
+            // Check for images or important elements
+            const importantElements = document.querySelectorAll('img, blockquote, .highlight, .important');
+            for (const element of importantElements) {
+                const rect = element.getBoundingClientRect();
+                const elementTop = rect.top + window.pageYOffset;
+                
+                if (elementTop >= viewportRect.top && elementTop <= viewportRect.bottom) {
+                    return true;
+                }
+            }
+            
+            return false;
+        } catch (error) {
+            return false;
+        }
     }
 
     /**
@@ -915,10 +1111,10 @@ class BehaviorSimulator {
                 scrollPattern: 'mouse_scroll',
                 clickPattern: 'mouse_click',
                 hoverProbability: 0.4,
-                pageDwellTime: { min: 30, max: 300 },
+                pageDwellTime: { min: 45, max: 180 }, // Increased from 15-120 to 45-180 seconds
                 maxPages: 8,
-                scrollSpeed: 1.0,
-                pauseFrequency: 0.2,
+                scrollSpeed: 0.7, // Reduced from 1.0 to 0.7 for less aggressive scrolling
+                pauseFrequency: 0.3, // Increased from 0.2 to 0.3 for more pauses
                 characteristics: 'Large viewport, mouse interface, longer engagement'
             }
         };
@@ -962,10 +1158,10 @@ class BehaviorSimulator {
     }
 
     /**
-     * Simulate pause at content
+     * Simulate pause at content (optimized for realistic timing)
      */
     async simulateContentPause() {
-        const pauseTime = 500 + Math.random() * 1500;
+        const pauseTime = 200 + Math.random() * 800; // Reduced from 500-2000ms to 200-1000ms
         await this.delay(pauseTime);
     }
 
@@ -992,8 +1188,13 @@ class BehaviorSimulator {
      * Simulate mouse click for desktop
      */
     async simulateMouseClick(element, x, y) {
+        // Calculate click coordinates
+        const rect = element.getBoundingClientRect();
+        const clickX = x || rect.left + rect.width / 2;
+        const clickY = y || rect.top + rect.height / 2;
+
         // Move mouse to element first
-        await this.simulateMouseMovement(x, y, 800);
+        await this.simulateMouseMovement(clickX, clickY, 800);
 
         // Simulate hover
         if (this.behaviorConfig.mouseMovement.hoverEffects) {
@@ -1254,8 +1455,8 @@ class BehaviorSimulator {
             await this.simulateTextSelection();
         }
 
-        // Simulate scrolling while reading
-        if (readingPattern.scrollWhileReading) {
+        // Simulate scrolling while reading (reduced frequency)
+        if (readingPattern.scrollWhileReading && Math.random() < 0.3) { // Only 30% chance
             await this.simulateReadingScroll();
         }
     }
@@ -1401,6 +1602,470 @@ class BehaviorSimulator {
      */
     stopSimulation() {
         this.isSimulating = false;
+    }
+
+    /**
+     * Simulate touch tap for mobile/tablet devices
+     */
+    async simulateTouchTap(element, clickX, clickY) {
+        if (!element) return false;
+
+        const rect = element.getBoundingClientRect();
+        const tapX = clickX || rect.left + rect.width / 2;
+        const tapY = clickY || rect.top + rect.height / 2;
+
+        try {
+            // Create touch start event
+            const touchStartEvent = new TouchEvent('touchstart', {
+                bubbles: true,
+                cancelable: true,
+                touches: [new Touch({
+                    identifier: 0,
+                    target: element,
+                    clientX: tapX,
+                    clientY: tapY,
+                    screenX: tapX,
+                    screenY: tapY,
+                    pageX: tapX,
+                    pageY: tapY,
+                    radiusX: 10,
+                    radiusY: 10,
+                    rotationAngle: 0,
+                    force: 1.0
+                })]
+            });
+
+            // Create touch end event
+            const touchEndEvent = new TouchEvent('touchend', {
+                bubbles: true,
+                cancelable: true,
+                touches: [],
+                changedTouches: [new Touch({
+                    identifier: 0,
+                    target: element,
+                    clientX: tapX,
+                    clientY: tapY,
+                    screenX: tapX,
+                    screenY: tapY,
+                    pageX: tapX,
+                    pageY: tapY,
+                    radiusX: 10,
+                    radiusY: 10,
+                    rotationAngle: 0,
+                    force: 0.0
+                })]
+            });
+
+            // Dispatch touch events
+            element.dispatchEvent(touchStartEvent);
+            await this.delay(50 + Math.random() * 100); // Touch duration
+            element.dispatchEvent(touchEndEvent);
+
+            // Also dispatch click event for compatibility
+            const clickEvent = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true,
+                clientX: tapX,
+                clientY: tapY
+            });
+
+            element.dispatchEvent(clickEvent);
+
+            return true;
+        } catch (error) {
+            console.warn('Touch tap simulation failed, falling back to click:', error.message);
+            // Fallback to regular click
+            return await this.simulateMouseClick(element, tapX, tapY);
+        }
+    }
+
+    /**
+     * Simulate mobile gesture (swipe, pinch, etc.)
+     */
+    async simulateMobileGesture(element, gestureType, options = {}) {
+        if (!element) return false;
+
+        const rect = element.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        try {
+            switch (gestureType) {
+                case 'swipe_left':
+                    return await this.simulateSwipeGesture(element, centerX, centerY, 'left', options);
+                case 'swipe_right':
+                    return await this.simulateSwipeGesture(element, centerX, centerY, 'right', options);
+                case 'swipe_up':
+                    return await this.simulateSwipeGesture(element, centerX, centerY, 'up', options);
+                case 'swipe_down':
+                    return await this.simulateSwipeGesture(element, centerX, centerY, 'down', options);
+                case 'pinch_zoom_in':
+                    return await this.simulatePinchGesture(element, centerX, centerY, 'in', options);
+                case 'pinch_zoom_out':
+                    return await this.simulatePinchGesture(element, centerX, centerY, 'out', options);
+                case 'long_press':
+                    return await this.simulateLongPress(element, centerX, centerY, options);
+                default:
+                    console.warn(`Unknown gesture type: ${gestureType}`);
+                    return false;
+            }
+        } catch (error) {
+            console.warn('Mobile gesture simulation failed:', error.message);
+            return false;
+        }
+    }
+
+    /**
+     * Simulate swipe gesture
+     */
+    async simulateSwipeGesture(element, startX, startY, direction, options = {}) {
+        const distance = options.distance || 100;
+        const duration = options.duration || 300;
+        const steps = options.steps || 10;
+
+        let endX = startX;
+        let endY = startY;
+
+        // Calculate end position based on direction
+        switch (direction) {
+            case 'left':
+                endX = startX - distance;
+                break;
+            case 'right':
+                endX = startX + distance;
+                break;
+            case 'up':
+                endY = startY - distance;
+                break;
+            case 'down':
+                endY = startY + distance;
+                break;
+        }
+
+        // Create touch start event
+        const touchStartEvent = new TouchEvent('touchstart', {
+            bubbles: true,
+            cancelable: true,
+            touches: [new Touch({
+                identifier: 0,
+                target: element,
+                clientX: startX,
+                clientY: startY,
+                screenX: startX,
+                screenY: startY,
+                pageX: startX,
+                pageY: startY,
+                radiusX: 10,
+                radiusY: 10,
+                rotationAngle: 0,
+                force: 1.0
+            })]
+        });
+
+        element.dispatchEvent(touchStartEvent);
+
+        // Simulate touch move events
+        for (let i = 1; i <= steps; i++) {
+            const progress = i / steps;
+            const currentX = startX + (endX - startX) * progress;
+            const currentY = startY + (endY - startY) * progress;
+
+            const touchMoveEvent = new TouchEvent('touchmove', {
+                bubbles: true,
+                cancelable: true,
+                touches: [new Touch({
+                    identifier: 0,
+                    target: element,
+                    clientX: currentX,
+                    clientY: currentY,
+                    screenX: currentX,
+                    screenY: currentY,
+                    pageX: currentX,
+                    pageY: currentY,
+                    radiusX: 10,
+                    radiusY: 10,
+                    rotationAngle: 0,
+                    force: 1.0
+                })]
+            });
+
+            element.dispatchEvent(touchMoveEvent);
+            await this.delay(duration / steps);
+        }
+
+        // Create touch end event
+        const touchEndEvent = new TouchEvent('touchend', {
+            bubbles: true,
+            cancelable: true,
+            touches: [],
+            changedTouches: [new Touch({
+                identifier: 0,
+                target: element,
+                clientX: endX,
+                clientY: endY,
+                screenX: endX,
+                screenY: endY,
+                pageX: endX,
+                pageY: endY,
+                radiusX: 10,
+                radiusY: 10,
+                rotationAngle: 0,
+                force: 0.0
+            })]
+        });
+
+        element.dispatchEvent(touchEndEvent);
+        return true;
+    }
+
+    /**
+     * Simulate pinch gesture
+     */
+    async simulatePinchGesture(element, centerX, centerY, direction, options = {}) {
+        const distance = options.distance || 50;
+        const duration = options.duration || 500;
+        const steps = options.steps || 10;
+
+        // Create two touch points for pinch
+        const touch1StartX = centerX - distance;
+        const touch1StartY = centerY;
+        const touch2StartX = centerX + distance;
+        const touch2StartY = centerY;
+
+        let touch1EndX, touch1EndY, touch2EndX, touch2EndY;
+
+        if (direction === 'in') {
+            // Pinch in - fingers move closer
+            touch1EndX = centerX - distance / 2;
+            touch1EndY = centerY;
+            touch2EndX = centerX + distance / 2;
+            touch2EndY = centerY;
+        } else {
+            // Pinch out - fingers move apart
+            touch1EndX = centerX - distance * 1.5;
+            touch1EndY = centerY;
+            touch2EndX = centerX + distance * 1.5;
+            touch2EndY = centerY;
+        }
+
+        // Create touch start event with two touches
+        const touchStartEvent = new TouchEvent('touchstart', {
+            bubbles: true,
+            cancelable: true,
+            touches: [
+                new Touch({
+                    identifier: 0,
+                    target: element,
+                    clientX: touch1StartX,
+                    clientY: touch1StartY,
+                    screenX: touch1StartX,
+                    screenY: touch1StartY,
+                    pageX: touch1StartX,
+                    pageY: touch1StartY,
+                    radiusX: 10,
+                    radiusY: 10,
+                    rotationAngle: 0,
+                    force: 1.0
+                }),
+                new Touch({
+                    identifier: 1,
+                    target: element,
+                    clientX: touch2StartX,
+                    clientY: touch2StartY,
+                    screenX: touch2StartX,
+                    screenY: touch2StartY,
+                    pageX: touch2StartX,
+                    pageY: touch2StartY,
+                    radiusX: 10,
+                    radiusY: 10,
+                    rotationAngle: 0,
+                    force: 1.0
+                })
+            ]
+        });
+
+        element.dispatchEvent(touchStartEvent);
+
+        // Simulate touch move events
+        for (let i = 1; i <= steps; i++) {
+            const progress = i / steps;
+            const touch1CurrentX = touch1StartX + (touch1EndX - touch1StartX) * progress;
+            const touch1CurrentY = touch1StartY + (touch1EndY - touch1StartY) * progress;
+            const touch2CurrentX = touch2StartX + (touch2EndX - touch2StartX) * progress;
+            const touch2CurrentY = touch2StartY + (touch2EndY - touch2StartY) * progress;
+
+            const touchMoveEvent = new TouchEvent('touchmove', {
+                bubbles: true,
+                cancelable: true,
+                touches: [
+                    new Touch({
+                        identifier: 0,
+                        target: element,
+                        clientX: touch1CurrentX,
+                        clientY: touch1CurrentY,
+                        screenX: touch1CurrentX,
+                        screenY: touch1CurrentY,
+                        pageX: touch1CurrentX,
+                        pageY: touch1CurrentY,
+                        radiusX: 10,
+                        radiusY: 10,
+                        rotationAngle: 0,
+                        force: 1.0
+                    }),
+                    new Touch({
+                        identifier: 1,
+                        target: element,
+                        clientX: touch2CurrentX,
+                        clientY: touch2CurrentY,
+                        screenX: touch2CurrentX,
+                        screenY: touch2CurrentY,
+                        pageX: touch2CurrentX,
+                        pageY: touch2CurrentY,
+                        radiusX: 10,
+                        radiusY: 10,
+                        rotationAngle: 0,
+                        force: 1.0
+                    })
+                ]
+            });
+
+            element.dispatchEvent(touchMoveEvent);
+            await this.delay(duration / steps);
+        }
+
+        // Create touch end event
+        const touchEndEvent = new TouchEvent('touchend', {
+            bubbles: true,
+            cancelable: true,
+            touches: [],
+            changedTouches: [
+                new Touch({
+                    identifier: 0,
+                    target: element,
+                    clientX: touch1EndX,
+                    clientY: touch1EndY,
+                    screenX: touch1EndX,
+                    screenY: touch1EndY,
+                    pageX: touch1EndX,
+                    pageY: touch1EndY,
+                    radiusX: 10,
+                    radiusY: 10,
+                    rotationAngle: 0,
+                    force: 0.0
+                }),
+                new Touch({
+                    identifier: 1,
+                    target: element,
+                    clientX: touch2EndX,
+                    clientY: touch2EndY,
+                    screenX: touch2EndX,
+                    screenY: touch2EndY,
+                    pageX: touch2EndX,
+                    pageY: touch2EndY,
+                    radiusX: 10,
+                    radiusY: 10,
+                    rotationAngle: 0,
+                    force: 0.0
+                })
+            ]
+        });
+
+        element.dispatchEvent(touchEndEvent);
+        return true;
+    }
+
+    /**
+     * Simulate long press gesture
+     */
+    async simulateLongPress(element, x, y, options = {}) {
+        const duration = options.duration || 1000; // 1 second long press
+
+        // Create touch start event
+        const touchStartEvent = new TouchEvent('touchstart', {
+            bubbles: true,
+            cancelable: true,
+            touches: [new Touch({
+                identifier: 0,
+                target: element,
+                clientX: x,
+                clientY: y,
+                screenX: x,
+                screenY: y,
+                pageX: x,
+                pageY: y,
+                radiusX: 10,
+                radiusY: 10,
+                rotationAngle: 0,
+                force: 1.0
+            })]
+        });
+
+        element.dispatchEvent(touchStartEvent);
+
+        // Hold for duration
+        await this.delay(duration);
+
+        // Create touch end event
+        const touchEndEvent = new TouchEvent('touchend', {
+            bubbles: true,
+            cancelable: true,
+            touches: [],
+            changedTouches: [new Touch({
+                identifier: 0,
+                target: element,
+                clientX: x,
+                clientY: y,
+                screenX: x,
+                screenY: y,
+                pageX: x,
+                pageY: y,
+                radiusX: 10,
+                radiusY: 10,
+                rotationAngle: 0,
+                force: 0.0
+            })]
+        });
+
+        element.dispatchEvent(touchEndEvent);
+
+        // Trigger context menu event for long press
+        const contextMenuEvent = new MouseEvent('contextmenu', {
+            view: window,
+            bubbles: true,
+            cancelable: true,
+            clientX: x,
+            clientY: y
+        });
+
+        element.dispatchEvent(contextMenuEvent);
+        return true;
+    }
+
+    /**
+     * Get mobile-specific behavior patterns
+     */
+    getMobileBehaviorPatterns() {
+        return {
+            touch: {
+                tapDuration: { min: 50, max: 150 },
+                longPressDuration: { min: 800, max: 1200 },
+                swipeDistance: { min: 80, max: 200 },
+                pinchDistance: { min: 40, max: 100 }
+            },
+            gestures: {
+                swipeProbability: 0.3,
+                pinchProbability: 0.1,
+                longPressProbability: 0.2,
+                doubleTapProbability: 0.15
+            },
+            navigation: {
+                preferSwipe: true,
+                preferTap: true,
+                avoidHover: true,
+                useGestures: true
+            }
+        };
     }
 }
 

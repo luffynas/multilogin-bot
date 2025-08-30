@@ -1,28 +1,68 @@
 /**
  * Personality Engine - Generates and manages user personalities
  * Implements personality types: Explorer, Researcher, Casual, Professional
+ * Each personality type has unique behavior patterns that influence automation
  */
 
 class PersonalityEngine {
     constructor() {
+        // Define available personality types for user behavior simulation
         this.personalityTypes = {
-            EXPLORER: 'explorer',
-            RESEARCHER: 'researcher', 
-            CASUAL: 'casual',
-            PROFESSIONAL: 'professional'
+            EXPLORER: 'explorer',      // Curious, fast-paced, broad navigation
+            RESEARCHER: 'researcher',  // Analytical, thorough, deep reading
+            CASUAL: 'casual',          // Quick, surface-level, minimal engagement
+            PROFESSIONAL: 'professional' // Systematic, efficient, goal-oriented
+        };
+        
+        // Constants for behavior configuration
+        this.BEHAVIOR_CONSTANTS = {
+            // Dwell time ranges (in seconds)
+            DWELL_TIME: {
+                EXPLORER: { min: 30, max: 120 },
+                RESEARCHER: { min: 120, max: 300 },
+                CASUAL: { min: 15, max: 60 },
+                PROFESSIONAL: { min: 60, max: 180 }
+            },
+            
+            // Click probability ranges
+            CLICK_PROBABILITY: {
+                EXPLORER: 0.12,
+                RESEARCHER: 0.15,
+                CASUAL: 0.08,
+                PROFESSIONAL: 0.10
+            },
+            
+            // Hover probability ranges
+            HOVER_PROBABILITY: {
+                EXPLORER: 0.8,
+                RESEARCHER: 0.6,
+                CASUAL: 0.4,
+                PROFESSIONAL: 0.5
+            },
+            
+            // Session ID configuration
+            SESSION_ID: {
+                MAX_LENGTH: 100,
+                PREFIX: 'session_',
+                FALLBACK_PREFIX: 'session_fallback_'
+            }
         };
         
         this.currentPersonality = null;
+        
+        // Distribution weights for personality generation (balanced 25% each)
+        // Higher weights = more likely to be selected during random generation
         this.personalityWeights = {
-            explorer: 0.25,    // Balanced distribution
-            researcher: 0.25,  // Balanced distribution
-            casual: 0.25,      // Balanced distribution
-            professional: 0.25 // Balanced distribution
+            explorer: 0.25,    // 25% chance - Balanced distribution
+            researcher: 0.25,  // 25% chance - Balanced distribution
+            casual: 0.25,      // 25% chance - Balanced distribution
+            professional: 0.25 // 25% chance - Balanced distribution
         };
     }
 
     /**
      * Generate user personality based on weights
+     * Uses weighted random selection to choose personality type
      */
     generateUserPersonality() {
         const random = Math.random();
@@ -36,80 +76,88 @@ class PersonalityEngine {
             }
         }
         
-        // Fallback to explorer
+        // Fallback to explorer if no personality selected
         this.currentPersonality = this.createPersonality('explorer');
         return this.currentPersonality;
     }
 
     /**
-     * Create detailed personality object
+     * Create detailed personality object with behavior configurations
+     * Each personality type has specific parameters that influence automation behavior
      */
     createPersonality(type) {
+        // Validate personality type to prevent injection attacks
+        const validatedType = this.validatePersonalityType(type);
+        
         const basePersonality = {
-            type: type,
-            timestamp: Date.now(),
-            sessionId: this.generateSessionId()
+            type: validatedType,                    // Personality type identifier
+            timestamp: Date.now(),         // When personality was created
+            sessionId: this.generateSessionId() // Unique session identifier
         };
 
-        switch (type) {
+        switch (validatedType) {
             case 'explorer':
                 return {
                     ...basePersonality,
-                    navigationStyle: 'high',
-                    readingSpeed: 'fast',
-                    attentionSpan: 'medium',
-                    engagementLevel: 'high',
-                    dwellTime: { min: 30, max: 120 },
-                    scrollBehavior: 'continuous',
-                    clickProbability: 0.12, // Reduced to 12%
-                    hoverProbability: 0.8,
-                    tabSwitching: 'frequent',
-                    searchBehavior: 'broad'
+                    // Navigation behavior - High engagement with multiple pages
+                    navigationStyle: 'high',           // Visits many pages, explores broadly
+                    readingSpeed: 'fast',              // Quick reading, skims content
+                    attentionSpan: 'medium',           // Moderate focus duration
+                    engagementLevel: 'high',           // High interaction with content
+                    dwellTime: this.BEHAVIOR_CONSTANTS.DWELL_TIME.EXPLORER,  // Use constants
+                    scrollBehavior: 'continuous',      // Smooth, uninterrupted scrolling
+                    clickProbability: this.BEHAVIOR_CONSTANTS.CLICK_PROBABILITY.EXPLORER,  // Use constants
+                    hoverProbability: this.BEHAVIOR_CONSTANTS.HOVER_PROBABILITY.EXPLORER,  // Use constants
+                    tabSwitching: 'frequent',          // Often switches between tabs
+                    searchBehavior: 'broad'            // Searches for general topics
                 };
 
             case 'researcher':
                 return {
                     ...basePersonality,
-                    navigationStyle: 'deep',
-                    readingSpeed: 'slow',
-                    attentionSpan: 'long',
-                    engagementLevel: 'very_high',
-                    dwellTime: { min: 120, max: 300 },
-                    scrollBehavior: 'analytical',
-                    clickProbability: 0.15, // Reduced to 15%
-                    hoverProbability: 0.6,
-                    tabSwitching: 'rare',
-                    searchBehavior: 'specific'
+                    // Navigation behavior - Deep analysis of specific content
+                    navigationStyle: 'deep',            // Focuses on specific topics deeply
+                    readingSpeed: 'slow',               // Thorough reading, analyzes content
+                    attentionSpan: 'long',              // Extended focus duration
+                    engagementLevel: 'very_high',       // Very high interaction with content
+                    dwellTime: { min: 120, max: 300 },  // 2-5 minutes per page (longer reading)
+                    scrollBehavior: 'analytical',       // Pauses to analyze content while scrolling
+                    clickProbability: 0.15,             // 15% chance to click ads (highest among personalities)
+                    hoverProbability: 0.6,              // 60% chance to hover over elements
+                    tabSwitching: 'rare',               // Rarely switches tabs, focuses on current content
+                    searchBehavior: 'specific'          // Searches for specific, detailed information
                 };
 
             case 'casual':
                 return {
                     ...basePersonality,
-                    navigationStyle: 'low',
-                    readingSpeed: 'medium',
-                    attentionSpan: 'short',
-                    engagementLevel: 'low',
-                    dwellTime: { min: 15, max: 60 },
-                    scrollBehavior: 'quick',
-                    clickProbability: 0.08, // Reduced to 8%
-                    hoverProbability: 0.4,
-                    tabSwitching: 'moderate',
-                    searchBehavior: 'general'
+                    // Navigation behavior - Quick browsing with minimal engagement
+                    navigationStyle: 'low',             // Visits few pages, minimal exploration
+                    readingSpeed: 'medium',             // Moderate reading speed
+                    attentionSpan: 'short',             // Brief focus duration
+                    engagementLevel: 'low',             // Low interaction with content
+                    dwellTime: { min: 15, max: 60 },    // 15-60 seconds per page (quick browsing)
+                    scrollBehavior: 'quick',            // Fast scrolling, minimal pauses
+                    clickProbability: 0.08,             // 8% chance to click ads (lowest among personalities)
+                    hoverProbability: 0.4,              // 40% chance to hover over elements
+                    tabSwitching: 'moderate',           // Moderate tab switching
+                    searchBehavior: 'general'           // Searches for general, popular topics
                 };
 
             case 'professional':
                 return {
                     ...basePersonality,
-                    navigationStyle: 'systematic',
-                    readingSpeed: 'medium',
-                    attentionSpan: 'long',
-                    engagementLevel: 'high',
-                    dwellTime: { min: 60, max: 180 },
-                    scrollBehavior: 'methodical',
-                    clickProbability: 0.10, // Reduced to 10%
-                    hoverProbability: 0.5,
-                    tabSwitching: 'strategic',
-                    searchBehavior: 'targeted'
+                    // Navigation behavior - Systematic, goal-oriented browsing
+                    navigationStyle: 'systematic',      // Organized, methodical navigation
+                    readingSpeed: 'medium',             // Balanced reading speed
+                    attentionSpan: 'long',              // Extended focus duration
+                    engagementLevel: 'high',            // High interaction with relevant content
+                    dwellTime: { min: 60, max: 180 },   // 1-3 minutes per page (focused reading)
+                    scrollBehavior: 'methodical',       // Systematic scrolling with purpose
+                    clickProbability: 0.10,             // 10% chance to click ads (moderate)
+                    hoverProbability: 0.5,              // 50% chance to hover over elements
+                    tabSwitching: 'strategic',          // Strategic tab switching for efficiency
+                    searchBehavior: 'targeted'          // Searches for specific, professional topics
                 };
 
             default:
@@ -118,7 +166,8 @@ class PersonalityEngine {
     }
 
     /**
-     * Adjust behavior based on personality
+     * Adjust behavior based on personality characteristics
+     * Modifies base values according to personality traits
      */
     adjustBehaviorByPersonality(behaviorType, baseValue) {
         if (!this.currentPersonality) {
@@ -126,34 +175,40 @@ class PersonalityEngine {
         }
 
         const personality = this.currentPersonality;
-        let adjustment = 1.0;
+        let adjustment = 1.0; // Default multiplier (no change)
 
         switch (behaviorType) {
             case 'click_delay':
-                adjustment = personality.readingSpeed === 'slow' ? 1.5 : 
-                           personality.readingSpeed === 'fast' ? 0.7 : 1.0;
+                // Adjust click delay based on reading speed
+                adjustment = personality.readingSpeed === 'slow' ? 1.5 :    // 50% slower for slow readers
+                           personality.readingSpeed === 'fast' ? 0.7 : 1.0; // 30% faster for fast readers
                 break;
 
             case 'scroll_speed':
-                adjustment = personality.scrollBehavior === 'quick' ? 0.5 :
-                           personality.scrollBehavior === 'analytical' ? 2.0 : 1.0;
+                // Adjust scroll speed based on scroll behavior pattern
+                adjustment = personality.scrollBehavior === 'quick' ? 0.5 :        // 50% faster for quick scrollers
+                           personality.scrollBehavior === 'analytical' ? 2.0 : 1.0; // 100% slower for analytical scrollers
                 break;
 
             case 'dwell_time':
-                adjustment = personality.dwellTime.max / 120; // Normalize to 120s
+                // Normalize dwell time to 120 seconds baseline
+                adjustment = personality.dwellTime.max / 120;
                 break;
 
             case 'click_probability':
+                // Use personality-specific click probability
                 adjustment = personality.clickProbability;
                 break;
 
             case 'hover_probability':
+                // Use personality-specific hover probability
                 adjustment = personality.hoverProbability;
                 break;
 
             case 'attention_span':
-                adjustment = personality.attentionSpan === 'long' ? 2.0 :
-                           personality.attentionSpan === 'short' ? 0.5 : 1.0;
+                // Adjust based on attention span characteristics
+                adjustment = personality.attentionSpan === 'long' ? 2.0 :   // 100% longer for long attention spans
+                           personality.attentionSpan === 'short' ? 0.5 : 1.0; // 50% shorter for short attention spans
                 break;
         }
 
@@ -161,7 +216,8 @@ class PersonalityEngine {
     }
 
     /**
-     * Get personality-specific behavior patterns
+     * Get personality-specific behavior patterns for automation
+     * Returns detailed patterns for mouse, scrolling, clicking, reading, and navigation
      */
     getBehaviorPatterns() {
         if (!this.currentPersonality) {
@@ -169,81 +225,136 @@ class PersonalityEngine {
         }
 
         return {
-            mouseMovement: this.getMouseMovementPattern(),
-            scrolling: this.getScrollingPattern(),
-            clicking: this.getClickingPattern(),
-            reading: this.getReadingPattern(),
-            navigation: this.getNavigationPattern()
+            mouseMovement: this.getMouseMovementPattern(),    // Mouse movement characteristics
+            scrolling: this.getScrollingPattern(),            // Scrolling behavior patterns
+            clicking: this.getClickingPattern(),              // Clicking behavior patterns
+            reading: this.getReadingPattern(),                // Reading behavior patterns
+            navigation: this.getNavigationPattern()           // Navigation behavior patterns
         };
     }
 
+    /**
+     * Get mouse movement pattern based on personality
+     * Influences how mouse moves across the page
+     */
     getMouseMovementPattern() {
         const personality = this.currentPersonality;
         
         return {
-            speed: personality.type === 'casual' ? 'fast' : 
-                   personality.type === 'researcher' ? 'slow' : 'medium',
-            precision: personality.type === 'professional' ? 'high' : 'medium',
-            hoverTime: personality.hoverProbability > 0.7 ? 'long' : 'short',
-            pathType: personality.type === 'explorer' ? 'curved' : 'direct'
+            speed: personality.type === 'casual' ? 'fast' :           // Fast movement for casual users
+                   personality.type === 'researcher' ? 'slow' : 'medium', // Slow, deliberate for researchers
+            precision: personality.type === 'professional' ? 'high' : 'medium', // High precision for professionals
+            hoverTime: personality.hoverProbability > 0.7 ? 'long' : 'short', // Long hover for high probability
+            pathType: personality.type === 'explorer' ? 'curved' : 'direct'    // Curved paths for explorers
         };
     }
 
+    /**
+     * Get scrolling pattern based on personality
+     * Influences how user scrolls through content
+     */
     getScrollingPattern() {
         const personality = this.currentPersonality;
         
         return {
-            speed: personality.scrollBehavior === 'quick' ? 'fast' :
-                   personality.scrollBehavior === 'analytical' ? 'slow' : 'medium',
-            pauseFrequency: personality.attentionSpan === 'long' ? 'high' : 'low',
-            scrollDistance: personality.type === 'explorer' ? 'large' : 'medium',
-            direction: 'mixed'
+            speed: personality.scrollBehavior === 'quick' ? 'fast' :           // Fast scrolling for quick behavior
+                   personality.scrollBehavior === 'analytical' ? 'slow' : 'medium', // Slow for analytical behavior
+            pauseFrequency: personality.attentionSpan === 'long' ? 'high' : 'low', // Frequent pauses for long attention
+            scrollDistance: personality.type === 'explorer' ? 'large' : 'medium',   // Large scrolls for explorers
+            direction: 'mixed' // Mixed scroll directions for realism
         };
     }
 
+    /**
+     * Get clicking pattern based on personality
+     * Influences how user clicks on elements
+     */
     getClickingPattern() {
         const personality = this.currentPersonality;
         
         return {
-            frequency: personality.clickProbability > 0.7 ? 'high' : 'low',
-            precision: personality.type === 'professional' ? 'high' : 'medium',
-            doubleClickProbability: personality.type === 'casual' ? 0.1 : 0.05,
-            clickDelay: personality.readingSpeed === 'slow' ? 'long' : 'short'
+            frequency: personality.clickProbability > 0.7 ? 'high' : 'low',    // High frequency for high probability
+            precision: personality.type === 'professional' ? 'high' : 'medium', // High precision for professionals
+            doubleClickProbability: personality.type === 'casual' ? 0.1 : 0.05, // Higher double-click for casual users
+            clickDelay: personality.readingSpeed === 'slow' ? 'long' : 'short'   // Longer delays for slow readers
         };
     }
 
+    /**
+     * Get reading pattern based on personality
+     * Influences how user reads and interacts with content
+     */
     getReadingPattern() {
         const personality = this.currentPersonality;
         
         return {
-            speed: personality.readingSpeed,
-            comprehension: personality.type === 'researcher' ? 'high' : 'medium',
-            selectionProbability: personality.type === 'researcher' ? 0.8 : 0.3,
-            reReadingProbability: personality.attentionSpan === 'long' ? 0.6 : 0.2
+            speed: personality.readingSpeed,                                    // Reading speed characteristic
+            comprehension: personality.type === 'researcher' ? 'high' : 'medium', // High comprehension for researchers
+            selectionProbability: personality.type === 'researcher' ? 0.8 : 0.3,  // High text selection for researchers
+            reReadingProbability: personality.attentionSpan === 'long' ? 0.6 : 0.2 // High re-reading for long attention spans
         };
     }
 
+    /**
+     * Get navigation pattern based on personality
+     * Influences how user navigates between pages and uses browser features
+     */
     getNavigationPattern() {
         const personality = this.currentPersonality;
         
         return {
-            style: personality.navigationStyle,
-            tabUsage: personality.tabSwitching,
-            backForwardUsage: personality.type === 'explorer' ? 'high' : 'low',
-            bookmarkUsage: personality.type === 'professional' ? 'high' : 'low',
-            searchUsage: personality.searchBehavior
+            style: personality.navigationStyle,                                // Navigation style characteristic
+            tabUsage: personality.tabSwitching,                               // Tab switching behavior
+            backForwardUsage: personality.type === 'explorer' ? 'high' : 'low', // High back/forward for explorers
+            bookmarkUsage: personality.type === 'professional' ? 'high' : 'low', // High bookmark usage for professionals
+            searchUsage: personality.searchBehavior                           // Search behavior pattern
         };
     }
 
     /**
-     * Generate session ID
+     * Generate unique session ID for tracking with security enhancements
+     * Combines timestamp with random string for uniqueness and sanitizes output
      */
     generateSessionId() {
-        return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        try {
+            const timestamp = Date.now().toString();
+            const random = Math.random().toString(36).substr(2, 9);
+            const sessionId = `${this.BEHAVIOR_CONSTANTS.SESSION_ID.PREFIX}${timestamp}_${random}`;
+            
+            // Sanitize session ID to prevent injection attacks
+            return this.sanitizeString(sessionId);
+        } catch (error) {
+            console.warn('Error generating session ID:', error.message);
+            // Fallback to simple timestamp-based ID
+            return `${this.BEHAVIOR_CONSTANTS.SESSION_ID.FALLBACK_PREFIX}${Date.now()}`;
+        }
     }
 
     /**
-     * Get current personality
+     * Sanitize string to prevent XSS and injection attacks
+     */
+    sanitizeString(input) {
+        if (typeof input !== 'string') {
+            return '';
+        }
+        
+        // Remove potentially dangerous characters
+        return input
+            .replace(/[<>\"'&]/g, '') // Remove HTML special characters
+            .replace(/[^a-zA-Z0-9_-]/g, '') // Only allow alphanumeric, underscore, and dash
+            .substring(0, this.BEHAVIOR_CONSTANTS.SESSION_ID.MAX_LENGTH); // Limit length to prevent buffer overflow
+    }
+
+    /**
+     * Validate personality type to prevent injection attacks
+     */
+    validatePersonalityType(type) {
+        const validTypes = Object.values(this.personalityTypes);
+        return validTypes.includes(type) ? type : this.personalityTypes.EXPLORER;
+    }
+
+    /**
+     * Get current personality or generate new one if none exists
      */
     getCurrentPersonality() {
         if (!this.currentPersonality) {
@@ -253,33 +364,82 @@ class PersonalityEngine {
     }
 
     /**
-     * Update personality weights
+     * Update personality weights for different distribution
+     * Allows dynamic adjustment of personality selection probabilities
      */
     updatePersonalityWeights(weights) {
         this.personalityWeights = { ...this.personalityWeights, ...weights };
     }
 
     /**
-     * Save personality to stealth storage
+     * Save personality to stealth storage for persistence
+     * Uses stealth storage to avoid detection while maintaining session continuity
      */
     async savePersonality() {
         if (this.currentPersonality) {
-            // Use stealth storage instead of chrome storage
-            const stealthStorage = new (window._stealth_storage || StealthStorage)();
-            stealthStorage.set('currentPersonality', this.currentPersonality);
+            // Use stealth storage instead of chrome storage for enhanced security
+            try {
+                const stealthStorage = new (window._stealth_storage || (() => {
+                    // Fallback storage if stealth storage is not available
+                    return {
+                        set: (key, value) => {
+                            try {
+                                localStorage.setItem(key, JSON.stringify(value));
+                            } catch (e) {
+                                // Silent fallback - no error logging for stealth
+                            }
+                        },
+                        get: (key) => {
+                            try {
+                                const item = localStorage.getItem(key);
+                                return item ? JSON.parse(item) : null;
+                            } catch (e) {
+                                return null;
+                            }
+                        }
+                    };
+                })());
+                stealthStorage.set('currentPersonality', this.currentPersonality);
+            } catch (error) {
+                // Silent fallback - no error logging for stealth
+            }
         }
     }
 
     /**
-     * Load personality from stealth storage
+     * Load personality from stealth storage for session continuity
+     * Restores previous personality state if available
      */
     async loadPersonality() {
-        // Use stealth storage instead of chrome storage
-        const stealthStorage = new (window._stealth_storage || StealthStorage)();
-        const currentPersonality = stealthStorage.get('currentPersonality');
-        if (currentPersonality) {
-            this.currentPersonality = currentPersonality;
-            return this.currentPersonality;
+        // Use stealth storage instead of chrome storage for enhanced security
+        try {
+            const stealthStorage = new (window._stealth_storage || (() => {
+                // Fallback storage if stealth storage is not available
+                return {
+                    set: (key, value) => {
+                        try {
+                            localStorage.setItem(key, JSON.stringify(value));
+                        } catch (e) {
+                            // Silent fallback - no error logging for stealth
+                        }
+                    },
+                    get: (key) => {
+                        try {
+                            const item = localStorage.getItem(key);
+                            return item ? JSON.parse(item) : null;
+                        } catch (e) {
+                            return null;
+                        }
+                    }
+                };
+            })());
+            const currentPersonality = stealthStorage.get('currentPersonality');
+            if (currentPersonality) {
+                this.currentPersonality = currentPersonality;
+                return this.currentPersonality;
+            }
+        } catch (error) {
+            // Silent fallback - no error logging for stealth
         }
         return null;
     }

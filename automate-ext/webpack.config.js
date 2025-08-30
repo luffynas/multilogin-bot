@@ -24,8 +24,7 @@ module.exports = {
         'lib/ml-behavior-engine': './lib/ml-behavior-engine.js',
         'lib/advanced-mouse-physics': './lib/advanced-mouse-physics.js',
         'lib/network-traffic-simulator': './lib/network-traffic-simulator.js',
-        'lib/advanced-bot-evasion': './lib/advanced-bot-evasion.js',
-        'lib/multilogin-optimizer': './lib/multilogin-optimizer.js'
+            'lib/advanced-bot-evasion': './lib/advanced-bot-evasion.js'
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -88,7 +87,7 @@ module.exports = {
                             'KeyboardSimulator', 'ReadingSimulator', 'NavigationSimulator',
                             'SessionManager', 'StealthMonitor', 'MLBehaviorEngine',
                             'AdvancedMousePhysics', 'NetworkTrafficSimulator',
-                            'AdvancedBotEvasion', 'MultiloginOptimizer'
+                            'AdvancedBotEvasion'
                         ]
                     },
                     format: {
@@ -128,6 +127,9 @@ module.exports = {
                 
                 // Copy icons
                 { from: 'icons', to: 'icons' },
+                
+                // Copy lib folder (all JavaScript files)
+                { from: 'lib', to: 'lib' },
                 
                 // Copy other assets
                 { from: 'data', to: 'data', noErrorOnMissing: true },

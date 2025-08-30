@@ -6,8 +6,12 @@ class NavigationSimulator {
     constructor(behaviorSimulator) {
         this.behaviorSimulator = behaviorSimulator;
         this.isNavigating = false;
+        this.navigationLock = false; // Thread safety lock
         this.navigationHistory = [];
         this.currentPage = null;
+        
+        // Memory management for navigation history
+        this.maxHistorySize = 100; // Limit navigation history to prevent memory leaks
         
         this.navigationConfig = {
             intelligentLinks: true,
@@ -28,47 +32,121 @@ class NavigationSimulator {
             timestamp: Date.now()
         };
         
-        this.navigationHistory.push(this.currentPage);
+        this.addToHistory(this.currentPage);
     }
 
     /**
-     * Simulate intelligent navigation
+     * Add page to navigation history with size limit
+     */
+    addToHistory(page) {
+        this.navigationHistory.push(page);
+        
+        // Limit history size to prevent memory leaks
+        if (this.navigationHistory.length > this.maxHistorySize) {
+            this.navigationHistory = this.navigationHistory.slice(-this.maxHistorySize);
+        }
+    }
+
+    /**
+     * Simulate intelligent navigation with thread safety and cooldown
      */
     async simulateIntelligentNavigation(options = {}) {
-        if (this.isNavigating) return;
+        // Thread safety: prevent concurrent navigation
+        if (this.navigationLock || this.isNavigating) {
+            console.debug('Navigation already in progress, skipping...');
+            return false;
+        }
         
+        // Acquire lock
+        this.navigationLock = true;
         this.isNavigating = true;
+        
+        try {
+            // Add cooldown to prevent over-navigation (reduced for testing)
+            const now = Date.now();
+            const lastNavigation = this.lastNavigationTime || 0;
+            const cooldownPeriod = 60000; // Reduced from 120 to 60 seconds (1 minute) cooldown for testing
+            
+            if (now - lastNavigation < cooldownPeriod) {
+                console.debug(`Navigation in cooldown, skipping... (${Math.round((cooldownPeriod - (now - lastNavigation)) / 1000)}s remaining)`);
+                return false;
+            }
+            
+            // Reduce navigation probability based on page time
+            const pageTime = now - (this.currentPage?.timestamp || now);
+            const navigationProbability = this.calculateNavigationProbability(pageTime);
+            
+            if (Math.random() > navigationProbability) {
+                console.debug('Navigation skipped due to low probability');
+                return false;
+            }
         
         const personality = this.behaviorSimulator?.currentPersonality;
         const navigationType = this.chooseNavigationType(personality, options);
+            
+            console.log(`Navigating to: ${navigationType}`);
+            
+            let navigationSuccess = false;
         
         switch (navigationType) {
             case 'related_content':
-                await this.navigateRelatedContent();
+                    navigationSuccess = await this.navigateRelatedContent();
                 break;
             case 'category':
-                await this.navigateToCategory();
+                    navigationSuccess = await this.navigateToCategory();
                 break;
             case 'previous_next':
-                await this.navigatePreviousNext();
+                    navigationSuccess = await this.navigatePreviousNext();
                 break;
             case 'random':
-                await this.navigateRandomPage();
+                    navigationSuccess = await this.navigateRandomPage();
                 break;
             case 'search':
-                await this.navigateSearchResults();
+                    navigationSuccess = await this.navigateSearchResults();
                 break;
             case 'back':
-                await this.navigateBack();
+                    navigationSuccess = await this.navigateBack();
                 break;
             case 'forward':
-                await this.navigateForward();
+                    navigationSuccess = await this.navigateForward();
                 break;
             default:
-                await this.navigateRelatedContent();
+                    navigationSuccess = await this.navigateRelatedContent();
+            }
+            
+            // Update last navigation time only if successful
+            if (navigationSuccess) {
+                this.lastNavigationTime = now;
+            }
+            
+            return navigationSuccess;
+            
+        } catch (error) {
+            // Silent error handling for stealth
+            console.warn('Navigation error:', error.message);
+            return false;
+        } finally {
+            // Always release lock
+            this.navigationLock = false;
+        this.isNavigating = false;
+        }
+    }
+    
+    /**
+     * Calculate navigation probability based on page time
+     */
+    calculateNavigationProbability(pageTime) {
+        // Increased probability for testing
+        const baseProbability = 0.05; // Increased from 2% to 5% base probability
+        const maxProbability = 0.25;  // Increased from 8% to 25% max probability
+        const timeThreshold = 180000; // Reduced from 5 to 3 minutes
+        
+        if (pageTime < timeThreshold) {
+            return baseProbability;
         }
         
-        this.isNavigating = false;
+        const timeProgress = Math.min((pageTime - timeThreshold) / timeThreshold, 1);
+        return baseProbability + (maxProbability - baseProbability) * timeProgress;
     }
 
     /**
@@ -107,50 +185,51 @@ class NavigationSimulator {
     }
 
     /**
-     * Get navigation weights based on personality
+     * Get navigation weights based on personality with reduced frequency
      */
     getNavigationWeights(personality) {
+        // Drastically reduced base weights to prevent over-navigation
         const baseWeights = {
-            related_content: 0.3,
-            category: 0.2,
-            previous_next: 0.2,
-            random: 0.1,
-            search: 0.1,
-            back: 0.05,
-            forward: 0.05
+            related_content: 0.05,  // Reduced from 0.15 to 0.05
+            category: 0.03,         // Reduced from 0.1 to 0.03
+            previous_next: 0.03,    // Reduced from 0.1 to 0.03
+            random: 0.02,           // Reduced from 0.05 to 0.02
+            search: 0.02,           // Reduced from 0.05 to 0.02
+            back: 0.01,             // Reduced from 0.02 to 0.01
+            forward: 0.01           // Reduced from 0.02 to 0.01
         };
         
         if (!personality) return baseWeights;
         
-        // Adjust weights based on personality type
+        // Adjust weights based on personality type with reduced frequency
         switch (personality.type) {
             case 'explorer':
                 return {
                     ...baseWeights,
-                    random: 0.3,
-                    related_content: 0.4,
-                    category: 0.2
+                    random: 0.05,         // Reduced from 0.15 to 0.05
+                    related_content: 0.08, // Reduced from 0.2 to 0.08
+                    category: 0.05        // Reduced from 0.1 to 0.05
                 };
             case 'researcher':
                 return {
                     ...baseWeights,
-                    related_content: 0.5,
-                    category: 0.3,
-                    search: 0.2
+                    related_content: 0.08, // Reduced from 0.25 to 0.08
+                    category: 0.05,        // Reduced from 0.15 to 0.05
+                    search: 0.03           // Reduced from 0.1 to 0.03
                 };
             case 'casual':
                 return {
                     ...baseWeights,
-                    previous_next: 0.4,
-                    back: 0.2,
-                    random: 0.2
+                    previous_next: 0.05,   // Reduced from 0.2 to 0.05
+                    back: 0.03,            // Reduced from 0.1 to 0.03
+                    random: 0.03           // Reduced from 0.1 to 0.03
                 };
             case 'professional':
                 return {
                     ...baseWeights,
-                    related_content: 0.4,
-                    category: 0.3,
-                    search: 0.2
+                    related_content: 0.08, // Reduced from 0.2 to 0.08
+                    category: 0.05,        // Reduced from 0.15 to 0.05
+                    search: 0.03           // Reduced from 0.1 to 0.03
                 };
             default:
                 return baseWeights;
@@ -161,6 +240,7 @@ class NavigationSimulator {
      * Navigate to related content
      */
     async navigateRelatedContent() {
+        try {
         const links = this.findRelatedLinks();
         
         if (links.length > 0) {
@@ -169,6 +249,10 @@ class NavigationSimulator {
         } else {
             // Fallback to category navigation
             await this.navigateToCategory();
+            }
+        } catch (error) {
+            // Silent error handling for stealth
+            console.warn('Related content navigation error:', error.message);
         }
     }
 
@@ -212,17 +296,47 @@ class NavigationSimulator {
     }
 
     /**
+     * Find ANY valid link on the page as fallback
+     */
+    findAnyValidLink() {
+        console.log('🧭 Searching for ANY valid link on page...');
+        const allLinks = document.querySelectorAll('a[href]');
+        console.log(`🧭 Total links found: ${allLinks.length}`);
+        
+        const validLinks = [];
+        allLinks.forEach(link => {
+            if (this.isValidLink(link)) {
+                console.log(`🧭 Valid link found: ${link.href} (text: "${link.textContent.trim()}")`);
+                validLinks.push(link);
+            }
+        });
+        
+        console.log(`🧭 Total valid links: ${validLinks.length}`);
+        return validLinks;
+    }
+
+    /**
      * Navigate to category page
      */
     async navigateToCategory() {
+        try {
+            console.log('🧭 Searching for category links...');
         const categoryLinks = this.findCategoryLinks();
+            console.log(`🧭 Found ${categoryLinks.length} category links`);
         
         if (categoryLinks.length > 0) {
             const selectedLink = this.selectBestLink(categoryLinks);
-            await this.clickLink(selectedLink);
+                console.log(`🧭 Selected category link: ${selectedLink.href}`);
+                const success = await this.clickLink(selectedLink);
+                console.log(`🧭 Category link click ${success ? 'successful' : 'failed'}`);
         } else {
+                console.log('🧭 No category links found, trying random navigation...');
             // Fallback to random navigation
             await this.navigateRandomPage();
+            }
+        } catch (error) {
+            // Silent error handling for stealth
+            console.warn('🧭 Category navigation error:', error.message);
         }
     }
 
@@ -279,14 +393,44 @@ class NavigationSimulator {
      * Navigate to previous/next page
      */
     async navigatePreviousNext() {
+        try {
         const prevNextLinks = this.findPreviousNextLinks();
         
         if (prevNextLinks.length > 0) {
-            const selectedLink = this.selectBestLink(prevNextLinks);
-            await this.clickLink(selectedLink);
+                // Prefer next over previous (more natural behavior)
+                const nextLinks = prevNextLinks.filter(link => {
+                    const text = link.textContent.toLowerCase();
+                    const href = link.href.toLowerCase();
+                    return text.includes('next') || 
+                           text.includes('newer') || 
+                           href.includes('next') || 
+                           text.includes('→') || 
+                           text.includes('›') ||
+                           text.includes('>');
+                });
+                
+                let selectedLink;
+                if (nextLinks.length > 0) {
+                    // Prefer next links
+                    selectedLink = this.selectBestLink(nextLinks);
         } else {
+                    // Fallback to any navigation link
+                    selectedLink = this.selectBestLink(prevNextLinks);
+                }
+                
+                if (selectedLink) {
+                    await this.clickLink(selectedLink);
+                    return true;
+                }
+            }
+            
             // Fallback to back navigation
             await this.navigateBack();
+            return false;
+        } catch (error) {
+            // Silent error handling for stealth
+            console.warn('Previous/Next navigation error:', error.message);
+            return false;
         }
     }
 
@@ -296,24 +440,95 @@ class NavigationSimulator {
     findPreviousNextLinks() {
         const links = [];
         const selectors = [
+            // Standard pagination selectors
+            'a[rel="prev"]',
+            'a[rel="next"]',
             'a[href*="prev"]',
             'a[href*="next"]',
             'a[href*="previous"]',
+            'a[href*="page"]',
+            'a[href*="p="]',
+            
+            // CSS class selectors
             '.prev a',
             '.next a',
             '.previous a',
             '.pagination a',
             '.nav-prev a',
-            '.nav-next a'
+            '.nav-next a',
+            '.nav-previous a',
+            '.pagination-prev a',
+            '.pagination-next a',
+            '.post-navigation a',
+            '.article-navigation a',
+            '.content-navigation a',
+            
+            // WordPress specific
+            '.nav-previous a',
+            '.nav-next a',
+            '.post-navigation a',
+            '.navigation a',
+            
+            // Bootstrap and other frameworks
+            '.pagination .prev a',
+            '.pagination .next a',
+            '.pagination .previous a',
+            '.pagination .page-item a',
+            
+            // Custom selectors
+            '[data-nav="prev"] a',
+            '[data-nav="next"] a',
+            '.navigation-prev a',
+            '.navigation-next a',
+            
+            // Text-based detection
+            'a:contains("Previous")',
+            'a:contains("Next")',
+            'a:contains("Older")',
+            'a:contains("Newer")',
+            'a:contains("←")',
+            'a:contains("→")',
+            'a:contains("‹")',
+            'a:contains("›")'
         ];
         
         selectors.forEach(selector => {
+            try {
             const elements = document.querySelectorAll(selector);
             elements.forEach(element => {
                 if (this.isValidLink(element)) {
                     links.push(element);
                 }
             });
+            } catch (error) {
+                // Silent error handling for stealth
+            }
+        });
+        
+        // Additional text-based detection for links containing navigation keywords
+        const allLinks = document.querySelectorAll('a[href]');
+        const navigationKeywords = ['previous', 'next', 'older', 'newer', 'prev', 'next'];
+        const navigationSymbols = ['←', '→', '‹', '›', '<', '>'];
+        
+        allLinks.forEach(link => {
+            if (this.isValidLink(link)) {
+                const text = link.textContent.toLowerCase().trim();
+                const href = link.href.toLowerCase();
+                
+                // Check for navigation keywords in text or href
+                const hasKeyword = navigationKeywords.some(keyword => 
+                    text.includes(keyword) || href.includes(keyword)
+                );
+                
+                // Check for navigation symbols
+                const hasSymbol = navigationSymbols.some(symbol => 
+                    link.textContent.includes(symbol)
+                );
+                
+                if (hasKeyword || hasSymbol) {
+                    links.push(link);
+                }
+            }
         });
         
         return links;
@@ -323,26 +538,20 @@ class NavigationSimulator {
      * Navigate to random page
      */
     async navigateRandomPage() {
-        // First, check if current page is a category/listing page
-        if (this.isCategoryPage()) {
-            // Stealth logging - removed for security
-            const articleLink = this.selectRandomArticle();
-            if (articleLink) {
-                // Stealth logging - removed for security
-                await this.clickLink(articleLink);
-                return;
-            }
-        }
-        
-        // Look for internal links
-        const internalLinks = this.findInternalLinks();
-        
-        if (internalLinks.length > 0) {
-            const randomLink = internalLinks[Math.floor(Math.random() * internalLinks.length)];
-            await this.clickLink(randomLink);
+        try {
+            console.log('🧭 Searching for random links...');
+            const randomLinks = this.findAnyValidLink();
+            
+            if (randomLinks.length > 0) {
+                const selectedLink = randomLinks[Math.floor(Math.random() * randomLinks.length)];
+                console.log(`🧭 Selected random link: ${selectedLink.href}`);
+                const success = await this.clickLink(selectedLink);
+                console.log(`🧭 Random link click ${success ? 'successful' : 'failed'}`);
         } else {
-            // Fallback to search
-            await this.navigateSearchResults();
+                console.log('🧭 No valid links found anywhere on page!');
+            }
+        } catch (error) {
+            console.warn('🧭 Random navigation error:', error.message);
         }
     }
 
@@ -499,6 +708,7 @@ class NavigationSimulator {
      * Select best link from options
      */
     selectBestLink(links) {
+        try {
         if (links.length === 0) return null;
         
         // Score links based on various factors
@@ -513,111 +723,52 @@ class NavigationSimulator {
         // Return top link or random from top 3
         const topLinks = scoredLinks.slice(0, Math.min(3, scoredLinks.length));
         return topLinks[Math.floor(Math.random() * topLinks.length)].element;
+        } catch (error) {
+            // Silent error handling for stealth
+            console.warn('Link selection error:', error.message);
+            return links.length > 0 ? links[0] : null;
+        }
     }
 
     /**
      * Score link based on various factors
      */
     scoreLink(link) {
-        let score = 0;
-        
-        // Text content relevance
-        const text = link.textContent.toLowerCase();
-        const relevantKeywords = ['read', 'more', 'continue', 'next', 'article', 'post', 'story'];
-        relevantKeywords.forEach(keyword => {
-            if (text.includes(keyword)) {
-                score += 2;
-            }
-        });
-        
-        // URL relevance
-        const href = link.href.toLowerCase();
-        const urlKeywords = ['article', 'post', 'page', 'content'];
-        urlKeywords.forEach(keyword => {
-            if (href.includes(keyword)) {
-                score += 1;
-            }
-        });
-        
-        // Position on page (prefer above the fold)
+        try {
         const rect = link.getBoundingClientRect();
-        if (rect.top < window.innerHeight) {
-            score += 1;
-        }
+            const text = link.textContent.trim();
+            const href = link.href;
         
-        // Size (prefer larger, more prominent links)
+            let score = 0;
+            
+            // Size factor (larger links are better)
         const area = rect.width * rect.height;
-        if (area > 1000) {
-            score += 1;
-        }
-        
-        // Random factor
-        score += Math.random();
-        
-        return score;
-    }
-
-    /**
-     * Click link with realistic behavior
-     */
-    async clickLink(link) {
-        if (!link) return false;
-        
-        // Add to navigation history
-        this.navigationHistory.push({
-            url: link.href,
-            title: link.textContent,
-            timestamp: Date.now()
-        });
-        
-        // Simulate realistic click
-        await this.behaviorSimulator.simulateNaturalClick(link);
-        
-        return true;
-    }
-
-    /**
-     * Find search box
-     */
-    findSearchBox() {
-        const selectors = [
-            'input[type="search"]',
-            'input[name*="search"]',
-            'input[placeholder*="search"]',
-            'input[placeholder*="Search"]',
-            '.search input',
-            '#search input',
-            'form[role="search"] input'
-        ];
-        
-        for (const selector of selectors) {
-            const element = document.querySelector(selector);
-            if (element) {
-                return element;
+            score += area * 0.1;
+            
+            // Position factor (more centered links are better)
+            const centerDistance = Math.abs(rect.top + rect.height / 2 - window.innerHeight / 2);
+            score += (1000 / (1 + centerDistance)) * 10;
+            
+            // Text length factor (meaningful text is better)
+            score += text.length * 2;
+            
+            // URL quality factor
+            if (href.includes('article') || href.includes('post') || href.includes('blog')) {
+                score += 50;
             }
-        }
-        
-        return null;
-    }
-
-    /**
-     * Generate search query based on current page
-     */
-    generateSearchQuery() {
-        const personality = this.behaviorSimulator?.currentPersonality;
-        const currentTitle = document.title;
-        const currentContent = document.body.textContent;
-        
-        // Extract keywords from current page
-        const keywords = this.extractKeywords(currentTitle + ' ' + currentContent);
-        
-        // Generate query based on personality
-        if (personality?.type === 'researcher') {
-            return keywords.slice(0, 3).join(' ');
-        } else if (personality?.type === 'explorer') {
-            return keywords[0] + ' ' + this.getRandomTopic();
-        } else {
-            return keywords[0] || 'interesting';
+            
+            // Text quality factor
+            const qualityKeywords = ['read', 'more', 'continue', 'full', 'story', 'article', 'post'];
+            const hasQualityKeyword = qualityKeywords.some(keyword => 
+                text.toLowerCase().includes(keyword)
+            );
+            if (hasQualityKeyword) {
+                score += 30;
+            }
+            
+            return score;
+        } catch (error) {
+            return 0;
         }
     }
 
@@ -639,9 +790,11 @@ class NavigationSimulator {
         });
         
         // Sort by frequency
-        return Object.entries(wordCount)
-            .sort((a, b) => b[1] - a[1])
-            .map(entry => entry[0]);
+        const sortedWords = Object.entries(wordCount)
+            .sort(([,a], [,b]) => b - a)
+            .map(([word]) => word);
+        
+        return sortedWords.slice(0, 10);
     }
 
     /**
@@ -650,9 +803,11 @@ class NavigationSimulator {
     isCommonWord(word) {
         const commonWords = [
             'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with',
-            'by', 'is', 'are', 'was', 'were', 'be', 'been', 'have', 'has', 'had',
-            'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might',
-            'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they'
+            'by', 'from', 'up', 'about', 'into', 'through', 'during', 'before',
+            'after', 'above', 'below', 'between', 'among', 'within', 'without',
+            'this', 'that', 'these', 'those', 'is', 'are', 'was', 'were', 'be',
+            'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will',
+            'would', 'could', 'should', 'may', 'might', 'can', 'must', 'shall'
         ];
         
         return commonWords.includes(word);
@@ -664,7 +819,9 @@ class NavigationSimulator {
     getRandomTopic() {
         const topics = [
             'news', 'technology', 'science', 'health', 'business', 'entertainment',
-            'sports', 'politics', 'education', 'travel', 'food', 'fashion'
+            'sports', 'politics', 'education', 'travel', 'food', 'fashion',
+            'lifestyle', 'finance', 'automotive', 'real estate', 'fitness',
+            'cooking', 'gaming', 'music', 'movies', 'books', 'art', 'design'
         ];
         
         return topics[Math.floor(Math.random() * topics.length)];
@@ -1000,7 +1157,7 @@ class NavigationSimulator {
                 category: 25, // Number of category selectors
                 legal: 20, // Number of legal page selectors
                 article: 10, // Number of article selectors
-                pagination: 9 // Number of pagination selectors
+                pagination: 35 // Enhanced pagination selectors (increased from 9)
             },
             maturity: 'Advanced',
             comparison: 'Matches Python Selenium implementation'
@@ -1008,14 +1165,123 @@ class NavigationSimulator {
     }
 
     /**
+     * Click link with natural behavior simulation
+     */
+    async clickLink(element) {
+        if (!element || !this.isValidLink(element)) {
+            return false;
+        }
+
+        try {
+            // Use behavior simulator if available
+            if (this.behaviorSimulator && typeof this.behaviorSimulator.simulateNaturalClick === 'function') {
+                return await this.behaviorSimulator.simulateNaturalClick(element);
+            }
+
+            // Fallback to direct click
+            const rect = element.getBoundingClientRect();
+            const clickX = rect.left + rect.width / 2;
+            const clickY = rect.top + rect.height / 2;
+
+            // Simulate mouse movement
+            await this.simulateMouseMovement(clickX, clickY, 800);
+
+            // Click delay
+            await this.delay(200 + Math.random() * 300);
+
+            // Perform click
+            const clickEvent = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true,
+                clientX: clickX,
+                clientY: clickY
+            });
+
+            element.dispatchEvent(clickEvent);
+
+            // Record navigation
+            this.recordNavigation(element.href, 'click');
+
+            return true;
+        } catch (error) {
+            console.warn('Link click failed:', error.message);
+            return false;
+        }
+    }
+
+    /**
+     * Simulate mouse movement to coordinates
+     */
+    async simulateMouseMovement(targetX, targetY, duration = 800) {
+        try {
+            // Simple mouse movement simulation
+            const startX = 0;
+            const startY = 0;
+            const steps = 10;
+            const stepDelay = duration / steps;
+
+            for (let i = 0; i <= steps; i++) {
+                const progress = i / steps;
+                const currentX = startX + (targetX - startX) * progress;
+                const currentY = startY + (targetY - startY) * progress;
+
+                // Dispatch mousemove event
+                const moveEvent = new MouseEvent('mousemove', {
+                    view: window,
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: currentX,
+                    clientY: currentY
+                });
+
+                document.dispatchEvent(moveEvent);
+                await this.delay(stepDelay);
+            }
+        } catch (error) {
+            // Silent error handling
+        }
+    }
+
+    /**
+     * Record navigation action
+     */
+    recordNavigation(url, method) {
+        this.addToHistory({
+            url: url,
+            method: method,
+            timestamp: Date.now(),
+            deviceType: this.detectDeviceType()
+        });
+    }
+
+    /**
+     * Detect device type
+     */
+    detectDeviceType() {
+        const userAgent = navigator.userAgent.toLowerCase();
+        const isMobile = /android|iphone|ipad|ipod|blackberry|windows phone/i.test(userAgent);
+        const isTablet = /ipad|android(?=.*\b(?!.*mobile))/i.test(userAgent);
+        
+        if (isTablet) return 'tablet';
+        if (isMobile) return 'mobile';
+        return 'desktop';
+    }
+
+    /**
      * Utility delay function with stealth
      */
     delay(ms) {
         // Use stealth delay if available, otherwise fallback to standard delay
-        if (window._stealth_delay) {
-            const stealthDelay = new window._stealth_delay();
-            return stealthDelay.wait(ms);
-        } else {
+        try {
+            if (window._stealth_delay) {
+                const stealthDelay = new window._stealth_delay();
+                return stealthDelay.wait(ms);
+            } else {
+        return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        } catch (error) {
+            // Fallback to standard delay if stealth delay fails
             return new Promise(resolve => setTimeout(resolve, ms));
         }
     }

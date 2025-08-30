@@ -219,10 +219,15 @@ class StealthStorage {
     }
 }
 
-// Export for use in other modules
+// Export for use in other modules with immediate availability
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = StealthStorage;
-} else if (typeof window !== 'undefined' && !window._stealth_storage) {
-    // Use stealth naming to avoid detection
+} else if (typeof window !== 'undefined') {
+    // Use stealth naming to avoid detection and ensure immediate availability
     window._stealth_storage = StealthStorage;
+    
+    // Also export as a global function for immediate access
+    if (typeof window.StealthStorage === 'undefined') {
+        window.StealthStorage = StealthStorage;
+    }
 }

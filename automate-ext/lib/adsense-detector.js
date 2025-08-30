@@ -818,10 +818,15 @@ class AdSenseDetector {
      */
     delay(ms) {
         // Use stealth delay if available, otherwise fallback to standard delay
-        if (window._stealth_delay) {
-            const stealthDelay = new window._stealth_delay();
-            return stealthDelay.wait(ms);
-        } else {
+        try {
+            if (window._stealth_delay) {
+                const stealthDelay = new window._stealth_delay();
+                return stealthDelay.wait(ms);
+            } else {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        } catch (error) {
+            // Fallback to standard delay if stealth delay fails
             return new Promise(resolve => setTimeout(resolve, ms));
         }
     }
@@ -838,8 +843,31 @@ class AdSenseDetector {
         };
 
         // Use stealth storage instead of chrome storage
-        const stealthStorage = new (window._stealth_storage || StealthStorage)();
-        stealthStorage.set(`adsense_session_${this.currentSession.startTime}`, sessionData);
+        try {
+            const stealthStorage = new (window._stealth_storage || (() => {
+                // Fallback storage if stealth storage is not available
+                return {
+                    set: (key, value) => {
+                        try {
+                            localStorage.setItem(key, JSON.stringify(value));
+                        } catch (e) {
+                            // Silent fallback
+                        }
+                    },
+                    get: (key) => {
+                        try {
+                            const item = localStorage.getItem(key);
+                            return item ? JSON.parse(item) : null;
+                        } catch (e) {
+                            return null;
+                        }
+                    }
+                };
+            })());
+            stealthStorage.set(`adsense_session_${this.currentSession.startTime}`, sessionData);
+        } catch (error) {
+            // Silent fallback
+        }
 
         return sessionData;
     }
@@ -1351,12 +1379,414 @@ class AdSenseDetector {
             }
         };
     }
+
+    /**
+     * Get click probability for specific personality type
+     */
+    getPersonalityClickProbability(personalityType) {
+        const probabilities = {
+            researcher: 0.15,
+            explorer: 0.12,
+            professional: 0.10,
+            casual: 0.08
+        };
+        return probabilities[personalityType] || this.clickProbabilityConfig.default;
+    }
+
+    /**
+     * Calculate comprehensive RPM estimation
+     */
+    calculateRPMEstimation() {
+        const config = this.clickProbabilityConfig;
+        const session = this.currentSession;
+        
+        // Base RPM assumptions (industry averages)
+        const baseRPM = {
+            lowValue: 0.50,    // $0.50 per 1000 impressions
+            mediumValue: 2.00, // $2.00 per 1000 impressions
+            highValue: 8.00,   // $8.00 per 1000 impressions
+            premium: 15.00     // $15.00 per 1000 impressions
+        };
+        
+        // Calculate effective click probability
+        const effectiveClickProb = this.calculateEffectiveClickProbability();
+        
+        // Calculate RPM based on ad value distribution
+        const rpmEstimation = {
+            baseRPM: baseRPM,
+            effectiveClickProbability: (effectiveClickProb * 100).toFixed(2) + '%',
+            estimatedRPM: {
+                lowValue: baseRPM.lowValue * effectiveClickProb,
+                mediumValue: baseRPM.mediumValue * effectiveClickProb,
+                highValue: baseRPM.highValue * effectiveClickProb,
+                premium: baseRPM.premium * effectiveClickProb
+            },
+            optimization: {
+                highValueMultiplier: config.valueMultipliers.highValue,
+                aboveFoldMultiplier: config.valueMultipliers.aboveFold,
+                largeSizeMultiplier: config.valueMultipliers.largeSize,
+                personalityMultipliers: config.personalityMultipliers
+            },
+            recommendations: this.generateRPMRecommendations()
+        };
+        
+        return rpmEstimation;
+    }
+    
+    /**
+     * Calculate effective click probability considering all factors
+     */
+    calculateEffectiveClickProbability() {
+        const config = this.clickProbabilityConfig;
+        const personalities = [
+            { type: 'researcher', weight: 0.25 },
+            { type: 'explorer', weight: 0.25 },
+            { type: 'professional', weight: 0.25 },
+            { type: 'casual', weight: 0.25 }
+        ];
+        
+        let totalProbability = 0;
+        let totalWeight = 0;
+        
+        personalities.forEach(personality => {
+            const baseProb = this.getPersonalityClickProbability(personality.type);
+            const effectiveProb = baseProb * personality.weight;
+            totalProbability += effectiveProb;
+            totalWeight += personality.weight;
+        });
+        
+        // Apply value multipliers for high-value ads
+        const highValueBonus = config.valueMultipliers.highValue;
+        const aboveFoldBonus = config.valueMultipliers.aboveFold;
+        const largeSizeBonus = config.valueMultipliers.largeSize;
+        
+        const averageProbability = totalProbability / totalWeight;
+        const optimizedProbability = Math.min(
+            averageProbability * highValueBonus * aboveFoldBonus * largeSizeBonus,
+            config.max
+        );
+        
+        return Math.max(optimizedProbability, config.min);
+    }
+    
+    /**
+     * Generate RPM optimization recommendations
+     */
+    generateRPMRecommendations() {
+        return [
+            {
+                priority: 'High',
+                action: 'Focus on high-value categories',
+                impact: '20% increase in click probability',
+                categories: ['finance', 'business', 'healthcare', 'legal', 'technology']
+            },
+            {
+                priority: 'High',
+                action: 'Target above-fold ad positions',
+                impact: '10% increase in click probability',
+                description: 'Ads visible without scrolling'
+            },
+            {
+                priority: 'Medium',
+                action: 'Prefer large and medium ad sizes',
+                impact: '10% increase in click probability',
+                sizes: ['large', 'medium']
+            },
+            {
+                priority: 'Medium',
+                action: 'Use researcher personality',
+                impact: '15% base click probability (highest)',
+                description: 'Best for RPM optimization'
+            },
+            {
+                priority: 'Low',
+                action: 'Avoid casual personality',
+                impact: '8% base click probability (lowest)',
+                description: 'Use only for stealth scenarios'
+            }
+        ];
+    }
+
+    /**
+     * Initialize fraud prevention system
+     */
+    initializeFraudPrevention() {
+        this.fraudPreventionConfig = {
+            // Click frequency limits
+            maxClicksPerHour: 10,
+            maxClicksPerDay: 50,
+            minClickInterval: 30000, // 30 seconds
+            
+            // Page limits
+            maxClicksPerPage: 3,
+            maxClicksPerDomain: 5,
+            
+            // Session limits
+            maxClicksPerSession: 15,
+            maxLandingPageVisits: 20,
+            
+            // Behavior validation
+            requireLandingPageInteraction: true,
+            requireRealisticDwellTime: true,
+            preventRapidNavigation: true
+        };
+        
+        // Initialize tracking
+        this.clickTracking = {
+            hourlyClicks: [],
+            dailyClicks: [],
+            pageClicks: new Map(),
+            domainClicks: new Map(),
+            sessionClicks: 0,
+            lastClickTime: 0,
+            landingPageVisits: []
+        };
+        
+        // Setup periodic cleanup
+        this.setupClickTrackingCleanup();
+    }
+
+    /**
+     * Setup periodic cleanup for click tracking
+     */
+    setupClickTrackingCleanup() {
+        // Cleanup hourly clicks every hour
+        setInterval(() => {
+            this.cleanupHourlyClicks();
+        }, 60 * 60 * 1000);
+        
+        // Cleanup daily clicks every day
+        setInterval(() => {
+            this.cleanupDailyClicks();
+        }, 24 * 60 * 60 * 1000);
+    }
+
+    /**
+     * Cleanup old click tracking data
+     */
+    cleanupHourlyClicks() {
+        const oneHourAgo = Date.now() - (60 * 60 * 1000);
+        this.clickTracking.hourlyClicks = this.clickTracking.hourlyClicks.filter(
+            click => click.timestamp > oneHourAgo
+        );
+        console.debug('Hourly click tracking cleaned');
+    }
+
+    cleanupDailyClicks() {
+        const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
+        this.clickTracking.dailyClicks = this.clickTracking.dailyClicks.filter(
+            click => click.timestamp > oneDayAgo
+        );
+        console.debug('Daily click tracking cleaned');
+    }
+
+    /**
+     * Enhanced fraud prevention validation
+     */
+    validateFraudPrevention(element) {
+        try {
+            const now = Date.now();
+            const currentUrl = window.location.href;
+            const domain = new URL(currentUrl).hostname;
+            
+            // Check click frequency limits
+            if (!this.validateClickFrequency(now)) {
+                return { valid: false, reason: 'Click frequency limit exceeded' };
+            }
+            
+            // Check page limits
+            if (!this.validatePageLimits(currentUrl)) {
+                return { valid: false, reason: 'Page click limit exceeded' };
+            }
+            
+            // Check domain limits
+            if (!this.validateDomainLimits(domain)) {
+                return { valid: false, reason: 'Domain click limit exceeded' };
+            }
+            
+            // Check session limits
+            if (!this.validateSessionLimits()) {
+                return { valid: false, reason: 'Session click limit exceeded' };
+            }
+            
+            // Check element validity
+            if (!this.validateElement(element)) {
+                return { valid: false, reason: 'Invalid ad element' };
+            }
+            
+            return { valid: true, reason: 'All validations passed' };
+            
+        } catch (error) {
+            console.error('Error in fraud prevention validation:', error);
+            return { valid: false, reason: 'Validation error' };
+        }
+    }
+
+    /**
+     * Validate click frequency
+     */
+    validateClickFrequency(now) {
+        // Check hourly limit
+        const hourlyClicks = this.clickTracking.hourlyClicks.filter(
+            click => click.timestamp > now - (60 * 60 * 1000)
+        ).length;
+        
+        if (hourlyClicks >= this.fraudPreventionConfig.maxClicksPerHour) {
+            console.warn(`Hourly click limit exceeded: ${hourlyClicks}`);
+            return false;
+        }
+        
+        // Check daily limit
+        const dailyClicks = this.clickTracking.dailyClicks.filter(
+            click => click.timestamp > now - (24 * 60 * 60 * 1000)
+        ).length;
+        
+        if (dailyClicks >= this.fraudPreventionConfig.maxClicksPerDay) {
+            console.warn(`Daily click limit exceeded: ${dailyClicks}`);
+            return false;
+        }
+        
+        // Check minimum interval
+        const timeSinceLastClick = now - this.clickTracking.lastClickTime;
+        if (timeSinceLastClick < this.fraudPreventionConfig.minClickInterval) {
+            console.warn(`Click too soon: ${timeSinceLastClick}ms since last click`);
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
+     * Validate page limits
+     */
+    validatePageLimits(currentUrl) {
+        const pageClicks = this.clickTracking.pageClicks.get(currentUrl) || 0;
+        if (pageClicks >= this.fraudPreventionConfig.maxClicksPerPage) {
+            console.warn(`Page click limit exceeded: ${pageClicks} on ${currentUrl}`);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Validate domain limits
+     */
+    validateDomainLimits(domain) {
+        const domainClicks = this.clickTracking.domainClicks.get(domain) || 0;
+        if (domainClicks >= this.fraudPreventionConfig.maxClicksPerDomain) {
+            console.warn(`Domain click limit exceeded: ${domainClicks} on ${domain}`);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Validate session limits
+     */
+    validateSessionLimits() {
+        if (this.clickTracking.sessionClicks >= this.fraudPreventionConfig.maxClicksPerSession) {
+            console.warn(`Session click limit exceeded: ${this.clickTracking.sessionClicks}`);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Validate element
+     */
+    validateElement(element) {
+        if (!element || !element.getBoundingClientRect) {
+            return false;
+        }
+        
+        const rect = element.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) {
+            return false;
+        }
+        
+        // Check if element is in viewport
+        if (rect.top < 0 || rect.left < 0 || 
+            rect.bottom > window.innerHeight || 
+            rect.right > window.innerWidth) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
+     * Record click for fraud prevention
+     */
+    recordClickForFraudPrevention(element, adInfo) {
+        try {
+            const now = Date.now();
+            const currentUrl = window.location.href;
+            const domain = new URL(currentUrl).hostname;
+            
+            // Record click in all tracking systems
+            const clickRecord = {
+                timestamp: now,
+                url: currentUrl,
+                domain: domain,
+                adInfo: adInfo,
+                element: element
+            };
+            
+            // Add to hourly tracking
+            this.clickTracking.hourlyClicks.push(clickRecord);
+            
+            // Add to daily tracking
+            this.clickTracking.dailyClicks.push(clickRecord);
+            
+            // Update page clicks
+            const pageClicks = this.clickTracking.pageClicks.get(currentUrl) || 0;
+            this.clickTracking.pageClicks.set(currentUrl, pageClicks + 1);
+            
+            // Update domain clicks
+            const domainClicks = this.clickTracking.domainClicks.get(domain) || 0;
+            this.clickTracking.domainClicks.set(domain, domainClicks + 1);
+            
+            // Update session clicks
+            this.clickTracking.sessionClicks++;
+            this.clickTracking.lastClickTime = now;
+            
+            console.log(`📊 Click recorded for fraud prevention - Session: ${this.clickTracking.sessionClicks}, Page: ${pageClicks + 1}, Domain: ${domainClicks + 1}`);
+            
+        } catch (error) {
+            console.error('Error recording click for fraud prevention:', error);
+        }
+    }
+
+    /**
+     * Get fraud prevention summary
+     */
+    getFraudPreventionSummary() {
+        const now = Date.now();
+        
+        return {
+            hourlyClicks: this.clickTracking.hourlyClicks.filter(
+                click => click.timestamp > now - (60 * 60 * 1000)
+            ).length,
+            dailyClicks: this.clickTracking.dailyClicks.filter(
+                click => click.timestamp > now - (24 * 60 * 60 * 1000)
+            ).length,
+            sessionClicks: this.clickTracking.sessionClicks,
+            lastClickTime: this.clickTracking.lastClickTime,
+            timeSinceLastClick: now - this.clickTracking.lastClickTime,
+            landingPageVisits: this.clickTracking.landingPageVisits.length,
+            limits: {
+                maxClicksPerHour: this.fraudPreventionConfig.maxClicksPerHour,
+                maxClicksPerDay: this.fraudPreventionConfig.maxClicksPerDay,
+                maxClicksPerSession: this.fraudPreventionConfig.maxClicksPerSession,
+                minClickInterval: this.fraudPreventionConfig.minClickInterval
+            }
+        };
+    }
 }
 
 // Export for use in other modules with enhanced stealth protection
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = AdSenseDetector;
-} else if (typeof window !== 'undefined' && !window._stealth_adsense_detector) {
-    // Use stealth naming to avoid detection
-    window._stealth_adsense_detector = AdSenseDetector;
+} else if (typeof window !== 'undefined' && !window.AdSenseDetector) {
+    window.AdSenseDetector = AdSenseDetector;
 }

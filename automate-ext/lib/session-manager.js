@@ -18,7 +18,26 @@ class SessionManager {
         this.saveTimer = null;
         
         // Initialize stealth storage
-        this.stealthStorage = new (window._stealth_storage || StealthStorage)();
+        this.stealthStorage = new (window._stealth_storage || (() => {
+            // Fallback storage if stealth storage is not available
+            return {
+                set: (key, value) => {
+                    try {
+                        localStorage.setItem(key, JSON.stringify(value));
+                    } catch (e) {
+                        // Silent fallback
+                    }
+                },
+                get: (key) => {
+                    try {
+                        const item = localStorage.getItem(key);
+                        return item ? JSON.parse(item) : null;
+                    } catch (e) {
+                        return null;
+                    }
+                }
+            };
+        })());
     }
 
     /**
@@ -264,9 +283,26 @@ class SessionManager {
         try {
             // Check if extension context is still valid
             if (!this.isExtensionContextValid()) {
-                console.warn('Extension context invalid, skipping session save');
-                this.stopAutoSave();
-                return;
+                console.warn('Extension context invalid, using fallback storage');
+                
+                // Use fallback storage when extension context is invalid
+                try {
+                    const sessionData = {
+                        ...this.currentSession,
+                        lastSaved: Date.now(),
+                        savedVia: 'fallback_storage'
+                    };
+                    
+                    // Use localStorage as fallback
+                    const key = `session_${this.currentSession.sessionId}`;
+                    localStorage.setItem(key, JSON.stringify(sessionData));
+                    console.log('Session saved via fallback storage');
+                    return;
+                } catch (fallbackError) {
+                    console.warn('Fallback storage also failed:', fallbackError.message);
+                    this.stopAutoSave();
+                    return;
+                }
             }
             
             const sessionData = {
@@ -297,7 +333,29 @@ class SessionManager {
         try {
             // Check if extension context is still valid
             if (!this.isExtensionContextValid()) {
-                console.warn('Extension context invalid, skipping session load');
+                console.warn('Extension context invalid, trying fallback session load');
+                
+                // Try to load from localStorage as fallback
+                try {
+                    const keys = Object.keys(localStorage);
+                    const sessionKeys = keys.filter(key => key.startsWith('session_'));
+                    
+                    if (sessionKeys.length > 0) {
+                        // Load the most recent session
+                        const latestKey = sessionKeys.sort().pop();
+                        const sessionData = JSON.parse(localStorage.getItem(latestKey));
+                        
+                        if (sessionData) {
+                            this.currentSession = sessionData;
+                            this.isActive = sessionData.status === 'active';
+                            console.log('Session loaded via fallback storage');
+                            return;
+                        }
+                    }
+                } catch (fallbackError) {
+                    console.warn('Fallback session load failed:', fallbackError.message);
+                }
+                
                 return;
             }
             
@@ -492,10 +550,24 @@ class SessionManager {
     isExtensionContextValid() {
         try {
             // Try to access chrome.runtime to check if context is valid
-            return typeof chrome !== 'undefined' && 
-                   chrome.runtime && 
-                   chrome.runtime.id;
+            if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
+                return true;
+            }
+            
+            // Fallback: Check if we're in a valid extension context
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                return true;
+            }
+            
+            // Final fallback: Check if we're in a content script context
+            if (typeof window !== 'undefined' && window.location) {
+                return true;
+            }
+            
+            return false;
         } catch (error) {
+            // If any error occurs, assume context is invalid but allow fallback operations
+            console.debug('Extension context check failed:', error.message);
             return false;
         }
     }
@@ -651,6 +723,55 @@ class SessionManager {
         
         const endTime = this.currentSession.endTime || Date.now();
         return endTime - this.currentSession.startTime;
+    }
+
+    /**
+     * Create a new session
+     */
+    createSession(options = {}) {
+        try {
+            const sessionId = this.generateSessionId();
+            const session = {
+                sessionId: sessionId,
+                startTime: Date.now(),
+                status: 'active',
+                pageVisits: [],
+                interactions: [],
+                adsenseData: {
+                    totalAds: 0,
+                    highValueAds: 0,
+                    clickedAds: 0,
+                    hoveredAds: 0,
+                    viewTime: 0,
+                    rpmScore: 0
+                },
+                behaviorData: {
+                    personality: null,
+                    readingTime: 0,
+                    navigationCount: 0,
+                    scrollDepth: 0
+                },
+                stealthData: {
+                    botDetectionScore: 0,
+                    humanBehaviorScore: 0,
+                    stealthLevel: 'high'
+                },
+                options: options
+            };
+            
+            this.currentSession = session;
+            this.isActive = true;
+            
+            // Save session immediately
+            this.saveSession();
+            
+            console.log(`Session created: ${sessionId}`);
+            return session;
+            
+        } catch (error) {
+            console.error('Session creation error:', error);
+            return null;
+        }
     }
 }
 

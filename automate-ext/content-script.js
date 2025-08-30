@@ -28,9 +28,7 @@ class AdSenseAutomationPro {
         this.sessionManager = new SessionManager();
         this.stealthMonitor = new StealthMonitor();
         
-        // Initialize Multilogin Optimizer for RPM enhancement
-        this.multiloginOptimizer = null;
-        this.initializeMultiloginOptimizer();
+        // Multilogin Optimizer removed - was only simulation without real API integration
         
         // Event listeners
         this.eventListeners = [];
@@ -39,24 +37,7 @@ class AdSenseAutomationPro {
         this.setupMessageHandling();
     }
 
-    /**
-     * Initialize Multilogin Optimizer with retry mechanism
-     */
-    async initializeMultiloginOptimizer() {
-        try {
-            // Wait for MultiloginOptimizer to be available
-            const isAvailable = await this.waitForMultiloginOptimizer();
-            
-            if (isAvailable && typeof MultiloginOptimizer !== 'undefined') {
-                this.multiloginOptimizer = new MultiloginOptimizer();
-                console.log('MultiloginOptimizer initialized successfully');
-            } else {
-                console.warn('MultiloginOptimizer not available, continuing without it');
-            }
-        } catch (error) {
-            console.warn('Failed to initialize MultiloginOptimizer:', error);
-        }
-    }
+
 
     /**
      * Initialize the automation system
@@ -78,10 +59,11 @@ class AdSenseAutomationPro {
             this.stealthMonitor.initialize();
             this.navigationSimulator.initialize();
             
-            // Initialize Multilogin Optimizer
-            if (this.multiloginOptimizer) {
-                await this.multiloginOptimizer.initialize();
-            }
+            // Set session start time for navigation tracking
+            this.sessionStartTime = Date.now();
+            console.log(`🕐 Session started at: ${new Date(this.sessionStartTime).toLocaleTimeString()}`);
+            
+
             
             // Load configuration
             await this.loadConfiguration();
@@ -379,11 +361,47 @@ class AdSenseAutomationPro {
                     await this.interactWithAds({ ads: ads, personality: this.personalityEngine.getCurrentPersonality() });
                 }
                 
-                // Simulate reading behavior
+                // Simulate reading behavior first (priority)
                 await this.simulateReadingBehavior();
                 
-                // Simulate navigation
-                await this.simulateNavigation();
+                // Check if we've been on this page too long (force navigation)
+                const sessionStartTime = this.sessionStartTime || this.sessionManager?.currentSession?.startTime || Date.now();
+                const pageTime = Date.now() - sessionStartTime;
+                
+                console.log(`⏱️ Page time: ${(pageTime / 1000).toFixed(0)}s`);
+                
+                // Navigation cooldown after reading (minimum 2 minutes on page)
+                if (pageTime < 120000) { // 2 minutes minimum
+                    console.log(`⏳ Navigation cooldown: ${(120 - pageTime / 1000).toFixed(0)}s remaining`);
+                    await this.delay(10000); // Wait 10 seconds before next check
+                    continue;
+                }
+                
+                // Ensure reading is completed before allowing navigation
+                if (!this.readingCompleted) {
+                    console.log(`📚 Reading not completed yet, continuing...`);
+                    await this.delay(5000); // Wait 5 seconds before next check
+                    continue;
+                }
+                
+                if (pageTime > 300000) { // 5 minutes
+                    console.log(`🚨 Force navigation after ${(pageTime / 1000).toFixed(0)}s on page`);
+                    await this.simulateNavigation();
+                    continue; // Skip normal navigation logic
+                }
+                
+                // Add longer delay after reading before navigation
+                await this.delay(5000 + Math.random() * 10000); // 5-15 seconds
+                
+                // Simulate navigation with drastically reduced frequency
+                const navigationProbability = Math.min(0.05, pageTime / 600000); // 5% max after 10 minutes
+                
+                if (Math.random() < navigationProbability) {
+                    console.log(`🧭 Navigation probability: ${(navigationProbability * 100).toFixed(1)}% (page time: ${(pageTime / 1000).toFixed(0)}s)`);
+                    await this.simulateNavigation();
+                } else {
+                    console.log(`⏳ Navigation skipped (${(navigationProbability * 100).toFixed(1)}% chance)`);
+                }
                 
                 // Random delay between actions
                 const delay = this.getRandomDelay();
@@ -500,24 +518,39 @@ class AdSenseAutomationPro {
     }
 
     /**
-     * Simulate reading behavior
+     * Simulate reading behavior with enhanced logging
      */
     async simulateReadingBehavior() {
         try {
+            console.log('📖 Starting reading behavior simulation...');
+            
             // Analyze content
             const contentType = this.readingSimulator.detectContentType();
             const contentQuality = this.readingSimulator.analyzeContentQuality();
             
-            // Simulate reading
+            console.log(`📖 Content type: ${contentType}, Quality: ${contentQuality}`);
+            
+            // Simulate reading with longer duration
+            const readingStartTime = Date.now();
             await this.readingSimulator.simulateReadingBehavior(contentType, contentQuality);
+            const readingDuration = Date.now() - readingStartTime;
+            
+            console.log(`📖 Reading completed in ${readingDuration}ms`);
             
             // Record reading interaction
             this.sessionManager.addInteraction({
                 type: 'reading',
                 contentType: contentType,
                 contentQuality: contentQuality,
-                duration: 5000 + Math.random() * 10000
+                duration: readingDuration,
+                timestamp: Date.now()
             });
+            
+            console.log('📖 Reading behavior simulation completed successfully');
+            
+            // Mark reading as completed for this page
+            this.readingCompleted = true;
+            this.lastReadingTime = Date.now();
             
         } catch (error) {
             console.error('Reading behavior simulation error:', error);
@@ -525,31 +558,109 @@ class AdSenseAutomationPro {
     }
 
     /**
-     * Simulate navigation
+     * Simulate navigation with improved timing and state management
      */
     async simulateNavigation() {
         try {
+            console.log('🧭 Starting navigation simulation...');
+            
+            // Check if navigation simulator is available
+            if (!this.navigationSimulator) {
+                console.warn('Navigation simulator not available');
+                return;
+            }
+            
+            // Track navigation attempt
+            if (!this.navigationState) {
+                this.navigationState = {
+                    navigationAttempts: 0,
+                    maxNavigationAttempts: 3,
+                    lastNavigationTime: 0,
+                    readingCompleted: false,
+                    pageStartTime: Date.now()
+                };
+            }
+            
+            this.navigationState.navigationAttempts++;
+            
+            // Check if we've exceeded maximum navigation attempts
+            if (this.navigationState.navigationAttempts > this.navigationState.maxNavigationAttempts) {
+                console.log(`🚫 Maximum navigation attempts (${this.navigationState.maxNavigationAttempts}) reached`);
+                return;
+            }
+            
+            // Check navigation cooldown
+            const now = Date.now();
+            const timeSinceLastNavigation = now - this.navigationState.lastNavigationTime;
+            const navigationCooldown = 60000; // 1 minute cooldown
+            
+            if (timeSinceLastNavigation < navigationCooldown) {
+                console.log(`⏳ Navigation cooldown: ${Math.round((navigationCooldown - timeSinceLastNavigation) / 1000)}s remaining`);
+                return;
+            }
+            
             // Intelligent navigation based on personality
-            await this.navigationSimulator.simulateIntelligentNavigation();
+            const navigationResult = await this.navigationSimulator.simulateIntelligentNavigation();
             
-            // Record navigation interaction
-            this.sessionManager.addInteraction({
-                type: 'navigation',
-                url: window.location.href,
-                title: document.title
-            });
-            
-            // Add page visit to session
-            this.sessionManager.addPageVisit({
-                url: window.location.href,
-                title: document.title,
-                timeSpent: 30000 + Math.random() * 60000, // 30-90 seconds
-                scrollDepth: Math.random() * 100,
-                readingTime: 15000 + Math.random() * 30000
-            });
+            if (navigationResult) {
+                console.log('🧭 Navigation completed, starting reading on new page...');
+                
+                // Update navigation state
+                this.navigationState.lastNavigationTime = now;
+                this.navigationState.readingCompleted = false;
+                this.navigationState.pageStartTime = now;
+                
+                // Wait after navigation before reading
+                const postNavigationDelay = 3000 + Math.random() * 5000; // 3-8 seconds
+                console.log(`⏳ Post-navigation delay: ${Math.round(postNavigationDelay / 1000)}s`);
+                await this.delay(postNavigationDelay);
+                
+                // Force reading behavior after navigation
+                console.log('📖 Starting reading behavior on new page...');
+                await this.simulateReadingBehavior();
+                
+                // Mark reading as completed
+                this.navigationState.readingCompleted = true;
+                
+                // Mandatory delay after reading to prevent immediate navigation
+                const mandatoryReadingDelay = 30000 + Math.random() * 60000; // 30-90 seconds
+                console.log(`📚 Mandatory reading delay: ${Math.round(mandatoryReadingDelay / 1000)}s`);
+                await this.delay(mandatoryReadingDelay);
+                
+                // Record navigation interaction
+                if (this.sessionManager) {
+                    this.sessionManager.addInteraction({
+                        type: 'navigation',
+                        url: window.location.href,
+                        title: document.title,
+                        timestamp: Date.now(),
+                        navigationAttempt: this.navigationState.navigationAttempts
+                    });
+                    
+                    // Add page visit to session
+                    this.sessionManager.addPageVisit({
+                        url: window.location.href,
+                        title: document.title,
+                        timeSpent: mandatoryReadingDelay + postNavigationDelay,
+                        scrollDepth: Math.random() * 100,
+                        readingTime: 15000 + Math.random() * 30000
+                    });
+                }
+                
+                console.log('🧭 Navigation and reading cycle completed successfully');
+                
+            } else {
+                console.log('🧭 Navigation failed, will retry later');
+                // Reduce navigation attempts counter since this attempt failed
+                this.navigationState.navigationAttempts--;
+            }
             
         } catch (error) {
-            console.error('Navigation simulation error:', error);
+            console.warn('Navigation simulation error:', error.message);
+            // Reduce navigation attempts counter since this attempt failed
+            if (this.navigationState) {
+                this.navigationState.navigationAttempts--;
+            }
         }
     }
 
@@ -669,22 +780,7 @@ class AdSenseAutomationPro {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    /**
-     * Wait for MultiloginOptimizer to be available
-     */
-    async waitForMultiloginOptimizer() {
-        let attempts = 0;
-        const maxAttempts = 10;
-        
-        while (attempts < maxAttempts) {
-            if (typeof MultiloginOptimizer !== 'undefined') {
-                return true;
-            }
-            await this.delay(500);
-            attempts++;
-        }
-        return false;
-    }
+
 
     /**
      * Cleanup resources
@@ -705,44 +801,230 @@ class AdSenseAutomationPro {
     }
 }
 
+// Pre-initialize stealth modules to ensure availability
+if (typeof window !== 'undefined') {
+    // Ensure stealth modules are available immediately
+    if (typeof window._stealth_delay === 'undefined') {
+        window._stealth_delay = class PreInitStealthDelay {
+            constructor() {
+                this.delayHistory = [];
+            }
+            async wait(ms) { 
+                this.delayHistory.push({ delay: ms, type: 'wait', timestamp: Date.now() });
+                return new Promise(resolve => setTimeout(resolve, ms)); 
+            }
+            async waitRandom(min, max) { 
+                const delay = Math.random() * (max - min) + min;
+                this.delayHistory.push({ delay: delay, type: 'random', timestamp: Date.now() });
+                return new Promise(resolve => setTimeout(resolve, delay)); 
+            }
+            getDelayStats() {
+                return { averageDelay: 0, totalDelays: this.delayHistory.length, delayTypes: {}, patternAnalysis: 'pre_init' };
+            }
+        };
+    }
+    
+    if (typeof window._stealth_storage === 'undefined') {
+        window._stealth_storage = class PreInitStealthStorage {
+            constructor() {
+                this.prefix = 'stealth_';
+                this.maxStorageSize = 1024 * 1024; // 1MB
+            }
+            set(key, value) { 
+                try { 
+                    const fullKey = this.prefix + key;
+                    const data = { value: value, timestamp: Date.now() };
+                    localStorage.setItem(fullKey, JSON.stringify(data)); 
+                } catch (e) { 
+                    console.warn('Pre-init storage set failed:', e.message);
+                } 
+            }
+            get(key) { 
+                try { 
+                    const fullKey = this.prefix + key;
+                    const item = localStorage.getItem(fullKey); 
+                    return item ? JSON.parse(item).value : null; 
+                } catch (e) { 
+                    console.warn('Pre-init storage get failed:', e.message);
+                    return null; 
+                } 
+            }
+            remove(key) {
+                try {
+                    const fullKey = this.prefix + key;
+                    localStorage.removeItem(fullKey);
+                } catch (e) {
+                    console.warn('Pre-init storage remove failed:', e.message);
+                }
+            }
+            clear() {
+                try {
+                    const keys = Object.keys(localStorage);
+                    keys.forEach(key => {
+                        if (key.startsWith(this.prefix)) {
+                            localStorage.removeItem(key);
+                        }
+                    });
+                } catch (e) {
+                    console.warn('Pre-init storage clear failed:', e.message);
+                }
+            }
+            getStats() {
+                return { keyCount: 0, totalSize: 0, maxSize: this.maxStorageSize, usagePercent: 0 };
+            }
+        };
+    }
+}
+
 // Initialize automation when content script loads with enhanced stealth protection
 let automationPro = null;
+
+// Function to initialize automation with dependency checks
+function initializeAutomation() {
+    if (typeof window !== 'undefined' && !window.AdSenseAutomationProInstance) {
+        try {
+            // Check if required dependencies are available
+            if (typeof AdSenseAutomationPro === 'undefined') {
+                console.warn('AdSenseAutomationPro class not available, retrying...');
+                setTimeout(initializeAutomation, 1000); // Retry after 1 second
+                return;
+            }
+            
+            // Enhanced stealth modules check with immediate fallback creation
+            const stealthDelayAvailable = typeof window._stealth_delay !== 'undefined';
+            const stealthStorageAvailable = typeof window._stealth_storage !== 'undefined';
+            
+            // Create fallback modules immediately if not available
+            if (!stealthDelayAvailable) {
+                console.log('Creating fallback StealthDelay module...');
+                window._stealth_delay = class FallbackStealthDelay {
+                    constructor() {
+                        this.delayHistory = [];
+                    }
+                    async wait(ms) { 
+                        this.delayHistory.push({ delay: ms, type: 'wait', timestamp: Date.now() });
+                        return new Promise(resolve => setTimeout(resolve, ms)); 
+                    }
+                    async waitRandom(min, max) { 
+                        const delay = Math.random() * (max - min) + min;
+                        this.delayHistory.push({ delay: delay, type: 'random', timestamp: Date.now() });
+                        return new Promise(resolve => setTimeout(resolve, delay)); 
+                    }
+                    getDelayStats() {
+                        return { averageDelay: 0, totalDelays: this.delayHistory.length, delayTypes: {}, patternAnalysis: 'fallback' };
+                    }
+                };
+            }
+            
+            if (!stealthStorageAvailable) {
+                console.log('Creating fallback StealthStorage module...');
+                window._stealth_storage = class FallbackStealthStorage {
+                    constructor() {
+                        this.prefix = 'stealth_';
+                        this.maxStorageSize = 1024 * 1024; // 1MB
+                    }
+                    set(key, value) { 
+                        try { 
+                            const fullKey = this.prefix + key;
+                            const data = { value: value, timestamp: Date.now() };
+                            localStorage.setItem(fullKey, JSON.stringify(data)); 
+                        } catch (e) { 
+                            console.warn('Fallback storage set failed:', e.message);
+                        } 
+                    }
+                    get(key) { 
+                        try { 
+                            const fullKey = this.prefix + key;
+                            const item = localStorage.getItem(fullKey); 
+                            return item ? JSON.parse(item).value : null; 
+                        } catch (e) { 
+                            console.warn('Fallback storage get failed:', e.message);
+                            return null; 
+                        } 
+                    }
+                    remove(key) {
+                        try {
+                            const fullKey = this.prefix + key;
+                            localStorage.removeItem(fullKey);
+                        } catch (e) {
+                            console.warn('Fallback storage remove failed:', e.message);
+                        }
+                    }
+                    clear() {
+                        try {
+                            const keys = Object.keys(localStorage);
+                            keys.forEach(key => {
+                                if (key.startsWith(this.prefix)) {
+                                    localStorage.removeItem(key);
+                                }
+                            });
+                        } catch (e) {
+                            console.warn('Fallback storage clear failed:', e.message);
+                        }
+                    }
+                    getStats() {
+                        return { keyCount: 0, totalSize: 0, maxSize: this.maxStorageSize, usagePercent: 0 };
+                    }
+                };
+            }
+            
+            // Log status after fallback creation
+            if (!stealthDelayAvailable || !stealthStorageAvailable) {
+                console.log(`Stealth modules created - Delay: ${typeof window._stealth_delay !== 'undefined'}, Storage: ${typeof window._stealth_storage !== 'undefined'}`);
+            }
+            
+            automationPro = new AdSenseAutomationPro();
+            window.AdSenseAutomationProInstance = automationPro;
+            automationPro.initialize();
+            console.log('Automation initialized successfully');
+        } catch (error) {
+            console.warn('Failed to initialize automation:', error.message);
+        }
+    }
+}
 
 // Enhanced check if already initialized to prevent duplication
 if (typeof window !== 'undefined' && window.AdSenseAutomationProInstance) {
     console.log('Automation already initialized, skipping...');
     automationPro = window.AdSenseAutomationProInstance;
 } else {
-    // Wait for DOM to be ready
+    // Initialize immediately with multiple attempts
+    console.log('Starting automation initialization...');
+    
+    // First attempt - immediate
+    initializeAutomation();
+    
+    // Second attempt - after DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-            if (typeof window !== 'undefined' && !window.AdSenseAutomationProInstance) {
-                try {
-                    automationPro = new AdSenseAutomationPro();
-                    window.AdSenseAutomationProInstance = automationPro;
-                    automationPro.initialize();
-                } catch (error) {
-                    console.warn('Failed to initialize automation:', error);
-                }
-            }
+            setTimeout(initializeAutomation, 50); // Very short delay
         });
     } else {
-        if (typeof window !== 'undefined' && !window.AdSenseAutomationProInstance) {
-            try {
-                automationPro = new AdSenseAutomationPro();
-                window.AdSenseAutomationProInstance = automationPro;
-                automationPro.initialize();
-            } catch (error) {
-                console.warn('Failed to initialize automation:', error);
-            }
-        }
+        setTimeout(initializeAutomation, 50); // Very short delay
     }
+    
+    // Third attempt - after window load
+    window.addEventListener('load', () => {
+        setTimeout(initializeAutomation, 100);
+    });
 }
 
-// Cleanup on page unload
+// Cleanup on page unload with graceful handling
 window.addEventListener('beforeunload', () => {
-    if (automationPro) {
-        automationPro.cleanup();
+    try {
+        if (automationPro) {
+            // Try to save session before cleanup
+            if (automationPro.sessionManager && automationPro.sessionManager.currentSession) {
+                automationPro.sessionManager.saveSession().catch(error => {
+                    console.debug('Session save during cleanup failed:', error.message);
+                });
+            }
+            
+            // Perform cleanup
+            automationPro.cleanup();
+        }
+    } catch (error) {
+        console.debug('Cleanup during page unload failed:', error.message);
     }
 });
 

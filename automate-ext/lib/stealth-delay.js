@@ -331,10 +331,15 @@ class StealthDelay {
     }
 }
 
-// Export for use in other modules
+// Export for use in other modules with immediate availability
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = StealthDelay;
-} else if (typeof window !== 'undefined' && !window._stealth_delay) {
-    // Use stealth naming to avoid detection
+} else if (typeof window !== 'undefined') {
+    // Use stealth naming to avoid detection and ensure immediate availability
     window._stealth_delay = StealthDelay;
+    
+    // Also export as a global function for immediate access
+    if (typeof window.StealthDelay === 'undefined') {
+        window.StealthDelay = StealthDelay;
+    }
 }
