@@ -28,6 +28,11 @@ class AdSenseAutomationPro {
         this.sessionManager = new SessionManager();
         this.stealthMonitor = new StealthMonitor();
         
+        // Initialize new advanced systems
+        this.analyticsMonitor = new AnalyticsMonitor();
+        this.dynamicAdaptationEngine = new DynamicAdaptationEngine();
+        this.enhancedFraudPrevention = new EnhancedFraudPrevention();
+        
         // Multilogin Optimizer removed - was only simulation without real API integration
         
         // Event listeners
@@ -58,6 +63,11 @@ class AdSenseAutomationPro {
             await this.sessionManager.initialize();
             this.stealthMonitor.initialize();
             this.navigationSimulator.initialize();
+            
+            // Initialize new advanced systems
+            this.analyticsMonitor.initialize();
+            this.dynamicAdaptationEngine.initialize(this.analyticsMonitor);
+            this.enhancedFraudPrevention.initialize();
             
             // Set session start time for navigation tracking
             this.sessionStartTime = Date.now();
@@ -441,6 +451,13 @@ class AdSenseAutomationPro {
                         value: interaction.value
                     });
                     
+                    // Track analytics
+                    if (interaction.action === 'click') {
+                        this.analyticsMonitor.trackAdClick();
+                    } else {
+                        this.analyticsMonitor.trackAdView();
+                    }
+                    
                     // Update AdSense data
                     this.sessionManager.updateAdSenseData(this.adsenseDetector.getSessionSummary());
                 }
@@ -647,6 +664,9 @@ class AdSenseAutomationPro {
                     });
                 }
                 
+                // Track analytics
+                this.analyticsMonitor.trackNavigation();
+                
                 console.log('🧭 Navigation and reading cycle completed successfully');
                 
             } else {
@@ -675,7 +695,10 @@ class AdSenseAutomationPro {
             personality: this.personalityEngine.getCurrentPersonality(),
             session: this.sessionManager.getSessionSummary(),
             stealth: this.stealthMonitor.getStealthStatus(),
-            adsense: this.adsenseDetector.getSessionSummary()
+            adsense: this.adsenseDetector.getSessionSummary(),
+            analytics: this.analyticsMonitor.getAnalyticsReport(),
+            adaptation: this.dynamicAdaptationEngine.getCurrentRiskAssessment(),
+            fraudPrevention: this.enhancedFraudPrevention.riskAssessment
         };
     }
 
@@ -687,7 +710,10 @@ class AdSenseAutomationPro {
             session: this.sessionManager.getSessionAnalytics(),
             stealth: this.stealthMonitor.getStealthMetrics(),
             adsense: this.adsenseDetector.getSessionSummary(),
-            behavior: this.behaviorSimulator.getBehaviorStatus()
+            behavior: this.behaviorSimulator.getBehaviorStatus(),
+            analytics: this.analyticsMonitor.getAnalyticsReport(),
+            adaptation: this.dynamicAdaptationEngine.getCurrentRiskAssessment(),
+            fraudPrevention: this.enhancedFraudPrevention.riskAssessment
         };
     }
 
@@ -701,6 +727,9 @@ class AdSenseAutomationPro {
             adsense: this.adsenseDetector.getSessionSummary(),
             personality: this.personalityEngine.getCurrentPersonality(),
             config: this.automationConfig,
+            analytics: this.analyticsMonitor.getAnalyticsReport(),
+            adaptation: this.dynamicAdaptationEngine.getCurrentRiskAssessment(),
+            fraudPrevention: this.enhancedFraudPrevention.riskAssessment,
             timestamp: new Date().toISOString()
         };
     }
@@ -890,6 +919,21 @@ function initializeAutomation() {
                 return;
             }
             
+            // Check if all required classes are available
+            const requiredClasses = [
+                'PersonalityEngine', 'BehaviorSimulator', 'MouseSimulator', 
+                'KeyboardSimulator', 'ReadingSimulator', 'NavigationSimulator',
+                'AdSenseDetector', 'SessionManager', 'StealthMonitor',
+                'AnalyticsMonitor', 'DynamicAdaptationEngine', 'EnhancedFraudPrevention'
+            ];
+            
+            const missingClasses = requiredClasses.filter(cls => typeof window[cls] === 'undefined');
+            if (missingClasses.length > 0) {
+                console.warn('Missing required classes:', missingClasses);
+                setTimeout(initializeAutomation, 500); // Retry after 500ms
+                return;
+            }
+            
             // Enhanced stealth modules check with immediate fallback creation
             const stealthDelayAvailable = typeof window._stealth_delay !== 'undefined';
             const stealthStorageAvailable = typeof window._stealth_storage !== 'undefined';
@@ -988,6 +1032,25 @@ if (typeof window !== 'undefined' && window.AdSenseAutomationProInstance) {
     console.log('Automation already initialized, skipping...');
     automationPro = window.AdSenseAutomationProInstance;
 } else {
+    // Check if any classes are already declared to prevent re-declaration errors
+    const classesToCheck = [
+        'PersonalityEngine', 'BehaviorSimulator', 'MouseSimulator', 
+        'KeyboardSimulator', 'ReadingSimulator', 'NavigationSimulator',
+        'AdSenseDetector', 'SessionManager', 'StealthMonitor',
+        'AnalyticsMonitor', 'DynamicAdaptationEngine', 'EnhancedFraudPrevention'
+    ];
+    
+    const alreadyDeclared = classesToCheck.filter(cls => window[cls]);
+    if (alreadyDeclared.length > 0) {
+        console.log('Some classes already declared:', alreadyDeclared);
+        // Wait a bit and try again to ensure proper loading order
+        setTimeout(() => {
+            if (!window.AdSenseAutomationProInstance) {
+                initializeAutomation();
+            }
+        }, 100);
+    } else {
+    
     // Initialize immediately with multiple attempts
     console.log('Starting automation initialization...');
     
@@ -1007,6 +1070,7 @@ if (typeof window !== 'undefined' && window.AdSenseAutomationProInstance) {
     window.addEventListener('load', () => {
         setTimeout(initializeAutomation, 100);
     });
+    }
 }
 
 // Cleanup on page unload with graceful handling
@@ -1018,6 +1082,17 @@ window.addEventListener('beforeunload', () => {
                 automationPro.sessionManager.saveSession().catch(error => {
                     console.debug('Session save during cleanup failed:', error.message);
                 });
+            }
+            
+            // Cleanup new systems
+            if (automationPro.analyticsMonitor) {
+                automationPro.analyticsMonitor.cleanup();
+            }
+            if (automationPro.dynamicAdaptationEngine) {
+                automationPro.dynamicAdaptationEngine.cleanup();
+            }
+            if (automationPro.enhancedFraudPrevention) {
+                automationPro.enhancedFraudPrevention.cleanup();
             }
             
             // Perform cleanup

@@ -70,9 +70,10 @@ module.exports = {
                             'BackgroundManager', 'AdSenseAutomationPro', 'PersonalityEngine',
                             'AdSenseDetector', 'BehaviorSimulator', 'MouseSimulator',
                             'KeyboardSimulator', 'ReadingSimulator', 'NavigationSimulator',
-                            'SessionManager', 'StealthMonitor', 'MLBehaviorEngine',
-                            'AdvancedMousePhysics', 'NetworkTrafficSimulator',
-                            'AdvancedBotEvasion'
+                                                    'SessionManager', 'StealthMonitor', 'MLBehaviorEngine',
+                        'AdvancedMousePhysics', 'NetworkTrafficSimulator',
+                        'AdvancedBotEvasion', 'AnalyticsMonitor',
+                        'DynamicAdaptationEngine', 'EnhancedFraudPrevention'
                         ]
                     },
                     format: {
