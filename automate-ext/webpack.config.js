@@ -9,22 +9,7 @@ module.exports = {
         // Main scripts
         'content-script': './content-script.js',
         'background': './background.js',
-        'popup': './popup.js',
-        
-        // Library files
-        'lib/personality-engine': './lib/personality-engine.js',
-        'lib/adsense-detector': './lib/adsense-detector.js',
-        'lib/behavior-simulator': './lib/behavior-simulator.js',
-        'lib/mouse-simulator': './lib/mouse-simulator.js',
-        'lib/keyboard-simulator': './lib/keyboard-simulator.js',
-        'lib/reading-simulator': './lib/reading-simulator.js',
-        'lib/navigation-simulator': './lib/navigation-simulator.js',
-        'lib/session-manager': './lib/session-manager.js',
-        'lib/stealth-monitor': './lib/stealth-monitor.js',
-        'lib/ml-behavior-engine': './lib/ml-behavior-engine.js',
-        'lib/advanced-mouse-physics': './lib/advanced-mouse-physics.js',
-        'lib/network-traffic-simulator': './lib/network-traffic-simulator.js',
-            'lib/advanced-bot-evasion': './lib/advanced-bot-evasion.js'
+        'popup': './popup.js'
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -98,17 +83,8 @@ module.exports = {
                 extractComments: false
             })
         ],
-        // Split chunks for better caching
-        splitChunks: {
-            chunks: 'all',
-            cacheGroups: {
-                vendor: {
-                    test: /[\\/]lib[\\/]/,
-                    name: 'vendors',
-                    chunks: 'all'
-                }
-            }
-        }
+        // Disable code splitting to keep individual files
+        splitChunks: false
     },
     plugins: [
         // Clean dist folder before build
