@@ -4,6 +4,7 @@
 
 class AdSenseDetector {
     constructor() {
+        this.userRegion = this.detectUserRegion();
         this.adSelectors = [
             // Standard AdSense selectors
             'ins.adsbygoogle',
@@ -47,6 +48,113 @@ class AdSenseDetector {
         ];
         
         this.detectedAds = [];
+    }
+
+    detectUserRegion() {
+        // Try to detect user region from various sources
+        const language = navigator.language || navigator.userLanguage;
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        
+        console.log('🌍 Detecting user region:', { language, timezone });
+        
+        // Check for Indonesian indicators
+        if (language.includes('id') || language.includes('ID') || 
+            timezone.includes('Asia/Jakarta') || timezone.includes('Asia/Makassar') ||
+            timezone.includes('Asia/Jayapura')) {
+            console.log('🇮🇩 Detected Indonesia region');
+            return 'ID';
+        }
+        
+        // Check for US indicators
+        if (language.includes('en-US') || timezone.includes('America/') ||
+            timezone.includes('US/') || timezone.includes('EST') || 
+            timezone.includes('CST') || timezone.includes('MST') || 
+            timezone.includes('PST')) {
+            console.log('🇺🇸 Detected US region');
+            return 'US';
+        }
+        
+        // Default to global
+        console.log('🌐 Using global region (default)');
+        return 'GLOBAL';
+    }
+
+    getHighValueKeywords() {
+        const baseKeywords = [
+            // Finance & Investment (High CPC - Global)
+            'finance', 'business', 'investment', 'money', 'credit', 'loan', 'insurance'
+        ];
+
+        const indonesiaKeywords = [
+            // Indonesia High CPC Keywords
+            'kredit', 'pinjaman', 'investasi', 'keuangan', 'bisnis', 'asuransi', 'bank',
+            'tabungan', 'deposito', 'reksadana', 'saham', 'obligasi', 'forex', 'trading',
+            'properti', 'rumah', 'mobil', 'motor', 'bpkb', 'leasing', 'gadai', 'kartu kredit',
+            'paylater', 'fintech', 'p2p lending', 'crowdfunding', 'crypto', 'bitcoin',
+            'emoney', 'dana', 'ovo', 'gopay', 'shopeepay', 'linkaja', 'doku',
+            
+            // E-commerce Indonesia
+            'tokopedia', 'shopee', 'lazada', 'bukalapak', 'blibli', 'jd.id',
+            
+            // Travel Indonesia
+            'bali', 'jakarta', 'surabaya', 'yogyakarta', 'bandung'
+        ];
+
+        const usKeywords = [
+            // US High CPC Keywords
+            'mortgage', 'refinance', 'home loan', 'car loan', 'personal loan', 'student loan',
+            'credit card', 'debt consolidation', 'bankruptcy', 'tax preparation', 'accounting',
+            'real estate', 'property', 'insurance quote', 'life insurance', 'health insurance',
+            'car insurance', 'home insurance', 'business insurance', 'retirement planning',
+            '401k', 'ira', 'roth ira', 'investment portfolio', 'stock market', 'mutual funds',
+            'etf', 'options trading', 'futures', 'commodities', 'gold', 'silver', 'cryptocurrency',
+            'bitcoin', 'ethereum', 'blockchain', 'nft', 'defi', 'robinhood', 'fidelity',
+            'vanguard', 'schwab', 'ameritrade', 'etrade', 'webull', 'coinbase', 'binance',
+            
+            // E-commerce US
+            'amazon', 'ebay', 'walmart', 'target', 'best buy',
+            
+            // Travel US
+            'new york', 'los angeles', 'chicago', 'miami', 'las vegas', 'orlando', 
+            'san francisco', 'seattle', 'boston', 'philadelphia', 'atlanta'
+        ];
+
+        const globalKeywords = [
+            // E-commerce & Shopping (High CPC - Both Regions)
+            'online shopping', 'ecommerce', 'electronics', 'smartphone', 'laptop', 'computer', 
+            'gaming', 'fashion', 'clothing', 'shoes', 'accessories', 'beauty', 'cosmetics', 
+            'skincare', 'makeup', 'perfume',
+            
+            // Travel & Tourism (High CPC - Both Regions)
+            'travel', 'vacation', 'holiday', 'hotel', 'flight', 'airline', 'booking',
+            'ticket', 'tour', 'package', 'destination',
+            
+            // Health & Wellness (High CPC - Both Regions)
+            'health', 'medical', 'doctor', 'hospital', 'clinic', 'pharmacy', 'medicine',
+            'supplement', 'vitamin', 'fitness', 'gym', 'workout', 'diet', 'weight loss',
+            'dental', 'vision', 'mental health', 'therapy', 'counseling', 'psychology',
+            
+            // Education & Training (High CPC - Both Regions)
+            'education', 'course', 'training', 'certification', 'degree', 'university',
+            'college', 'school', 'online learning', 'skill development', 'professional development',
+            'language learning', 'english', 'indonesian', 'spanish', 'mandarin', 'japanese',
+            
+            // Technology & Software (High CPC - Both Regions)
+            'software', 'saas', 'cloud', 'hosting', 'domain', 'website', 'web design',
+            'seo', 'digital marketing', 'social media', 'facebook', 'instagram', 'tiktok',
+            'youtube', 'google ads', 'facebook ads', 'instagram ads', 'tiktok ads',
+            'email marketing', 'content marketing', 'influencer marketing', 'affiliate marketing'
+        ];
+
+        // Return keywords based on detected region
+        switch (this.userRegion) {
+            case 'ID':
+                return [...baseKeywords, ...indonesiaKeywords, ...globalKeywords];
+            case 'US':
+                return [...baseKeywords, ...usKeywords, ...globalKeywords];
+            default:
+                return [...baseKeywords, ...globalKeywords];
+        }
     }
 
     detectAds() {
@@ -181,11 +289,15 @@ class AdSenseDetector {
             }
         });
 
-        // Bonus for high-value ad categories
-        const highValueKeywords = ['finance', 'business', 'investment', 'money', 'credit', 'loan', 'insurance'];
+        // Bonus for high-value ad categories (Region-specific high CPC keywords)
+        const highValueKeywords = this.getHighValueKeywords();
+        
+        console.log(`🎯 Using ${this.userRegion} region keywords (${highValueKeywords.length} total)`);
+        
         highValueKeywords.forEach(keyword => {
             if (adText.includes(keyword)) {
                 score += 2;
+                console.log(`✅ High-value keyword match: "${keyword}" (+2 score)`);
             }
         });
 
