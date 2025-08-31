@@ -22,6 +22,10 @@ class SmartAdSenseBackground {
             currentUrl: null
         };
         
+        // Global visited URLs tracking
+        this.globalVisitedUrls = new Set();
+        this.maxPostsPerSession = 5;
+        
         this.init();
     }
 
@@ -42,9 +46,13 @@ class SmartAdSenseBackground {
 
     async loadConfig() {
         try {
-            const saved = await chrome.storage.local.get(['smartAdSenseConfig']);
+            const saved = await chrome.storage.local.get(['smartAdSenseConfig', 'globalVisitedUrls']);
             if (saved.smartAdSenseConfig) {
                 this.config = { ...this.config, ...saved.smartAdSenseConfig };
+            }
+            if (saved.globalVisitedUrls) {
+                this.globalVisitedUrls = new Set(saved.globalVisitedUrls);
+                console.log('📊 Loaded global visited URLs:', this.globalVisitedUrls.size);
             }
         } catch (error) {
             console.error('Error loading config:', error);
@@ -53,7 +61,10 @@ class SmartAdSenseBackground {
 
     async saveConfig() {
         try {
-            await chrome.storage.local.set({ smartAdSenseConfig: this.config });
+            await chrome.storage.local.set({ 
+                smartAdSenseConfig: this.config,
+                globalVisitedUrls: Array.from(this.globalVisitedUrls)
+            });
         } catch (error) {
             console.error('Error saving config:', error);
         }
@@ -108,6 +119,29 @@ class SmartAdSenseBackground {
                 
             case 'getSessionData':
                 sendResponse({ sessionData: this.sessionData });
+                break;
+                
+            case 'addVisitedUrl':
+                this.addGlobalVisitedUrl(message.url);
+                sendResponse({ status: 'url_added' });
+                break;
+                
+            case 'isUrlVisited':
+                const isVisited = this.isGlobalUrlVisited(message.url);
+                sendResponse({ isVisited: isVisited });
+                break;
+                
+            case 'getGlobalVisitedUrls':
+                sendResponse({ 
+                    visitedUrls: Array.from(this.globalVisitedUrls),
+                    count: this.globalVisitedUrls.size,
+                    maxPosts: this.maxPostsPerSession
+                });
+                break;
+                
+            case 'resetGlobalVisitedUrls':
+                this.resetGlobalVisitedUrls();
+                sendResponse({ status: 'reset_complete' });
                 break;
                 
             default:
@@ -197,6 +231,69 @@ class SmartAdSenseBackground {
         if (this.sessionData.adClicks >= this.config.maxAdClicksPerSession) {
             console.log('🖱️ Max ad clicks reached for this session');
         }
+    }
+
+    // Global URL tracking methods
+    addGlobalVisitedUrl(url) {
+        if (url && typeof url === 'string') {
+            this.globalVisitedUrls.add(url);
+            console.log('📝 Added to global visited URLs:', url);
+            console.log('📊 Total global visited URLs:', this.globalVisitedUrls.size);
+            
+            // Save to storage
+            this.saveConfig();
+        }
+    }
+
+    isGlobalUrlVisited(url) {
+        if (!url || typeof url !== 'string') return false;
+        
+        // Check exact match
+        if (this.globalVisitedUrls.has(url)) {
+            return true;
+        }
+        
+        // Check without hash fragments
+        try {
+            const urlObj = new URL(url);
+            const urlWithoutHash = urlObj.origin + urlObj.pathname + urlObj.search;
+            
+            for (const visitedUrl of this.globalVisitedUrls) {
+                const visitedUrlObj = new URL(visitedUrl);
+                const visitedWithoutHash = visitedUrlObj.origin + visitedUrlObj.pathname + visitedUrlObj.search;
+                
+                if (urlWithoutHash === visitedWithoutHash) {
+                    return true;
+                }
+            }
+        } catch (error) {
+            console.warn('Error checking global visited URL:', error);
+        }
+        
+        return false;
+    }
+
+    resetGlobalVisitedUrls() {
+        this.globalVisitedUrls.clear();
+        console.log('🔄 Global visited URLs reset');
+        this.saveConfig();
+    }
+
+    shouldResetGlobalSession() {
+        const visitedCount = this.globalVisitedUrls.size;
+        const maxPosts = this.maxPostsPerSession;
+        
+        // Only reset when we've reached the maximum posts limit
+        if (visitedCount >= maxPosts) {
+            console.log('🔄 Global session limit reached, should reset');
+            return true;
+        }
+        
+        // Don't reset just because we're near the limit
+        // This prevents premature resets that could cause URL revisiting
+        console.log(`📊 Global session progress: ${visitedCount}/${maxPosts} (${Math.round(visitedCount/maxPosts*100)}%)`);
+        
+        return false;
     }
 
     // Utility methods

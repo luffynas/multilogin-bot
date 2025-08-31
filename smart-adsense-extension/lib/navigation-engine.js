@@ -177,67 +177,80 @@ class NavigationEngine {
             ]
         };
         
-        this.visitedUrls = new Set();
+        // Global URL tracking will be handled by background script
         this.maxPostsPerSession = 5;
         
-        // Add current page to visited URLs on initialization
-        this.addCurrentPageToVisited();
+        // Don't add current page to visited URLs on initialization
+        // Only add when actually navigating to a new page
+        console.log('📍 NavigationEngine initialized - current page not marked as visited yet');
     }
 
-    addCurrentPageToVisited() {
+    addCurrentPageToGlobalVisited() {
         const currentUrl = window.location.href;
-        this.visitedUrls.add(currentUrl);
-        console.log('📍 Added current page to visited URLs:', currentUrl);
+        this.addToGlobalVisitedUrls(currentUrl);
+        console.log('📍 Added current page to global visited URLs:', currentUrl);
     }
 
-    addToVisitedUrls(url) {
+    async addToGlobalVisitedUrls(url) {
         if (url && typeof url === 'string') {
-            this.visitedUrls.add(url);
-            console.log('📝 Added to visited URLs:', url);
-            console.log('📊 Total visited URLs:', this.visitedUrls.size);
+            try {
+                await chrome.runtime.sendMessage({
+                    action: 'addVisitedUrl',
+                    url: url
+                });
+                console.log('📝 Added to global visited URLs:', url);
+            } catch (error) {
+                console.warn('Error adding to global visited URLs:', error);
+            }
         }
     }
 
-    isUrlVisited(url) {
+    async isUrlVisited(url) {
         if (!url || typeof url !== 'string') return false;
         
-        // Check exact match
-        if (this.visitedUrls.has(url)) {
-            console.log('🚫 URL already visited (exact match):', url);
-            return true;
-        }
-        
-        // Check without hash fragments
         try {
-            const urlObj = new URL(url, window.location.origin);
-            const urlWithoutHash = urlObj.origin + urlObj.pathname + urlObj.search;
+            const response = await chrome.runtime.sendMessage({
+                action: 'isUrlVisited',
+                url: url
+            });
             
-            for (const visitedUrl of this.visitedUrls) {
-                const visitedUrlObj = new URL(visitedUrl, window.location.origin);
-                const visitedWithoutHash = visitedUrlObj.origin + visitedUrlObj.pathname + visitedUrlObj.search;
-                
-                if (urlWithoutHash === visitedWithoutHash) {
-                    console.log('🚫 URL already visited (without hash):', url);
-                    return true;
-                }
+            if (response.isVisited) {
+                console.log('🚫 URL already visited (global):', url);
+            } else {
+                console.log('✅ URL not visited yet (global):', url);
             }
+            
+            return response.isVisited;
         } catch (error) {
-            console.warn('Error checking visited URL:', error);
+            console.warn('Error checking global visited URL:', error);
+            return false;
         }
-        
-        return false;
     }
 
-    getVisitedUrlsInfo() {
-        return {
-            total: this.visitedUrls.size,
-            urls: Array.from(this.visitedUrls),
-            maxPosts: this.maxPostsPerSession,
-            remaining: this.maxPostsPerSession - this.visitedUrls.size
-        };
+    async getVisitedUrlsInfo() {
+        try {
+            const response = await chrome.runtime.sendMessage({
+                action: 'getGlobalVisitedUrls'
+            });
+            
+            return {
+                total: response.count,
+                urls: response.visitedUrls,
+                maxPosts: response.maxPosts,
+                remaining: response.maxPosts - response.count
+            };
+        } catch (error) {
+            console.warn('Error getting global visited URLs info:', error);
+            return {
+                total: 0,
+                urls: [],
+                maxPosts: this.maxPostsPerSession,
+                remaining: this.maxPostsPerSession
+            };
+        }
     }
 
-    findNavigationLinks() {
+    async findNavigationLinks() {
         const currentPageInfo = this.getCurrentPageInfo();
         const pageType = this.detectPageType();
         
@@ -253,20 +266,20 @@ class NavigationEngine {
                 next: [],
                 related: [],
                 random: [],
-                postLinks: this.findPostLinks(),
-                recentPosts: this.findRecentPosts()
+                postLinks: await this.findPostLinks(),
+                recentPosts: await this.findRecentPosts()
             };
             
             console.log('🏠 Home/Category page detected - focusing on post links and recent posts');
         } else {
             // On individual post pages, look for navigation links
             links = {
-                previous: this.findPreviousLinks(),
-                next: this.findNextLinks(),
-                related: this.findRelatedLinks(),
-                random: this.findRandomLinks(),
+                previous: await this.findPreviousLinks(),
+                next: await this.findNextLinks(),
+                related: await this.findRelatedLinks(),
+                random: await this.findRandomLinks(),
                 postLinks: [],
-                recentPosts: this.findRecentPosts()
+                recentPosts: await this.findRecentPosts()
             };
             
             console.log('📝 Individual post page detected - focusing on navigation links and recent posts');
@@ -285,91 +298,124 @@ class NavigationEngine {
         console.log('📍 Current page info:', currentPageInfo);
         
         // Log visited URLs info
-        const visitedInfo = this.getVisitedUrlsInfo();
+        const visitedInfo = await this.getVisitedUrlsInfo();
         console.log('📊 Visited URLs info:', visitedInfo);
 
         return links;
     }
 
-    findBestNavigationTarget(content = null) {
+    async findBestNavigationTarget(content = null) {
         const pageType = this.detectPageType();
         console.log('🎯 Finding best navigation target for page type:', pageType);
         
-        if (pageType === 'home' || pageType === 'category') {
-            // On home/category pages, prioritize recent posts first
-            const recentUrl = this.findRecentPost();
-            if (recentUrl) {
-                console.log('🕒 Selected recent post from home/category page:', recentUrl);
-                return recentUrl;
-            }
-            
-            // Then try regular post links
-            const postUrl = this.findPostFromHomeOrCategory();
+        if (pageType === 'home') {
+            // On home pages, select random post link
+            console.log('🏠 Home page detected - selecting random post link');
+            const postUrl = await this.findPostFromHomeOrCategory();
             if (postUrl) {
-                console.log('🏠 Selected post from home/category page:', postUrl);
+                console.log('✅ Selected random post from home page:', postUrl);
                 return postUrl;
             }
             
-            // Fallback to random links if no post links found
-            console.log('⚠️ No post links found, trying random links as fallback');
-            return this.findRandomPost();
-        } else {
-            // On individual post pages, use existing navigation logic with recent posts
-            console.log('📝 Using post navigation logic with recent posts');
+            // Fallback to recent posts if no post links found
+            const recentUrl = await this.findRecentPost();
+            if (recentUrl) {
+                console.log('🕒 Fallback to recent post from home page:', recentUrl);
+                return recentUrl;
+            }
             
-            // Try recent posts first (fresh content)
-            const recentUrl = this.findRecentPost();
+            console.log('⚠️ No post links found on home page');
+            return null;
+        } else if (pageType === 'category') {
+            // On category pages, select random post link
+            console.log('🏷️ Category page detected - selecting random post link');
+            const postUrl = await this.findPostFromHomeOrCategory();
+            if (postUrl) {
+                console.log('✅ Selected random post from category page:', postUrl);
+                return postUrl;
+            }
+            
+            // Fallback to recent posts if no post links found
+            const recentUrl = await this.findRecentPost();
+            if (recentUrl) {
+                console.log('🕒 Fallback to recent post from category page:', recentUrl);
+                return recentUrl;
+            }
+            
+            console.log('⚠️ No post links found on category page');
+            return null;
+        } else {
+            // On individual post pages, use priority-based selection: Next → Related → Recent posts → Random
+            console.log('📝 Individual post page detected - using priority-based navigation');
+            
+            // 1. Try next post first
+            const nextUrl = await this.findPreviousNextPost();
+            if (nextUrl) {
+                console.log('➡️ Selected next post:', nextUrl);
+                return nextUrl;
+            }
+            
+            // 2. Try related post
+            const relatedUrl = await this.findRelatedPost(content);
+            if (relatedUrl) {
+                console.log('🔗 Selected related post:', relatedUrl);
+                return relatedUrl;
+            }
+            
+            // 3. Try recent posts
+            const recentUrl = await this.findRecentPost();
             if (recentUrl) {
                 console.log('🕒 Selected recent post:', recentUrl);
                 return recentUrl;
             }
             
-            // Try next post
-            const nextUrl = this.findPreviousNextPost();
-            if (nextUrl) {
-                return nextUrl;
-            }
-            
-            // Try related post
-            const relatedUrl = this.findRelatedPost(content);
-            if (relatedUrl) {
-                return relatedUrl;
-            }
-            
-            // Try random post
-            const randomUrl = this.findRandomPost();
+            // 4. Try random post as fallback
+            const randomUrl = await this.findRandomPost();
             if (randomUrl) {
+                console.log('🎲 Selected random post:', randomUrl);
                 return randomUrl;
             }
+            
+            // 5. Try generic fallback - find any unvisited link on the page
+            console.log('🔄 Trying generic fallback - searching for any unvisited link...');
+            // const fallbackUrl = await this.findGenericFallbackLink();
+            // if (fallbackUrl) {
+            //     console.log('🎯 Found fallback link:', fallbackUrl);
+            //     return fallbackUrl;
+            // }
         }
         
         console.log('❌ No navigation target found');
         return null;
     }
 
-    findPreviousNextPost() {
+    async findPreviousNextPost() {
         // Try to find next post first (more common)
-        const nextLinks = this.findNextLinks();
+        const nextLinks = await this.findNextLinks();
         if (nextLinks.length > 0) {
-            const nextLink = this.selectBestLink(nextLinks);
-            console.log('✅ Found next post:', nextLink.href);
-            return nextLink.href;
+            const nextLink = await this.selectBestLink(nextLinks);
+            if (nextLink) {
+                console.log('✅ Found next post:', nextLink.href);
+                return nextLink.href;
+            }
         }
 
         // Try to find previous post
-        const prevLinks = this.findPreviousLinks();
+        const prevLinks = await this.findPreviousLinks();
         if (prevLinks.length > 0) {
-            const prevLink = this.selectBestLink(prevLinks);
-            console.log('✅ Found previous post:', prevLink.href);
-            return prevLink.href;
+            const prevLink = await this.selectBestLink(prevLinks);
+            if (prevLink) {
+                console.log('✅ Found previous post:', prevLink.href);
+                return prevLink.href;
+            }
         }
 
         console.log('ℹ️ No previous/next posts found');
         return null;
     }
 
-    findRelatedPost(content) {
-        const relatedLinks = this.findRelatedLinks();
+    async findRelatedPost(content) {
+        const relatedLinks = await this.findRelatedLinks();
         
         if (relatedLinks.length === 0) {
             console.log('ℹ️ No related posts found');
@@ -385,33 +431,43 @@ class NavigationEngine {
         // Sort by relevance score
         scoredLinks.sort((a, b) => b.score - a.score);
 
-        const bestLink = scoredLinks[0].link;
-        console.log('✅ Found related post:', bestLink.href, 'score:', scoredLinks[0].score);
-        return bestLink.href;
+        const bestLink = await this.selectBestLink(scoredLinks.map(item => item.link));
+        if (bestLink) {
+            console.log('✅ Found related post:', bestLink.href);
+            return bestLink.href;
+        }
+
+        console.log('ℹ️ No valid related posts found');
+        return null;
     }
 
-    findRandomPost() {
-        const randomLinks = this.findRandomLinks();
+    async findRandomPost() {
+        const randomLinks = await this.findRandomLinks();
         
         if (randomLinks.length === 0) {
             console.log('ℹ️ No random posts found');
             return null;
         }
 
-        const randomLink = this.selectBestLink(randomLinks);
-        console.log('✅ Found random post:', randomLink.href);
-        return randomLink.href;
+        const randomLink = await this.selectBestLink(randomLinks);
+        if (randomLink) {
+            console.log('✅ Found random post:', randomLink.href);
+            return randomLink.href;
+        }
+
+        console.log('ℹ️ No valid random posts found');
+        return null;
     }
 
-    findPostFromHomeOrCategory() {
-        const postLinks = this.findPostLinks();
+    async findPostFromHomeOrCategory() {
+        const postLinks = await this.findPostLinks();
         
         if (postLinks.length === 0) {
             console.log('ℹ️ No post links found on home/category page');
             return null;
         }
 
-        const selectedPost = this.selectBestLink(postLinks);
+        const selectedPost = await this.selectBestLink(postLinks);
         if (selectedPost) {
             console.log('✅ Selected post from home/category page:', selectedPost.href);
             return selectedPost.href;
@@ -421,15 +477,15 @@ class NavigationEngine {
         return null;
     }
 
-    findRecentPost() {
-        const recentLinks = this.findRecentPosts();
+    async findRecentPost() {
+        const recentLinks = await this.findRecentPosts();
         
         if (recentLinks.length === 0) {
             console.log('ℹ️ No recent posts found');
             return null;
         }
 
-        const selectedRecent = this.selectBestLink(recentLinks);
+        const selectedRecent = await this.selectBestLink(recentLinks);
         if (selectedRecent) {
             console.log('✅ Selected recent post:', selectedRecent.href);
             return selectedRecent.href;
@@ -439,135 +495,176 @@ class NavigationEngine {
         return null;
     }
 
-    findPreviousLinks() {
+    async findPreviousLinks() {
         const links = [];
         
-        this.navigationSelectors.previous.forEach(selector => {
+        for (const selector of this.navigationSelectors.previous) {
             const elements = document.querySelectorAll(selector);
-            elements.forEach(element => {
-                if (element.href && this.isValidPostLink(element.href) && !this.isTOCLink(element)) {
+            for (const element of elements) {
+                if (element.href && await this.isValidPostLink(element.href) && !this.isTOCLink(element)) {
                     links.push(element);
                 }
-            });
-        });
+            }
+        }
 
         console.log('⬅️ Previous links found:', links.map(link => link.href));
         return links;
     }
 
-    findNextLinks() {
+    async findNextLinks() {
         const links = [];
         
-        this.navigationSelectors.next.forEach(selector => {
+        console.log('🔍 Searching for next links with selectors:', this.navigationSelectors.next);
+        
+        for (const selector of this.navigationSelectors.next) {
             const elements = document.querySelectorAll(selector);
-            elements.forEach(element => {
-                if (element.href && this.isValidPostLink(element.href) && !this.isTOCLink(element)) {
+            console.log(`🔍 Selector "${selector}" found ${elements.length} elements`);
+            
+            for (const element of elements) {
+                if (element.href && await this.isValidPostLink(element.href) && !this.isTOCLink(element)) {
                     links.push(element);
+                    console.log('✅ Valid next link found:', element.href);
+                } else {
+                    console.log('🚫 Invalid next link:', element.href, {
+                        hasHref: !!element.href,
+                        isValidPost: await this.isValidPostLink(element.href),
+                        isTOC: this.isTOCLink(element)
+                    });
                 }
-            });
-        });
+            }
+        }
 
         console.log('➡️ Next links found:', links.map(link => link.href));
         return links;
     }
 
-    findRelatedLinks() {
+    async findRelatedLinks() {
         const links = [];
         
-        this.navigationSelectors.related.forEach(selector => {
+        for (const selector of this.navigationSelectors.related) {
             const container = document.querySelector(selector);
             if (container) {
                 const linkElements = container.querySelectorAll('a[href]');
-                linkElements.forEach(element => {
-                    if (element.href && this.isValidPostLink(element.href) && !this.isTOCLink(element)) {
+                for (const element of linkElements) {
+                    if (element.href && await this.isValidPostLink(element.href) && !this.isTOCLink(element)) {
                         links.push(element);
                     }
-                });
+                }
             }
-        });
+        }
 
         console.log('🔗 Related links found:', links.map(link => link.href));
         return links;
     }
 
-    findRandomLinks() {
+    async findRandomLinks() {
         const links = [];
         
-        this.navigationSelectors.random.forEach(selector => {
+        console.log('🔍 Searching for random links with selectors:', this.navigationSelectors.random);
+        
+        for (const selector of this.navigationSelectors.random) {
             const elements = document.querySelectorAll(selector);
-            elements.forEach(element => {
-                if (element.href && this.isValidPostLink(element.href) && !this.isTOCLink(element)) {
-                    links.push(element);
+            console.log(`🔍 Selector "${selector}" found ${elements.length} elements`);
+            
+            for (const element of elements) {
+                if (element.href && await this.isValidPostLink(element.href) && !this.isTOCLink(element)) {
+                    // Additional check: ensure it's not pointing to home page
+                    if (!this.isHomePageLink(element.href)) {
+                        links.push(element);
+                        console.log('✅ Valid random link found:', element.href);
+                    } else {
+                        console.log('🚫 Filtering out home page link from random links:', element.href);
+                    }
+                } else {
+                    console.log('🚫 Invalid random link:', element.href, {
+                        hasHref: !!element.href,
+                        isValidPost: await this.isValidPostLink(element.href),
+                        isTOC: this.isTOCLink(element)
+                    });
                 }
-            });
-        });
+            }
+        }
 
         console.log('🎲 Random links found:', links.map(link => link.href));
         return links;
     }
 
-    findPostLinks() {
+    async findPostLinks() {
         const links = [];
         
-        this.navigationSelectors.postLinks.forEach(selector => {
+        for (const selector of this.navigationSelectors.postLinks) {
             const elements = document.querySelectorAll(selector);
-            elements.forEach(element => {
-                if (element.href && this.isValidPostLink(element.href) && !this.isTOCLink(element)) {
+            for (const element of elements) {
+                if (element.href && await this.isValidPostLink(element.href) && !this.isTOCLink(element)) {
                     links.push(element);
                 }
-            });
-        });
+            }
+        }
 
         console.log('📝 Post links found:', links.map(link => link.href));
         return links;
     }
 
-    findRecentPosts() {
+    async findRecentPosts() {
         const links = [];
         
-        this.navigationSelectors.recentPosts.forEach(selector => {
+        for (const selector of this.navigationSelectors.recentPosts) {
             const elements = document.querySelectorAll(selector);
-            elements.forEach(element => {
-                if (element.href && this.isValidPostLink(element.href) && !this.isTOCLink(element)) {
+            for (const element of elements) {
+                if (element.href && await this.isValidPostLink(element.href) && !this.isTOCLink(element)) {
                     links.push(element);
                 }
-            });
-        });
+            }
+        }
 
         console.log('🕒 Recent posts found:', links.map(link => link.href));
         return links;
     }
 
-    selectBestLink(links) {
+    async selectBestLink(links) {
         if (links.length === 0) return null;
 
         // Filter out already visited links and current page
-        const validLinks = links.filter(link => {
-            // Check if not visited
-            if (this.isUrlVisited(link.href)) {
+        const validLinks = [];
+        for (const link of links) {
+            const isVisited = await this.isUrlVisited(link.href);
+            if (isVisited) {
                 console.log('🚫 Filtering out visited link:', link.href);
-                return false;
+                continue;
             }
             
-            // Check if not current page
             if (this.isCurrentPage(link.href)) {
                 console.log('🚫 Filtering out current page link:', link.href);
-                return false;
+                continue;
             }
             
-            return true;
-        });
+            validLinks.push(link);
+        }
 
         if (validLinks.length === 0) {
             console.log('⚠️ No valid unvisited links found');
             
             // Check if we should reset session
-            if (this.shouldResetSession()) {
+            if (await this.shouldResetSession()) {
                 console.log('🔄 Resetting session due to no valid links');
-                this.forceResetSession();
+                await this.forceResetSession();
                 
-                // Try again with reset session
-                const resetValidLinks = links.filter(link => !this.isCurrentPage(link.href));
+                // Try again with reset session - still check for visited URLs
+                const resetValidLinks = [];
+                for (const link of links) {
+                    const isVisited = await this.isUrlVisited(link.href);
+                    if (isVisited) {
+                        console.log('🚫 Filtering out visited link after reset:', link.href);
+                        continue;
+                    }
+                    
+                    if (this.isCurrentPage(link.href)) {
+                        console.log('🚫 Filtering out current page link after reset:', link.href);
+                        continue;
+                    }
+                    
+                    resetValidLinks.push(link);
+                }
                 
                 if (resetValidLinks.length === 0) {
                     console.log('❌ No valid links found even after reset');
@@ -844,7 +941,7 @@ class NavigationEngine {
         }
     }
 
-    isValidPostLink(href) {
+    async isValidPostLink(href) {
         try {
             const url = new URL(href, window.location.origin);
             const currentUrl = new URL(window.location.href);
@@ -877,7 +974,8 @@ class NavigationEngine {
             }
 
             // Must not be visited recently
-            if (this.isUrlVisited(href)) {
+            const isVisited = await this.isUrlVisited(href);
+            if (isVisited) {
                 console.log('🚫 Skipping recently visited URL:', href);
                 return false;
             }
@@ -907,12 +1005,18 @@ class NavigationEngine {
                 return false;
             }
 
+            // Must not be home page link
+            if (this.isHomePageLink(href)) {
+                console.log('🚫 Skipping home page link:', href);
+                return false;
+            }
+
             // Must look like a post URL
             const path = url.pathname;
             const postPatterns = [
                 /\/post\//,
                 /\/article\//,
-                /\/blog\//,
+                /\/blog\/[^\/]+\//, // blog with specific post
                 /\/news\//,
                 /\/[0-9]{4}\//, // Year pattern
                 /\/[a-zA-Z0-9-]+\.html$/,
@@ -939,7 +1043,7 @@ class NavigationEngine {
         console.log('🚀 Navigating to post:', url);
         
         // Final validation before navigation
-        if (!this.isValidPostLink(url)) {
+        if (!await this.isValidPostLink(url)) {
             console.error('❌ Cannot navigate to invalid post link:', url);
             return false;
         }
@@ -956,8 +1060,8 @@ class NavigationEngine {
             return false;
         }
         
-        // Mark URL as visited
-        this.addToVisitedUrls(url);
+        // Mark URL as visited in global storage
+        await this.addToGlobalVisitedUrls(url);
         
         console.log('✅ Navigation validated, proceeding to:', url);
         
@@ -966,14 +1070,54 @@ class NavigationEngine {
         return true;
     }
 
-    getNavigationStats() {
-        const recentPosts = this.findRecentPosts();
-        const postLinks = this.findPostLinks();
+    async findGenericFallbackLink() {
+        console.log('🔍 Searching for generic fallback links...');
+        
+        // Try to find any link that looks like a post
+        const allLinks = document.querySelectorAll('a[href]');
+        const validLinks = [];
+        
+        for (const link of allLinks) {
+            try {
+                if (!link.href || !link.href.startsWith('http')) continue;
+                
+                // Check if it's a valid post link
+                if (await this.isValidPostLink(link.href)) {
+                    // Check if it's not visited
+                    const isVisited = await this.isUrlVisited(link.href);
+                    if (!isVisited) {
+                        validLinks.push(link);
+                        console.log('✅ Found unvisited fallback link:', link.href);
+                    } else {
+                        console.log('🚫 Fallback link already visited:', link.href);
+                    }
+                }
+            } catch (error) {
+                console.warn('Error checking fallback link:', error);
+            }
+        }
+        
+        if (validLinks.length > 0) {
+            // Select random valid link
+            const randomIndex = Math.floor(Math.random() * validLinks.length);
+            const selectedLink = validLinks[randomIndex];
+            console.log('🎯 Selected fallback link:', selectedLink.href);
+            return selectedLink.href;
+        }
+        
+        console.log('❌ No fallback links found');
+        return null;
+    }
+
+    async getNavigationStats() {
+        const recentPosts = await this.findRecentPosts();
+        const postLinks = await this.findPostLinks();
+        const visitedInfo = await this.getVisitedUrlsInfo();
         
         return {
-            visitedUrls: this.visitedUrls.size,
-            maxPostsPerSession: this.maxPostsPerSession,
-            remainingPosts: this.maxPostsPerSession - this.visitedUrls.size,
+            visitedUrls: visitedInfo.total,
+            maxPostsPerSession: visitedInfo.maxPosts,
+            remainingPosts: visitedInfo.remaining,
             recentPostsFound: recentPosts.length,
             postLinksFound: postLinks.length,
             totalAvailableLinks: recentPosts.length + postLinks.length
@@ -989,29 +1133,44 @@ class NavigationEngine {
         return this.visitedUrls.size >= this.maxPostsPerSession;
     }
 
-    shouldResetSession() {
-        const visitedCount = this.visitedUrls.size;
-        const maxPosts = this.maxPostsPerSession;
-        
-        if (visitedCount >= maxPosts) {
-            console.log('🔄 Session limit reached, should reset session');
-            return true;
+    async shouldResetSession() {
+        try {
+            const response = await chrome.runtime.sendMessage({
+                action: 'getGlobalVisitedUrls'
+            });
+            
+            const visitedCount = response.count;
+            const maxPosts = response.maxPosts;
+            
+            // Only reset when we've reached the maximum posts limit
+            if (visitedCount >= maxPosts) {
+                console.log('🔄 Global session limit reached, should reset session');
+                return true;
+            }
+            
+            // Don't reset just because we're near the limit
+            // This prevents premature resets that could cause URL revisiting
+            console.log(`📊 Session progress: ${visitedCount}/${maxPosts} (${Math.round(visitedCount/maxPosts*100)}%)`);
+            
+            return false;
+        } catch (error) {
+            console.warn('Error checking global session reset:', error);
+            return false;
         }
-        
-        // Reset if we have visited most posts but no more valid links
-        if (visitedCount >= maxPosts * 0.8) {
-            console.log('⚠️ Session nearly complete, consider reset');
-            return true;
-        }
-        
-        return false;
     }
 
-    forceResetSession() {
-        console.log('🔄 Force resetting navigation session');
-        this.visitedUrls.clear();
-        this.addCurrentPageToVisited();
-        console.log('✅ Navigation session reset complete');
+    async forceResetSession() {
+        console.log('🔄 Force resetting global navigation session');
+        try {
+            await chrome.runtime.sendMessage({
+                action: 'resetGlobalVisitedUrls'
+            });
+            // Don't add current page to visited URLs after reset
+            // Only add when actually navigating to new pages
+            console.log('✅ Global navigation session reset complete');
+        } catch (error) {
+            console.warn('Error resetting global session:', error);
+        }
     }
 
     isCurrentPage(href) {
@@ -1026,6 +1185,53 @@ class NavigationEngine {
             return currentUrlWithoutHash === urlWithoutHash;
         } catch (error) {
             console.warn('Error checking if link is current page:', error);
+            return false;
+        }
+    }
+
+    isHomePageLink(href) {
+        try {
+            const url = new URL(href, window.location.origin);
+            const pathname = url.pathname.toLowerCase();
+            
+            // Check for home page patterns
+            const homePatterns = [
+                /^\/$/, // Root path
+                /^\/home\/?$/,
+                /^\/index\.html?$/,
+                /^\/default\.html?$/,
+                /^\/main\.html?$/,
+                /^\/blog\/?$/, // Exact blog root
+                /^\/posts\/?$/, // Exact posts root
+                /^\/articles\/?$/ // Exact articles root
+            ];
+            
+            // Check URL parameters for WordPress home
+            const urlParams = new URLSearchParams(url.search);
+            const isWordPressHome = urlParams.has('page_id') || 
+                                   (pathname === '/' && !urlParams.has('p')) ||
+                                   (pathname === '/index.php' && !urlParams.has('p'));
+            
+            // Check for home page patterns
+            for (const pattern of homePatterns) {
+                if (pattern.test(pathname)) {
+                    return true;
+                }
+            }
+            
+            // Check WordPress specific logic
+            if (isWordPressHome) {
+                return true;
+            }
+            
+            // Check for very short pathname (likely home)
+            if (pathname === '/' || pathname === '' || pathname.split('/').length <= 2) {
+                return true;
+            }
+            
+            return false;
+        } catch (error) {
+            console.warn('Error checking if link is home page:', error);
             return false;
         }
     }
@@ -1072,16 +1278,16 @@ class NavigationEngine {
         const pathname = currentUrl.pathname.toLowerCase();
         const search = currentUrl.search.toLowerCase();
         
-        // Check for home page patterns
+        // Check for home page patterns (exact matches only)
         const homePatterns = [
             /^\/$/, // Root path
             /^\/home\/?$/,
             /^\/index\.html?$/,
             /^\/default\.html?$/,
             /^\/main\.html?$/,
-            /^\/blog\/?$/,
-            /^\/posts\/?$/,
-            /^\/articles\/?$/
+            /^\/blog\/?$/, // Exact blog root
+            /^\/posts\/?$/, // Exact posts root
+            /^\/articles\/?$/ // Exact articles root
         ];
         
         // Check for category page patterns
@@ -1096,11 +1302,11 @@ class NavigationEngine {
             /\/subject\//
         ];
         
-        // Check for individual post patterns
+        // Check for individual post patterns (more specific)
         const postPatterns = [
             /\/post\//,
             /\/article\//,
-            /\/blog\//,
+            /\/blog\/[^\/]+\//, // blog with specific post
             /\/news\//,
             /\/[0-9]{4}\/[0-9]{2}\//, // Year/month pattern
             /\/[0-9]{4}\//, // Year pattern
