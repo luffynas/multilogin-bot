@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "Smart AdSense Pro",
+  "version": "1.0.0",
+  "description": "Smart Chrome extension untuk otomatis running saat diaktifkan. Sistem yang dibangun Smart dan Efisien untuk menghindari deteksi Google AdSense.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "tabs",
+    "webNavigation",
+    "webRequest",
+    "cookies",
+    "geolocation",
+    "notifications"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "lib/device-detector.js",
+        "lib/content-analyzer.js",
+        "lib/personality-engine.js",
+        "lib/reading-simulator.js",
+        "lib/navigation-engine.js",
+        "lib/adsense-detector.js",
+        "lib/click-simulator.js",
+        "lib/stealth-monitor.js",
+        "lib/session-manager.js",
+        "content-script.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Smart AdSense Pro"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/*", "data/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

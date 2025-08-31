@@ -1,0 +1,105 @@
+{
+  "name": "smart-adsense-pro",
+  "version": "1.0.0",
+  "description": "Smart Chrome extension untuk otomatis running saat diaktifkan. Sistem yang dibangun Smart dan Efisien untuk menghindari deteksi Google AdSense.",
+  "main": "background.js",
+  "scripts": {
+    "build": "echo 'Extension built successfully'",
+    "dev": "echo 'Development mode - load extension in Chrome'",
+    "test": "echo 'No tests specified'",
+    "lint": "echo 'No linter configured'",
+    "clean": "rm -rf dist/*",
+    "zip": "zip -r smart-adsense-pro.zip . -x 'node_modules/*' '*.git*' '*.DS_Store'"
+  },
+  "keywords": [
+    "chrome-extension",
+    "adsense",
+    "automation",
+    "bot-detection",
+    "smart-browsing",
+    "revenue-optimization"
+  ],
+  "author": "Smart AdSense Pro Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/smart-adsense-pro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/smart-adsense-pro/issues"
+  },
+  "homepage": "https://github.com/your-username/smart-adsense-pro#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {},
+  "dependencies": {},
+  "manifest": {
+    "version": 3,
+    "permissions": [
+      "activeTab",
+      "storage",
+      "scripting",
+      "tabs",
+      "webNavigation",
+      "webRequest",
+      "cookies",
+      "geolocation",
+      "notifications"
+    ],
+    "host_permissions": [
+      "<all_urls>"
+    ]
+  },
+  "features": {
+    "autoStart": true,
+    "stealthMode": true,
+    "personalityEngine": true,
+    "adsenseDetection": true,
+    "readingSimulation": true,
+    "navigationIntelligence": true,
+    "sessionManagement": true,
+    "riskMonitoring": true
+  },
+  "personalityTypes": {
+    "explorer": {
+      "name": "Explorer",
+      "description": "Penjelajah yang penasaran, klik berbagai konten",
+      "readingSpeed": "180-220 wpm",
+      "behavior": "curious, explores content"
+    },
+    "researcher": {
+      "name": "Researcher", 
+      "description": "Pembaca teliti, membaca dengan seksama",
+      "readingSpeed": "150-180 wpm",
+      "behavior": "thorough, detailed reading"
+    },
+    "casual": {
+      "name": "Casual",
+      "description": "Pembaca santai, membaca dengan cepat", 
+      "readingSpeed": "200-250 wpm",
+      "behavior": "quick, skimming"
+    },
+    "professional": {
+      "name": "Professional",
+      "description": "Pembaca profesional, fokus pada konten bisnis",
+      "readingSpeed": "160-200 wpm", 
+      "behavior": "focused, business-oriented"
+    }
+  },
+  "sessionLimits": {
+    "maxPostsPerSession": 5,
+    "maxAdClicksPerSession": 1,
+    "maxSessionDuration": "30 minutes",
+    "readingTimeRange": "2-5 minutes"
+  },
+  "stealthFeatures": {
+    "humanLikeMouseMovements": true,
+    "variableReadingSpeed": true,
+    "randomDelays": true,
+    "textSelection": true,
+    "scrollPatterns": true,
+    "riskAssessment": true,
+    "behaviorAdjustment": true
+  }
+}

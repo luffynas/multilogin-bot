@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart AdSense Pro</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <img src="icons/icon48.png" alt="Smart AdSense Pro" class="logo-img">
+                <h1>Smart AdSense Pro</h1>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot" id="statusDot"></div>
+                <span class="status-text" id="statusText">Initializing...</span>
+            </div>
+        </div>
+
+        <!-- Main Controls -->
+        <div class="main-controls">
+            <div class="control-group">
+                <label for="autoStartToggle">Auto Start</label>
+                <div class="toggle-switch">
+                    <input type="checkbox" id="autoStartToggle" checked>
+                    <label for="autoStartToggle" class="toggle-label"></label>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="stealthModeToggle">Stealth Mode</label>
+                <div class="toggle-switch">
+                    <input type="checkbox" id="stealthModeToggle" checked>
+                    <label for="stealthModeToggle" class="toggle-label"></label>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="personalitySelect">Personality Type</label>
+                <select id="personalitySelect" class="select-input">
+                    <option value="auto">Auto (Random)</option>
+                    <option value="explorer">Explorer</option>
+                    <option value="researcher">Researcher</option>
+                    <option value="casual">Casual</option>
+                    <option value="professional">Professional</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="maxPostsInput">Max Posts per Session</label>
+                <input type="number" id="maxPostsInput" class="number-input" value="5" min="1" max="10">
+            </div>
+
+            <div class="control-group">
+                <label for="readingTimeRange">Reading Time (minutes)</label>
+                <div class="range-input">
+                    <input type="number" id="readingTimeMin" class="number-input" value="2" min="1" max="10">
+                    <span>-</span>
+                    <input type="number" id="readingTimeMax" class="number-input" value="5" min="1" max="10">
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button id="startBtn" class="btn btn-primary">Start Automation</button>
+            <button id="stopBtn" class="btn btn-secondary" disabled>Stop Automation</button>
+        </div>
+
+        <!-- Session Stats -->
+        <div class="session-stats">
+            <h3>Session Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Posts Read</div>
+                    <div class="stat-value" id="postsReadValue">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Ad Clicks</div>
+                    <div class="stat-value" id="adClicksValue">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Session Time</div>
+                    <div class="stat-value" id="sessionTimeValue">0m 0s</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Risk Level</div>
+                    <div class="stat-value" id="riskLevelValue">Low</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bars -->
+        <div class="progress-section">
+            <div class="progress-item">
+                <div class="progress-label">Posts Progress</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="postsProgressFill"></div>
+                </div>
+                <div class="progress-text" id="postsProgressText">0/5</div>
+            </div>
+            <div class="progress-item">
+                <div class="progress-label">Ad Clicks Progress</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="clicksProgressFill"></div>
+                </div>
+                <div class="progress-text" id="clicksProgressText">0/1</div>
+            </div>
+        </div>
+
+        <!-- Current Activity -->
+        <div class="current-activity">
+            <h3>Current Activity</h3>
+            <div class="activity-log" id="activityLog">
+                <div class="activity-item">
+                    <span class="activity-time">--:--</span>
+                    <span class="activity-text">Waiting for activity...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-links">
+                <button id="exportBtn" class="link-btn">Export Data</button>
+                <button id="resetBtn" class="link-btn">Reset Session</button>
+            </div>
+            <div class="version-info">
+                v1.0.0
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
