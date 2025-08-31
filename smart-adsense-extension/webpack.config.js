@@ -1,0 +1,128 @@
+const path = require('path');
+const TerserPlugin = require('terser-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+module.exports = {
+    mode: 'production',
+    entry: {
+        // Main scripts
+        'content-script': './content-script.js',
+        'background': './background.js',
+        'popup': './popup.js'
+    },
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].js',
+        clean: true
+    },
+    module: {
+        rules: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            ['@babel/preset-env', {
+                                targets: {
+                                    chrome: '88',
+                                    firefox: '85'
+                                }
+                            }]
+                        ],
+                        plugins: [
+                            // Remove console.log statements in production
+                            ['transform-remove-console', {
+                                exclude: ['error', 'warn']
+                            }]
+                        ]
+                    }
+                }
+            }
+        ]
+    },
+    optimization: {
+        minimize: true,
+        minimizer: [
+            new TerserPlugin({
+                terserOptions: {
+                    compress: {
+                        // Remove console.log, console.info, console.debug
+                        drop_console: true,
+                        drop_debugger: true,
+                        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+                        // Remove unused code
+                        dead_code: true,
+                        // Remove unused variables
+                        unused: true,
+                        // Remove unreachable code
+                        passes: 2
+                    },
+                    mangle: {
+                        // Mangle variable names for obfuscation
+                        toplevel: true,
+                        reserved: [
+                            'chrome', 'window', 'document', 'navigator', 'location',
+                            'chrome.runtime', 'chrome.tabs', 'chrome.storage', 
+                            'chrome.action', 'chrome.scripting', 'chrome.notifications',
+                            'SmartAdSenseContent', 'SmartAdSenseBackground', 'SmartAdSensePopup',
+                            'DeviceDetector', 'ContentAnalyzer', 'PersonalityEngine',
+                            'ReadingSimulator', 'NavigationEngine', 'AdSenseDetector',
+                            'ClickSimulator', 'StealthMonitor', 'SessionManager'
+                        ]
+                    },
+                    format: {
+                        // Remove all comments
+                        comments: false
+                    }
+                },
+                extractComments: false
+            })
+        ],
+        // Disable code splitting to keep individual files
+        splitChunks: false
+    },
+    plugins: [
+        // Clean dist folder before build
+        new CleanWebpackPlugin(),
+        
+        // Copy static files
+        new CopyWebpackPlugin({
+            patterns: [
+                // Copy manifest files
+                { from: 'manifest.json', to: 'manifest.json' },
+                
+                // Copy HTML files
+                { from: 'popup.html', to: 'popup.html' },
+                { from: 'popup.css', to: 'popup.css' },
+                
+                // Copy icons
+                { from: 'icons', to: 'icons' },
+                
+                // Copy lib folder (all JavaScript files)
+                { from: 'lib', to: 'lib' },
+                
+                // Copy documentation files
+                { from: 'README.md', to: 'README.md' },
+                { from: 'package.json', to: 'package.json' },
+                { from: 'INSTALLATION.md', to: 'INSTALLATION.md' },
+                
+                // Copy documentation files (optional)
+                { from: '*.md', to: '[name][ext]', noErrorOnMissing: true }
+            ]
+        })
+    ],
+    resolve: {
+        extensions: ['.js']
+    },
+    // Source maps for debugging (optional - can be disabled for production)
+    devtool: false,
+    // Performance hints
+    performance: {
+        hints: 'warning',
+        maxEntrypointSize: 512000,
+        maxAssetSize: 512000
+    }
+};
