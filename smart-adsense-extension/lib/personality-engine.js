@@ -64,24 +64,67 @@ class PersonalityEngine {
 
     determineReadingBehavior() {
         const personality = this.personalityTypes[this.currentPersonality];
+        const timeOfDay = this.getTimeOfDay();
+        
+        // Get base reading speed
+        let readingSpeed = this.getRandomInRange(personality.readingSpeed);
+        
+        // Adjust reading speed based on time of day for more realistic behavior
+        readingSpeed = this.adjustReadingSpeedForTimeOfDay(readingSpeed, timeOfDay);
         
         return {
             type: this.currentPersonality,
-            readingSpeed: this.getRandomInRange(personality.readingSpeed),
+            readingSpeed: readingSpeed,
             style: personality.readingStyle,
             interactionLevel: personality.interactionLevel,
             scrollBehavior: personality.scrollBehavior,
             pauseFrequency: personality.pauseFrequency,
             eyeMovement: this.generateEyeMovementPattern(),
             textSelection: this.shouldSelectText(),
-            reReading: this.shouldReRead()
+            reReading: this.shouldReRead(),
+            timeOfDay: timeOfDay
         };
+    }
+
+    adjustReadingSpeedForTimeOfDay(baseSpeed, timeOfDay) {
+        let adjustedSpeed = baseSpeed;
+        
+        switch (timeOfDay) {
+            case 'morning':
+                // Morning: More alert, slightly faster reading
+                adjustedSpeed *= 1.05; // 5% faster
+                console.log('🌅 Morning reading speed: +5% (more alert)');
+                break;
+            case 'afternoon':
+                // Afternoon: Peak alertness, fastest reading
+                adjustedSpeed *= 1.1; // 10% faster
+                console.log('☀️ Afternoon reading speed: +10% (peak alertness)');
+                break;
+            case 'evening':
+                // Evening: Starting to slow down, more relaxed
+                adjustedSpeed *= 0.8; // 20% slower
+                console.log('🌆 Evening reading speed: -20% (more relaxed)');
+                break;
+            case 'night':
+                // Night: Tired, slowest reading
+                adjustedSpeed *= 0.6; // 40% slower
+                console.log('🌙 Night reading speed: -40% (tired)');
+                break;
+            default:
+                console.log('⏰ Default reading speed: no adjustment');
+        }
+        
+        return Math.max(80, Math.min(300, adjustedSpeed)); // Keep within realistic bounds (80-300 WPM)
     }
 
     calculateReadingTime(content) {
         const wordCount = this.getWordCount(content || '');
         const personality = this.personalityTypes[this.currentPersonality];
-        const readingSpeed = this.getRandomInRange(personality.readingSpeed);
+        const timeOfDay = this.getTimeOfDay();
+        
+        // Get base reading speed and adjust for time of day
+        let readingSpeed = this.getRandomInRange(personality.readingSpeed);
+        readingSpeed = this.adjustReadingSpeedForTimeOfDay(readingSpeed, timeOfDay);
         
         // Calculate base reading time
         let baseTime = wordCount / readingSpeed;

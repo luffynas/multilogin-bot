@@ -79,6 +79,11 @@ class SessionManager {
             this.checkSessionStatus();
             this.updateSessionStats();
         }, 30000);
+
+        // Add force navigation monitoring for mobile devices
+        this.forceNavigationInterval = setInterval(() => {
+            this.checkForceNavigation();
+        }, 60000); // Check every minute
     }
 
     setupAutoSave() {
@@ -112,6 +117,88 @@ class SessionManager {
 
         // Update session status
         this.sessionData.status = 'active';
+    }
+
+    // Check if force navigation is needed (especially for mobile)
+    checkForceNavigation() {
+        const currentTime = Date.now();
+        const sessionDuration = currentTime - this.sessionStartTime;
+        const minutesElapsed = Math.floor(sessionDuration / 60000);
+
+        // Mobile-specific force navigation (more aggressive)
+        if (this.sessionData.deviceType === 'mobile') {
+            // Force navigation after 3 minutes if no posts have been read (mobile)
+            if (minutesElapsed >= 3 && this.sessionData.postsRead === 0) {
+                console.log('📱 Mobile force navigation triggered: 3 minutes elapsed with no posts read');
+                this.triggerForceNavigation('mobile_aggressive');
+                return;
+            }
+
+            // Force navigation after 5 minutes if less than 1 post read (mobile)
+            if (minutesElapsed >= 5 && this.sessionData.postsRead < 1) {
+                console.log('📱 Mobile force navigation triggered: 5 minutes elapsed with insufficient posts read');
+                this.triggerForceNavigation('mobile_timeout');
+                return;
+            }
+
+            // Force navigation after 7 minutes regardless of progress (mobile)
+            if (minutesElapsed >= 7) {
+                console.log('📱 Mobile force navigation triggered: 7 minutes elapsed - forcing navigation');
+                this.triggerForceNavigation('mobile_force');
+                return;
+            }
+        } else {
+            // Desktop force navigation (less aggressive)
+            // Force navigation after 5 minutes if no posts have been read
+            if (minutesElapsed >= 5 && this.sessionData.postsRead === 0) {
+                console.log('🖥️ Desktop force navigation triggered: 5 minutes elapsed with no posts read');
+                this.triggerForceNavigation('desktop_timeout');
+                return;
+            }
+
+            // Force navigation after 8 minutes if less than 2 posts read
+            if (minutesElapsed >= 8 && this.sessionData.postsRead < 2) {
+                console.log('🖥️ Desktop force navigation triggered: 8 minutes elapsed with insufficient posts read');
+                this.triggerForceNavigation('desktop_insufficient');
+                return;
+            }
+
+            // Force navigation after 10 minutes regardless of progress
+            if (minutesElapsed >= 10) {
+                console.log('🖥️ Desktop force navigation triggered: 10 minutes elapsed - forcing navigation');
+                this.triggerForceNavigation('desktop_force');
+                return;
+            }
+        }
+    }
+
+    // Trigger force navigation
+    triggerForceNavigation(reason = 'timeout') {
+        console.log('🚀 Triggering force navigation...', { reason: reason });
+        
+        // Send force navigation message to content script
+        this.sendForceNavigationMessage(reason);
+        
+        // Update session status
+        this.sessionData.status = 'force_navigation';
+    }
+
+    // Send force navigation message
+    sendForceNavigationMessage(reason = 'timeout') {
+        // Send message to content script about force navigation
+        chrome.runtime.sendMessage({
+            action: 'forceNavigation',
+            reason: reason,
+            sessionData: {
+                duration: this.formatDuration(this.getSessionDuration()),
+                postsRead: this.sessionData.postsRead,
+                adClicks: this.sessionData.adClicks,
+                deviceType: this.sessionData.deviceType
+            }
+        }).catch(() => {
+            // Ignore errors if background script is not available
+            console.log('📱 Force navigation message sent to content script');
+        });
     }
 
     updateSessionStats() {
@@ -321,6 +408,10 @@ class SessionManager {
 
         if (this.autoSaveInterval) {
             clearInterval(this.autoSaveInterval);
+        }
+
+        if (this.forceNavigationInterval) {
+            clearInterval(this.forceNavigationInterval);
         }
 
         // Save final data

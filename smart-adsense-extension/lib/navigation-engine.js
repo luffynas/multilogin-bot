@@ -4,177 +4,351 @@
 
 class NavigationEngine {
     constructor() {
+        this.deviceType = null; // Will be set by device detector
         this.navigationSelectors = {
-            previous: [
-                '.prev-post',
-                '.previous-post',
-                '.nav-previous',
-                '.pagination-prev',
-                'a[rel="prev"]',
-                '.post-navigation .prev',
-                '.navigation .prev'
-            ],
-            next: [
-                '.next-post',
-                '.next-post',
-                '.nav-next',
-                '.pagination-next',
-                'a[rel="next"]',
-                '.post-navigation .next',
-                '.navigation .next'
-            ],
-            related: [
-                '.related-posts',
-                '.related-articles',
-                '.similar-posts',
-                '.recommended-posts',
-                '.more-posts',
-                '.post-suggestions'
-            ],
-            random: [
-                '.random-posts',
-                '.popular-posts',
-                '.featured-posts',
-                '.latest-posts',
-                '.recent-posts',
-                '.blog-posts a',
-                '.post-list a',
-                '.article-list a'
-            ],
-            // New selectors for post links on home/category pages
-            postLinks: [
-                // Common post link selectors
-                '.post-title a',
-                '.entry-title a',
-                '.article-title a',
-                '.blog-post-title a',
-                '.post-heading a',
-                '.post-link',
-                '.entry-link',
-                '.article-link',
-                
-                // Container-based selectors
-                '.post a[href*="/post/"]',
-                '.post a[href*="/article/"]',
-                '.post a[href*="/blog/"]',
-                '.entry a[href*="/post/"]',
-                '.entry a[href*="/article/"]',
-                '.entry a[href*="/blog/"]',
-                '.article a[href*="/post/"]',
-                '.article a[href*="/article/"]',
-                '.article a[href*="/blog/"]',
-                
-                // List-based selectors
-                '.post-list .post a',
-                '.post-list .entry a',
-                '.post-list .article a',
-                '.article-list .post a',
-                '.article-list .entry a',
-                '.article-list .article a',
-                '.blog-list .post a',
-                '.blog-list .entry a',
-                '.blog-list .article a',
-                
-                // Grid-based selectors
-                '.post-grid .post a',
-                '.post-grid .entry a',
-                '.post-grid .article a',
-                '.article-grid .post a',
-                '.article-grid .entry a',
-                '.article-grid .article a',
-                
-                // Generic post patterns
-                'a[href*="/post/"]',
-                'a[href*="/article/"]',
-                'a[href*="/blog/"]',
-                'a[href*="/news/"]',
-                'a[href*="/2024/"]',
-                'a[href*="/2023/"]',
-                'a[href*="/2022/"]',
-                'a[href*="/2021/"]',
-                'a[href*="/2020/"]',
-                
-                // WordPress specific
-                '.post a[href*="?p="]',
-                '.entry a[href*="?p="]',
-                '.article a[href*="?p="]',
-                
-                // Category page specific
-                '.category-posts a',
-                '.category-articles a',
-                '.taxonomy-posts a',
-                '.archive-posts a',
-                '.archive-articles a'
-            ],
-            // Recent post selectors
-            recentPosts: [
-                // Common recent post selectors
-                '.recent-posts a',
-                '.latest-posts a',
-                '.new-posts a',
-                '.recent-articles a',
-                '.latest-articles a',
-                '.new-articles a',
-                '.recent-blog-posts a',
-                '.latest-blog-posts a',
-                '.new-blog-posts a',
-                
-                // Container-based recent selectors
-                '.recent-posts .post a',
-                '.recent-posts .entry a',
-                '.recent-posts .article a',
-                '.latest-posts .post a',
-                '.latest-posts .entry a',
-                '.latest-posts .article a',
-                '.new-posts .post a',
-                '.new-posts .entry a',
-                '.new-posts .article a',
-                
-                // Sidebar recent posts
-                '.sidebar .recent-posts a',
-                '.sidebar .latest-posts a',
-                '.sidebar .new-posts a',
-                '.widget .recent-posts a',
-                '.widget .latest-posts a',
-                '.widget .new-posts a',
-                
-                // Widget-based selectors
-                '.recent-posts-widget a',
-                '.latest-posts-widget a',
-                '.new-posts-widget a',
-                '.recent-articles-widget a',
-                '.latest-articles-widget a',
-                '.new-articles-widget a',
-                
-                // WordPress specific recent selectors
-                '.widget_recent_entries a',
-                '.widget_recent_posts a',
-                '.recent-posts-widget a',
-                '.latest-posts-widget a',
-                
-                // Time-based selectors (posts from last 7-30 days)
-                '.recent-7-days a',
-                '.recent-30-days a',
-                '.latest-week a',
-                '.latest-month a',
-                
-                // Featured recent posts
-                '.featured-recent a',
-                '.highlighted-recent a',
-                '.spotlight-recent a',
-                
-                // Category-specific recent posts
-                '.recent-category-posts a',
-                '.latest-category-posts a',
-                '.category-recent a',
-                
-                // Generic recent patterns
-                'a[href*="/recent/"]',
-                'a[href*="/latest/"]',
-                'a[href*="/new/"]',
-                'a[href*="/2024/"]', // Current year posts
-                'a[href*="/2023/"]'  // Last year posts
-            ]
+            // Desktop-specific selectors
+            desktop: {
+                previous: [
+                    '.prev-post',
+                    '.previous-post',
+                    '.nav-previous',
+                    '.pagination-prev',
+                    'a[rel="prev"]',
+                    '.post-navigation .prev',
+                    '.navigation .prev'
+                ],
+                next: [
+                    '.next-post',
+                    '.next-post',
+                    '.nav-next',
+                    '.pagination-next',
+                    'a[rel="next"]',
+                    '.post-navigation .next',
+                    '.navigation .next'
+                ],
+                related: [
+                    '.related-posts',
+                    '.related-articles',
+                    '.similar-posts',
+                    '.recommended-posts',
+                    '.more-posts',
+                    '.post-suggestions'
+                ],
+                random: [
+                    '.random-posts',
+                    '.popular-posts',
+                    '.featured-posts',
+                    '.latest-posts',
+                    '.recent-posts',
+                    '.blog-posts a',
+                    '.post-list a',
+                    '.article-list a'
+                ],
+                postLinks: [
+                    // Common post link selectors
+                    '.post-title a',
+                    '.entry-title a',
+                    '.article-title a',
+                    '.blog-post-title a',
+                    '.post-heading a',
+                    '.post-link',
+                    '.entry-link',
+                    '.article-link',
+                    
+                    // Container-based selectors
+                    '.post a[href*="/post/"]',
+                    '.post a[href*="/article/"]',
+                    '.post a[href*="/blog/"]',
+                    '.entry a[href*="/post/"]',
+                    '.entry a[href*="/article/"]',
+                    '.entry a[href*="/blog/"]',
+                    '.article a[href*="/post/"]',
+                    '.article a[href*="/article/"]',
+                    '.article a[href*="/blog/"]',
+                    
+                    // List-based selectors
+                    '.post-list .post a',
+                    '.post-list .entry a',
+                    '.post-list .article a',
+                    '.article-list .post a',
+                    '.article-list .entry a',
+                    '.article-list .article a',
+                    '.blog-list .post a',
+                    '.blog-list .entry a',
+                    '.blog-list .article a',
+                    
+                    // Grid-based selectors
+                    '.post-grid .post a',
+                    '.post-grid .entry a',
+                    '.post-grid .article a',
+                    '.article-grid .post a',
+                    '.article-grid .entry a',
+                    '.article-grid .article a',
+                    
+                    // Generic post patterns
+                    'a[href*="/post/"]',
+                    'a[href*="/article/"]',
+                    'a[href*="/blog/"]',
+                    'a[href*="/news/"]',
+                    'a[href*="/2024/"]',
+                    'a[href*="/2023/"]',
+                    'a[href*="/2022/"]',
+                    'a[href*="/2021/"]',
+                    'a[href*="/2020/"]',
+                    
+                    // WordPress specific
+                    '.post a[href*="?p="]',
+                    '.entry a[href*="?p="]',
+                    '.article a[href*="?p="]',
+                    
+                    // Category page specific
+                    '.category-posts a',
+                    '.category-articles a',
+                    '.taxonomy-posts a',
+                    '.archive-posts a',
+                    '.archive-articles a'
+                ],
+                recentPosts: [
+                    // Common recent post selectors
+                    '.recent-posts a',
+                    '.latest-posts a',
+                    '.new-posts a',
+                    '.recent-articles a',
+                    '.latest-articles a',
+                    '.new-articles a',
+                    '.recent-blog-posts a',
+                    '.latest-blog-posts a',
+                    '.new-blog-posts a',
+                    
+                    // Container-based recent selectors
+                    '.recent-posts .post a',
+                    '.recent-posts .entry a',
+                    '.recent-posts .article a',
+                    '.latest-posts .post a',
+                    '.latest-posts .entry a',
+                    '.latest-posts .article a',
+                    '.new-posts .post a',
+                    '.new-posts .entry a',
+                    '.new-posts .article a',
+                    
+                    // Sidebar recent posts
+                    '.sidebar .recent-posts a',
+                    '.sidebar .latest-posts a',
+                    '.sidebar .new-posts a',
+                    '.widget .recent-posts a',
+                    '.widget .latest-posts a',
+                    '.widget .new-posts a',
+                    
+                    // Widget-based selectors
+                    '.recent-posts-widget a',
+                    '.latest-posts-widget a',
+                    '.new-posts-widget a',
+                    '.recent-articles-widget a',
+                    '.latest-articles-widget a',
+                    '.new-articles-widget a',
+                    
+                    // WordPress specific recent selectors
+                    '.widget_recent_entries a',
+                    '.widget_recent_posts a',
+                    '.recent-posts-widget a',
+                    '.latest-posts-widget a',
+                    
+                    // Time-based selectors (posts from last 7-30 days)
+                    '.recent-7-days a',
+                    '.recent-30-days a',
+                    '.latest-week a',
+                    '.latest-month a',
+                    
+                    // Featured recent posts
+                    '.featured-recent a',
+                    '.highlighted-recent a',
+                    '.spotlight-recent a',
+                    
+                    // Category-specific recent posts
+                    '.recent-category-posts a',
+                    '.latest-category-posts a',
+                    '.category-recent a',
+                    
+                    // Generic recent patterns
+                    'a[href*="/recent/"]',
+                    'a[href*="/latest/"]',
+                    'a[href*="/new/"]',
+                    'a[href*="/2024/"]', // Current year posts
+                    'a[href*="/2023/"]'  // Last year posts
+                ]
+            },
+            
+            // Mobile-specific selectors
+            mobile: {
+                previous: [
+                    '.prev-post',
+                    '.previous-post',
+                    '.nav-previous',
+                    '.pagination-prev',
+                    'a[rel="prev"]',
+                    '.post-navigation .prev',
+                    '.navigation .prev'
+                ],
+                next: [
+                    '.next-post',
+                    '.next-post',
+                    '.nav-next',
+                    '.pagination-next',
+                    'a[rel="next"]',
+                    '.post-navigation .next',
+                    '.navigation .next'
+                ],
+                related: [
+                    '.related-posts',
+                    '.related-articles',
+                    '.similar-posts',
+                    '.recommended-posts',
+                    '.more-posts',
+                    '.post-suggestions'
+                ],
+                random: [
+                    '.random-posts',
+                    '.popular-posts',
+                    '.featured-posts',
+                    '.latest-posts',
+                    '.recent-posts',
+                    '.blog-posts a',
+                    '.post-list a',
+                    '.article-list a'
+                ],
+                postLinks: [
+                    // Common post link selectors
+                    '.post-title a',
+                    '.entry-title a',
+                    '.article-title a',
+                    '.blog-post-title a',
+                    '.post-heading a',
+                    '.post-link',
+                    '.entry-link',
+                    '.article-link',
+                    
+                    // Container-based selectors
+                    '.post a[href*="/post/"]',
+                    '.post a[href*="/article/"]',
+                    '.post a[href*="/blog/"]',
+                    '.entry a[href*="/post/"]',
+                    '.entry a[href*="/article/"]',
+                    '.entry a[href*="/blog/"]',
+                    '.article a[href*="/post/"]',
+                    '.article a[href*="/article/"]',
+                    '.article a[href*="/blog/"]',
+                    
+                    // List-based selectors
+                    '.post-list .post a',
+                    '.post-list .entry a',
+                    '.post-list .article a',
+                    '.article-list .post a',
+                    '.article-list .entry a',
+                    '.article-list .article a',
+                    '.blog-list .post a',
+                    '.blog-list .entry a',
+                    '.blog-list .article a',
+                    
+                    // Grid-based selectors
+                    '.post-grid .post a',
+                    '.post-grid .entry a',
+                    '.post-grid .article a',
+                    '.article-grid .post a',
+                    '.article-grid .entry a',
+                    '.article-grid .article a',
+                    
+                    // Generic post patterns
+                    'a[href*="/post/"]',
+                    'a[href*="/article/"]',
+                    'a[href*="/blog/"]',
+                    'a[href*="/news/"]',
+                    'a[href*="/2024/"]',
+                    'a[href*="/2023/"]',
+                    'a[href*="/2022/"]',
+                    'a[href*="/2021/"]',
+                    'a[href*="/2020/"]',
+                    
+                    // WordPress specific
+                    '.post a[href*="?p="]',
+                    '.entry a[href*="?p="]',
+                    '.article a[href*="?p="]',
+                    
+                    // Category page specific
+                    '.category-posts a',
+                    '.category-articles a',
+                    '.taxonomy-posts a',
+                    '.archive-posts a',
+                    '.archive-articles a'
+                ],
+                recentPosts: [
+                    // Common recent post selectors
+                    '.recent-posts a',
+                    '.latest-posts a',
+                    '.new-posts a',
+                    '.recent-articles a',
+                    '.latest-articles a',
+                    '.new-articles a',
+                    '.recent-blog-posts a',
+                    '.latest-blog-posts a',
+                    '.new-blog-posts a',
+                    
+                    // Container-based recent selectors
+                    '.recent-posts .post a',
+                    '.recent-posts .entry a',
+                    '.recent-posts .article a',
+                    '.latest-posts .post a',
+                    '.latest-posts .entry a',
+                    '.latest-posts .article a',
+                    '.new-posts .post a',
+                    '.new-posts .entry a',
+                    '.new-posts .article a',
+                    
+                    // Sidebar recent posts
+                    '.sidebar .recent-posts a',
+                    '.sidebar .latest-posts a',
+                    '.sidebar .new-posts a',
+                    '.widget .recent-posts a',
+                    '.widget .latest-posts a',
+                    '.widget .new-posts a',
+                    
+                    // Widget-based selectors
+                    '.recent-posts-widget a',
+                    '.latest-posts-widget a',
+                    '.new-posts-widget a',
+                    '.recent-articles-widget a',
+                    '.latest-articles-widget a',
+                    '.new-articles-widget a',
+                    
+                    // WordPress specific recent selectors
+                    '.widget_recent_entries a',
+                    '.widget_recent_posts a',
+                    '.recent-posts-widget a',
+                    '.latest-posts-widget a',
+                    
+                    // Time-based selectors (posts from last 7-30 days)
+                    '.recent-7-days a',
+                    '.recent-30-days a',
+                    '.latest-week a',
+                    '.latest-month a',
+                    
+                    // Featured recent posts
+                    '.featured-recent a',
+                    '.highlighted-recent a',
+                    '.spotlight-recent a',
+                    
+                    // Category-specific recent posts
+                    '.recent-category-posts a',
+                    '.latest-category-posts a',
+                    '.category-recent a',
+                    
+                    // Generic recent patterns
+                    'a[href*="/recent/"]',
+                    'a[href*="/latest/"]',
+                    'a[href*="/new/"]',
+                    'a[href*="/2024/"]', // Current year posts
+                    'a[href*="/2023/"]'  // Last year posts
+                ]
+            }
         };
         
         // Global URL tracking will be handled by background script
@@ -183,6 +357,23 @@ class NavigationEngine {
         // Don't add current page to visited URLs on initialization
         // Only add when actually navigating to a new page
         console.log('📍 NavigationEngine initialized - current page not marked as visited yet');
+    }
+
+    // Set device type for navigation
+    setDeviceType(deviceType) {
+        this.deviceType = deviceType;
+        console.log('📱 NavigationEngine device type set to:', deviceType);
+    }
+
+    // Get current selectors based on device type
+    getCurrentSelectors() {
+        if (this.deviceType === 'mobile') {
+            console.log('📱 Using mobile-specific navigation selectors');
+            return this.navigationSelectors.mobile;
+        } else {
+            console.log('🖥️ Using desktop-specific navigation selectors');
+            return this.navigationSelectors.desktop;
+        }
     }
 
     addCurrentPageToGlobalVisited() {
@@ -495,10 +686,11 @@ class NavigationEngine {
         return null;
     }
 
-    async findPreviousLinks() {
+        async findPreviousLinks() {
         const links = [];
+        const selectors = this.getCurrentSelectors();
         
-        for (const selector of this.navigationSelectors.previous) {
+        for (const selector of selectors.previous) {
             const elements = document.querySelectorAll(selector);
             for (const element of elements) {
                 if (element.href && await this.isValidPostLink(element.href) && !this.isTOCLink(element)) {
@@ -506,17 +698,18 @@ class NavigationEngine {
                 }
             }
         }
-
+        
         console.log('⬅️ Previous links found:', links.map(link => link.href));
         return links;
     }
 
     async findNextLinks() {
         const links = [];
+        const selectors = this.getCurrentSelectors();
         
-        console.log('🔍 Searching for next links with selectors:', this.navigationSelectors.next);
+        console.log('🔍 Searching for next links with selectors:', selectors.next);
         
-        for (const selector of this.navigationSelectors.next) {
+        for (const selector of selectors.next) {
             const elements = document.querySelectorAll(selector);
             console.log(`🔍 Selector "${selector}" found ${elements.length} elements`);
             
@@ -538,10 +731,11 @@ class NavigationEngine {
         return links;
     }
 
-    async findRelatedLinks() {
+        async findRelatedLinks() {
         const links = [];
+        const selectors = this.getCurrentSelectors();
         
-        for (const selector of this.navigationSelectors.related) {
+        for (const selector of selectors.related) {
             const container = document.querySelector(selector);
             if (container) {
                 const linkElements = container.querySelectorAll('a[href]');
@@ -552,17 +746,18 @@ class NavigationEngine {
                 }
             }
         }
-
+        
         console.log('🔗 Related links found:', links.map(link => link.href));
         return links;
     }
 
     async findRandomLinks() {
         const links = [];
+        const selectors = this.getCurrentSelectors();
         
-        console.log('🔍 Searching for random links with selectors:', this.navigationSelectors.random);
+        console.log('🔍 Searching for random links with selectors:', selectors.random);
         
-        for (const selector of this.navigationSelectors.random) {
+        for (const selector of selectors.random) {
             const elements = document.querySelectorAll(selector);
             console.log(`🔍 Selector "${selector}" found ${elements.length} elements`);
             
@@ -591,8 +786,9 @@ class NavigationEngine {
 
     async findPostLinks() {
         const links = [];
+        const selectors = this.getCurrentSelectors();
         
-        for (const selector of this.navigationSelectors.postLinks) {
+        for (const selector of selectors.postLinks) {
             const elements = document.querySelectorAll(selector);
             for (const element of elements) {
                 if (element.href && await this.isValidPostLink(element.href) && !this.isTOCLink(element)) {
@@ -607,8 +803,9 @@ class NavigationEngine {
 
     async findRecentPosts() {
         const links = [];
+        const selectors = this.getCurrentSelectors();
         
-        for (const selector of this.navigationSelectors.recentPosts) {
+        for (const selector of selectors.recentPosts) {
             const elements = document.querySelectorAll(selector);
             for (const element of elements) {
                 if (element.href && await this.isValidPostLink(element.href) && !this.isTOCLink(element)) {

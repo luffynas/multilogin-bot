@@ -74,6 +74,10 @@ class SmartAdSenseContent {
                     this.stopAutomation();
                     sendResponse({ status: 'received' });
                     break;
+                case 'forceNavigation':
+                    this.handleForceNavigation(message);
+                    sendResponse({ status: 'received' });
+                    break;
                 default:
                     sendResponse({ status: 'received' });
             }
@@ -158,7 +162,21 @@ class SmartAdSenseContent {
         console.log('📱 Step 2: Detecting device type...');
         
         this.pageData.deviceType = this.deviceDetector.detectDevice();
+        
+        // Set device type in navigation engine for device-specific navigation
+        this.navigationEngine.setDeviceType(this.pageData.deviceType);
+        
+        // Enable mobile-specific features if on mobile
+        if (this.pageData.deviceType === 'mobile') {
+            this.readingSimulator.monitorMobilePerformance();
+            this.readingSimulator.detectMobileTouchGestures();
+        }
+        
         console.log('✅ Device detected:', this.pageData.deviceType);
+        console.log('📱 Device type set in navigation engine for device-specific navigation');
+        if (this.pageData.deviceType === 'mobile') {
+            console.log('📱 Mobile performance monitoring and touch gestures enabled');
+        }
     }
 
     async step3_AnalyzeContent() {
@@ -304,6 +322,20 @@ class SmartAdSenseContent {
         console.log('⏹️ Stopping automation...');
         this.isRunning = false;
         this.currentStep = 0;
+        
+        // Cleanup mobile-specific features
+        try {
+            if (this.readingSimulator) {
+                if (this.readingSimulator.cleanupMobilePerformanceMonitoring) {
+                    this.readingSimulator.cleanupMobilePerformanceMonitoring();
+                }
+                if (this.readingSimulator.cleanupMobileTouchGestures) {
+                    this.readingSimulator.cleanupMobileTouchGestures();
+                }
+            }
+        } catch (error) {
+            console.error('Error cleaning up mobile features:', error);
+        }
     }
 
     async handlePageLoaded(url) {
@@ -341,6 +373,285 @@ class SmartAdSenseContent {
         } catch (error) {
             console.warn('Error marking current page as visited:', error);
         }
+    }
+
+    // Handle force navigation from session manager
+    async handleForceNavigation(message) {
+        console.log('🚀 Force navigation triggered:', message);
+        
+        const currentUrl = window.location.href;
+        const sessionData = message.sessionData;
+        const reason = message.reason;
+        
+        console.log('⚠️ Force navigation required:', {
+            currentUrl: currentUrl,
+            reason: reason,
+            sessionDuration: sessionData.duration,
+            postsRead: sessionData.postsRead,
+            adClicks: sessionData.adClicks,
+            deviceType: sessionData.deviceType
+        });
+
+        // Device-specific force navigation handling
+        if (sessionData.deviceType === 'mobile') {
+            console.log('📱 Mobile force navigation - using aggressive strategy');
+            await this.handleMobileForceNavigation(reason);
+        } else {
+            console.log('🖥️ Desktop force navigation - using standard strategy');
+            await this.handleDesktopForceNavigation(reason);
+        }
+    }
+
+    // Handle mobile force navigation (more aggressive)
+    async handleMobileForceNavigation(reason) {
+        console.log('📱 Executing mobile force navigation strategy...');
+        
+        // Check current visited URLs status
+        const visitedInfo = await this.navigationEngine.getVisitedUrlsInfo();
+        console.log('📱 Mobile force navigation - current visited URLs status:', visitedInfo);
+        
+        // Stop current reading simulation immediately
+        if (this.readingSimulator && this.readingSimulator.isReading) {
+            this.readingSimulator.stopReading();
+            console.log('⏹️ Reading simulation stopped for mobile force navigation');
+        }
+
+        // Use different strategies based on reason
+        switch (reason) {
+            case 'mobile_aggressive':
+                await this.executeAggressiveMobileNavigation();
+                break;
+            case 'mobile_timeout':
+                await this.executeTimeoutMobileNavigation();
+                break;
+            case 'mobile_force':
+                await this.executeForceMobileNavigation();
+                break;
+            default:
+                await this.executeStandardMobileNavigation();
+        }
+    }
+
+    // Handle desktop force navigation (less aggressive)
+    async handleDesktopForceNavigation(reason) {
+        console.log('🖥️ Executing desktop force navigation strategy...');
+        
+        // Stop current reading simulation gracefully
+        if (this.readingSimulator && this.readingSimulator.isReading) {
+            this.readingSimulator.stopReading();
+            console.log('⏹️ Reading simulation stopped for desktop force navigation');
+        }
+
+        // Use different strategies based on reason
+        switch (reason) {
+            case 'desktop_timeout':
+                await this.executeTimeoutDesktopNavigation();
+                break;
+            case 'desktop_insufficient':
+                await this.executeInsufficientDesktopNavigation();
+                break;
+            case 'desktop_force':
+                await this.executeForceDesktopNavigation();
+                break;
+            default:
+                await this.executeStandardDesktopNavigation();
+        }
+    }
+
+    // Fallback navigation when force navigation fails
+    async fallbackNavigation() {
+        console.log('🔄 Attempting fallback navigation...');
+        
+        try {
+            // Try to find any available link
+            const links = document.querySelectorAll('a[href]');
+            const validLinks = [];
+            
+            // Filter links and check for visited URLs
+            for (const link of links) {
+                const href = link.href;
+                
+                // Basic filtering
+                if (!href || 
+                    href === window.location.href || 
+                    href === window.location.origin + '/' ||
+                    href.includes('#') ||
+                    href.includes('javascript:')) {
+                    continue;
+                }
+                
+                // Check if URL is already visited
+                const isVisited = await this.navigationEngine.isUrlVisited(href);
+                if (isVisited) {
+                    console.log('🚫 Skipping visited URL in fallback navigation:', href);
+                    continue;
+                }
+                
+                validLinks.push(link);
+            }
+
+            if (validLinks.length > 0) {
+                const randomLink = validLinks[Math.floor(Math.random() * validLinks.length)];
+                console.log('🎯 Using fallback link for navigation (unvisited):', randomLink.href);
+                window.location.href = randomLink.href;
+            } else {
+                console.log('❌ No unvisited fallback links found - stopping automation');
+                this.stopAutomation();
+            }
+        } catch (error) {
+            console.error('❌ Error during fallback navigation:', error);
+            this.stopAutomation();
+        }
+    }
+
+    // Mobile force navigation strategies
+    async executeAggressiveMobileNavigation() {
+        console.log('📱 Executing aggressive mobile navigation (3 minutes timeout)');
+        
+        try {
+            // Check visited URLs info before navigation
+            const visitedInfo = await this.navigationEngine.getVisitedUrlsInfo();
+            console.log('📱 Mobile navigation - visited URLs info:', visitedInfo);
+            
+            // Immediately try to find and navigate to next page
+            const nextUrl = await this.navigationEngine.findBestNavigationTarget();
+            
+            if (nextUrl) {
+                console.log('✅ Found unvisited next page for aggressive mobile navigation:', nextUrl);
+                await this.navigationEngine.navigateToPost(nextUrl);
+            } else {
+                console.log('❌ No unvisited next page found - using fallback navigation');
+                await this.fallbackNavigation();
+            }
+        } catch (error) {
+            console.error('❌ Error during aggressive mobile navigation:', error);
+            await this.fallbackNavigation();
+        }
+    }
+
+    async executeTimeoutMobileNavigation() {
+        console.log('📱 Executing timeout mobile navigation (5 minutes timeout)');
+        
+        try {
+            // Check visited URLs info before navigation
+            const visitedInfo = await this.navigationEngine.getVisitedUrlsInfo();
+            console.log('📱 Mobile navigation - visited URLs info:', visitedInfo);
+            
+            // Try to find next page with fallback
+            const nextUrl = await this.navigationEngine.findBestNavigationTarget();
+            
+            if (nextUrl) {
+                console.log('✅ Found unvisited next page for timeout mobile navigation:', nextUrl);
+                await this.navigationEngine.navigateToPost(nextUrl);
+            } else {
+                console.log('❌ No unvisited next page found - using fallback navigation');
+                await this.fallbackNavigation();
+            }
+        } catch (error) {
+            console.error('❌ Error during timeout mobile navigation:', error);
+            await this.fallbackNavigation();
+        }
+    }
+
+    async executeForceMobileNavigation() {
+        console.log('📱 Executing force mobile navigation (7 minutes timeout)');
+        
+        // Force navigation regardless of current state
+        try {
+            // Try multiple navigation strategies with visited URL checking
+            let nextUrl = await this.navigationEngine.findBestNavigationTarget();
+            
+            if (!nextUrl) {
+                console.log('📱 No best navigation target found, trying post links...');
+                // Try to find any post link (already includes visited URL checking)
+                nextUrl = await this.navigationEngine.findPostFromHomeOrCategory();
+            }
+            
+            if (!nextUrl) {
+                console.log('📱 No post links found, trying recent posts...');
+                // Try to find any recent post (already includes visited URL checking)
+                nextUrl = await this.navigationEngine.findRecentPost();
+            }
+            
+            if (nextUrl) {
+                console.log('✅ Found unvisited page for force mobile navigation:', nextUrl);
+                await this.navigationEngine.navigateToPost(nextUrl);
+            } else {
+                console.log('❌ No unvisited navigation target found - using fallback navigation');
+                await this.fallbackNavigation();
+            }
+        } catch (error) {
+            console.error('❌ Error during force mobile navigation:', error);
+            await this.fallbackNavigation();
+        }
+    }
+
+    async executeStandardMobileNavigation() {
+        console.log('📱 Executing standard mobile navigation');
+        await this.executeTimeoutMobileNavigation();
+    }
+
+    // Desktop force navigation strategies
+    async executeTimeoutDesktopNavigation() {
+        console.log('🖥️ Executing timeout desktop navigation (5 minutes timeout)');
+        
+        try {
+            const nextUrl = await this.navigationEngine.findBestNavigationTarget();
+            
+            if (nextUrl) {
+                console.log('✅ Found next page for timeout desktop navigation:', nextUrl);
+                await this.navigationEngine.navigateToPost(nextUrl);
+            } else {
+                console.log('❌ No next page found - stopping automation');
+                this.stopAutomation();
+            }
+        } catch (error) {
+            console.error('❌ Error during timeout desktop navigation:', error);
+            this.stopAutomation();
+        }
+    }
+
+    async executeInsufficientDesktopNavigation() {
+        console.log('🖥️ Executing insufficient desktop navigation (8 minutes timeout)');
+        
+        try {
+            const nextUrl = await this.navigationEngine.findBestNavigationTarget();
+            
+            if (nextUrl) {
+                console.log('✅ Found next page for insufficient desktop navigation:', nextUrl);
+                await this.navigationEngine.navigateToPost(nextUrl);
+            } else {
+                console.log('❌ No next page found - stopping automation');
+                this.stopAutomation();
+            }
+        } catch (error) {
+            console.error('❌ Error during insufficient desktop navigation:', error);
+            this.stopAutomation();
+        }
+    }
+
+    async executeForceDesktopNavigation() {
+        console.log('🖥️ Executing force desktop navigation (10 minutes timeout)');
+        
+        try {
+            const nextUrl = await this.navigationEngine.findBestNavigationTarget();
+            
+            if (nextUrl) {
+                console.log('✅ Found next page for force desktop navigation:', nextUrl);
+                await this.navigationEngine.navigateToPost(nextUrl);
+            } else {
+                console.log('❌ No next page found - stopping automation');
+                this.stopAutomation();
+            }
+        } catch (error) {
+            console.error('❌ Error during force desktop navigation:', error);
+            this.stopAutomation();
+        }
+    }
+
+    async executeStandardDesktopNavigation() {
+        console.log('🖥️ Executing standard desktop navigation');
+        await this.executeTimeoutDesktopNavigation();
     }
 
     // Utility methods

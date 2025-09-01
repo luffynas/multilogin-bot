@@ -4,7 +4,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
-    mode: 'production',
+    mode: 'production', //development | production
     entry: {
         // Main scripts
         'content-script': './content-script.js',
@@ -97,6 +97,7 @@ module.exports = {
                 // Copy HTML files
                 { from: 'popup.html', to: 'popup.html' },
                 { from: 'popup.css', to: 'popup.css' },
+                { from: 'mobile-optimization.css', to: 'mobile-optimization.css' },
                 
                 // Copy icons
                 { from: 'icons', to: 'icons' },

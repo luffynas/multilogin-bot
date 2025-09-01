@@ -29,6 +29,8 @@ class ReadingSimulator {
             duration: `${duration / 1000} seconds`,
             personality: behavior.type,
             readingSpeed: behavior.readingSpeed,
+            timeOfDay: personalization.timeOfDay,
+            deviceType: personalization.deviceType,
             personalization: personalization
         });
 
@@ -336,25 +338,87 @@ class ReadingSimulator {
         const rect = element.getBoundingClientRect();
         const targetY = window.scrollY + rect.top - window.innerHeight / 3;
         
-        await this.scrollToPosition(targetY);
+        // Device-specific element scrolling
+        if (this.isMobileDevice()) {
+            await this.performSmoothMobileElementScroll(element, targetY);
+        } else {
+            await this.scrollToPosition(targetY);
+        }
+    }
+
+    // Smooth mobile element scrolling with focus animation
+    async performSmoothMobileElementScroll(element, targetY) {
+        const currentY = window.scrollY;
+        const distance = targetY - currentY;
+        
+        console.log('📱 Performing smooth mobile element scroll:', {
+            element: element.tagName,
+            from: currentY,
+            to: targetY,
+            distance: distance
+        });
+
+        // Use different strategies based on element type and distance
+        if (element.tagName === 'H1' || element.tagName === 'H2') {
+            // Headings: use instant scroll for better UX
+            await this.performInstantMobileScroll(targetY);
+        } else if (Math.abs(distance) < 300) {
+            // Short distance: use smooth scroll
+            await this.performSmoothMobileNavigation(targetY);
+        } else {
+            // Long distance: use accelerated scroll
+            await this.performAcceleratedMobileScroll(targetY);
+        }
+
+        // Add focus highlight effect for mobile
+        await this.addMobileElementFocus(element);
+    }
+
+    // Add mobile element focus effect
+    async addMobileElementFocus(element) {
+        // Add temporary highlight class
+        element.classList.add('mobile-focus-highlight');
+        
+        // Remove highlight after animation
+        setTimeout(() => {
+            element.classList.remove('mobile-focus-highlight');
+        }, 1000);
     }
 
     async scrollToPosition(y) {
-        window.scrollTo({
-            top: y,
-            behavior: 'smooth'
-        });
+        // Device-specific scrolling behavior
+        if (this.isMobileDevice()) {
+            // Mobile: use smart navigation strategy for optimal smoothness
+            await this.performSmoothMobileNavigation(y);
+        } else {
+            // Desktop: use smooth scrolling
+            window.scrollTo({
+                top: y,
+                behavior: 'smooth'
+            });
+        }
 
-        // Wait for scroll to complete with realistic timing
-        await this.delay(500 + Math.random() * 300); // 0.5-0.8 seconds
+        // Minimal delays for smoother navigation
+        const scrollDelay = this.isMobileDevice() ? 100 + Math.random() * 100 : 200 + Math.random() * 100;
+        await this.delay(scrollDelay);
     }
 
     async scrollToTop() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-        await this.delay(600 + Math.random() * 300); // 0.6-0.9 seconds
+        // Device-specific scrolling behavior
+        if (this.isMobileDevice()) {
+            // Mobile: use smart navigation strategy for optimal smoothness
+            await this.performSmoothMobileNavigation(0);
+        } else {
+            // Desktop: use smooth scrolling
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Minimal delays for smoother navigation
+        const scrollDelay = this.isMobileDevice() ? 100 + Math.random() * 100 : 200 + Math.random() * 100;
+        await this.delay(scrollDelay);
     }
 
     async performReviewScroll() {
@@ -458,9 +522,30 @@ class ReadingSimulator {
             adjusted.readingSpeed *= 0.8; // Slower on mobile
         }
         
-        // Adjust based on time of day
-        if (personalization.timeOfDay === 'night') {
-            adjusted.readingSpeed *= 0.9; // Slower at night
+        // Adjust based on time of day for more realistic reading behavior
+        switch (personalization.timeOfDay) {
+            case 'morning':
+                // Morning: More alert, faster reading
+                adjusted.readingSpeed *= 0.7;
+                console.log('🌅 Morning reading: Slightly faster (110%)');
+                break;
+            case 'afternoon':
+                // Afternoon: Peak alertness, fastest reading
+                adjusted.readingSpeed *= 0.7;
+                console.log('☀️ Afternoon reading: Fastest (120%)');
+                break;
+            case 'evening':
+                // Evening: Starting to slow down, more relaxed
+                adjusted.readingSpeed *= 0.85; // Slower in evening
+                console.log('🌆 Evening reading: Slower and more relaxed (85%)');
+                break;
+            case 'night':
+                // Night: Tired, slowest reading
+                adjusted.readingSpeed *= 0.7; // Much slower at night
+                console.log('🌙 Night reading: Slowest (70%)');
+                break;
+            default:
+                console.log('⏰ Default reading speed (100%)');
         }
         
         return adjusted;
@@ -490,21 +575,41 @@ class ReadingSimulator {
     async simulateWordReading(chunk, timePerWord, behavior, personalization) {
         const totalTime = chunk.length * timePerWord;
         
-        // Add some randomness to reading speed based on personality
-        const randomFactor = this.getRandomFactorForPersonality(behavior.type);
+        // Add some randomness to reading speed based on personality and time of day
+        const randomFactor = this.getRandomFactorForPersonality(behavior.type, personalization.timeOfDay);
         const adjustedTime = totalTime * randomFactor;
         
         await this.delay(adjustedTime);
     }
 
-    getRandomFactorForPersonality(personalityType) {
-        const factors = {
+    getRandomFactorForPersonality(personalityType, timeOfDay = 'afternoon') {
+        // Base factors for personality types
+        const baseFactors = {
             'explorer': 1.2 + Math.random() * 0.8,    // 1.2-2.0 (variable but realistic)
             'researcher': 1.8 + Math.random() * 0.6,  // 1.8-2.4 (slower, thorough)
             'casual': 1.0 + Math.random() * 0.5,      // 1.0-1.5 (faster but realistic)
             'professional': 1.4 + Math.random() * 0.4 // 1.4-1.8 (consistent, focused)
         };
-        return factors[personalityType] || 1.4;
+        
+        let factor = baseFactors[personalityType] || 1.4;
+        
+        // Adjust factor based on time of day for more realistic behavior
+        switch (timeOfDay) {
+            case 'morning':
+                factor *= 0.9; // Slightly faster in morning (more alert)
+                break;
+            case 'afternoon':
+                factor *= 0.85; // Fastest in afternoon (peak alertness)
+                break;
+            case 'evening':
+                factor *= 1.3; // Slower in evening (more relaxed)
+                break;
+            case 'night':
+                factor *= 1.6; // Slowest at night (tired)
+                break;
+        }
+        
+        return factor;
     }
 
     shouldPerformMouseMovement(behavior) {
@@ -618,5 +723,427 @@ class ReadingSimulator {
         
         const elapsed = Date.now() - this.readingStartTime;
         return Math.min(100, (elapsed / this.totalDuration) * 100);
+    }
+
+    // Device detection helper
+    isMobileDevice() {
+        return window.innerWidth < 768 || 
+               'ontouchstart' in window || 
+               navigator.maxTouchPoints > 0;
+    }
+
+    // Mobile-specific scrolling simulation with smooth easing
+    async performMobileScroll(targetY) {
+        const currentY = window.scrollY;
+        const distance = targetY - currentY;
+        
+        // Use smaller steps for smoother scrolling (20px per step)
+        const steps = Math.max(10, Math.abs(Math.ceil(distance / 20)));
+        
+        console.log('📱 Performing smooth mobile scroll simulation:', {
+            from: currentY,
+            to: targetY,
+            distance: distance,
+            steps: steps
+        });
+
+        // Use requestAnimationFrame for smooth scrolling
+        return new Promise((resolve) => {
+            let currentStep = 0;
+            
+            const animateScroll = () => {
+                if (currentStep <= steps) {
+                    // Use easing function for smooth acceleration/deceleration
+                    const progress = this.easeInOutCubic(currentStep / steps);
+                    const currentScrollY = currentY + (distance * progress);
+                    
+                    // Smooth scroll to position
+                    window.scrollTo({
+                        top: currentScrollY,
+                        behavior: 'auto' // Use 'auto' for better mobile performance
+                    });
+                    
+                    currentStep++;
+                    
+                    // Use requestAnimationFrame for smooth 60fps animation
+                    requestAnimationFrame(animateScroll);
+                } else {
+                    // Final scroll to exact position
+                    window.scrollTo({
+                        top: targetY,
+                        behavior: 'auto'
+                    });
+                    resolve();
+                }
+            };
+            
+            // Start animation
+            requestAnimationFrame(animateScroll);
+        });
+    }
+
+    // Easing function for smooth acceleration/deceleration
+    easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    // Enhanced mobile scroll with momentum simulation
+    async performMobileScrollWithMomentum(targetY) {
+        const currentY = window.scrollY;
+        const distance = targetY - currentY;
+        
+        // Calculate momentum-based scrolling
+        const momentum = Math.abs(distance) > 500 ? 1.2 : 1.0; // Faster for longer distances
+        const duration = Math.min(800, Math.abs(distance) * 0.8); // Dynamic duration based on distance
+        
+        console.log('📱 Performing momentum-based mobile scroll:', {
+            from: currentY,
+            to: targetY,
+            distance: distance,
+            momentum: momentum,
+            duration: duration
+        });
+
+        return new Promise((resolve) => {
+            const startTime = performance.now();
+            
+            const animateMomentum = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Use easeOutQuart for natural deceleration
+                const easedProgress = this.easeOutQuart(progress);
+                const currentScrollY = currentY + (distance * easedProgress);
+                
+                window.scrollTo({
+                    top: currentScrollY,
+                    behavior: 'auto'
+                });
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateMomentum);
+                } else {
+                    // Final position
+                    window.scrollTo({
+                        top: targetY,
+                        behavior: 'auto'
+                    });
+                    resolve();
+                }
+            };
+            
+            requestAnimationFrame(animateMomentum);
+        });
+    }
+
+    // Easing function for natural deceleration
+    easeOutQuart(t) {
+        return 1 - Math.pow(1 - t, 4);
+    }
+
+    // Smooth mobile navigation with touch gesture simulation
+    async performSmoothMobileNavigation(targetY) {
+        const currentY = window.scrollY;
+        const distance = targetY - currentY;
+        
+        // Use different scrolling strategies based on distance
+        if (Math.abs(distance) < 200) {
+            // Short distance: use instant smooth scroll
+            return this.performInstantMobileScroll(targetY);
+        } else if (Math.abs(distance) < 800) {
+            // Medium distance: use momentum scroll
+            return this.performMobileScrollWithMomentum(targetY);
+        } else {
+            // Long distance: use accelerated scroll
+            return this.performAcceleratedMobileScroll(targetY);
+        }
+    }
+
+    // Instant smooth scroll for short distances
+    async performInstantMobileScroll(targetY) {
+        console.log('📱 Performing instant mobile scroll for short distance');
+        
+        return new Promise((resolve) => {
+            window.scrollTo({
+                top: targetY,
+                behavior: 'smooth'
+            });
+            
+            // Short delay for instant scroll
+            setTimeout(resolve, 100);
+        });
+    }
+
+    // Accelerated scroll for long distances
+    async performAcceleratedMobileScroll(targetY) {
+        const currentY = window.scrollY;
+        const distance = targetY - currentY;
+        const duration = Math.min(600, Math.abs(distance) * 0.6); // Faster for long distances
+        
+        console.log('📱 Performing accelerated mobile scroll for long distance:', {
+            from: currentY,
+            to: targetY,
+            distance: distance,
+            duration: duration
+        });
+
+        return new Promise((resolve) => {
+            const startTime = performance.now();
+            
+            const animateAccelerated = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Use easeInOutQuart for smooth acceleration and deceleration
+                const easedProgress = this.easeInOutQuart(progress);
+                const currentScrollY = currentY + (distance * easedProgress);
+                
+                window.scrollTo({
+                    top: currentScrollY,
+                    behavior: 'auto'
+                });
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateAccelerated);
+                } else {
+                    window.scrollTo({
+                        top: targetY,
+                        behavior: 'auto'
+                    });
+                    resolve();
+                }
+            };
+            
+            requestAnimationFrame(animateAccelerated);
+        });
+    }
+
+    // Enhanced easing function for smooth acceleration/deceleration
+    easeInOutQuart(t) {
+        return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
+    }
+
+    // Mobile performance monitoring
+    monitorMobilePerformance() {
+        if (!this.isMobileDevice()) return;
+
+        try {
+            // Monitor scroll performance
+            let lastScrollTime = performance.now();
+            let scrollCount = 0;
+            let isMonitoring = true;
+            
+            const scrollHandler = () => {
+                try {
+                    if (!isMonitoring) return;
+                    
+                    const currentTime = performance.now();
+                    const timeDiff = currentTime - lastScrollTime;
+                    
+                    if (timeDiff < 16) { // Less than 60fps
+                        scrollCount++;
+                        
+                        // Safe logging with error handling
+                        try {
+                            console.warn('📱 Mobile scroll performance issue detected:', {
+                                timeDiff: timeDiff.toFixed(2),
+                                scrollCount: scrollCount,
+                                timestamp: new Date().toISOString()
+                            });
+                        } catch (logError) {
+                            console.warn('📱 Mobile scroll performance issue detected:', 
+                                `timeDiff: ${timeDiff.toFixed(2)}, scrollCount: ${scrollCount}`);
+                        }
+                        
+                        // Enable performance mode if issues persist
+                        if (scrollCount > 5) {
+                            this.enableMobilePerformanceMode();
+                        }
+                    } else {
+                        scrollCount = Math.max(0, scrollCount - 1);
+                    }
+                    
+                    lastScrollTime = currentTime;
+                } catch (error) {
+                    console.error('📱 Error in scroll performance monitoring:', error);
+                    // Disable monitoring on error
+                    isMonitoring = false;
+                }
+            };
+
+            // Throttle scroll events for performance
+            let ticking = false;
+            const throttledScrollHandler = () => {
+                try {
+                    if (!ticking && isMonitoring) {
+                        requestAnimationFrame(() => {
+                            try {
+                                scrollHandler();
+                            } catch (error) {
+                                console.error('📱 Error in throttled scroll handler:', error);
+                            }
+                            ticking = false;
+                        });
+                        ticking = true;
+                    }
+                } catch (error) {
+                    console.error('📱 Error in throttled scroll handler setup:', error);
+                }
+            };
+
+            // Add scroll event listener with error handling
+            try {
+                window.addEventListener('scroll', throttledScrollHandler, { passive: true });
+                console.log('📱 Mobile performance monitoring enabled successfully');
+            } catch (error) {
+                console.error('📱 Failed to add scroll event listener:', error);
+            }
+            
+            // Cleanup function
+            this.cleanupMobilePerformanceMonitoring = () => {
+                try {
+                    isMonitoring = false;
+                    window.removeEventListener('scroll', throttledScrollHandler);
+                    console.log('📱 Mobile performance monitoring cleaned up');
+                } catch (error) {
+                    console.error('📱 Error cleaning up mobile performance monitoring:', error);
+                }
+            };
+            
+        } catch (error) {
+            console.error('📱 Error setting up mobile performance monitoring:', error);
+        }
+    }
+
+    // Enable mobile performance mode
+    enableMobilePerformanceMode() {
+        if (!this.isMobileDevice()) return;
+        
+        try {
+            // Check if document.body exists
+            if (!document.body) {
+                console.warn('📱 Document body not available for performance mode');
+                return;
+            }
+            
+            document.body.classList.add('mobile-performance-mode');
+            console.log('📱 Mobile performance mode enabled for better scrolling');
+            
+            // Disable performance mode after 10 seconds
+            setTimeout(() => {
+                try {
+                    if (document.body && document.body.classList.contains('mobile-performance-mode')) {
+                        document.body.classList.remove('mobile-performance-mode');
+                        console.log('📱 Mobile performance mode disabled');
+                    }
+                } catch (error) {
+                    console.error('📱 Error disabling mobile performance mode:', error);
+                }
+            }, 10000);
+            
+        } catch (error) {
+            console.error('📱 Error enabling mobile performance mode:', error);
+        }
+    }
+
+    // Mobile touch gesture detection
+    detectMobileTouchGestures() {
+        if (!this.isMobileDevice()) return;
+
+        try {
+            let startY = 0;
+            let startTime = 0;
+            let isGestureDetectionActive = true;
+            
+            const touchStart = (e) => {
+                try {
+                    if (!isGestureDetectionActive) return;
+                    
+                    if (e.touches && e.touches.length > 0) {
+                        startY = e.touches[0].clientY;
+                        startTime = Date.now();
+                    }
+                } catch (error) {
+                    console.error('📱 Error in touch start handler:', error);
+                }
+            };
+            
+            const touchEnd = (e) => {
+                try {
+                    if (!isGestureDetectionActive) return;
+                    
+                    if (e.changedTouches && e.changedTouches.length > 0) {
+                        const endY = e.changedTouches[0].clientY;
+                        const endTime = Date.now();
+                        const distance = Math.abs(endY - startY);
+                        const duration = endTime - startTime;
+                        
+                        if (distance > 50 && duration < 300) {
+                            // Swipe gesture detected
+                            const direction = endY > startY ? 'down' : 'up';
+                            
+                            // Safe logging with error handling
+                            try {
+                                console.log('📱 Mobile swipe gesture detected:', {
+                                    direction: direction,
+                                    distance: distance,
+                                    duration: duration,
+                                    timestamp: new Date().toISOString()
+                                });
+                            } catch (logError) {
+                                console.log('📱 Mobile swipe gesture detected:', 
+                                    `direction: ${direction}, distance: ${distance}, duration: ${duration}`);
+                            }
+                            
+                            // Handle swipe gesture
+                            this.handleMobileSwipe(direction, distance, duration);
+                        }
+                    }
+                } catch (error) {
+                    console.error('📱 Error in touch end handler:', error);
+                }
+            };
+            
+            // Add touch event listeners with error handling
+            try {
+                document.addEventListener('touchstart', touchStart, { passive: true });
+                document.addEventListener('touchend', touchEnd, { passive: true });
+                console.log('📱 Mobile touch gesture detection enabled successfully');
+            } catch (error) {
+                console.error('📱 Failed to add touch event listeners:', error);
+            }
+            
+            // Cleanup function
+            this.cleanupMobileTouchGestures = () => {
+                try {
+                    isGestureDetectionActive = false;
+                    document.removeEventListener('touchstart', touchStart);
+                    document.removeEventListener('touchend', touchEnd);
+                    console.log('📱 Mobile touch gesture detection cleaned up');
+                } catch (error) {
+                    console.error('📱 Error cleaning up mobile touch gestures:', error);
+                }
+            };
+            
+        } catch (error) {
+            console.error('📱 Error setting up mobile touch gesture detection:', error);
+        }
+    }
+
+    // Handle mobile swipe gestures
+    handleMobileSwipe(direction, distance, duration) {
+        const currentY = window.scrollY;
+        let targetY = currentY;
+        
+        if (direction === 'down') {
+            // Swipe down: scroll up
+            targetY = Math.max(0, currentY - distance);
+        } else {
+            // Swipe up: scroll down
+            targetY = currentY + distance;
+        }
+        
+        // Perform smooth scroll based on gesture
+        this.performSmoothMobileNavigation(targetY);
     }
 }

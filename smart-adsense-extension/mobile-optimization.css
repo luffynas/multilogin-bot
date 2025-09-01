@@ -1,0 +1,259 @@
+/* Mobile Optimization CSS for Smart AdSense Pro */
+
+/* Mobile Focus Highlight Effect */
+.mobile-focus-highlight {
+    animation: mobileFocusPulse 1s ease-in-out;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+    border-radius: 8px;
+    padding: 8px;
+    margin: 4px 0;
+    transition: all 0.3s ease;
+}
+
+@keyframes mobileFocusPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    }
+}
+
+/* Mobile Scrolling Optimizations */
+@media (max-width: 768px) {
+    /* Enable smooth scrolling for mobile */
+    html {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        overflow-scrolling: touch;
+    }
+    
+    /* Optimize touch scrolling */
+    body {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        touch-action: pan-y;
+    }
+    
+    /* Smooth transitions for mobile elements */
+    * {
+        transition: all 0.2s ease;
+    }
+    
+    /* Mobile-specific button and link optimizations */
+    button, a, input, textarea {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+    
+    /* Mobile navigation optimizations */
+    .mobile-nav, .mobile-pagination, .mobile-post-nav {
+        touch-action: pan-x pan-y;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Mobile post title optimizations */
+    .mobile-post-title, .mobile .post-title {
+        touch-action: manipulation;
+        cursor: pointer;
+    }
+    
+    /* Mobile scrolling performance */
+    .mobile-scroll-container {
+        will-change: transform;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+    }
+}
+
+/* Enhanced Mobile Scrolling for Different Screen Sizes */
+@media (max-width: 480px) {
+    /* Small mobile devices */
+    .mobile-focus-highlight {
+        padding: 6px;
+        margin: 2px 0;
+    }
+    
+    /* Optimize for small screens */
+    html {
+        font-size: 14px;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+    /* Medium mobile devices */
+    .mobile-focus-highlight {
+        padding: 8px;
+        margin: 4px 0;
+    }
+    
+    /* Optimize for medium screens */
+    html {
+        font-size: 16px;
+    }
+}
+
+/* Mobile Touch Gesture Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Touch-only devices */
+    .mobile-touch-optimized {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Touch-friendly spacing */
+    .mobile-touch-optimized + .mobile-touch-optimized {
+        margin-top: 8px;
+    }
+    
+    /* Touch-friendly buttons */
+    button.mobile-touch-optimized,
+    a.mobile-touch-optimized {
+        padding: 12px 16px;
+        border-radius: 8px;
+    }
+}
+
+/* Mobile Performance Optimizations */
+@media (max-width: 768px) {
+    /* Reduce animations for better performance */
+    .mobile-performance-mode * {
+        animation-duration: 0.3s !important;
+        transition-duration: 0.2s !important;
+    }
+    
+    /* Optimize images for mobile */
+    img {
+        max-width: 100%;
+        height: auto;
+        -webkit-user-drag: none;
+        -khtml-user-drag: none;
+        -moz-user-drag: none;
+        -o-user-drag: none;
+        user-drag: none;
+    }
+    
+    /* Mobile-friendly typography */
+    body {
+        line-height: 1.6;
+        letter-spacing: 0.01em;
+    }
+    
+    /* Mobile-optimized headings */
+    h1, h2, h3, h4, h5, h6 {
+        line-height: 1.3;
+        margin: 16px 0 8px 0;
+    }
+    
+    /* Mobile-friendly paragraphs */
+    p {
+        margin: 12px 0;
+        text-align: justify;
+    }
+}
+
+/* Mobile Navigation Enhancements */
+.mobile-nav-enhanced {
+    position: relative;
+    overflow: hidden;
+}
+
+.mobile-nav-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.mobile-nav-enhanced:hover::before {
+    transform: translateX(100%);
+}
+
+/* Mobile Scroll Indicators */
+.mobile-scroll-indicator {
+    position: fixed;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    z-index: 1000;
+}
+
+.mobile-scroll-indicator::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background: rgba(59, 130, 246, 0.6);
+    border-radius: 2px;
+    transition: transform 0.3s ease;
+}
+
+/* Mobile Loading States */
+.mobile-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-radius: 50%;
+    border-top-color: rgba(59, 130, 246, 0.8);
+    animation: mobileSpin 1s ease-in-out infinite;
+}
+
+@keyframes mobileSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Mobile Error States */
+.mobile-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 8px 0;
+    color: #dc2626;
+}
+
+/* Mobile Success States */
+.mobile-success {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 8px 0;
+    color: #16a34a;
+}
+
+/* Mobile Info States */
+.mobile-info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 8px 0;
+    color: #2563eb;
+}

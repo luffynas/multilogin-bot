@@ -35,6 +35,7 @@
         "lib/session-manager.js",
         "content-script.js"
       ],
+      "css": ["mobile-optimization.css"],
       "run_at": "document_start"
     }
   ],
