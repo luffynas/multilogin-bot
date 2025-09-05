@@ -1,0 +1,142 @@
+{
+  "name": "default",
+  "displayName": "Default Profile",
+  "description": "Balanced autoscroll profile with natural human-like behavior",
+  "version": "1.0.0",
+  "enabled": true,
+  "scroll": {
+    "strategy": "linear",
+    "minStep": 50,
+    "maxStep": 200,
+    "minDelay": 100,
+    "maxDelay": 500,
+    "jitter": 0.1,
+    "easing": "ease-out",
+    "momentum": true,
+    "reverse": {
+      "enabled": true,
+      "probability": 0.05,
+      "maxSteps": 3
+    }
+  },
+  "stealth": {
+    "enabled": true,
+    "level": "basic",
+    "noiseEvents": {
+      "enabled": true,
+      "frequency": 0.1,
+      "intensity": "medium",
+      "types": ["mousemove", "keypress"],
+      "microMovements": true,
+      "idleBehavior": true
+    },
+    "tabAwareness": {
+      "enabled": true,
+      "pauseOnBlur": true,
+      "resumeDelay": 1000,
+      "simulateFocus": true,
+      "focusDelay": { "minMs": 500, "maxMs": 2000 },
+      "blurDelay": { "minMs": 200, "maxMs": 800 }
+    },
+    "dwellTime": {
+      "enabled": true,
+      "minMs": 1000,
+      "maxMs": 3000,
+      "contentAware": true,
+      "readingPause": { "baseMs": 2000, "variation": 0.5 },
+      "thinkingPause": { "baseMs": 1500, "variation": 0.4 },
+      "distractionPause": { "baseMs": 3000, "variation": 0.6 },
+      "microPause": { "baseMs": 500, "variation": 0.3 }
+    },
+    "humanError": {
+      "enabled": true,
+      "probability": 0.03,
+      "types": ["overshoot", "pause", "wrong_direction"],
+      "correctionDelay": { "minMs": 100, "maxMs": 500 }
+    },
+    "scrollNoise": {
+      "enabled": true,
+      "frequency": 0.05,
+      "deltaRange": { "min": -10, "max": 10 }
+    },
+    "touchNoise": {
+      "enabled": true,
+      "frequency": 0.02,
+      "duration": { "minMs": 50, "maxMs": 200 }
+    }
+  },
+  "navigation": {
+    "enabled": true,
+    "autoNavigate": false,
+    "mode": "sameTab",
+    "target": "next",
+    "delay": {
+      "minMs": 2000,
+      "maxMs": 5000
+    },
+    "hover": {
+      "enabled": true,
+      "delay": {
+        "minMs": 500,
+        "maxMs": 1500
+      }
+    }
+  },
+  "adapters": {
+    "desktop": {
+      "enabled": true,
+      "wheelEvents": true,
+      "smoothScroll": true,
+      "precision": "high"
+    },
+    "mobile": {
+      "enabled": true,
+      "touchEvents": true,
+      "gestureSimulation": true,
+      "precision": "medium"
+    }
+  },
+  "analytics": {
+    "enabled": true,
+    "tracking": {
+      "scrollDistance": true,
+      "dwellTime": true,
+      "navigation": true,
+      "errors": true
+    },
+    "export": {
+      "enabled": false,
+      "format": "json"
+    }
+  },
+  "ai": {
+    "enabled": false,
+    "patternGeneration": false,
+    "behaviorLearning": false,
+    "adaptiveSpeed": false
+  },
+  "compliance": {
+    "adInteraction": {
+      "enabled": false,
+      "optIn": true,
+      "warning": "Ad interaction features require explicit opt-in and should only be used for research purposes"
+    },
+    "fingerprint": {
+      "enabled": false,
+      "optIn": true,
+      "warning": "Fingerprint modification features require explicit opt-in"
+    }
+  },
+  "limits": {
+    "maxSessionTime": 300000,
+    "maxPagesPerSession": 10,
+    "maxScrollDistance": 10000,
+    "autoStop": true
+  },
+  "debug": {
+    "enabled": false,
+    "logLevel": "info",
+    "overlay": false,
+    "heatmap": false
+  }
+}

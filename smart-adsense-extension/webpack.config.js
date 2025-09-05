@@ -107,7 +107,6 @@ module.exports = {
                 // Copy documentation files
                 { from: 'README.md', to: 'README.md' },
                 { from: 'package.json', to: 'package.json' },
-                { from: 'INSTALLATION.md', to: 'INSTALLATION.md' },
                 
                 // Copy documentation files (optional)
                 { from: '*.md', to: '[name][ext]', noErrorOnMissing: true }

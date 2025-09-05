@@ -1,0 +1,461 @@
+{
+  "name": "advanced",
+  "displayName": "Advanced Stealth Profile",
+  "description": "High-level stealth profile with advanced human behavior simulation",
+  "version": "1.0.0",
+  "enabled": true,
+  "scroll": {
+    "strategy": "adaptive",
+    "minStep": 30,
+    "maxStep": 300,
+    "minDelay": 50,
+    "maxDelay": 800,
+    "jitter": 0.2,
+    "easing": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "momentum": true,
+    "reverse": {
+      "enabled": true,
+      "probability": 0.08,
+      "maxSteps": 5
+    },
+    "adaptive": {
+      "enabled": true,
+      "contentAware": true,
+      "speedVariation": 0.3,
+      "pauseVariation": 0.4
+    }
+  },
+  "stealth": {
+    "enabled": true,
+    "level": "advanced",
+    "noiseEvents": {
+      "enabled": true,
+      "frequency": 0.2,
+      "intensity": "high",
+      "types": ["mousemove", "keypress", "focus", "blur"],
+      "microMovements": true,
+      "idleBehavior": true,
+      "scrollNoise": true,
+      "touchNoise": true
+    },
+    "tabAwareness": {
+      "enabled": true,
+      "pauseOnBlur": true,
+      "resumeDelay": 2000,
+      "simulateFocus": true,
+      "focusDelay": { "minMs": 800, "maxMs": 3000 },
+      "blurDelay": { "minMs": 300, "maxMs": 1200 },
+      "behaviorSimulation": true
+    },
+    "cursorSimulator": {
+      "enabled": true,
+      "movementFrequency": 0.05,
+      "minMoveDuration": 100,
+      "maxMoveDuration": 500,
+      "minMoveDistance": 10,
+      "maxMoveDistance": 100
+    },
+    "gestureSimulator": {
+      "enabled": true,
+      "gestureFrequency": 0.02,
+      "minTapDuration": 50,
+      "maxTapDuration": 150,
+      "minSwipeDuration": 200,
+      "maxSwipeDuration": 800,
+      "minSwipeDistance": 50,
+      "maxSwipeDistance": 300
+    },
+    "canvasNoise": {
+      "enabled": false,
+      "intensity": "low",
+      "noiseFactor": {
+        "low": 0.0001,
+        "medium": 0.0005,
+        "high": 0.001
+      }
+    },
+    "hoverSimulator": {
+      "enabled": true,
+      "minHoverDelay": 300,
+      "maxHoverDelay": 1200,
+      "multipleHover": true,
+      "maxHovers": 3,
+      "hoverAreaPadding": 5
+    },
+    "dwellTimeSimulator": {
+      "enabled": true,
+      "minDwellTime": 1000,
+      "maxDwellTime": 5000,
+      "contentAware": true,
+      "readingSpeedWPM": 200,
+      "variation": 0.2,
+      "readingPause": { "baseMs": 2000, "variation": 0.5, "weight": 0.4 },
+      "thinkingPause": { "baseMs": 1500, "variation": 0.4, "weight": 0.3 },
+      "distractionPause": { "baseMs": 3000, "variation": 0.6, "weight": 0.2 },
+      "microPause": { "baseMs": 500, "variation": 0.3, "weight": 0.1 }
+    },
+    "errorSimulator": {
+      "enabled": true,
+      "errorProbability": 0.03,
+      "types": ["overshoot", "undershoot", "wrong_direction", "pause", "hesitation"],
+      "correctionDelay": { "minMs": 100, "maxMs": 500 },
+      "overshootAmount": { "min": 20, "max": 100 },
+      "undershootAmount": { "min": 10, "max": 50 },
+      "wrongDirectionAmount": { "min": 50, "max": 150 },
+      "hesitationDuration": { "minMs": 500, "maxMs": 2000 }
+    },
+    "fingerprintVariation": {
+      "enabled": true,
+      "variationTypes": ["userAgent", "timezone", "language", "screen", "plugins", "fonts"],
+      "currentType": "userAgent",
+      "userAgent": {
+        "enabled": true,
+        "variationRate": 0.1,
+        "userAgents": [
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+          "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:119.0) Gecko/20100101 Firefox/119.0",
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:120.0) Gecko/20100101 Firefox/120.0",
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:119.0) Gecko/20100101 Firefox/119.0"
+        ]
+      },
+      "timezone": {
+        "enabled": true,
+        "variationRate": 0.05,
+        "timezones": [
+          "America/New_York",
+          "America/Chicago",
+          "America/Denver",
+          "America/Los_Angeles",
+          "Europe/London",
+          "Europe/Paris",
+          "Europe/Berlin",
+          "Asia/Tokyo",
+          "Asia/Shanghai",
+          "Australia/Sydney"
+        ]
+      },
+      "language": {
+        "enabled": true,
+        "variationRate": 0.03,
+        "languages": [
+          "en-US",
+          "en-GB",
+          "en-CA",
+          "en-AU",
+          "es-US",
+          "es-ES",
+          "fr-FR",
+          "fr-CA",
+          "de-DE",
+          "it-IT",
+          "pt-BR",
+          "pt-PT",
+          "ja-JP",
+          "ko-KR",
+          "zh-CN",
+          "zh-TW"
+        ]
+      },
+      "screen": {
+        "enabled": true,
+        "variationRate": 0.02,
+        "resolutions": [
+          { "width": 1920, "height": 1080 },
+          { "width": 1366, "height": 768 },
+          { "width": 1536, "height": 864 },
+          { "width": 1440, "height": 900 },
+          { "width": 1280, "height": 720 },
+          { "width": 1600, "height": 900 },
+          { "width": 2560, "height": 1440 },
+          { "width": 3840, "height": 2160 }
+        ]
+      },
+      "plugins": {
+        "enabled": true,
+        "variationRate": 0.01,
+        "pluginSets": [
+          ["Chrome PDF Plugin", "Chrome PDF Viewer", "Native Client"],
+          ["Chrome PDF Plugin", "Chrome PDF Viewer", "Native Client", "WebKit built-in PDF"],
+          ["Chrome PDF Plugin", "Chrome PDF Viewer", "Native Client", "WebKit built-in PDF", "Microsoft Edge PDF Viewer"],
+          ["Chrome PDF Plugin", "Chrome PDF Viewer", "Native Client", "WebKit built-in PDF", "Microsoft Edge PDF Viewer", "PDF.js"]
+        ]
+      },
+      "fonts": {
+        "enabled": true,
+        "variationRate": 0.01,
+        "fontSets": [
+          ["Arial", "Helvetica", "Times New Roman", "Courier New", "Verdana"],
+          ["Arial", "Helvetica", "Times New Roman", "Courier New", "Verdana", "Georgia"],
+          ["Arial", "Helvetica", "Times New Roman", "Courier New", "Verdana", "Georgia", "Palatino"],
+          ["Arial", "Helvetica", "Times New Roman", "Courier New", "Verdana", "Georgia", "Palatino", "Garamond"]
+        ]
+      },
+      "behavior": {
+        "humanVariation": true,
+        "sessionBased": true,
+        "timeBased": true,
+        "contextAware": true,
+        "gradualChange": true,
+        "changeRate": 0.1
+      },
+      "patterns": {
+        "morning": {
+          "variationRate": 0.8,
+          "changeFrequency": 0.5
+        },
+        "afternoon": {
+          "variationRate": 1.0,
+          "changeFrequency": 1.0
+        },
+        "evening": {
+          "variationRate": 1.2,
+          "changeFrequency": 1.5
+        },
+        "night": {
+          "variationRate": 1.5,
+          "changeFrequency": 2.0
+        }
+      }
+    },
+    "dwellTime": {
+      "enabled": true,
+      "minMs": 2000,
+      "maxMs": 8000,
+      "contentAware": true,
+      "readingSpeed": 200,
+      "variation": 0.4,
+      "readingPause": { "baseMs": 3000, "variation": 0.6 },
+      "thinkingPause": { "baseMs": 2000, "variation": 0.5 },
+      "distractionPause": { "baseMs": 5000, "variation": 0.7 },
+      "microPause": { "baseMs": 800, "variation": 0.4 }
+    },
+    "humanError": {
+      "enabled": true,
+      "probability": 0.06,
+      "types": ["overshoot", "undershoot", "pause", "wrong_direction", "hesitation"],
+      "correctionDelay": { "minMs": 200, "maxMs": 800 }
+    },
+    "scrollNoise": {
+      "enabled": true,
+      "frequency": 0.08,
+      "deltaRange": { "min": -15, "max": 15 }
+    },
+    "touchNoise": {
+      "enabled": true,
+      "frequency": 0.05,
+      "duration": { "minMs": 100, "maxMs": 400 }
+    },
+    "cursorSimulation": {
+      "enabled": true,
+      "movement": "natural",
+      "hoverDelay": {
+        "minMs": 300,
+        "maxMs": 1200
+      }
+    },
+    "gestureSimulation": {
+      "enabled": true,
+      "swipeVariation": 0.3,
+      "touchDelay": {
+        "minMs": 100,
+        "maxMs": 500
+      }
+    },
+    "canvasNoise": {
+      "enabled": false,
+      "optIn": true,
+      "intensity": "low"
+    }
+  },
+  "navigation": {
+    "enabled": true,
+    "autoNavigate": true,
+    "mode": "newTab",
+    "target": "mixed",
+    "delay": {
+      "minMs": 3000,
+      "maxMs": 8000
+    },
+    "hover": {
+      "enabled": true,
+      "delay": {
+        "minMs": 800,
+        "maxMs": 2500
+      },
+      "multipleHover": true,
+      "maxHovers": 3
+    },
+    "outbound": {
+      "enabled": true,
+      "probability": 0.1,
+      "whitelist": [],
+      "blacklist": ["ads", "tracking"]
+    }
+  },
+  "adapters": {
+    "desktop": {
+      "enabled": true,
+      "wheelEvents": true,
+      "smoothScroll": true,
+      "precision": "high",
+      "momentum": true,
+      "inertia": true
+    },
+    "mobile": {
+      "enabled": true,
+      "touchEvents": true,
+      "gestureSimulation": true,
+      "precision": "high",
+      "swipe": true,
+      "pinch": false
+    },
+    "viewport": {
+      "enabled": true,
+      "simulation": false,
+      "randomization": false
+    },
+    "fingerprint": {
+      "enabled": false,
+      "optIn": true,
+      "userAgent": false,
+      "timezone": false,
+      "language": false
+    }
+  },
+  "analytics": {
+    "enabled": true,
+    "tracking": {
+      "scrollDistance": true,
+      "dwellTime": true,
+      "navigation": true,
+      "errors": true,
+      "heatmap": true,
+      "sessionTimeline": true
+    },
+    "export": {
+      "enabled": true,
+      "format": "json",
+      "autoExport": false
+    }
+  },
+  "ai": {
+    "enabled": true,
+    "sessionManager": {
+      "enabled": true,
+      "sessionTypes": ["short", "medium", "long", "extended"],
+      "currentSessionType": "medium",
+      "sessionPatterns": {
+        "short": {
+          "duration": { "min": 300000, "max": 900000 },
+          "pages": { "min": 3, "max": 8 },
+          "scrollPattern": "burst",
+          "navigationPattern": "linear",
+          "stealthLevel": "medium",
+          "variationRate": 0.3
+        },
+        "medium": {
+          "duration": { "min": 900000, "max": 1800000 },
+          "pages": { "min": 8, "max": 15 },
+          "scrollPattern": "mixed",
+          "navigationPattern": "exploratory",
+          "stealthLevel": "high",
+          "variationRate": 0.5
+        },
+        "long": {
+          "duration": { "min": 1800000, "max": 3600000 },
+          "pages": { "min": 15, "max": 30 },
+          "scrollPattern": "adaptive",
+          "navigationPattern": "deep",
+          "stealthLevel": "high",
+          "variationRate": 0.7
+        },
+        "extended": {
+          "duration": { "min": 3600000, "max": 7200000 },
+          "pages": { "min": 30, "max": 60 },
+          "scrollPattern": "adaptive",
+          "navigationPattern": "comprehensive",
+          "stealthLevel": "maximum",
+          "variationRate": 0.9
+        }
+      },
+      "behavior": {
+        "humanVariation": true,
+        "timeBased": true,
+        "contextAware": true,
+        "adaptive": true,
+        "learning": true,
+        "patternRecognition": true
+      },
+      "patterns": {
+        "morning": {
+          "sessionType": "short",
+          "activity": "browsing",
+          "focus": "news",
+          "duration": { "min": 300000, "max": 600000 }
+        },
+        "afternoon": {
+          "sessionType": "medium",
+          "activity": "exploration",
+          "focus": "content",
+          "duration": { "min": 900000, "max": 1800000 }
+        },
+        "evening": {
+          "sessionType": "long",
+          "activity": "deep_reading",
+          "focus": "articles",
+          "duration": { "min": 1800000, "max": 3600000 }
+        },
+        "night": {
+          "sessionType": "extended",
+          "activity": "research",
+          "focus": "comprehensive",
+          "duration": { "min": 3600000, "max": 7200000 }
+        }
+      },
+      "learning": {
+        "enabled": true,
+        "adaptationRate": 0.1,
+        "memorySize": 100,
+        "patternThreshold": 0.7,
+        "behaviorWeight": 0.8
+      }
+    },
+    "patternGeneration": true,
+    "behaviorLearning": true,
+    "adaptiveSpeed": true,
+    "linkChooser": true,
+    "sessionManager": true
+  },
+  "compliance": {
+    "adInteraction": {
+      "enabled": false,
+      "optIn": true,
+      "warning": "Ad interaction features require explicit opt-in and should only be used for research purposes"
+    },
+    "fingerprint": {
+      "enabled": false,
+      "optIn": true,
+      "warning": "Fingerprint modification features require explicit opt-in"
+    }
+  },
+  "limits": {
+    "maxSessionTime": 600000,
+    "maxPagesPerSession": 20,
+    "maxScrollDistance": 20000,
+    "autoStop": true,
+    "sessionVariation": true
+  },
+  "debug": {
+    "enabled": false,
+    "logLevel": "debug",
+    "overlay": false,
+    "heatmap": false,
+    "performance": true
+  }
+}

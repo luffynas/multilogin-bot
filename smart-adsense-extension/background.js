@@ -11,7 +11,7 @@ class SmartAdSenseBackground {
             autoStart: true,
             maxPostsPerSession: 5,
             readingTimeRange: { min: 2, max: 5 }, // menit
-            maxAdClicksPerSession: 1,
+            maxAdClicksPerSession: 3,
             stealthMode: true
         };
         
@@ -46,14 +46,26 @@ class SmartAdSenseBackground {
 
     async loadConfig() {
         try {
-            const saved = await chrome.storage.local.get(['smartAdSenseConfig', 'globalVisitedUrls']);
+            // Initialize storage service
+            this.storageService = new StorageService();
+            await this.storageService.init();
+            
+            // Load configuration using unified storage
+            const saved = await this.storageService.get(['smartAdSenseConfig', 'globalVisitedUrls']);
+            
             if (saved.smartAdSenseConfig) {
                 this.config = { ...this.config, ...saved.smartAdSenseConfig };
+                console.log('✅ Configuration loaded from unified storage');
             }
+            
             if (saved.globalVisitedUrls) {
                 this.globalVisitedUrls = new Set(saved.globalVisitedUrls);
                 console.log('📊 Loaded global visited URLs:', this.globalVisitedUrls.size);
             }
+            
+            // Migrate old localStorage data if needed
+            await this.migrateOldData();
+            
         } catch (error) {
             console.error('Error loading config:', error);
         }
@@ -61,12 +73,100 @@ class SmartAdSenseBackground {
 
     async saveConfig() {
         try {
-            await chrome.storage.local.set({ 
-                smartAdSenseConfig: this.config,
-                globalVisitedUrls: Array.from(this.globalVisitedUrls)
-            });
+            if (this.storageService) {
+                await this.storageService.set('smartAdSenseConfig', this.config);
+                await this.storageService.set('globalVisitedUrls', Array.from(this.globalVisitedUrls));
+                console.log('✅ Configuration saved to unified storage');
+            }
         } catch (error) {
             console.error('Error saving config:', error);
+        }
+    }
+
+    async migrateOldData() {
+        try {
+            if (this.storageService) {
+                const migratedCount = await this.storageService.migrateFromLocalStorage();
+                if (migratedCount > 0) {
+                    console.log(`🔄 Migrated ${migratedCount} items from localStorage to unified storage`);
+                }
+            }
+        } catch (error) {
+            console.warn('⚠️ Error during data migration:', error);
+        }
+    }
+
+    async resetSession() {
+        try {
+            console.log('🔄 Resetting session...');
+            
+            // Reset session data
+            this.sessionData = {
+                startTime: Date.now(),
+                postsRead: 0,
+                adClicks: 0,
+                currentUrl: null
+            };
+            
+            // Clear global visited URLs
+            this.globalVisitedUrls.clear();
+            
+            // Save reset state
+            await this.saveConfig();
+            
+            console.log('✅ Session reset completed');
+        } catch (error) {
+            console.error('❌ Error resetting session:', error);
+            throw error;
+        }
+    }
+
+    async clearStorage() {
+        try {
+            console.log('🧹 Clearing all storage data...');
+            
+            if (this.storageService) {
+                await this.storageService.clear();
+            }
+            
+            // Clear local data structures
+            this.globalVisitedUrls.clear();
+            this.sessionData = {
+                startTime: Date.now(),
+                postsRead: 0,
+                adClicks: 0,
+                currentUrl: null
+            };
+            
+            console.log('✅ Storage cleared successfully');
+        } catch (error) {
+            console.error('❌ Error clearing storage:', error);
+            throw error;
+        }
+    }
+
+    async getStorageInfo() {
+        try {
+            if (this.storageService) {
+                return await this.storageService.getStorageInfo();
+            } else {
+                return {
+                    type: 'unknown',
+                    keyCount: 0,
+                    totalSize: 0,
+                    available: false,
+                    error: 'Storage service not initialized'
+                };
+            }
+        } catch (error) {
+            console.error('❌ Error getting storage info:', error);
+            return {
+                type: 'error',
+                keyCount: 0,
+                totalSize: 0,
+                available: false,
+                error: error.message
+            };
         }
     }
 
@@ -122,26 +222,55 @@ class SmartAdSenseBackground {
                 break;
                 
             case 'addVisitedUrl':
-                this.addGlobalVisitedUrl(message.url);
-                sendResponse({ status: 'url_added' });
+                // This functionality is now handled by navigation engine
+                sendResponse({ status: 'deprecated', message: 'Use navigation engine methods instead' });
                 break;
                 
             case 'isUrlVisited':
-                const isVisited = this.isGlobalUrlVisited(message.url);
-                sendResponse({ isVisited: isVisited });
+                // This functionality is now handled by navigation engine
+                sendResponse({ status: 'deprecated', message: 'Use navigation engine methods instead' });
                 break;
                 
             case 'getGlobalVisitedUrls':
-                sendResponse({ 
-                    visitedUrls: Array.from(this.globalVisitedUrls),
-                    count: this.globalVisitedUrls.size,
-                    maxPosts: this.maxPostsPerSession
-                });
+                // This functionality is now handled by navigation engine
+                sendResponse({ status: 'deprecated', message: 'Use navigation engine methods instead' });
                 break;
                 
             case 'resetGlobalVisitedUrls':
-                this.resetGlobalVisitedUrls();
-                sendResponse({ status: 'reset_complete' });
+                // This functionality is now handled by navigation engine
+                sendResponse({ status: 'deprecated', message: 'Use navigation engine methods instead' });
+                break;
+                
+            case 'resetSession':
+                this.resetSession().then(() => {
+                    sendResponse({ status: 'reset' });
+                }).catch(error => {
+                    sendResponse({ status: 'error', message: error.message });
+                });
+                break;
+                
+            case 'clearStorage':
+                this.clearStorage().then(() => {
+                    sendResponse({ status: 'cleared' });
+                }).catch(error => {
+                    sendResponse({ status: 'error', message: error.message });
+                });
+                break;
+                
+            case 'getStorageInfo':
+                this.getStorageInfo().then(storageInfo => {
+                    sendResponse({ storageInfo: storageInfo });
+                }).catch(error => {
+                    sendResponse({ status: 'error', message: error.message });
+                });
+                break;
+                
+            case 'migrateStorage':
+                this.migrateOldData().then(() => {
+                    sendResponse({ status: 'migrated' });
+                }).catch(error => {
+                    sendResponse({ status: 'error', message: error.message });
+                });
                 break;
                 
             default:
@@ -207,6 +336,34 @@ class SmartAdSenseBackground {
         }
     }
 
+    startExtension() {
+        this.isActive = true;
+        console.log('🟢 Smart AdSense Pro Extension Started');
+        
+        // Send message to all active tabs
+        chrome.tabs.query({ active: true }, (tabs) => {
+            tabs.forEach(tab => {
+                chrome.tabs.sendMessage(tab.id, {
+                    action: 'extensionStarted'
+                }).catch(() => {});
+            });
+        });
+    }
+
+    stopExtension() {
+        this.isActive = false;
+        console.log('🔴 Smart AdSense Pro Extension Stopped');
+        
+        // Send message to all active tabs
+        chrome.tabs.query({ active: true }, (tabs) => {
+            tabs.forEach(tab => {
+                chrome.tabs.sendMessage(tab.id, {
+                    action: 'extensionStopped'
+                }).catch(() => {});
+            });
+        });
+    }
+
     startAutomation(tabId) {
         chrome.tabs.sendMessage(tabId, {
             action: 'startAutomation'
@@ -235,64 +392,24 @@ class SmartAdSenseBackground {
 
     // Global URL tracking methods
     addGlobalVisitedUrl(url) {
-        if (url && typeof url === 'string') {
-            this.globalVisitedUrls.add(url);
-            console.log('📝 Added to global visited URLs:', url);
-            console.log('📊 Total global visited URLs:', this.globalVisitedUrls.size);
-            
-            // Save to storage
-            this.saveConfig();
-        }
+        console.warn('addGlobalVisitedUrl is deprecated - use navigation engine methods instead');
+        return false;
     }
 
     isGlobalUrlVisited(url) {
         if (!url || typeof url !== 'string') return false;
         
-        // Check exact match
-        if (this.globalVisitedUrls.has(url)) {
-            return true;
-        }
-        
-        // Check without hash fragments
-        try {
-            const urlObj = new URL(url);
-            const urlWithoutHash = urlObj.origin + urlObj.pathname + urlObj.search;
-            
-            for (const visitedUrl of this.globalVisitedUrls) {
-                const visitedUrlObj = new URL(visitedUrl);
-                const visitedWithoutHash = visitedUrlObj.origin + visitedUrlObj.pathname + visitedUrlObj.search;
-                
-                if (urlWithoutHash === visitedWithoutHash) {
-                    return true;
-                }
-            }
-        } catch (error) {
-            console.warn('Error checking global visited URL:', error);
-        }
-        
+        console.warn('isGlobalUrlVisited is deprecated - use navigation engine methods instead');
         return false;
+
     }
 
     resetGlobalVisitedUrls() {
-        this.globalVisitedUrls.clear();
-        console.log('🔄 Global visited URLs reset');
-        this.saveConfig();
+        console.warn('resetGlobalVisitedUrls is deprecated - use navigation engine methods instead');
     }
 
     shouldResetGlobalSession() {
-        const visitedCount = this.globalVisitedUrls.size;
-        const maxPosts = this.maxPostsPerSession;
-        
-        // Only reset when we've reached the maximum posts limit
-        if (visitedCount >= maxPosts) {
-            console.log('🔄 Global session limit reached, should reset');
-            return true;
-        }
-        
-        // Don't reset just because we're near the limit
-        // This prevents premature resets that could cause URL revisiting
-        console.log(`📊 Global session progress: ${visitedCount}/${maxPosts} (${Math.round(visitedCount/maxPosts*100)}%)`);
-        
+        console.warn('shouldResetGlobalSession is deprecated - use navigation engine methods instead');
         return false;
     }
 

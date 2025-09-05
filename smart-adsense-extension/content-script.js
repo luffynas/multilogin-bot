@@ -96,7 +96,7 @@ class SmartAdSenseContent {
             
             // Verify that the page was marked as visited
             const currentUrl = window.location.href;
-            const isVisited = await this.navigationEngine.isUrlVisited(currentUrl);
+            const isVisited = await this.navigationEngine.isUrlVisitedComprehensive(currentUrl);
             console.log(`📍 Verification - Current page visited status: ${isVisited ? 'VISITED' : 'NOT VISITED'}`);
             
             // Check if this page was already processed (visited before)
@@ -245,26 +245,23 @@ class SmartAdSenseContent {
     async step6_NavigateToNextPost() {
         console.log('🔗 Step 6: Navigating to next post...');
         
-        // Find navigation links
-        this.pageData.navigationLinks = await this.navigationEngine.findNavigationLinks();
+        // Find next post using enhanced fallback strategies
+        const nextPostResult = await this.navigationEngine.findNextPostWithFallback();
         
-        // Find best navigation target using priority-based selection
-        const nextPostUrl = await this.navigationEngine.findBestNavigationTarget(this.pageData.content);
-        
-        if (nextPostUrl) {
-            console.log('✅ Found next post:', nextPostUrl);
+        if (nextPostResult && nextPostResult.url) {
+            console.log('✅ Found next post:', nextPostResult.url);
             
             // Double-check if the URL is not visited before navigation
-            const isVisited = await this.navigationEngine.isUrlVisited(nextPostUrl);
+            const isVisited = await this.navigationEngine.isUrlVisitedComprehensive(nextPostResult.url);
             if (isVisited) {
                 console.log('🚫 Next post URL is already visited - this should not happen!');
                 console.log('🔄 Looking for another unvisited page...');
                 
-                // Try to find another unvisited page
-                const alternativeUrl = await this.navigationEngine.findBestNavigationTarget(this.pageData.content);
-                if (alternativeUrl && alternativeUrl !== nextPostUrl) {
-                    console.log('✅ Found alternative unvisited page:', alternativeUrl);
-                    await this.navigationEngine.navigateToPost(alternativeUrl);
+                // Try to find another unvisited page using fallback
+                const alternativeResult = await this.navigationEngine.findNextPostWithFallback();
+                if (alternativeResult && alternativeResult.url && alternativeResult.url !== nextPostResult.url) {
+                    console.log('✅ Found alternative unvisited page:', alternativeResult.url);
+                    await this.navigationEngine.navigateToPost(alternativeResult.url);
                 } else {
                     console.log('❌ No alternative unvisited pages found - stopping automation');
                     this.stopAutomation();
@@ -273,7 +270,7 @@ class SmartAdSenseContent {
             } else {
                 console.log('✅ Next post URL is not visited - proceeding with navigation');
                 // Navigate to next post
-                await this.navigationEngine.navigateToPost(nextPostUrl);
+                await this.navigationEngine.navigateToPost(nextPostResult.url);
             }
             
             // Wait for navigation
@@ -330,13 +327,13 @@ class SmartAdSenseContent {
             console.log('📍 Attempting to mark current page as visited:', currentUrl);
             
             // Check if already visited before marking
-            const isAlreadyVisited = await this.navigationEngine.isUrlVisited(currentUrl);
+            const isAlreadyVisited = await this.navigationEngine.isUrlVisitedComprehensive(currentUrl);
             if (isAlreadyVisited) {
                 console.log('ℹ️ Current page already marked as visited:', currentUrl);
                 return;
             }
             
-            await this.navigationEngine.addToGlobalVisitedUrls(currentUrl);
+            await this.navigationEngine.markUrlAsVisited(currentUrl);
             console.log('✅ Successfully marked current page as visited:', currentUrl);
         } catch (error) {
             console.warn('Error marking current page as visited:', error);

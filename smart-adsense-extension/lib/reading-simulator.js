@@ -4,12 +4,83 @@
 
 class ReadingSimulator {
     constructor() {
+        // Enhanced configuration for performance optimization
+        this.config = {
+            // Memory management
+            maxScrollPositions: 30,
+            maxMousePositions: 25,
+            maxTextSelections: 20,
+            cleanupInterval: 30000, // 30 seconds
+            
+            // Performance optimization
+            enableCaching: true,
+            cacheTimeout: 300000, // 5 minutes
+            maxCacheSize: 100,
+            enableRateLimiting: true,
+            minEventDelay: 100, // Minimum delay between events
+            
+            // Reading behavior
+            maxReadingDuration: 300000, // 5 minutes
+            enableProgressTracking: true,
+            enableAdaptiveTiming: true,
+            
+            // Error handling
+            maxRetries: 3,
+            retryDelay: 1000,
+            enableFallbackBehavior: true
+        };
+
+        // Core reading state
         this.isReading = false;
         this.currentPosition = 0;
         this.readingStartTime = null;
+        this.totalDuration = 0;
+        this.totalElements = 0;
+        
+        // Performance optimization: memory management
         this.scrollPositions = [];
         this.mousePositions = [];
         this.textSelections = [];
+        this.lastCleanup = Date.now();
+        
+        // Performance optimization: caching system
+        this.elementCache = new Map();
+        this.selectorCache = new Map();
+        this.positionCache = new Map();
+        
+        // Performance optimization: rate limiting
+        this.lastEventTime = 0;
+        this.eventCount = 0;
+        this.rateLimitWindow = 1000; // 1 second window
+        
+        // Progress tracking
+        this.readingProgress = {
+            current: 0,
+            total: 0,
+            percentage: 0,
+            timeElapsed: 0,
+            elementsRead: 0
+        };
+        
+        // Error tracking and recovery
+        this.errorCount = 0;
+        this.lastError = null;
+        this.recoveryAttempts = 0;
+        
+        // Performance metrics
+        this.performanceMetrics = {
+            totalSessions: 0,
+            averageReadingTime: 0,
+            cacheHits: 0,
+            cacheMisses: 0,
+            errorRate: 0,
+            memoryUsage: 0
+        };
+        
+        // Initialize cleanup interval
+        this.initializeCleanupInterval();
+        
+        console.log('🚀 Enhanced Reading Simulator initialized with config:', this.config);
     }
 
     async simulateReading(options) {
@@ -618,5 +689,264 @@ class ReadingSimulator {
         
         const elapsed = Date.now() - this.readingStartTime;
         return Math.min(100, (elapsed / this.totalDuration) * 100);
+    }
+
+    // Enhanced memory management
+    initializeCleanupInterval() {
+        if (this.cleanupInterval) {
+            clearInterval(this.cleanupInterval);
+        }
+        
+        this.cleanupInterval = setInterval(() => {
+            this.cleanupMemory();
+        }, this.config.cleanupInterval);
+    }
+
+    cleanupMemory() {
+        const now = Date.now();
+        const cutoffTime = now - (this.config.cleanupInterval * 2);
+
+        // Cleanup old scroll positions
+        if (this.scrollPositions.length > this.config.maxScrollPositions) {
+            this.scrollPositions = this.scrollPositions.slice(-this.config.maxScrollPositions);
+        }
+
+        // Cleanup old mouse positions
+        if (this.mousePositions.length > this.config.maxMousePositions) {
+            this.mousePositions = this.mousePositions.slice(-this.config.maxMousePositions);
+        }
+
+        // Cleanup old text selections
+        if (this.textSelections.length > this.config.maxTextSelections) {
+            this.textSelections = this.textSelections.slice(-this.config.maxTextSelections);
+        }
+
+        // Cleanup expired cache entries
+        this.cleanupCache();
+
+        // Update memory usage metrics
+        this.updateMemoryUsage();
+
+        this.lastCleanup = now;
+        console.log('🧹 Memory cleanup completed');
+    }
+
+    cleanupCache() {
+        const now = Date.now();
+        
+        // Cleanup element cache
+        for (const [key, value] of this.elementCache.entries()) {
+            if (now - value.timestamp > this.config.cacheTimeout) {
+                this.elementCache.delete(key);
+            }
+        }
+
+        // Cleanup selector cache
+        for (const [key, value] of this.selectorCache.entries()) {
+            if (now - value.timestamp > this.config.cacheTimeout) {
+                this.selectorCache.delete(key);
+            }
+        }
+
+        // Cleanup position cache
+        for (const [key, value] of this.positionCache.entries()) {
+            if (now - value.timestamp > this.config.cacheTimeout) {
+                this.positionCache.delete(key);
+            }
+        }
+
+        // Limit cache size
+        if (this.elementCache.size > this.config.maxCacheSize) {
+            const entries = Array.from(this.elementCache.entries());
+            entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
+            const toDelete = entries.slice(0, entries.length - this.config.maxCacheSize);
+            toDelete.forEach(([key]) => this.elementCache.delete(key));
+        }
+    }
+
+    updateMemoryUsage() {
+        this.performanceMetrics.memoryUsage = 
+            this.scrollPositions.length + 
+            this.mousePositions.length + 
+            this.textSelections.length +
+            this.elementCache.size +
+            this.selectorCache.size +
+            this.positionCache.size;
+    }
+
+    // Enhanced performance optimization
+    getCachedElement(selector) {
+        if (!this.config.enableCaching) {
+            return document.querySelector(selector);
+        }
+
+        const cached = this.elementCache.get(selector);
+        if (cached && Date.now() - cached.timestamp < this.config.cacheTimeout) {
+            this.performanceMetrics.cacheHits++;
+            return cached.element;
+        }
+
+        this.performanceMetrics.cacheMisses++;
+        const element = document.querySelector(selector);
+        if (element) {
+            this.elementCache.set(selector, {
+                element: element,
+                timestamp: Date.now()
+            });
+        }
+        return element;
+    }
+
+    getCachedElements(selector) {
+        if (!this.config.enableCaching) {
+            return document.querySelectorAll(selector);
+        }
+
+        const cached = this.selectorCache.get(selector);
+        if (cached && Date.now() - cached.timestamp < this.config.cacheTimeout) {
+            this.performanceMetrics.cacheHits++;
+            return cached.elements;
+        }
+
+        this.performanceMetrics.cacheMisses++;
+        const elements = document.querySelectorAll(selector);
+        if (elements.length > 0) {
+            this.selectorCache.set(selector, {
+                elements: elements,
+                timestamp: Date.now()
+            });
+        }
+        return elements;
+    }
+
+    // Enhanced rate limiting
+    checkRateLimit() {
+        if (!this.config.enableRateLimiting) {
+            return true;
+        }
+
+        const now = Date.now();
+        if (now - this.lastEventTime < this.config.minEventDelay) {
+            return false;
+        }
+
+        if (now - this.lastEventTime > this.rateLimitWindow) {
+            this.eventCount = 0;
+        }
+
+        if (this.eventCount >= 10) { // Max 10 events per second
+            return false;
+        }
+
+        this.lastEventTime = now;
+        this.eventCount++;
+        return true;
+    }
+
+    // Enhanced error handling and recovery
+    async performActionWithRetry(action, fallback, maxRetries = null) {
+        const retries = maxRetries || this.config.maxRetries;
+        
+        for (let attempt = 0; attempt < retries; attempt++) {
+            try {
+                return await action();
+            } catch (error) {
+                this.errorCount++;
+                this.lastError = error;
+                
+                console.warn(`⚠️ Action failed (attempt ${attempt + 1}/${retries}):`, error);
+                
+                if (attempt === retries - 1) {
+                    console.warn('⚠️ All retry attempts failed, using fallback');
+                    if (fallback) {
+                        return await fallback();
+                    }
+                    throw error;
+                }
+                
+                // Wait before retry
+                await this.delay(this.config.retryDelay * (attempt + 1));
+            }
+        }
+    }
+
+    // Enhanced progress tracking
+    updateReadingProgress(current, total, elementsRead = 0) {
+        if (!this.config.enableProgressTracking) return;
+
+        this.readingProgress = {
+            current: current,
+            total: total,
+            percentage: total > 0 ? Math.round((current / total) * 100) : 0,
+            timeElapsed: this.readingStartTime ? Date.now() - this.readingStartTime : 0,
+            elementsRead: elementsRead
+        };
+
+        // Emit progress event if supported
+        if (typeof this.onProgress === 'function') {
+            this.onProgress(this.readingProgress);
+        }
+
+        console.log(`📊 Reading progress: ${this.readingProgress.percentage}% (${current}/${total})`);
+    }
+
+    // Enhanced performance monitoring
+    getPerformanceMetrics() {
+        const totalRequests = this.performanceMetrics.cacheHits + this.performanceMetrics.cacheMisses;
+        const cacheHitRate = totalRequests > 0 ? this.performanceMetrics.cacheHits / totalRequests : 0;
+        const errorRate = this.performanceMetrics.totalSessions > 0 ? this.errorCount / this.performanceMetrics.totalSessions : 0;
+
+        return {
+            ...this.performanceMetrics,
+            cacheHitRate: cacheHitRate,
+            errorRate: errorRate,
+            memoryUsage: this.performanceMetrics.memoryUsage,
+            lastCleanup: this.lastCleanup
+        };
+    }
+
+    // Enhanced session management
+    startSession() {
+        this.performanceMetrics.totalSessions++;
+        this.readingStartTime = Date.now();
+        this.errorCount = 0;
+        this.lastError = null;
+        this.recoveryAttempts = 0;
+        
+        console.log('🚀 Reading session started');
+    }
+
+    endSession() {
+        if (this.readingStartTime) {
+            const sessionDuration = Date.now() - this.readingStartTime;
+            this.performanceMetrics.averageReadingTime = 
+                (this.performanceMetrics.averageReadingTime * (this.performanceMetrics.totalSessions - 1) + sessionDuration) / 
+                this.performanceMetrics.totalSessions;
+        }
+        
+        // Cleanup memory
+        this.cleanupMemory();
+        
+        console.log('🏁 Reading session ended');
+    }
+
+    // Enhanced cleanup and disposal
+    dispose() {
+        if (this.cleanupInterval) {
+            clearInterval(this.cleanupInterval);
+            this.cleanupInterval = null;
+        }
+        
+        // Clear all caches
+        this.elementCache.clear();
+        this.selectorCache.clear();
+        this.positionCache.clear();
+        
+        // Clear arrays
+        this.scrollPositions.length = 0;
+        this.mousePositions.length = 0;
+        this.textSelections.length = 0;
+        
+        console.log('🧹 Reading Simulator disposed and cleaned up');
     }
 }

@@ -1,0 +1,391 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Autoscroll Extension Profile Schema",
+  "type": "object",
+  "required": ["name", "displayName", "description", "version", "enabled"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "Unique profile identifier"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50,
+      "description": "Human-readable profile name"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Profile description"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Profile version"
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Whether profile is enabled"
+    },
+    "scroll": {
+      "type": "object",
+      "required": ["strategy", "minStep", "maxStep", "minDelay", "maxDelay"],
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": ["linear", "burst", "momentum", "idle", "reverse", "adaptive"],
+          "description": "Scroll strategy type"
+        },
+        "minStep": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "Minimum scroll step in pixels"
+        },
+        "maxStep": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "Maximum scroll step in pixels"
+        },
+        "minDelay": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10000,
+          "description": "Minimum delay between scrolls in ms"
+        },
+        "maxDelay": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10000,
+          "description": "Maximum delay between scrolls in ms"
+        },
+        "jitter": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Jitter percentage for randomization"
+        },
+        "easing": {
+          "type": "string",
+          "description": "CSS easing function"
+        },
+        "momentum": {
+          "type": "boolean",
+          "description": "Enable momentum scrolling"
+        },
+        "reverse": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "probability": { "type": "number", "minimum": 0, "maximum": 1 },
+            "maxSteps": { "type": "number", "minimum": 1, "maximum": 10 }
+          }
+        },
+        "adaptive": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "contentAware": { "type": "boolean" },
+            "speedVariation": { "type": "number", "minimum": 0, "maximum": 1 },
+            "pauseVariation": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
+    "stealth": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "level": {
+          "type": "string",
+          "enum": ["basic", "intermediate", "advanced", "expert"],
+          "description": "Stealth level"
+        },
+        "noiseEvents": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "frequency": { "type": "number", "minimum": 0, "maximum": 1 },
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["mousemove", "keypress", "focus", "blur", "click"]
+              }
+            },
+            "intensity": {
+              "type": "string",
+              "enum": ["low", "medium", "high"]
+            }
+          }
+        },
+        "tabAwareness": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "pauseOnBlur": { "type": "boolean" },
+            "resumeDelay": { "type": "number", "minimum": 0, "maximum": 10000 },
+            "simulateFocus": { "type": "boolean" }
+          }
+        },
+        "dwellTime": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "minMs": { "type": "number", "minimum": 0, "maximum": 60000 },
+            "maxMs": { "type": "number", "minimum": 0, "maximum": 60000 },
+            "contentAware": { "type": "boolean" },
+            "readingSpeed": { "type": "number", "minimum": 50, "maximum": 1000 },
+            "variation": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "humanError": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "probability": { "type": "number", "minimum": 0, "maximum": 1 },
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["overshoot", "undershoot", "pause", "wrong_direction", "hesitation"]
+              }
+            }
+          }
+        },
+        "cursorSimulation": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "movement": {
+              "type": "string",
+              "enum": ["linear", "natural", "bezier"]
+            },
+            "hoverDelay": {
+              "type": "object",
+              "properties": {
+                "minMs": { "type": "number", "minimum": 0, "maximum": 5000 },
+                "maxMs": { "type": "number", "minimum": 0, "maximum": 5000 }
+              }
+            }
+          }
+        },
+        "gestureSimulation": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "swipeVariation": { "type": "number", "minimum": 0, "maximum": 1 },
+            "touchDelay": {
+              "type": "object",
+              "properties": {
+                "minMs": { "type": "number", "minimum": 0, "maximum": 2000 },
+                "maxMs": { "type": "number", "minimum": 0, "maximum": 2000 }
+              }
+            }
+          }
+        },
+        "canvasNoise": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "optIn": { "type": "boolean" },
+            "intensity": {
+              "type": "string",
+              "enum": ["low", "medium", "high"]
+            }
+          }
+        }
+      }
+    },
+    "navigation": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "autoNavigate": { "type": "boolean" },
+        "mode": {
+          "type": "string",
+          "enum": ["sameTab", "newTab", "mixed"]
+        },
+        "target": {
+          "type": "string",
+          "enum": ["next", "prev", "related", "recent", "mixed"]
+        },
+        "delay": {
+          "type": "object",
+          "properties": {
+            "minMs": { "type": "number", "minimum": 0, "maximum": 30000 },
+            "maxMs": { "type": "number", "minimum": 0, "maximum": 30000 }
+          }
+        },
+        "hover": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "delay": {
+              "type": "object",
+              "properties": {
+                "minMs": { "type": "number", "minimum": 0, "maximum": 5000 },
+                "maxMs": { "type": "number", "minimum": 0, "maximum": 5000 }
+              }
+            },
+            "multipleHover": { "type": "boolean" },
+            "maxHovers": { "type": "number", "minimum": 1, "maximum": 10 }
+          }
+        },
+        "outbound": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "probability": { "type": "number", "minimum": 0, "maximum": 1 },
+            "whitelist": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "blacklist": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "adapters": {
+      "type": "object",
+      "properties": {
+        "desktop": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "wheelEvents": { "type": "boolean" },
+            "smoothScroll": { "type": "boolean" },
+            "precision": {
+              "type": "string",
+              "enum": ["low", "medium", "high"]
+            },
+            "momentum": { "type": "boolean" },
+            "inertia": { "type": "boolean" }
+          }
+        },
+        "mobile": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "touchEvents": { "type": "boolean" },
+            "gestureSimulation": { "type": "boolean" },
+            "precision": {
+              "type": "string",
+              "enum": ["low", "medium", "high"]
+            },
+            "swipe": { "type": "boolean" },
+            "pinch": { "type": "boolean" }
+          }
+        },
+        "viewport": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "simulation": { "type": "boolean" },
+            "randomization": { "type": "boolean" }
+          }
+        },
+        "fingerprint": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "optIn": { "type": "boolean" },
+            "userAgent": { "type": "boolean" },
+            "timezone": { "type": "boolean" },
+            "language": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "analytics": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "tracking": {
+          "type": "object",
+          "properties": {
+            "scrollDistance": { "type": "boolean" },
+            "dwellTime": { "type": "boolean" },
+            "navigation": { "type": "boolean" },
+            "errors": { "type": "boolean" },
+            "heatmap": { "type": "boolean" },
+            "sessionTimeline": { "type": "boolean" }
+          }
+        },
+        "export": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "format": {
+              "type": "string",
+              "enum": ["json", "csv", "xml"]
+            },
+            "autoExport": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "ai": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "patternGeneration": { "type": "boolean" },
+        "behaviorLearning": { "type": "boolean" },
+        "adaptiveSpeed": { "type": "boolean" },
+        "linkChooser": { "type": "boolean" },
+        "sessionManager": { "type": "boolean" }
+      }
+    },
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "adInteraction": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "optIn": { "type": "boolean" },
+            "warning": { "type": "string" }
+          }
+        },
+        "fingerprint": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "optIn": { "type": "boolean" },
+            "warning": { "type": "string" }
+          }
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "maxSessionTime": { "type": "number", "minimum": 0, "maximum": 3600000 },
+        "maxPagesPerSession": { "type": "number", "minimum": 1, "maximum": 100 },
+        "maxScrollDistance": { "type": "number", "minimum": 0, "maximum": 100000 },
+        "autoStop": { "type": "boolean" },
+        "sessionVariation": { "type": "boolean" }
+      }
+    },
+    "debug": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "logLevel": {
+          "type": "string",
+          "enum": ["debug", "info", "warn", "error"]
+        },
+        "overlay": { "type": "boolean" },
+        "heatmap": { "type": "boolean" },
+        "performance": { "type": "boolean" }
+      }
+    }
+  }
+}
