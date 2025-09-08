@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stealth Extension Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .content {
+            height: 2000px;
+            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+            margin: 20px 0;
+            padding: 20px;
+        }
+        .scroll-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Stealth Auto Scroll Extension - Test Page</h1>
+    
+    <div class="scroll-indicator" id="scrollIndicator">
+        Scroll: 0px
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Test Instructions</h2>
+        <ol>
+            <li>Load the extension in Chrome (chrome://extensions/)</li>
+            <li>Click the extension icon to open popup</li>
+            <li>Click "Start" to begin auto-scrolling</li>
+            <li>Run the tests below to verify functionality</li>
+            <li>Check console for any errors</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Stealth Detection Tests</h2>
+        <button class="test-button" onclick="runStealthAudit()">Run Self-Audit Script</button>
+        <button class="test-button" onclick="checkGlobalVariables()">Check Global Variables</button>
+        <button class="test-button" onclick="checkNativeFunctions()">Check Native Functions</button>
+        <button class="test-button" onclick="checkExtensionResources()">Check Extension Resources</button>
+        <div id="stealthResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>⚡ Performance Tests</h2>
+        <button class="test-button" onclick="runPerformanceTest()">Run Performance Test</button>
+        <button class="test-button" onclick="checkMemoryUsage()">Check Memory Usage</button>
+        <div id="performanceResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎮 Extension Control Tests</h2>
+        <button class="test-button" onclick="testKeyboardShortcuts()">Test Keyboard Shortcuts</button>
+        <button class="test-button" onclick="testEventListeners()">Test Event Listeners</button>
+        <button class="test-button" onclick="simulateUserInteraction()">Simulate User Interaction</button>
+        <div id="controlResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Scroll Behavior Tests</h2>
+        <button class="test-button" onclick="monitorScrollBehavior()">Monitor Scroll Behavior</button>
+        <button class="test-button" onclick="testScrollPatterns()">Test Scroll Patterns</button>
+        <div id="scrollResults"></div>
+    </div>
+
+    <div class="content">
+        <h2>📄 Test Content</h2>
+        <p>This is a long content area to test scrolling behavior. The extension should scroll through this content smoothly and naturally.</p>
+        
+        <h3>Section 1: Basic Content</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        
+        <h3>Section 2: More Content</h3>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        
+        <h3>Section 3: Even More Content</h3>
+        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+        
+        <h3>Section 4: Final Content</h3>
+        <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+    </div>
+
+    <script>
+        // Scroll monitoring
+        let scrollStartTime = Date.now();
+        let scrollDistance = 0;
+        let scrollEvents = [];
+
+        window.addEventListener('scroll', () => {
+            scrollDistance = window.pageYOffset;
+            document.getElementById('scrollIndicator').textContent = `Scroll: ${scrollDistance}px`;
+            
+            scrollEvents.push({
+                time: Date.now() - scrollStartTime,
+                position: scrollDistance
+            });
+        });
+
+        // Stealth Detection Tests
+        function runStealthAudit() {
+            const results = document.getElementById('stealthResults');
+            results.innerHTML = '<div class="info">Running stealth audit...</div>';
+            
+            setTimeout(() => {
+                const auditResult = (function selfAudit(){
+                    'use strict';
+                    
+                    const results = {
+                        globalVariables: [],
+                        nativeFunctionPatches: [],
+                        extensionResources: [],
+                        performance: {},
+                        overall: 'PASS'
+                    };
+                    
+                    // 1) Check for globals
+                    for(let k in window){
+                        if(/^(ext|auto|scroll|myext)/i.test(k)) results.globalVariables.push(k);
+                    }
+
+                    // 2) Check native function patching
+                    ['scrollTo','fetch','XMLHttpRequest'].forEach(fn => {
+                        try{
+                            if(Function.prototype.toString.call(window[fn]).indexOf('[native code]') === -1){
+                                results.nativeFunctionPatches.push(fn);
+                            }
+                        }catch(e){}
+                    });
+
+                    // 3) Check for chrome-extension resources
+                    const scripts = document.querySelectorAll('script[src]');
+                    scripts.forEach(script => {
+                        if (script.src.includes('chrome-extension://')) {
+                            results.extensionResources.push(script.src);
+                        }
+                    });
+                    
+                    // 4) Performance check
+                    const startTime = performance.now();
+                    for(let i = 0; i < 1000; i++) {
+                        Math.random();
+                    }
+                    const endTime = performance.now();
+                    results.performance.executionTime = endTime - startTime;
+                    
+                    // Determine overall result
+                    if (results.globalVariables.length > 0 || 
+                        results.nativeFunctionPatches.length > 0 || 
+                        results.extensionResources.length > 0 || 
+                        results.performance.executionTime > 10) {
+                        results.overall = 'FAIL';
+                    }
+                    
+                    return results;
+                })();
+                
+                let html = `<h3>Stealth Audit Results</h3>`;
+                html += `<div class="${auditResult.overall === 'PASS' ? 'pass' : 'fail'}">Overall Status: ${auditResult.overall}</div>`;
+                html += `<div class="info">Global Variables: ${auditResult.globalVariables.length}</div>`;
+                html += `<div class="info">Native Function Patches: ${auditResult.nativeFunctionPatches.length}</div>`;
+                html += `<div class="info">Extension Resources: ${auditResult.extensionResources.length}</div>`;
+                html += `<div class="info">Performance: ${auditResult.performance.executionTime.toFixed(2)}ms</div>`;
+                
+                results.innerHTML = html;
+            }, 1000);
+        }
+
+        function checkGlobalVariables() {
+            const results = document.getElementById('stealthResults');
+            const suspicious = [];
+            const nativeProps = ['scrollbars', 'external', 'scrollX', 'scrollY', 'scroll', 'scrollBy', 'scrollTo', 'innerWidth', 'innerHeight', 'outerWidth', 'outerHeight'];
+            
+            for(let k in window){
+                if(/^(ext|auto|scroll|myext|stealth|bot|page_nav)/i.test(k) && !nativeProps.includes(k)) {
+                    suspicious.push(k);
+                }
+            }
+            
+            let html = `<h3>Global Variables Check</h3>`;
+            if (suspicious.length === 0) {
+                html += `<div class="pass">✅ No suspicious global variables found</div>`;
+            } else {
+                html += `<div class="fail">❌ Suspicious variables: ${suspicious.join(', ')}</div>`;
+            }
+            
+            results.innerHTML = html;
+        }
+
+        function checkNativeFunctions() {
+            const results = document.getElementById('stealthResults');
+            const patched = [];
+            
+            ['scrollTo','scrollBy','fetch','XMLHttpRequest'].forEach(fn => {
+                try{
+                    if(Function.prototype.toString.call(window[fn]).indexOf('[native code]') === -1){
+                        patched.push(fn);
+                    }
+                }catch(e){}
+            });
+            
+            let html = `<h3>Native Functions Check</h3>`;
+            if (patched.length === 0) {
+                html += `<div class="pass">✅ No native functions patched</div>`;
+            } else {
+                html += `<div class="fail">❌ Patched functions: ${patched.join(', ')}</div>`;
+            }
+            
+            results.innerHTML = html;
+        }
+
+        function checkExtensionResources() {
+            const results = document.getElementById('stealthResults');
+            const scripts = document.querySelectorAll('script[src]');
+            const extensionScripts = [];
+            
+            scripts.forEach(script => {
+                if (script.src.includes('chrome-extension://')) {
+                    extensionScripts.push(script.src);
+                }
+            });
+            
+            let html = `<h3>Extension Resources Check</h3>`;
+            if (extensionScripts.length === 0) {
+                html += `<div class="pass">✅ No extension resources detected</div>`;
+            } else {
+                html += `<div class="fail">❌ Extension resources: ${extensionScripts.length}</div>`;
+            }
+            
+            results.innerHTML = html;
+        }
+
+        // Performance Tests
+        function runPerformanceTest() {
+            const results = document.getElementById('performanceResults');
+            results.innerHTML = '<div class="info">Running performance test...</div>';
+            
+            setTimeout(() => {
+                const startTime = performance.now();
+                
+                // Simulate some work
+                for (let i = 0; i < 10000; i++) {
+                    Math.random();
+                }
+                
+                const endTime = performance.now();
+                const executionTime = endTime - startTime;
+                
+                let html = `<h3>Performance Test Results</h3>`;
+                html += `<div class="${executionTime < 10 ? 'pass' : 'fail'}">Execution Time: ${executionTime.toFixed(2)}ms</div>`;
+                html += `<div class="info">Memory Usage: ${(performance.memory ? (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2) : 'N/A')}MB</div>`;
+                
+                results.innerHTML = html;
+            }, 1000);
+        }
+
+        function checkMemoryUsage() {
+            const results = document.getElementById('performanceResults');
+            
+            if (performance.memory) {
+                const memory = performance.memory;
+                let html = `<h3>Memory Usage</h3>`;
+                html += `<div class="info">Used: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)}MB</div>`;
+                html += `<div class="info">Total: ${(memory.totalJSHeapSize / 1024 / 1024).toFixed(2)}MB</div>`;
+                html += `<div class="info">Limit: ${(memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2)}MB</div>`;
+                
+                results.innerHTML = html;
+            } else {
+                results.innerHTML = '<div class="info">Memory API not available</div>';
+            }
+        }
+
+        // Control Tests
+        function testKeyboardShortcuts() {
+            const results = document.getElementById('controlResults');
+            results.innerHTML = '<div class="info">Test keyboard shortcuts manually:<br>Ctrl+Shift+A: Toggle scrolling<br>Ctrl+Shift+S: Open settings</div>';
+        }
+
+        function testEventListeners() {
+            const results = document.getElementById('controlResults');
+            
+            // Check for stealth extension events
+            const hasStealthEvents = window.addEventListener.toString().includes('stealth') || 
+                                   document.addEventListener.toString().includes('stealth');
+            
+            let html = `<h3>Event Listeners Check</h3>`;
+            html += `<div class="${!hasStealthEvents ? 'pass' : 'fail'}">Stealth Events: ${hasStealthEvents ? 'Detected' : 'Not Detected'}</div>`;
+            
+            results.innerHTML = html;
+        }
+
+        function simulateUserInteraction() {
+            const results = document.getElementById('controlResults');
+            
+            // Simulate mouse movement
+            const event = new MouseEvent('mousemove', {
+                clientX: Math.random() * window.innerWidth,
+                clientY: Math.random() * window.innerHeight,
+                bubbles: true
+            });
+            document.dispatchEvent(event);
+            
+            results.innerHTML = '<div class="info">✅ Simulated user interaction (mouse movement)</div>';
+        }
+
+        // Scroll Behavior Tests
+        function monitorScrollBehavior() {
+            const results = document.getElementById('scrollResults');
+            
+            if (scrollEvents.length > 0) {
+                let html = `<h3>Scroll Behavior Analysis</h3>`;
+                html += `<div class="info">Total Scroll Events: ${scrollEvents.length}</div>`;
+                html += `<div class="info">Total Distance: ${scrollDistance}px</div>`;
+                
+                // Analyze scroll pattern
+                const intervals = [];
+                for (let i = 1; i < scrollEvents.length; i++) {
+                    intervals.push(scrollEvents[i].time - scrollEvents[i-1].time);
+                }
+                
+                if (intervals.length > 0) {
+                    const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+                    html += `<div class="info">Average Interval: ${avgInterval.toFixed(2)}ms</div>`;
+                }
+                
+                results.innerHTML = html;
+            } else {
+                results.innerHTML = '<div class="info">No scroll events recorded yet. Start the extension to see data.</div>';
+            }
+        }
+
+        function testScrollPatterns() {
+            const results = document.getElementById('scrollResults');
+            
+            // Test smooth scrolling
+            window.scrollTo({
+                top: 500,
+                behavior: 'smooth'
+            });
+            
+            setTimeout(() => {
+                results.innerHTML = '<div class="info">✅ Tested smooth scrolling behavior</div>';
+            }, 1000);
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('🧪 Stealth Extension Test Page Loaded');
+                console.log('📋 Ready for testing. Load the extension and run tests.');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

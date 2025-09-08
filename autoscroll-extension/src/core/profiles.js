@@ -2,8 +2,8 @@
  * Profile loader and validator
  */
 
-import { getStorageValue, setStorageValue } from '@utils/storage.js';
-import { createLogger } from '@utils/logger.js';
+import { getStorageValue, setStorageValue } from '../utils/storage.js';
+import { createLogger } from '../utils/logger.js';
 
 const logger = createLogger('profiles');
 
@@ -80,16 +80,188 @@ export async function loadProfile(profileName = 'default') {
  */
 async function loadDefaultProfile(profileName) {
   try {
-    // In a real implementation, this would load from the profiles directory
-    // For now, we'll return the default profile
+    // Load from profiles directory
+    const profilePath = `../profiles/${profileName}.json`;
+    
+    try {
+      // Try to import the profile file
+      const profileModule = await import(profilePath);
+      const profile = profileModule.default || profileModule;
+      
+      if (profile && profile.name === profileName) {
+        logger.debug('Loaded profile from file', { profileName, path: profilePath });
+        return profile;
+      }
+    } catch (importError) {
+      logger.debug('Could not import profile file', { profileName, path: profilePath, error: importError.message });
+    }
+    
+    // Fallback to hardcoded profiles
     if (profileName === 'default') {
       return DEFAULT_PROFILE;
+    }
+    
+    // Try to load from built-in profiles
+    const builtInProfiles = await loadBuiltInProfiles();
+    if (builtInProfiles[profileName]) {
+      return builtInProfiles[profileName];
     }
     
     return null;
   } catch (error) {
     logger.error('Error loading default profile', { profileName, error });
     return null;
+  }
+}
+
+/**
+ * Load built-in profiles
+ * @returns {Promise<Object>} - Built-in profiles
+ */
+async function loadBuiltInProfiles() {
+  try {
+    // Advanced profile configuration
+    const advancedProfile = {
+      name: 'advanced',
+      displayName: 'Advanced Stealth Profile',
+      description: 'High-level stealth profile with advanced human behavior simulation',
+      version: '1.0.0',
+      enabled: true,
+      scroll: {
+        strategy: 'adaptive',
+        minStep: 30,
+        maxStep: 300,
+        minDelay: 50,
+        maxDelay: 800,
+        jitter: 0.2,
+        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        momentum: true,
+        reverse: {
+          enabled: true,
+          probability: 0.08,
+          maxSteps: 5
+        }
+      },
+      stealth: {
+        level: 'expert',
+        noiseEvents: {
+          enabled: true,
+          frequency: 0.3,
+          types: ['mousemove', 'keypress', 'focus', 'blur', 'scroll']
+        },
+        dwellTime: {
+          enabled: true,
+          minDuration: 2000,
+          maxDuration: 8000,
+          variation: 0.4
+        },
+        cursorSimulation: {
+          enabled: true,
+          movement: true,
+          hover: true,
+          click: true
+        },
+        fingerprintVariation: {
+          enabled: true,
+          level: 'high',
+          userAgent: true,
+          screen: true,
+          timezone: true
+        }
+      },
+      navigation: {
+        autoNavigate: true,
+        mode: 'newTab',
+        target: 'next',
+        delay: {
+          min: 3000,
+          max: 8000
+        }
+      },
+      analytics: {
+        enabled: true,
+        heatmap: true,
+        timeline: true,
+        statistics: true
+      }
+    };
+
+    // Fast profile configuration
+    const fastProfile = {
+      name: 'fast',
+      displayName: 'Fast Profile',
+      description: 'Quick scrolling profile for rapid content consumption',
+      version: '1.0.0',
+      enabled: true,
+      scroll: {
+        strategy: 'linear',
+        minStep: 100,
+        maxStep: 500,
+        minDelay: 20,
+        maxDelay: 100,
+        jitter: 0.1,
+        easing: 'linear',
+        momentum: false
+      },
+      stealth: {
+        level: 'basic',
+        noiseEvents: {
+          enabled: false
+        },
+        dwellTime: {
+          enabled: false
+        }
+      },
+      navigation: {
+        autoNavigate: true,
+        mode: 'sameTab',
+        target: 'next'
+      }
+    };
+
+    // Slow profile configuration
+    const slowProfile = {
+      name: 'slow',
+      displayName: 'Slow Profile',
+      description: 'Slow, careful scrolling profile for detailed reading',
+      version: '1.0.0',
+      enabled: true,
+      scroll: {
+        strategy: 'idle',
+        minStep: 10,
+        maxStep: 50,
+        minDelay: 200,
+        maxDelay: 1000,
+        jitter: 0.3,
+        easing: 'ease-in-out',
+        momentum: true
+      },
+      stealth: {
+        level: 'intermediate',
+        noiseEvents: {
+          enabled: true,
+          frequency: 0.2
+        },
+        dwellTime: {
+          enabled: true,
+          minDuration: 5000,
+          maxDuration: 15000
+        }
+      },
+      navigation: {
+        autoNavigate: false
+      }
+    };
+
+    return {
+      default: DEFAULT_PROFILE,
+      advanced: advancedProfile,
+      fast: fastProfile,
+      slow: slowProfile
+    };
+  } catch (error) {
+    logger.error('Error loading built-in profiles', { error });
+    return { default: DEFAULT_PROFILE };
   }
 }
 
@@ -284,6 +456,30 @@ export function getActiveProfile() {
 }
 
 /**
+ * Get available profiles
+ * @returns {Promise<Array>} - Array of available profiles
+ */
+export async function getAvailableProfiles() {
+  try {
+    const builtInProfiles = await loadBuiltInProfiles();
+    const profiles = Object.values(builtInProfiles);
+    
+    // Add custom profiles from storage
+    const customProfiles = await getStorageValue('extensionProfiles', {});
+    Object.values(customProfiles).forEach(profile => {
+      if (profile && profile.name) {
+        profiles.push(profile);
+      }
+    });
+    
+    return profiles;
+  } catch (error) {
+    logger.error('Error getting available profiles', { error });
+    return [DEFAULT_PROFILE];
+  }
+}
+
+/**
  * Set active profile
  * @param {string} profileName - Profile name
  * @returns {Promise<boolean>} - Success status
@@ -304,23 +500,6 @@ export async function setActiveProfile(profileName) {
   }
 }
 
-/**
- * Get available profiles
- * @returns {Promise<Array>} - Array of available profiles
- */
-export async function getAvailableProfiles() {
-  try {
-    // In a real implementation, this would scan the profiles directory
-    // For now, return default profiles
-    return [
-      { name: 'default', displayName: 'Default Profile', description: 'Balanced autoscroll profile' },
-      { name: 'advanced', displayName: 'Advanced Stealth', description: 'High-level stealth profile' }
-    ];
-  } catch (error) {
-    logger.error('Error getting available profiles', { error });
-    return [];
-  }
-}
 
 /**
  * Delete profile

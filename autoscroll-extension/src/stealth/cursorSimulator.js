@@ -2,9 +2,9 @@
  * Cursor simulator for realistic mouse movement patterns
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice, jitter } from '@core/randomizer.js';
-import { delay } from '@utils/time.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice, jitter } from '../core/randomizer.js';
+import { delay } from '../utils/time.js';
 
 const logger = createLogger('cursor-simulator');
 

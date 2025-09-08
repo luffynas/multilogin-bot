@@ -2,8 +2,8 @@
  * Link parser for normalizing and validating links
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice } from '@core/randomizer.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice } from '../core/randomizer.js';
 
 const logger = createLogger('link-parser');
 

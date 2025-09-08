@@ -2,9 +2,9 @@
  * Desktop adapter - handles desktop scrolling with wheel events
  */
 
-import { createLogger } from '@utils/logger.js';
-import { dispatchWheelEvent, simulateNaturalScroll } from '@utils/events.js';
-import { getScrollPosition, getDocumentDimensions } from '@utils/dom.js';
+import { createLogger } from '../utils/logger.js';
+import { dispatchWheelEvent, simulateNaturalScroll } from '../utils/events.js';
+import { getScrollPosition, getDocumentDimensions } from '../utils/dom.js';
 
 const logger = createLogger('desktop-adapter');
 

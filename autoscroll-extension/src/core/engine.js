@@ -2,8 +2,8 @@
  * Core autoscroll engine - the heart of the system
  */
 
-import { createLogger } from '@utils/logger.js';
-import { sleep, addJitter, createCancellableTimeout } from '@utils/time.js';
+import { createLogger } from '../utils/logger.js';
+import { sleep, addJitter, createCancellableTimeout } from '../utils/time.js';
 import { getProfileValue } from './profiles.js';
 import { randScrollStep, randDelay, jitter } from './randomizer.js';
 import { noiseEventsGenerator } from '../stealth/noiseEvents.js';
@@ -16,6 +16,16 @@ import { dwellTimeSimulator } from '../stealth/dwellTimeSimulator.js';
 import { errorSimulator } from '../stealth/errorSimulator.js';
 import { fingerprintVariation } from '../stealth/fingerprintVariation.js';
 import { statsCollector } from '../analytics/statsCollector.js';
+import { heatmapGenerator } from '../analytics/heatmap.js';
+import { sessionTimelineTracker } from '../analytics/sessionTimeline.js';
+import { contentEstimator } from '../analytics/estimator.js';
+import { patternGenerator } from '../ai/patternGenerator.js';
+import { behaviorLearner } from '../ai/behaviorLearner.js';
+import { debugOverlay } from '../debug/debugOverlay.js';
+import { heatmapOverlay } from '../debug/heatmapOverlay.js';
+import { patternReplayManager } from './patternReplay.js';
+import { viewportManager } from './viewport.js';
+import { fingerprintManager } from './fingerprint.js';
 import { adSenseDetector } from '../detectors/adsenseDetector.js';
 import { navigationDetector } from '../detectors/navigationDetector.js';
 import { paginationDetector } from '../detectors/paginationDetector.js';
@@ -26,7 +36,29 @@ import { tabManager } from '../navigation/tabManager.js';
 import { outboundNavigator } from '../navigation/outboundNavigator.js';
 import { sessionManager } from '../ai/sessionManager.js';
 
+// Import all strategies and adapters statically
+import * as linearStrategy from '../strategies/linear.js';
+import * as burstStrategy from '../strategies/burst.js';
+import * as idleStrategy from '../strategies/idle.js';
+import * as momentumStrategy from '../strategies/momentum.js';
+
+import * as desktopAdapter from '../adapters/desktop.js';
+import * as mobileAdapter from '../adapters/mobile.js';
+
 const logger = createLogger('engine');
+
+// Strategy and adapter registries
+const STRATEGY_REGISTRY = {
+  linear: linearStrategy,
+  burst: burstStrategy,
+  idle: idleStrategy,
+  momentum: momentumStrategy
+};
+
+const ADAPTER_REGISTRY = {
+  desktop: desktopAdapter,
+  mobile: mobileAdapter
+};
 
 /**
  * Engine states
@@ -100,6 +132,25 @@ export class AutoscrollEngine {
     
     // Initialize AI modules
     this.sessionManager = sessionManager;
+    
+    // Initialize Analytics modules
+    this.statsCollector = statsCollector;
+    this.heatmapGenerator = heatmapGenerator;
+    this.sessionTimelineTracker = sessionTimelineTracker;
+    this.contentEstimator = contentEstimator;
+    
+    // Initialize AI modules
+    this.patternGenerator = patternGenerator;
+    this.behaviorLearner = behaviorLearner;
+    
+    // Initialize Debug modules
+    this.debugOverlay = debugOverlay;
+    this.heatmapOverlay = heatmapOverlay;
+    
+    // Initialize Core modules
+    this.patternReplayManager = patternReplayManager;
+    this.viewportManager = viewportManager;
+    this.fingerprintManager = fingerprintManager;
   }
 
   /**
@@ -133,6 +184,15 @@ export class AutoscrollEngine {
       
       // Initialize AI modules
       await this.initializeAIModules();
+      
+      // Initialize Analytics modules
+      await this.initializeAnalyticsModules();
+      
+      // Initialize Debug modules
+      await this.initializeDebugModules();
+      
+      // Initialize Core modules
+      await this.initializeCoreModules();
       
       // Initialize strategy and adapter
       await this.initializeStrategy();
@@ -189,6 +249,15 @@ export class AutoscrollEngine {
       
       // Stop AI modules
       await this.stopAIModules();
+      
+      // Stop Analytics modules
+      await this.stopAnalyticsModules();
+      
+      // Stop Debug modules
+      await this.stopDebugModules();
+      
+      // Stop Core modules
+      await this.stopCoreModules();
       
       // Stop scheduler
       this.stopScheduler();
@@ -627,8 +696,12 @@ export class AutoscrollEngine {
     try {
       logger.info('Setting scroll strategy', { strategyName });
       
-      // Import strategy dynamically
-      const strategyModule = await import(`@strategies/${strategyName}.js`);
+      // Get strategy from registry
+      const strategyModule = STRATEGY_REGISTRY[strategyName];
+      if (!strategyModule) {
+        throw new Error(`Strategy '${strategyName}' not found in registry`);
+      }
+      
       this.currentStrategy = strategyModule;
       
       logger.info('Scroll strategy set successfully', { strategyName });
@@ -648,8 +721,12 @@ export class AutoscrollEngine {
     try {
       logger.info('Setting scroll adapter', { adapterName });
       
-      // Import adapter dynamically
-      const adapterModule = await import(`@adapters/${adapterName}.js`);
+      // Get adapter from registry
+      const adapterModule = ADAPTER_REGISTRY[adapterName];
+      if (!adapterModule) {
+        throw new Error(`Adapter '${adapterName}' not found in registry`);
+      }
+      
       this.currentAdapter = adapterModule;
       
       logger.info('Scroll adapter set successfully', { adapterName });
@@ -786,6 +863,28 @@ export class AutoscrollEngine {
       this.stats.totalSteps++;
       this.stats.totalDistance += Math.abs(step.delta || 0);
       
+      // Record analytics data
+      await this.recordAnalyticsData('scroll', {
+        delta: step.delta,
+        speed: step.speed,
+        strategy: step.strategy,
+        timestamp: Date.now()
+      });
+      
+      // Record heatmap data
+      await this.recordHeatmapData('scroll', {
+        x: window.innerWidth / 2,
+        y: window.scrollY + window.innerHeight / 2,
+        delta: step.delta,
+        intensity: Math.abs(step.delta) / 100
+      });
+      
+      // Record pattern replay data
+      await this.recordPatternData('scroll', step);
+      
+      // Update debug overlay
+      this.updateDebugOverlay();
+      
       // Emit step event
       this.emit(ENGINE_EVENTS.STEP, step);
       
@@ -851,6 +950,243 @@ export class AutoscrollEngine {
       ...profile,
       ...config
     };
+  }
+
+  /**
+   * Initialize Analytics modules
+   */
+  async initializeAnalyticsModules() {
+    try {
+      logger.info('Initializing Analytics modules');
+      
+      // Initialize stats collector
+      await this.statsCollector.initialize(this.config.analytics?.statsCollector);
+      
+      // Initialize heatmap generator
+      await this.heatmapGenerator.initialize(this.config.analytics?.heatmap);
+      
+      // Initialize session timeline tracker
+      await this.sessionTimelineTracker.initialize(this.config.analytics?.sessionTimeline);
+      
+      // Initialize content estimator
+      await this.contentEstimator.initialize(this.config.analytics?.estimator);
+      
+      logger.info('Analytics modules initialized successfully');
+    } catch (error) {
+      logger.error('Error initializing Analytics modules', { error });
+    }
+  }
+
+  /**
+   * Initialize Debug modules
+   */
+  async initializeDebugModules() {
+    try {
+      logger.info('Initializing Debug modules');
+      
+      // Initialize debug overlay
+      await this.debugOverlay.initialize(this.config.debug?.overlay);
+      
+      // Initialize heatmap overlay
+      await this.heatmapOverlay.initialize(this.config.debug?.heatmapOverlay);
+      
+      logger.info('Debug modules initialized successfully');
+    } catch (error) {
+      logger.error('Error initializing Debug modules', { error });
+    }
+  }
+
+  /**
+   * Initialize Core modules
+   */
+  async initializeCoreModules() {
+    try {
+      logger.info('Initializing Core modules');
+      
+      // Initialize pattern replay manager
+      await this.patternReplayManager.initialize(this.config.core?.patternReplay);
+      
+      // Initialize viewport manager
+      await this.viewportManager.initialize(this.config.core?.viewport);
+      
+      // Initialize fingerprint manager
+      await this.fingerprintManager.initialize(this.config.core?.fingerprint);
+      
+      logger.info('Core modules initialized successfully');
+    } catch (error) {
+      logger.error('Error initializing Core modules', { error });
+    }
+  }
+
+  /**
+   * Stop Analytics modules
+   */
+  async stopAnalyticsModules() {
+    try {
+      logger.info('Stopping Analytics modules');
+      
+      // Stop stats collector
+      await this.statsCollector.stopCollection();
+      
+      // Stop heatmap generator
+      await this.heatmapGenerator.stopTracking();
+      
+      // Stop session timeline tracker
+      await this.sessionTimelineTracker.stopTracking();
+      
+      // Stop content estimator
+      await this.contentEstimator.stopEstimation();
+      
+      logger.info('Analytics modules stopped successfully');
+    } catch (error) {
+      logger.error('Error stopping Analytics modules', { error });
+    }
+  }
+
+  /**
+   * Stop Debug modules
+   */
+  async stopDebugModules() {
+    try {
+      logger.info('Stopping Debug modules');
+      
+      // Stop debug overlay
+      await this.debugOverlay.hide();
+      
+      // Stop heatmap overlay
+      await this.heatmapOverlay.hide();
+      
+      logger.info('Debug modules stopped successfully');
+    } catch (error) {
+      logger.error('Error stopping Debug modules', { error });
+    }
+  }
+
+  /**
+   * Stop Core modules
+   */
+  async stopCoreModules() {
+    try {
+      logger.info('Stopping Core modules');
+      
+      // Stop pattern replay manager
+      await this.patternReplayManager.stopReplay();
+      
+      // Stop viewport manager
+      await this.viewportManager.stopTracking();
+      
+      // Stop fingerprint manager (no stop method needed)
+      
+      logger.info('Core modules stopped successfully');
+    } catch (error) {
+      logger.error('Error stopping Core modules', { error });
+    }
+  }
+
+  /**
+   * Record analytics data
+   * @param {string} type - Data type
+   * @param {Object} data - Data to record
+   */
+  async recordAnalyticsData(type, data) {
+    try {
+      // Record in stats collector
+      await this.statsCollector.recordEvent(type, data);
+      
+      // Record in session timeline
+      await this.sessionTimelineTracker.recordEvent(type, data);
+      
+      // Learn from behavior
+      await this.behaviorLearner.learnFromBehavior(type, data);
+    } catch (error) {
+      logger.error('Error recording analytics data', { error, type, data });
+    }
+  }
+
+  /**
+   * Record heatmap data
+   * @param {string} type - Data type
+   * @param {Object} data - Data to record
+   */
+  async recordHeatmapData(type, data) {
+    try {
+      switch (type) {
+        case 'scroll':
+          await this.heatmapGenerator.recordScroll(data);
+          await this.heatmapOverlay.addScrollData(data);
+          break;
+        case 'click':
+          await this.heatmapGenerator.recordClick(data);
+          await this.heatmapOverlay.addClickData(data);
+          break;
+        case 'hover':
+          await this.heatmapGenerator.recordHover(data);
+          await this.heatmapOverlay.addHoverData(data);
+          break;
+        case 'dwell':
+          await this.heatmapGenerator.recordDwell(data);
+          break;
+      }
+    } catch (error) {
+      logger.error('Error recording heatmap data', { error, type, data });
+    }
+  }
+
+  /**
+   * Record pattern data
+   * @param {string} type - Data type
+   * @param {Object} data - Data to record
+   */
+  async recordPatternData(type, data) {
+    try {
+      await this.patternReplayManager.recordEvent(type, data);
+    } catch (error) {
+      logger.error('Error recording pattern data', { error, type, data });
+    }
+  }
+
+  /**
+   * Update debug overlay
+   */
+  updateDebugOverlay() {
+    try {
+      if (this.debugOverlay) {
+        this.debugOverlay.updateDebugData('engine', {
+          status: this.state,
+          active: this.isRunning,
+          strategy: this.currentStrategy?.name || 'None',
+          scrollPosition: window.scrollY,
+          totalDistance: this.stats.totalDistance,
+          steps: this.stats.totalSteps,
+          speed: this.stats.totalDistance / (Date.now() - this.stats.startTime) * 1000,
+          paused: this.state === ENGINE_STATES.PAUSED
+        });
+        
+        this.debugOverlay.updateDebugData('analytics', {
+          sessionDuration: Date.now() - this.stats.startTime,
+          pagesVisited: 1,
+          totalEvents: this.stats.totalSteps,
+          scrollEvents: this.stats.totalSteps,
+          navigationEvents: 0,
+          stealthEvents: 0,
+          behaviorScore: 0.5,
+          efficiency: this.stats.totalSteps > 0 ? this.stats.totalDistance / this.stats.totalSteps : 0
+        });
+        
+        this.debugOverlay.updateDebugData('performance', {
+          memoryUsage: performance.memory ? performance.memory.usedJSHeapSize / 1024 / 1024 : 0,
+          cpuUsage: 0,
+          responseTime: 0,
+          errorRate: this.stats.errors / Math.max(this.stats.totalSteps, 1),
+          successRate: 1 - (this.stats.errors / Math.max(this.stats.totalSteps, 1)),
+          fps: 60,
+          loadTime: 0,
+          lastUpdate: new Date().toLocaleTimeString()
+        });
+      }
+    } catch (error) {
+      logger.error('Error updating debug overlay', { error });
+    }
   }
 
   /**

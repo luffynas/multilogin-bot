@@ -2,8 +2,8 @@
  * Burst scroll strategy - quick bursts followed by pauses
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randScrollStep, randDelay, jitter } from '@core/randomizer.js';
+import { createLogger } from '../utils/logger.js';
+import { randScrollStep, randDelay, jitter } from '../core/randomizer.js';
 
 const logger = createLogger('burst-strategy');
 

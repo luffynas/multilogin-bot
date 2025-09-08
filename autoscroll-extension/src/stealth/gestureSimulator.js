@@ -2,9 +2,10 @@
  * Gesture simulator for mobile touch interactions
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice, jitter } from '@core/randomizer.js';
-import { delay } from '@utils/time.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice, jitter } from '../core/randomizer.js';
+import { createTouchEvent } from '../utils/events.js';
+import { delay } from '../utils/time.js';
 
 const logger = createLogger('gesture-simulator');
 
@@ -720,9 +721,7 @@ export class GestureSimulator {
    */
   dispatchTouchStart(touches) {
     try {
-      const event = new TouchEvent('touchstart', {
-        bubbles: true,
-        cancelable: true,
+      const event = createTouchEvent('touchstart', {
         touches: touches,
         targetTouches: touches,
         changedTouches: touches
@@ -740,9 +739,7 @@ export class GestureSimulator {
    */
   dispatchTouchMove(touches) {
     try {
-      const event = new TouchEvent('touchmove', {
-        bubbles: true,
-        cancelable: true,
+      const event = createTouchEvent('touchmove', {
         touches: touches,
         targetTouches: touches,
         changedTouches: touches
@@ -760,9 +757,7 @@ export class GestureSimulator {
    */
   dispatchTouchEnd(touches) {
     try {
-      const event = new TouchEvent('touchend', {
-        bubbles: true,
-        cancelable: true,
+      const event = createTouchEvent('touchend', {
         touches: [],
         targetTouches: [],
         changedTouches: touches

@@ -2,9 +2,9 @@
  * Pagination detector for identifying infinite scroll and load more functionality
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice } from '@core/randomizer.js';
-import { getElement, getElements, isElementVisible } from '@utils/dom.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice } from '../core/randomizer.js';
+import { safeQuerySelector, safeQuerySelectorAll, isElementVisible } from '../utils/dom.js';
 
 const logger = createLogger('pagination-detector');
 
@@ -260,7 +260,7 @@ export class PaginationDetector {
       
       for (const selector of selectors) {
         try {
-          const foundElements = getElements(selector);
+          const foundElements = safeQuerySelectorAll(selector);
           
           for (const element of foundElements) {
             const paginationElement = await this.analyzePaginationElement(element, 'loadMore');
@@ -300,7 +300,7 @@ export class PaginationDetector {
       
       for (const selector of selectors) {
         try {
-          const foundElements = getElements(selector);
+          const foundElements = safeQuerySelectorAll(selector);
           
           for (const element of foundElements) {
             const paginationElement = await this.analyzePaginationElement(element, 'pagination');
@@ -340,7 +340,7 @@ export class PaginationDetector {
       
       for (const selector of selectors) {
         try {
-          const foundElements = getElements(selector);
+          const foundElements = safeQuerySelectorAll(selector);
           
           for (const element of foundElements) {
             const paginationElement = await this.analyzePaginationElement(element, 'infiniteScroll');
@@ -380,7 +380,7 @@ export class PaginationDetector {
       
       for (const selector of selectors) {
         try {
-          const foundElements = getElements(selector);
+          const foundElements = safeQuerySelectorAll(selector);
           
           for (const element of foundElements) {
             const paginationElement = await this.analyzePaginationElement(element, 'nextPage');
@@ -416,7 +416,7 @@ export class PaginationDetector {
       }
       
       // Get all buttons and links
-      const allElements = [...getElements('button'), ...getElements('a')];
+      const allElements = [...safeQuerySelectorAll('button'), ...safeQuerySelectorAll('a')];
       
       for (const element of allElements) {
         const text = element.textContent?.trim() || '';
@@ -458,7 +458,7 @@ export class PaginationDetector {
       }
       
       // Get all elements
-      const allElements = getElements('*');
+      const allElements = safeQuerySelectorAll('*');
       
       for (const element of allElements) {
         for (const attr of attributes) {

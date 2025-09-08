@@ -1,22 +1,22 @@
 /**
- * Popup UI logic for autoscroll extension
+ * Popup script for autoscroll extension
  */
 
-import { createLogger } from '@utils/logger.js';
-import { getStorageValue, setStorageValue } from '@utils/storage.js';
+import { createLogger } from '../../utils/logger.js';
+import { getStorageValue, setStorageValue } from '../../utils/storage.js';
 
 const logger = createLogger('popup');
 
 /**
- * Popup UI Controller
+ * Popup Controller
  */
 class PopupController {
   constructor() {
+    this.isInitialized = false;
+    this.currentTab = null;
     this.isRunning = false;
     this.isPaused = false;
-    this.currentProfile = 'default';
-    this.currentStrategy = 'linear';
-    this.currentSpeed = 1.0;
+    this.currentConfig = null;
     this.stats = {
       steps: 0,
       distance: 0,
@@ -24,552 +24,698 @@ class PopupController {
       errors: 0
     };
     
-    this.initializeElements();
-    this.attachEventListeners();
-    this.loadSettings();
-    this.updateUI();
+    this.initialize();
   }
 
   /**
-   * Initialize DOM elements
+   * Initialize popup
    */
-  initializeElements() {
-    // Main controls
-    this.startStopBtn = document.getElementById('startStopBtn');
-    this.pauseBtn = document.getElementById('pauseBtn');
-    
-    // Status elements
-    this.statusDot = document.getElementById('statusDot');
-    this.statusText = document.getElementById('statusText');
-    
-    // Profile and strategy
-    this.profileSelect = document.getElementById('profileSelect');
-    this.strategySelect = document.getElementById('strategySelect');
-    
-    // Speed control
-    this.speedSlider = document.getElementById('speedSlider');
-    this.speedValue = document.getElementById('speedValue');
-    
-    // Statistics
-    this.stepsValue = document.getElementById('stepsValue');
-    this.distanceValue = document.getElementById('distanceValue');
-    this.durationValue = document.getElementById('durationValue');
-    this.errorsValue = document.getElementById('errorsValue');
-    this.resetStatsBtn = document.getElementById('resetStatsBtn');
-    
-    // Navigation
-    this.autoNavigateToggle = document.getElementById('autoNavigateToggle');
-    this.navModeSelect = document.getElementById('navModeSelect');
-    this.navTargetSelect = document.getElementById('navTargetSelect');
-    
-    // Footer buttons
-    this.optionsBtn = document.getElementById('optionsBtn');
-    this.helpBtn = document.getElementById('helpBtn');
-    
-    // Overlays and toasts
-    this.loadingOverlay = document.getElementById('loadingOverlay');
-    this.errorToast = document.getElementById('errorToast');
-    this.successToast = document.getElementById('successToast');
-    this.errorMessage = document.getElementById('errorMessage');
-    this.successMessage = document.getElementById('successMessage');
-    this.errorClose = document.getElementById('errorClose');
-    this.successClose = document.getElementById('successClose');
+  async initialize() {
+    try {
+      logger.info('Initializing popup');
+      
+      // Get current tab
+      await this.getCurrentTab();
+      
+      // Set up event listeners
+      this.setupEventListeners();
+      
+      // Load current status
+      await this.loadCurrentStatus();
+      
+      // Load settings
+      await this.loadSettings();
+      
+      this.isInitialized = true;
+      logger.info('Popup initialized successfully');
+    } catch (error) {
+      logger.error('Error initializing popup', { error });
+    }
   }
 
   /**
-   * Attach event listeners
+   * Get current active tab
    */
-  attachEventListeners() {
-    // Main controls
-    this.startStopBtn.addEventListener('click', () => this.toggleStartStop());
-    this.pauseBtn.addEventListener('click', () => this.togglePause());
-    
-    // Profile and strategy changes
-    this.profileSelect.addEventListener('change', (e) => this.onProfileChange(e.target.value));
-    this.strategySelect.addEventListener('change', (e) => this.onStrategyChange(e.target.value));
-    
-    // Speed control
-    this.speedSlider.addEventListener('input', (e) => this.onSpeedChange(e.target.value));
-    
-    // Statistics
-    this.resetStatsBtn.addEventListener('click', () => this.resetStats());
-    
-    // Navigation
-    this.autoNavigateToggle.addEventListener('change', (e) => this.onAutoNavigateChange(e.target.checked));
-    this.navModeSelect.addEventListener('change', (e) => this.onNavModeChange(e.target.value));
-    this.navTargetSelect.addEventListener('change', (e) => this.onNavTargetChange(e.target.value));
-    
-    // Footer buttons
-    this.optionsBtn.addEventListener('click', () => this.openOptions());
-    this.helpBtn.addEventListener('click', () => this.showHelp());
-    
-    // Toast close buttons
-    this.errorClose.addEventListener('click', () => this.hideErrorToast());
-    this.successClose.addEventListener('click', () => this.hideSuccessToast());
-    
-    // Listen for messages from content script
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      this.handleMessage(message, sender, sendResponse);
-    });
+  async getCurrentTab() {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      this.currentTab = tab;
+      logger.debug('Current tab', { tab });
+    } catch (error) {
+      logger.error('Error getting current tab', { error });
+    }
   }
 
   /**
-   * Load settings from storage
+   * Set up event listeners
+   */
+  setupEventListeners() {
+    // Start/Stop button
+    const startStopBtn = document.getElementById('startStopBtn');
+    if (startStopBtn) {
+      startStopBtn.addEventListener('click', () => this.handleStartStop());
+    }
+
+    // Pause button
+    const pauseBtn = document.getElementById('pauseBtn');
+    if (pauseBtn) {
+      pauseBtn.addEventListener('click', () => this.handlePause());
+    }
+
+    // Profile selection
+    const profileSelect = document.getElementById('profileSelect');
+    if (profileSelect) {
+      profileSelect.addEventListener('change', (e) => this.handleProfileChange(e.target.value));
+    }
+
+    // Strategy selection
+    const strategySelect = document.getElementById('strategySelect');
+    if (strategySelect) {
+      strategySelect.addEventListener('change', (e) => this.handleStrategyChange(e.target.value));
+    }
+
+    // Speed slider
+    const speedSlider = document.getElementById('speedSlider');
+    if (speedSlider) {
+      speedSlider.addEventListener('input', (e) => this.handleSpeedChange(e.target.value));
+    }
+
+    // Reset stats button
+    const resetStatsBtn = document.getElementById('resetStatsBtn');
+    if (resetStatsBtn) {
+      resetStatsBtn.addEventListener('click', () => this.handleResetStats());
+    }
+
+    // Auto navigate toggle
+    const autoNavigateToggle = document.getElementById('autoNavigateToggle');
+    if (autoNavigateToggle) {
+      autoNavigateToggle.addEventListener('change', (e) => this.handleAutoNavigateChange(e.target.checked));
+    }
+
+    // Navigation mode selection
+    const navModeSelect = document.getElementById('navModeSelect');
+    if (navModeSelect) {
+      navModeSelect.addEventListener('change', (e) => this.handleNavModeChange(e.target.value));
+    }
+
+    // Navigation target selection
+    const navTargetSelect = document.getElementById('navTargetSelect');
+    if (navTargetSelect) {
+      navTargetSelect.addEventListener('change', (e) => this.handleNavTargetChange(e.target.value));
+    }
+
+    // Options button
+    const optionsBtn = document.getElementById('optionsBtn');
+    if (optionsBtn) {
+      optionsBtn.addEventListener('click', () => this.handleOptions());
+    }
+
+    // Help button
+    const helpBtn = document.getElementById('helpBtn');
+    if (helpBtn) {
+      helpBtn.addEventListener('click', () => this.handleHelp());
+    }
+
+    // Error toast close
+    const errorClose = document.getElementById('errorClose');
+    if (errorClose) {
+      errorClose.addEventListener('click', () => this.hideErrorToast());
+    }
+
+    // Success toast close
+    const successClose = document.getElementById('successClose');
+    if (successClose) {
+      successClose.addEventListener('click', () => this.hideSuccessToast());
+    }
+  }
+
+  /**
+   * Load current status
+   */
+  async loadCurrentStatus() {
+    try {
+      if (!this.currentTab) return;
+
+      const response = await this.sendMessageToTab({
+        action: 'getStatus'
+      });
+
+      if (response && response.success) {
+        const status = response.data;
+        this.isRunning = status.isRunning;
+        this.isPaused = status.isPaused;
+        this.currentConfig = status.config;
+        
+        this.updateUI();
+      }
+    } catch (error) {
+      logger.error('Error loading current status', { error });
+    }
+  }
+
+  /**
+   * Load settings
    */
   async loadSettings() {
     try {
-      this.currentProfile = await getStorageValue('activeProfile', 'default');
-      this.currentStrategy = await getStorageValue('activeStrategy', 'linear');
-      this.currentSpeed = await getStorageValue('activeSpeed', 1.0);
+      const settings = await getStorageValue('extensionSettings', {});
       
-      // Load statistics
-      const savedStats = await getStorageValue('popupStats', {});
-      this.stats = { ...this.stats, ...savedStats };
-      
-      // Load navigation settings
-      const navSettings = await getStorageValue('navigationSettings', {});
-      this.autoNavigateToggle.checked = navSettings.autoNavigate || false;
-      this.navModeSelect.value = navSettings.mode || 'sameTab';
-      this.navTargetSelect.value = navSettings.target || 'next';
-      
-      logger.info('Settings loaded successfully');
+      // Update UI with current settings
+      this.updateSettingsUI(settings);
     } catch (error) {
       logger.error('Error loading settings', { error });
     }
   }
 
   /**
-   * Save settings to storage
+   * Update settings UI
+   * @param {Object} settings - Settings object
    */
-  async saveSettings() {
+  updateSettingsUI(settings) {
     try {
-      await setStorageValue('activeProfile', this.currentProfile);
-      await setStorageValue('activeStrategy', this.currentStrategy);
-      await setStorageValue('activeSpeed', this.currentSpeed);
-      await setStorageValue('popupStats', this.stats);
-      await setStorageValue('navigationSettings', {
-        autoNavigate: this.autoNavigateToggle.checked,
-        mode: this.navModeSelect.value,
-        target: this.navTargetSelect.value
-      });
-      
-      logger.info('Settings saved successfully');
+      // Profile
+      const profileSelect = document.getElementById('profileSelect');
+      if (profileSelect && settings.activeProfile) {
+        profileSelect.value = settings.activeProfile;
+      }
+
+      // Strategy
+      const strategySelect = document.getElementById('strategySelect');
+      if (strategySelect && settings.activeStrategy) {
+        strategySelect.value = settings.activeStrategy;
+      }
+
+      // Speed
+      const speedSlider = document.getElementById('speedSlider');
+      const speedValue = document.getElementById('speedValue');
+      if (speedSlider && settings.activeSpeed) {
+        speedSlider.value = settings.activeSpeed;
+        if (speedValue) {
+          speedValue.textContent = `${settings.activeSpeed}x`;
+        }
+      }
+
+      // Auto navigate
+      const autoNavigateToggle = document.getElementById('autoNavigateToggle');
+      if (autoNavigateToggle && settings.autoNavigate !== undefined) {
+        autoNavigateToggle.checked = settings.autoNavigate;
+      }
+
+      // Navigation mode
+      const navModeSelect = document.getElementById('navModeSelect');
+      if (navModeSelect && settings.navigationMode) {
+        navModeSelect.value = settings.navigationMode;
+      }
+
+      // Navigation target
+      const navTargetSelect = document.getElementById('navTargetSelect');
+      if (navTargetSelect && settings.navigationTarget) {
+        navTargetSelect.value = settings.navigationTarget;
+      }
     } catch (error) {
-      logger.error('Error saving settings', { error });
+      logger.error('Error updating settings UI', { error });
     }
   }
 
   /**
-   * Update UI elements
+   * Update UI based on current state
    */
   updateUI() {
-    // Update status
-    this.updateStatus();
-    
-    // Update controls
-    this.updateControls();
-    
-    // Update statistics
-    this.updateStatistics();
-    
-    // Update selectors
-    this.profileSelect.value = this.currentProfile;
-    this.strategySelect.value = this.currentStrategy;
-    this.speedSlider.value = this.currentSpeed;
-    this.speedValue.textContent = `${this.currentSpeed}x`;
+    try {
+      // Update status indicator
+      this.updateStatusIndicator();
+      
+      // Update buttons
+      this.updateButtons();
+      
+      // Update statistics
+      this.updateStatistics();
+    } catch (error) {
+      logger.error('Error updating UI', { error });
+    }
   }
 
   /**
    * Update status indicator
    */
-  updateStatus() {
-    if (this.isRunning && !this.isPaused) {
-      this.statusDot.className = 'status-dot running';
-      this.statusText.textContent = 'Running';
-    } else if (this.isPaused) {
-      this.statusDot.className = 'status-dot paused';
-      this.statusText.textContent = 'Paused';
-    } else {
-      this.statusDot.className = 'status-dot';
-      this.statusText.textContent = 'Stopped';
+  updateStatusIndicator() {
+    try {
+      const statusDot = document.getElementById('statusDot');
+      const statusText = document.getElementById('statusText');
+      
+      if (statusDot && statusText) {
+        if (this.isRunning) {
+          if (this.isPaused) {
+            statusDot.className = 'status-dot paused';
+            statusText.textContent = 'Paused';
+          } else {
+            statusDot.className = 'status-dot running';
+            statusText.textContent = 'Running';
+          }
+        } else {
+          statusDot.className = 'status-dot stopped';
+          statusText.textContent = 'Stopped';
+        }
+      }
+    } catch (error) {
+      logger.error('Error updating status indicator', { error });
     }
   }
 
   /**
-   * Update control buttons
+   * Update buttons
    */
-  updateControls() {
-    if (this.isRunning) {
-      this.startStopBtn.innerHTML = '<span class="btn-icon">⏹</span><span class="btn-text">Stop</span>';
-      this.startStopBtn.className = 'control-btn primary stop';
-      this.pauseBtn.disabled = false;
-    } else {
-      this.startStopBtn.innerHTML = '<span class="btn-icon">▶</span><span class="btn-text">Start</span>';
-      this.startStopBtn.className = 'control-btn primary';
-      this.pauseBtn.disabled = true;
-    }
-    
-    if (this.isPaused) {
-      this.pauseBtn.innerHTML = '<span class="btn-icon">▶</span><span class="btn-text">Resume</span>';
-    } else {
-      this.pauseBtn.innerHTML = '<span class="btn-icon">⏸</span><span class="btn-text">Pause</span>';
+  updateButtons() {
+    try {
+      const startStopBtn = document.getElementById('startStopBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+      
+      if (startStopBtn) {
+        if (this.isRunning) {
+          startStopBtn.innerHTML = '<span class="btn-icon">⏹</span><span class="btn-text">Stop</span>';
+          startStopBtn.className = 'control-btn danger';
+        } else {
+          startStopBtn.innerHTML = '<span class="btn-icon">▶</span><span class="btn-text">Start</span>';
+          startStopBtn.className = 'control-btn primary';
+        }
+      }
+      
+      if (pauseBtn) {
+        pauseBtn.disabled = !this.isRunning;
+        if (this.isPaused) {
+          pauseBtn.innerHTML = '<span class="btn-icon">▶</span><span class="btn-text">Resume</span>';
+        } else {
+          pauseBtn.innerHTML = '<span class="btn-icon">⏸</span><span class="btn-text">Pause</span>';
+        }
+      }
+    } catch (error) {
+      logger.error('Error updating buttons', { error });
     }
   }
 
   /**
-   * Update statistics display
+   * Update statistics
    */
   updateStatistics() {
-    this.stepsValue.textContent = this.stats.steps.toLocaleString();
-    this.distanceValue.textContent = `${this.stats.distance.toLocaleString()}px`;
-    this.durationValue.textContent = this.formatDuration(this.stats.duration);
-    this.errorsValue.textContent = this.stats.errors.toLocaleString();
-  }
-
-  /**
-   * Format duration in seconds
-   * @param {number} seconds - Duration in seconds
-   * @returns {string} - Formatted duration
-   */
-  formatDuration(seconds) {
-    if (seconds < 60) {
-      return `${seconds}s`;
-    } else if (seconds < 3600) {
-      const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = seconds % 60;
-      return `${minutes}m ${remainingSeconds}s`;
-    } else {
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      return `${hours}h ${minutes}m`;
+    try {
+      const stepsValue = document.getElementById('stepsValue');
+      const distanceValue = document.getElementById('distanceValue');
+      const durationValue = document.getElementById('durationValue');
+      const errorsValue = document.getElementById('errorsValue');
+      
+      if (stepsValue) stepsValue.textContent = this.stats.steps;
+      if (distanceValue) distanceValue.textContent = `${this.stats.distance}px`;
+      if (durationValue) durationValue.textContent = `${this.stats.duration}s`;
+      if (errorsValue) errorsValue.textContent = this.stats.errors;
+    } catch (error) {
+      logger.error('Error updating statistics', { error });
     }
   }
 
   /**
-   * Toggle start/stop
+   * Handle start/stop button click
    */
-  async toggleStartStop() {
+  async handleStartStop() {
     try {
-      this.showLoading();
-      
+      if (!this.currentTab) {
+        this.showErrorToast('No active tab found');
+        return;
+      }
+
       if (this.isRunning) {
-        await this.stop();
+        await this.stopAutoscroll();
       } else {
-        await this.start();
+        await this.startAutoscroll();
       }
     } catch (error) {
-      logger.error('Error toggling start/stop', { error });
-      this.showError('Failed to toggle autoscroll');
-    } finally {
-      this.hideLoading();
+      logger.error('Error handling start/stop', { error });
+      this.showErrorToast('Error starting/stopping autoscroll');
     }
   }
 
   /**
-   * Toggle pause/resume
+   * Handle pause button click
    */
-  async togglePause() {
+  async handlePause() {
     try {
-      this.showLoading();
-      
+      if (!this.currentTab) {
+        this.showErrorToast('No active tab found');
+        return;
+      }
+
       if (this.isPaused) {
-        await this.resume();
+        await this.resumeAutoscroll();
       } else {
-        await this.pause();
+        await this.pauseAutoscroll();
       }
     } catch (error) {
-      logger.error('Error toggling pause', { error });
-      this.showError('Failed to toggle pause');
-    } finally {
-      this.hideLoading();
+      logger.error('Error handling pause', { error });
+      this.showErrorToast('Error pausing/resuming autoscroll');
     }
   }
 
   /**
    * Start autoscroll
    */
-  async start() {
+  async startAutoscroll() {
     try {
-      const message = {
+      const config = this.getCurrentConfig();
+      
+      const response = await this.sendMessageToTab({
         action: 'start',
-        config: {
-          profile: this.currentProfile,
-          strategy: this.currentStrategy,
-          speed: this.currentSpeed
-        }
-      };
-      
-      const response = await this.sendMessageToContentScript(message);
-      
+        config: config
+      });
+
       if (response && response.success) {
         this.isRunning = true;
         this.isPaused = false;
         this.updateUI();
-        this.showSuccess('Autoscroll started');
-        await this.saveSettings();
+        this.showSuccessToast('Autoscroll started');
       } else {
-        throw new Error(response?.error || 'Failed to start autoscroll');
+        this.showErrorToast(response?.error || 'Failed to start autoscroll');
       }
     } catch (error) {
       logger.error('Error starting autoscroll', { error });
-      throw error;
+      this.showErrorToast('Error starting autoscroll');
     }
   }
 
   /**
    * Stop autoscroll
    */
-  async stop() {
+  async stopAutoscroll() {
     try {
-      const message = { action: 'stop' };
-      const response = await this.sendMessageToContentScript(message);
-      
+      const response = await this.sendMessageToTab({
+        action: 'stop'
+      });
+
       if (response && response.success) {
         this.isRunning = false;
         this.isPaused = false;
         this.updateUI();
-        this.showSuccess('Autoscroll stopped');
-        await this.saveSettings();
+        this.showSuccessToast('Autoscroll stopped');
       } else {
-        throw new Error(response?.error || 'Failed to stop autoscroll');
+        this.showErrorToast(response?.error || 'Failed to stop autoscroll');
       }
     } catch (error) {
       logger.error('Error stopping autoscroll', { error });
-      throw error;
+      this.showErrorToast('Error stopping autoscroll');
     }
   }
 
   /**
    * Pause autoscroll
    */
-  async pause() {
+  async pauseAutoscroll() {
     try {
-      const message = { action: 'pause' };
-      const response = await this.sendMessageToContentScript(message);
-      
+      const response = await this.sendMessageToTab({
+        action: 'pause'
+      });
+
       if (response && response.success) {
         this.isPaused = true;
         this.updateUI();
-        this.showSuccess('Autoscroll paused');
+        this.showSuccessToast('Autoscroll paused');
       } else {
-        throw new Error(response?.error || 'Failed to pause autoscroll');
+        this.showErrorToast(response?.error || 'Failed to pause autoscroll');
       }
     } catch (error) {
       logger.error('Error pausing autoscroll', { error });
-      throw error;
+      this.showErrorToast('Error pausing autoscroll');
     }
   }
 
   /**
    * Resume autoscroll
    */
-  async resume() {
+  async resumeAutoscroll() {
     try {
-      const message = { action: 'resume' };
-      const response = await this.sendMessageToContentScript(message);
-      
+      const response = await this.sendMessageToTab({
+        action: 'resume'
+      });
+
       if (response && response.success) {
         this.isPaused = false;
         this.updateUI();
-        this.showSuccess('Autoscroll resumed');
+        this.showSuccessToast('Autoscroll resumed');
       } else {
-        throw new Error(response?.error || 'Failed to resume autoscroll');
+        this.showErrorToast(response?.error || 'Failed to resume autoscroll');
       }
     } catch (error) {
       logger.error('Error resuming autoscroll', { error });
-      throw error;
+      this.showErrorToast('Error resuming autoscroll');
     }
   }
 
   /**
-   * Send message to content script
-   * @param {Object} message - Message to send
-   * @returns {Promise<Object>} - Response from content script
+   * Get current configuration
+   * @returns {Object} - Current configuration
    */
-  async sendMessageToContentScript(message) {
-    return new Promise((resolve) => {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs[0]) {
-          chrome.tabs.sendMessage(tabs[0].id, message, (response) => {
-            if (chrome.runtime.lastError) {
-              resolve({ success: false, error: chrome.runtime.lastError.message });
-            } else {
-              resolve(response);
-            }
-          });
-        } else {
-          resolve({ success: false, error: 'No active tab found' });
-        }
-      });
-    });
-  }
-
-  /**
-   * Handle message from content script
-   * @param {Object} message - Message from content script
-   * @param {Object} sender - Message sender
-   * @param {Function} sendResponse - Response function
-   */
-  handleMessage(message, sender, sendResponse) {
+  getCurrentConfig() {
     try {
-      switch (message.type) {
-        case 'statusUpdate':
-          this.handleStatusUpdate(message.data);
-          break;
-        case 'statsUpdate':
-          this.handleStatsUpdate(message.data);
-          break;
-        case 'error':
-          this.handleError(message.data);
-          break;
-      }
+      const profileSelect = document.getElementById('profileSelect');
+      const strategySelect = document.getElementById('strategySelect');
+      const speedSlider = document.getElementById('speedSlider');
+      const autoNavigateToggle = document.getElementById('autoNavigateToggle');
+      const navModeSelect = document.getElementById('navModeSelect');
+      const navTargetSelect = document.getElementById('navTargetSelect');
+
+      return {
+        profile: profileSelect?.value || 'default',
+        strategy: strategySelect?.value || 'linear',
+        speed: parseFloat(speedSlider?.value || '1.0'),
+        autoNavigate: autoNavigateToggle?.checked || false,
+        navigationMode: navModeSelect?.value || 'sameTab',
+        navigationTarget: navTargetSelect?.value || 'next'
+      };
     } catch (error) {
-      logger.error('Error handling message', { error, message });
+      logger.error('Error getting current config', { error });
+      return {};
     }
   }
 
   /**
-   * Handle status update
-   * @param {Object} data - Status data
+   * Handle profile change
+   * @param {string} profile - Profile name
    */
-  handleStatusUpdate(data) {
-    this.isRunning = data.isRunning;
-    this.isPaused = data.isPaused;
-    this.updateUI();
+  async handleProfileChange(profile) {
+    try {
+      await setStorageValue('activeProfile', profile);
+      logger.info('Profile changed', { profile });
+    } catch (error) {
+      logger.error('Error handling profile change', { error });
+    }
   }
 
   /**
-   * Handle statistics update
-   * @param {Object} data - Statistics data
+   * Handle strategy change
+   * @param {string} strategy - Strategy name
    */
-  handleStatsUpdate(data) {
-    this.stats = { ...this.stats, ...data };
-    this.updateStatistics();
+  async handleStrategyChange(strategy) {
+    try {
+      await setStorageValue('activeStrategy', strategy);
+      logger.info('Strategy changed', { strategy });
+    } catch (error) {
+      logger.error('Error handling strategy change', { error });
+    }
   }
 
   /**
-   * Handle error
-   * @param {Object} data - Error data
+   * Handle speed change
+   * @param {string} speed - Speed value
    */
-  handleError(data) {
-    this.showError(data.message || 'An error occurred');
+  async handleSpeedChange(speed) {
+    try {
+      const speedValue = document.getElementById('speedValue');
+      if (speedValue) {
+        speedValue.textContent = `${speed}x`;
+      }
+      
+      await setStorageValue('activeSpeed', parseFloat(speed));
+      logger.info('Speed changed', { speed });
+    } catch (error) {
+      logger.error('Error handling speed change', { error });
+    }
   }
 
   /**
-   * Event handlers
+   * Handle reset stats
    */
-  onProfileChange(profile) {
-    this.currentProfile = profile;
-    this.saveSettings();
-  }
-
-  onStrategyChange(strategy) {
-    this.currentStrategy = strategy;
-    this.saveSettings();
-  }
-
-  onSpeedChange(speed) {
-    this.currentSpeed = parseFloat(speed);
-    this.speedValue.textContent = `${this.currentSpeed}x`;
-    this.saveSettings();
-  }
-
-  onAutoNavigateChange(enabled) {
-    this.saveSettings();
-  }
-
-  onNavModeChange(mode) {
-    this.saveSettings();
-  }
-
-  onNavTargetChange(target) {
-    this.saveSettings();
+  async handleResetStats() {
+    try {
+      this.stats = { steps: 0, distance: 0, duration: 0, errors: 0 };
+      this.updateStatistics();
+      this.showSuccessToast('Statistics reset');
+    } catch (error) {
+      logger.error('Error handling reset stats', { error });
+    }
   }
 
   /**
-   * Reset statistics
+   * Handle auto navigate change
+   * @param {boolean} enabled - Auto navigate enabled
    */
-  resetStats() {
-    this.stats = {
-      steps: 0,
-      distance: 0,
-      duration: 0,
-      errors: 0
-    };
-    this.updateStatistics();
-    this.saveSettings();
-    this.showSuccess('Statistics reset');
+  async handleAutoNavigateChange(enabled) {
+    try {
+      await setStorageValue('autoNavigate', enabled);
+      logger.info('Auto navigate changed', { enabled });
+    } catch (error) {
+      logger.error('Error handling auto navigate change', { error });
+    }
   }
 
   /**
-   * Open options page
+   * Handle navigation mode change
+   * @param {string} mode - Navigation mode
    */
-  openOptions() {
-    chrome.runtime.openOptionsPage();
+  async handleNavModeChange(mode) {
+    try {
+      await setStorageValue('navigationMode', mode);
+      logger.info('Navigation mode changed', { mode });
+    } catch (error) {
+      logger.error('Error handling navigation mode change', { error });
+    }
   }
 
   /**
-   * Show help
+   * Handle navigation target change
+   * @param {string} target - Navigation target
    */
-  showHelp() {
-    // Open help page or show help modal
-    this.showSuccess('Help feature coming soon!');
+  async handleNavTargetChange(target) {
+    try {
+      await setStorageValue('navigationTarget', target);
+      logger.info('Navigation target changed', { target });
+    } catch (error) {
+      logger.error('Error handling navigation target change', { error });
+    }
   }
 
   /**
-   * Show loading overlay
+   * Handle options button click
    */
-  showLoading() {
-    this.loadingOverlay.classList.remove('hidden');
+  handleOptions() {
+    try {
+      chrome.runtime.openOptionsPage();
+    } catch (error) {
+      logger.error('Error opening options', { error });
+    }
   }
 
   /**
-   * Hide loading overlay
+   * Handle help button click
    */
-  hideLoading() {
-    this.loadingOverlay.classList.add('hidden');
+  handleHelp() {
+    try {
+      // Open options page instead of help page
+      chrome.runtime.openOptionsPage();
+    } catch (error) {
+      logger.error('Error opening help', { error });
+    }
+  }
+
+  /**
+   * Send message to current tab
+   * @param {Object} message - Message to send
+   * @returns {Promise<Object>} - Response
+   */
+  async sendMessageToTab(message) {
+    try {
+      if (!this.currentTab) {
+        throw new Error('No current tab');
+      }
+
+      return new Promise((resolve) => {
+        chrome.tabs.sendMessage(this.currentTab.id, message, (response) => {
+          if (chrome.runtime.lastError) {
+            logger.error('Error sending message to tab', { error: chrome.runtime.lastError });
+            resolve({ success: false, error: chrome.runtime.lastError.message });
+          } else {
+            resolve(response);
+          }
+        });
+      });
+    } catch (error) {
+      logger.error('Error sending message to tab', { error });
+      return { success: false, error: error.message };
+    }
   }
 
   /**
    * Show error toast
    * @param {string} message - Error message
    */
-  showError(message) {
-    this.errorMessage.textContent = message;
-    this.errorToast.classList.remove('hidden');
-    
-    // Auto-hide after 5 seconds
-    setTimeout(() => this.hideErrorToast(), 5000);
+  showErrorToast(message) {
+    try {
+      const errorToast = document.getElementById('errorToast');
+      const errorMessage = document.getElementById('errorMessage');
+      
+      if (errorToast && errorMessage) {
+        errorMessage.textContent = message;
+        errorToast.classList.remove('hidden');
+        
+        // Auto hide after 3 seconds
+        setTimeout(() => {
+          this.hideErrorToast();
+        }, 3000);
+      }
+    } catch (error) {
+      logger.error('Error showing error toast', { error });
+    }
   }
 
   /**
    * Hide error toast
    */
   hideErrorToast() {
-    this.errorToast.classList.add('hidden');
+    try {
+      const errorToast = document.getElementById('errorToast');
+      if (errorToast) {
+        errorToast.classList.add('hidden');
+      }
+    } catch (error) {
+      logger.error('Error hiding error toast', { error });
+    }
   }
 
   /**
    * Show success toast
    * @param {string} message - Success message
    */
-  showSuccess(message) {
-    this.successMessage.textContent = message;
-    this.successToast.classList.remove('hidden');
-    
-    // Auto-hide after 3 seconds
-    setTimeout(() => this.hideSuccessToast(), 3000);
+  showSuccessToast(message) {
+    try {
+      const successToast = document.getElementById('successToast');
+      const successMessage = document.getElementById('successMessage');
+      
+      if (successToast && successMessage) {
+        successMessage.textContent = message;
+        successToast.classList.remove('hidden');
+        
+        // Auto hide after 2 seconds
+        setTimeout(() => {
+          this.hideSuccessToast();
+        }, 2000);
+      }
+    } catch (error) {
+      logger.error('Error showing success toast', { error });
+    }
   }
 
   /**
    * Hide success toast
    */
   hideSuccessToast() {
-    this.successToast.classList.add('hidden');
+    try {
+      const successToast = document.getElementById('successToast');
+      if (successToast) {
+        successToast.classList.add('hidden');
+      }
+    } catch (error) {
+      logger.error('Error hiding success toast', { error });
+    }
   }
 }
 
-// Initialize popup when DOM is loaded
+// Initialize popup when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   new PopupController();
 });

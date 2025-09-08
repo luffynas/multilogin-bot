@@ -2,9 +2,9 @@
  * Dwell time simulator for realistic reading and interaction durations
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice, jitter } from '@core/randomizer.js';
-import { delay } from '@utils/time.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice, jitter } from '../core/randomizer.js';
+import { delay } from '../utils/time.js';
 
 const logger = createLogger('dwell-time-simulator');
 

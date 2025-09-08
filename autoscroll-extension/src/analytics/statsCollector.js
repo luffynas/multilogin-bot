@@ -1,383 +1,634 @@
 /**
- * Statistics collector for autoscroll behavior tracking
+ * Statistics Collector - Event bus and aggregator for analytics
  */
 
-import { createLogger } from '@utils/logger.js';
-import { getStorage, setStorage } from '@utils/storage.js';
-import { randFloat, randInt } from '@core/randomizer.js';
+import { createLogger } from '../utils/logger.js';
+import { getStorageValue, setStorageValue } from '../utils/storage.js';
+import { randFloat, randInt } from '../core/randomizer.js';
 
 const logger = createLogger('stats-collector');
 
 /**
  * Statistics Collector
- * Collects and manages autoscroll behavior statistics
+ * Collects and aggregates statistics from all modules
  */
 export class StatsCollector {
   constructor() {
     this.isActive = false;
+    this.eventListeners = new Map();
     this.stats = {
       session: {
-        id: this.generateSessionId(),
         startTime: null,
         endTime: null,
         duration: 0,
+        pagesVisited: 0,
+        totalScrollDistance: 0,
         totalSteps: 0,
+        totalPauses: 0,
+        totalErrors: 0,
+        averageSpeed: 0,
+        maxSpeed: 0,
+        minSpeed: Infinity
+      },
+      scroll: {
         totalDistance: 0,
-        totalPauseTime: 0,
+        totalSteps: 0,
         averageStep: 0,
-        averageDelay: 0,
-        errors: 0,
-        strategy: null,
-        profile: null
-      },
-      realtime: {
-        currentStep: 0,
-        currentDistance: 0,
-        currentDelay: 0,
-        lastStepTime: null,
-        isPaused: false,
-        pauseStartTime: null,
-        pauseDuration: 0
-      },
-      behavior: {
-        scrollPatterns: [],
-        pausePatterns: [],
-        errorPatterns: [],
-        speedVariations: [],
+        maxStep: 0,
+        minStep: Infinity,
+        stepDistribution: {},
+        speedDistribution: {},
         directionChanges: 0,
-        idlePeriods: 0,
-        totalIdleTime: 0
+        reverseScrolls: 0,
+        momentumScrolls: 0,
+        burstScrolls: 0
       },
-      performance: {
-        frameRate: 0,
-        averageFrameTime: 0,
-        droppedFrames: 0,
-        memoryUsage: 0,
-        cpuUsage: 0
+      navigation: {
+        totalNavigations: 0,
+        navigationsByType: {
+          next: 0,
+          previous: 0,
+          related: 0,
+          recent: 0,
+          outbound: 0
+        },
+        averageNavigationDelay: 0,
+        hoverEvents: 0,
+        clickEvents: 0,
+        tabSwitches: 0
       },
       stealth: {
         noiseEvents: 0,
-        tabSwitches: 0,
-        focusChanges: 0,
-        humanLikeActions: 0,
-        detectionRisk: 0
+        cursorMovements: 0,
+        gestureEvents: 0,
+        dwellTimeEvents: 0,
+        errorSimulations: 0,
+        fingerprintVariations: 0,
+        tabAwarenessEvents: 0,
+        canvasNoiseEvents: 0
+      },
+      performance: {
+        averageResponseTime: 0,
+        maxResponseTime: 0,
+        minResponseTime: Infinity,
+        memoryUsage: 0,
+        cpuUsage: 0,
+        errorRate: 0,
+        successRate: 0
+      },
+      behavior: {
+        readingPatterns: {},
+        interactionPatterns: {},
+        timePatterns: {},
+        contentPatterns: {},
+        userBehaviorScore: 0
       }
     };
     
     this.config = {
-      autoSave: true,
-      saveInterval: 30000, // 30 seconds
-      maxHistory: 100,
-      enablePerformance: true,
-      enableStealth: true
+      enabled: true,
+      collectionInterval: 1000, // 1 second
+      maxHistorySize: 1000,
+      exportFormats: ['json', 'csv'],
+      autoExport: false,
+      exportInterval: 300000, // 5 minutes
+      realTimeTracking: true,
+      performanceTracking: true,
+      behaviorTracking: true
     };
     
-    this.saveTimer = null;
-    this.eventListeners = new Map();
+    this.history = [];
+    this.currentSession = null;
+    this.performanceMetrics = {
+      startTime: null,
+      endTime: null,
+      operations: 0,
+      errors: 0
+    };
   }
 
   /**
-   * Initialize statistics collector
+   * Initialize stats collector
    * @param {Object} config - Configuration object
    * @returns {Promise<boolean>} - Success status
    */
   async initialize(config = {}) {
     try {
+      logger.info('Initializing stats collector', { config });
+      
       this.config = { ...this.config, ...config };
       
-      // Load existing stats if available
-      await this.loadStats();
+      if (this.config.enabled) {
+        await this.startCollection();
+      }
       
-      logger.info('Statistics collector initialized', { config: this.config });
+      logger.info('Stats collector initialized successfully');
       return true;
     } catch (error) {
-      logger.error('Error initializing statistics collector', { error });
+      logger.error('Error initializing stats collector', { error });
       return false;
     }
   }
 
   /**
-   * Start collecting statistics
+   * Start statistics collection
    * @returns {Promise<boolean>} - Success status
    */
-  async start() {
+  async startCollection() {
     try {
       if (this.isActive) {
-        logger.warn('Statistics collector already active');
+        logger.warn('Stats collector already active');
         return false;
       }
 
       this.isActive = true;
       this.stats.session.startTime = Date.now();
-      this.stats.session.id = this.generateSessionId();
+      this.performanceMetrics.startTime = Date.now();
       
-      // Start auto-save timer
-      if (this.config.autoSave) {
-        this.startAutoSave();
+      // Start collection interval
+      if (this.config.collectionInterval > 0) {
+        this.collectionInterval = setInterval(() => {
+          this.collectMetrics();
+        }, this.config.collectionInterval);
       }
       
-      logger.info('Statistics collection started', { sessionId: this.stats.session.id });
+      // Start auto-export if enabled
+      if (this.config.autoExport) {
+        this.exportInterval = setInterval(() => {
+          this.exportStats();
+        }, this.config.exportInterval);
+      }
+      
+      logger.info('Stats collection started');
       return true;
     } catch (error) {
-      logger.error('Error starting statistics collection', { error });
+      logger.error('Error starting stats collection', { error });
       return false;
     }
   }
 
   /**
-   * Stop collecting statistics
+   * Stop statistics collection
    * @returns {Promise<boolean>} - Success status
    */
-  async stop() {
+  async stopCollection() {
     try {
       if (!this.isActive) {
-        logger.warn('Statistics collector not active');
+        logger.warn('Stats collector not active');
         return false;
       }
 
       this.isActive = false;
       this.stats.session.endTime = Date.now();
       this.stats.session.duration = this.stats.session.endTime - this.stats.session.startTime;
+      this.performanceMetrics.endTime = Date.now();
       
-      // Stop auto-save timer
-      this.stopAutoSave();
+      // Clear intervals
+      if (this.collectionInterval) {
+        clearInterval(this.collectionInterval);
+        this.collectionInterval = null;
+      }
       
-      // Final save
-      await this.saveStats();
+      if (this.exportInterval) {
+        clearInterval(this.exportInterval);
+        this.exportInterval = null;
+      }
       
-      logger.info('Statistics collection stopped', { 
-        sessionId: this.stats.session.id,
-        duration: this.stats.session.duration 
-      });
+      // Final metrics collection
+      await this.collectFinalMetrics();
+      
+      logger.info('Stats collection stopped');
       return true;
     } catch (error) {
-      logger.error('Error stopping statistics collection', { error });
+      logger.error('Error stopping stats collection', { error });
       return false;
     }
   }
 
   /**
-   * Record scroll step
-   * @param {Object} step - Scroll step data
+   * Record an event
+   * @param {string} type - Event type
+   * @param {Object} data - Event data
+   * @returns {Promise<boolean>} - Success status
    */
-  recordScrollStep(step) {
+  async recordEvent(type, data = {}) {
     try {
-      if (!this.isActive) return;
-      
-      const now = Date.now();
-      
-      // Update session stats
-      this.stats.session.totalSteps++;
-      this.stats.session.totalDistance += step.delta || 0;
-      this.stats.session.totalPauseTime += step.delay || 0;
-      
-      // Update realtime stats
-      this.stats.realtime.currentStep = this.stats.session.totalSteps;
-      this.stats.realtime.currentDistance = this.stats.session.totalDistance;
-      this.stats.realtime.currentDelay = step.delay || 0;
-      this.stats.realtime.lastStepTime = now;
-      
-      // Update behavior stats
-      this.stats.behavior.scrollPatterns.push({
-        timestamp: now,
-        delta: step.delta || 0,
-        delay: step.delay || 0,
-        strategy: step.strategy || 'unknown',
-        easing: step.easing || 'linear'
-      });
-      
-      // Keep only recent patterns
-      if (this.stats.behavior.scrollPatterns.length > this.config.maxHistory) {
-        this.stats.behavior.scrollPatterns.shift();
+      if (!this.isActive) {
+        return false;
       }
+
+      const event = {
+        type,
+        data,
+        timestamp: Date.now(),
+        sessionId: this.currentSession?.id
+      };
+
+      // Update statistics based on event type
+      this.updateStats(type, data);
+      
+      // Add to history
+      this.history.push(event);
+      
+      // Maintain history size
+      if (this.history.length > this.config.maxHistorySize) {
+        this.history.shift();
+      }
+      
+      // Emit event to listeners
+      this.emit('event', event);
+      
+      logger.debug('Event recorded', { type, data });
+      return true;
+    } catch (error) {
+      logger.error('Error recording event', { error, type, data });
+      return false;
+    }
+  }
+
+  /**
+   * Update statistics based on event type
+   * @param {string} type - Event type
+   * @param {Object} data - Event data
+   */
+  updateStats(type, data) {
+    try {
+      switch (type) {
+        case 'scroll':
+          this.updateScrollStats(data);
+          break;
+        case 'navigation':
+          this.updateNavigationStats(data);
+          break;
+        case 'stealth':
+          this.updateStealthStats(data);
+          break;
+        case 'performance':
+          this.updatePerformanceStats(data);
+          break;
+        case 'behavior':
+          this.updateBehaviorStats(data);
+          break;
+        default:
+          logger.debug('Unknown event type', { type });
+      }
+    } catch (error) {
+      logger.error('Error updating stats', { error, type, data });
+    }
+  }
+
+  /**
+   * Update scroll statistics
+   * @param {Object} data - Scroll data
+   */
+  updateScrollStats(data) {
+    const { delta, speed, direction, strategy } = data;
+    
+    this.stats.scroll.totalDistance += Math.abs(delta || 0);
+    this.stats.scroll.totalSteps++;
+    
+    if (delta) {
+      this.stats.scroll.averageStep = this.stats.scroll.totalDistance / this.stats.scroll.totalSteps;
+      this.stats.scroll.maxStep = Math.max(this.stats.scroll.maxStep, Math.abs(delta));
+      this.stats.scroll.minStep = Math.min(this.stats.scroll.minStep, Math.abs(delta));
+    }
+    
+    if (speed) {
+      this.stats.session.averageSpeed = (this.stats.session.averageSpeed + speed) / 2;
+      this.stats.session.maxSpeed = Math.max(this.stats.session.maxSpeed, speed);
+      this.stats.session.minSpeed = Math.min(this.stats.session.minSpeed, speed);
+    }
+    
+    if (direction === 'reverse') {
+      this.stats.scroll.reverseScrolls++;
+    }
+    
+    if (strategy) {
+      this.stats.scroll.stepDistribution[strategy] = (this.stats.scroll.stepDistribution[strategy] || 0) + 1;
+    }
+  }
+
+  /**
+   * Update navigation statistics
+   * @param {Object} data - Navigation data
+   */
+  updateNavigationStats(data) {
+    const { type, delay, success } = data;
+    
+    this.stats.navigation.totalNavigations++;
+    
+    if (type) {
+      this.stats.navigation.navigationsByType[type] = (this.stats.navigation.navigationsByType[type] || 0) + 1;
+    }
+    
+    if (delay) {
+      this.stats.navigation.averageNavigationDelay = (this.stats.navigation.averageNavigationDelay + delay) / 2;
+    }
+    
+    if (data.hover) {
+      this.stats.navigation.hoverEvents++;
+    }
+    
+    if (data.click) {
+      this.stats.navigation.clickEvents++;
+    }
+    
+    if (data.tabSwitch) {
+      this.stats.navigation.tabSwitches++;
+    }
+  }
+
+  /**
+   * Update stealth statistics
+   * @param {Object} data - Stealth data
+   */
+  updateStealthStats(data) {
+    const { type, module } = data;
+    
+    switch (type) {
+      case 'noise':
+        this.stats.stealth.noiseEvents++;
+        break;
+      case 'cursor':
+        this.stats.stealth.cursorMovements++;
+        break;
+      case 'gesture':
+        this.stats.stealth.gestureEvents++;
+        break;
+      case 'dwell':
+        this.stats.stealth.dwellTimeEvents++;
+        break;
+      case 'error':
+        this.stats.stealth.errorSimulations++;
+        break;
+      case 'fingerprint':
+        this.stats.stealth.fingerprintVariations++;
+        break;
+      case 'tabAwareness':
+        this.stats.stealth.tabAwarenessEvents++;
+        break;
+      case 'canvasNoise':
+        this.stats.stealth.canvasNoiseEvents++;
+        break;
+    }
+  }
+
+  /**
+   * Update performance statistics
+   * @param {Object} data - Performance data
+   */
+  updatePerformanceStats(data) {
+    const { responseTime, memoryUsage, cpuUsage, success } = data;
+    
+    this.performanceMetrics.operations++;
+    
+    if (!success) {
+      this.performanceMetrics.errors++;
+    }
+    
+    if (responseTime) {
+      this.stats.performance.averageResponseTime = (this.stats.performance.averageResponseTime + responseTime) / 2;
+      this.stats.performance.maxResponseTime = Math.max(this.stats.performance.maxResponseTime, responseTime);
+      this.stats.performance.minResponseTime = Math.min(this.stats.performance.minResponseTime, responseTime);
+    }
+    
+    if (memoryUsage) {
+      this.stats.performance.memoryUsage = memoryUsage;
+    }
+    
+    if (cpuUsage) {
+      this.stats.performance.cpuUsage = cpuUsage;
+    }
+    
+    // Calculate rates
+    this.stats.performance.errorRate = this.performanceMetrics.errors / this.performanceMetrics.operations;
+    this.stats.performance.successRate = 1 - this.stats.performance.errorRate;
+  }
+
+  /**
+   * Update behavior statistics
+   * @param {Object} data - Behavior data
+   */
+  updateBehaviorStats(data) {
+    const { pattern, type, score } = data;
+    
+    if (pattern) {
+      this.stats.behavior.readingPatterns[pattern] = (this.stats.behavior.readingPatterns[pattern] || 0) + 1;
+    }
+    
+    if (type) {
+      this.stats.behavior.interactionPatterns[type] = (this.stats.behavior.interactionPatterns[type] || 0) + 1;
+    }
+    
+    if (score) {
+      this.stats.behavior.userBehaviorScore = (this.stats.behavior.userBehaviorScore + score) / 2;
+    }
+  }
+
+  /**
+   * Collect current metrics
+   */
+  collectMetrics() {
+    try {
+      // Collect performance metrics
+      if (this.config.performanceTracking) {
+        this.collectPerformanceMetrics();
+      }
+      
+      // Collect behavior metrics
+      if (this.config.behaviorTracking) {
+        this.collectBehaviorMetrics();
+      }
+      
+      // Emit metrics update
+      this.emit('metrics', this.getStats());
+    } catch (error) {
+      logger.error('Error collecting metrics', { error });
+    }
+  }
+
+  /**
+   * Collect performance metrics
+   */
+  collectPerformanceMetrics() {
+    try {
+      // Memory usage (if available)
+      if (performance.memory) {
+        this.stats.performance.memoryUsage = performance.memory.usedJSHeapSize;
+      }
+      
+      // Calculate response time
+      const now = Date.now();
+      if (this.performanceMetrics.startTime) {
+        const totalTime = now - this.performanceMetrics.startTime;
+        const avgResponseTime = totalTime / this.performanceMetrics.operations;
+        this.stats.performance.averageResponseTime = avgResponseTime;
+      }
+    } catch (error) {
+      logger.error('Error collecting performance metrics', { error });
+    }
+  }
+
+  /**
+   * Collect behavior metrics
+   */
+  collectBehaviorMetrics() {
+    try {
+      // Analyze reading patterns
+      this.analyzeReadingPatterns();
+      
+      // Analyze interaction patterns
+      this.analyzeInteractionPatterns();
+      
+      // Calculate behavior score
+      this.calculateBehaviorScore();
+    } catch (error) {
+      logger.error('Error collecting behavior metrics', { error });
+    }
+  }
+
+  /**
+   * Analyze reading patterns
+   */
+  analyzeReadingPatterns() {
+    try {
+      const recentEvents = this.history.slice(-100);
+      const scrollEvents = recentEvents.filter(e => e.type === 'scroll');
+      
+      if (scrollEvents.length > 0) {
+        const avgStep = scrollEvents.reduce((sum, e) => sum + Math.abs(e.data.delta || 0), 0) / scrollEvents.length;
+        const avgSpeed = scrollEvents.reduce((sum, e) => sum + (e.data.speed || 0), 0) / scrollEvents.length;
+        
+        // Classify reading pattern
+        let pattern = 'normal';
+        if (avgStep < 50) pattern = 'careful';
+        else if (avgStep > 200) pattern = 'fast';
+        else if (avgSpeed < 0.5) pattern = 'slow';
+        else if (avgSpeed > 2.0) pattern = 'rapid';
+        
+        this.stats.behavior.readingPatterns[pattern] = (this.stats.behavior.readingPatterns[pattern] || 0) + 1;
+      }
+    } catch (error) {
+      logger.error('Error analyzing reading patterns', { error });
+    }
+  }
+
+  /**
+   * Analyze interaction patterns
+   */
+  analyzeInteractionPatterns() {
+    try {
+      const recentEvents = this.history.slice(-50);
+      const interactionEvents = recentEvents.filter(e => e.type === 'navigation' || e.type === 'stealth');
+      
+      if (interactionEvents.length > 0) {
+        const hoverRate = interactionEvents.filter(e => e.data.hover).length / interactionEvents.length;
+        const clickRate = interactionEvents.filter(e => e.data.click).length / interactionEvents.length;
+        
+        // Classify interaction pattern
+        let pattern = 'balanced';
+        if (hoverRate > 0.7) pattern = 'cautious';
+        else if (clickRate > 0.8) pattern = 'direct';
+        else if (hoverRate < 0.3 && clickRate < 0.3) pattern = 'passive';
+        
+        this.stats.behavior.interactionPatterns[pattern] = (this.stats.behavior.interactionPatterns[pattern] || 0) + 1;
+      }
+    } catch (error) {
+      logger.error('Error analyzing interaction patterns', { error });
+    }
+  }
+
+  /**
+   * Calculate behavior score
+   */
+  calculateBehaviorScore() {
+    try {
+      let score = 0.5; // Base score
+      
+      // Factor in reading patterns
+      const readingPatterns = this.stats.behavior.readingPatterns;
+      const totalReading = Object.values(readingPatterns).reduce((sum, count) => sum + count, 0);
+      
+      if (totalReading > 0) {
+        const carefulRatio = (readingPatterns.careful || 0) / totalReading;
+        const fastRatio = (readingPatterns.fast || 0) / totalReading;
+        
+        score += carefulRatio * 0.2; // Careful reading is more human-like
+        score -= fastRatio * 0.1; // Too fast might be bot-like
+      }
+      
+      // Factor in interaction patterns
+      const interactionPatterns = this.stats.behavior.interactionPatterns;
+      const totalInteraction = Object.values(interactionPatterns).reduce((sum, count) => sum + count, 0);
+      
+      if (totalInteraction > 0) {
+        const balancedRatio = (interactionPatterns.balanced || 0) / totalInteraction;
+        const cautiousRatio = (interactionPatterns.cautious || 0) / totalInteraction;
+        
+        score += balancedRatio * 0.15; // Balanced interaction is good
+        score += cautiousRatio * 0.1; // Cautious interaction is human-like
+      }
+      
+      // Factor in error rate
+      const errorRate = this.stats.performance.errorRate;
+      if (errorRate > 0 && errorRate < 0.1) {
+        score += 0.1; // Some errors are human-like
+      } else if (errorRate === 0) {
+        score -= 0.1; // No errors might be bot-like
+      }
+      
+      // Clamp score between 0 and 1
+      this.stats.behavior.userBehaviorScore = Math.max(0, Math.min(1, score));
+    } catch (error) {
+      logger.error('Error calculating behavior score', { error });
+    }
+  }
+
+  /**
+   * Collect final metrics
+   */
+  async collectFinalMetrics() {
+    try {
+      // Final performance metrics
+      this.collectPerformanceMetrics();
+      
+      // Final behavior analysis
+      this.collectBehaviorMetrics();
+      
+      // Calculate session summary
+      this.calculateSessionSummary();
+      
+      // Save to storage
+      await this.saveStats();
+      
+      logger.info('Final metrics collected');
+    } catch (error) {
+      logger.error('Error collecting final metrics', { error });
+    }
+  }
+
+  /**
+   * Calculate session summary
+   */
+  calculateSessionSummary() {
+    try {
+      const session = this.stats.session;
       
       // Calculate averages
-      this.updateAverages();
-      
-      logger.debug('Scroll step recorded', { step, stats: this.stats.realtime });
-    } catch (error) {
-      logger.error('Error recording scroll step', { error });
-    }
-  }
-
-  /**
-   * Record pause event
-   * @param {Object} pause - Pause event data
-   */
-  recordPause(pause) {
-    try {
-      if (!this.isActive) return;
-      
-      const now = Date.now();
-      
-      if (pause.type === 'start') {
-        this.stats.realtime.isPaused = true;
-        this.stats.realtime.pauseStartTime = now;
-      } else if (pause.type === 'end') {
-        this.stats.realtime.isPaused = false;
-        if (this.stats.realtime.pauseStartTime) {
-          const pauseDuration = now - this.stats.realtime.pauseStartTime;
-          this.stats.realtime.pauseDuration += pauseDuration;
-          this.stats.session.totalPauseTime += pauseDuration;
-        }
+      if (session.totalSteps > 0) {
+        session.averageSpeed = session.totalScrollDistance / session.duration * 1000; // pixels per second
       }
       
-      // Update behavior stats
-      this.stats.behavior.pausePatterns.push({
-        timestamp: now,
-        type: pause.type,
-        duration: pause.duration || 0,
-        reason: pause.reason || 'unknown'
-      });
+      // Calculate efficiency
+      const efficiency = session.totalSteps > 0 ? session.totalScrollDistance / session.totalSteps : 0;
       
-      // Keep only recent patterns
-      if (this.stats.behavior.pausePatterns.length > this.config.maxHistory) {
-        this.stats.behavior.pausePatterns.shift();
-      }
+      // Add to session stats
+      session.efficiency = efficiency;
+      session.successRate = 1 - (session.totalErrors / Math.max(session.totalSteps, 1));
       
-      logger.debug('Pause recorded', { pause, stats: this.stats.realtime });
+      logger.info('Session summary calculated', { session });
     } catch (error) {
-      logger.error('Error recording pause', { error });
-    }
-  }
-
-  /**
-   * Record error event
-   * @param {Object} error - Error event data
-   */
-  recordError(error) {
-    try {
-      if (!this.isActive) return;
-      
-      const now = Date.now();
-      
-      // Update session stats
-      this.stats.session.errors++;
-      
-      // Update behavior stats
-      this.stats.behavior.errorPatterns.push({
-        timestamp: now,
-        type: error.type || 'unknown',
-        message: error.message || '',
-        severity: error.severity || 'low',
-        context: error.context || {}
-      });
-      
-      // Keep only recent patterns
-      if (this.stats.behavior.errorPatterns.length > this.config.maxHistory) {
-        this.stats.behavior.errorPatterns.shift();
-      }
-      
-      logger.debug('Error recorded', { error, totalErrors: this.stats.session.errors });
-    } catch (error) {
-      logger.error('Error recording error', { error });
-    }
-  }
-
-  /**
-   * Record stealth event
-   * @param {Object} event - Stealth event data
-   */
-  recordStealthEvent(event) {
-    try {
-      if (!this.isActive || !this.config.enableStealth) return;
-      
-      const now = Date.now();
-      
-      // Update stealth stats
-      switch (event.type) {
-        case 'noise':
-          this.stats.stealth.noiseEvents++;
-          break;
-        case 'tabSwitch':
-          this.stats.stealth.tabSwitches++;
-          break;
-        case 'focusChange':
-          this.stats.stealth.focusChanges++;
-          break;
-        case 'humanLike':
-          this.stats.stealth.humanLikeActions++;
-          break;
-      }
-      
-      // Calculate detection risk
-      this.calculateDetectionRisk();
-      
-      logger.debug('Stealth event recorded', { event, stealth: this.stats.stealth });
-    } catch (error) {
-      logger.error('Error recording stealth event', { error });
-    }
-  }
-
-  /**
-   * Record performance metrics
-   * @param {Object} metrics - Performance metrics
-   */
-  recordPerformance(metrics) {
-    try {
-      if (!this.isActive || !this.config.enablePerformance) return;
-      
-      // Update performance stats
-      this.stats.performance.frameRate = metrics.frameRate || 0;
-      this.stats.performance.averageFrameTime = metrics.averageFrameTime || 0;
-      this.stats.performance.droppedFrames = metrics.droppedFrames || 0;
-      this.stats.performance.memoryUsage = metrics.memoryUsage || 0;
-      this.stats.performance.cpuUsage = metrics.cpuUsage || 0;
-      
-      logger.debug('Performance recorded', { metrics, performance: this.stats.performance });
-    } catch (error) {
-      logger.error('Error recording performance', { error });
-    }
-  }
-
-  /**
-   * Update averages
-   */
-  updateAverages() {
-    try {
-      if (this.stats.session.totalSteps > 0) {
-        this.stats.session.averageStep = this.stats.session.totalDistance / this.stats.session.totalSteps;
-        this.stats.session.averageDelay = this.stats.session.totalPauseTime / this.stats.session.totalSteps;
-      }
-    } catch (error) {
-      logger.error('Error updating averages', { error });
-    }
-  }
-
-  /**
-   * Calculate detection risk
-   */
-  calculateDetectionRisk() {
-    try {
-      let risk = 0;
-      
-      // Base risk factors
-      const totalEvents = this.stats.stealth.noiseEvents + 
-                         this.stats.stealth.tabSwitches + 
-                         this.stats.stealth.focusChanges;
-      
-      if (totalEvents > 0) {
-        // High noise events increase risk
-        if (this.stats.stealth.noiseEvents > 100) {
-          risk += 0.3;
-        }
-        
-        // Frequent tab switches increase risk
-        if (this.stats.stealth.tabSwitches > 20) {
-          risk += 0.2;
-        }
-        
-        // Low human-like actions increase risk
-        const humanRatio = this.stats.stealth.humanLikeActions / totalEvents;
-        if (humanRatio < 0.5) {
-          risk += 0.4;
-        }
-      }
-      
-      // Normalize risk to 0-1
-      this.stats.stealth.detectionRisk = Math.min(1, Math.max(0, risk));
-    } catch (error) {
-      logger.error('Error calculating detection risk', { error });
+      logger.error('Error calculating session summary', { error });
     }
   }
 
@@ -388,102 +639,89 @@ export class StatsCollector {
   getStats() {
     return {
       ...this.stats,
-      isActive: this.isActive,
-      config: this.config
+      history: this.history.slice(-100), // Last 100 events
+      config: this.config,
+      isActive: this.isActive
     };
   }
 
   /**
-   * Get session summary
-   * @returns {Object} - Session summary
+   * Export statistics
+   * @param {string} format - Export format (json, csv)
+   * @returns {Promise<Object>} - Export data
    */
-  getSessionSummary() {
-    return {
-      sessionId: this.stats.session.id,
-      duration: this.stats.session.duration,
-      totalSteps: this.stats.session.totalSteps,
-      totalDistance: this.stats.session.totalDistance,
-      averageStep: this.stats.session.averageStep,
-      averageDelay: this.stats.session.averageDelay,
-      errors: this.stats.session.errors,
-      strategy: this.stats.session.strategy,
-      profile: this.stats.session.profile,
-      detectionRisk: this.stats.stealth.detectionRisk
-    };
-  }
-
-  /**
-   * Get behavior analysis
-   * @returns {Object} - Behavior analysis
-   */
-  getBehaviorAnalysis() {
+  async exportStats(format = 'json') {
     try {
-      const patterns = this.stats.behavior.scrollPatterns;
-      if (patterns.length === 0) {
-        return { message: 'No data available' };
+      const stats = this.getStats();
+      
+      switch (format) {
+        case 'json':
+          return {
+            format: 'json',
+            data: stats,
+            timestamp: Date.now(),
+            version: '1.0.0'
+          };
+          
+        case 'csv':
+          return {
+            format: 'csv',
+            data: this.convertToCSV(stats),
+            timestamp: Date.now(),
+            version: '1.0.0'
+          };
+          
+        default:
+          throw new Error(`Unsupported export format: ${format}`);
       }
-      
-      // Analyze scroll patterns
-      const deltas = patterns.map(p => p.delta);
-      const delays = patterns.map(p => p.delay);
-      
-      const analysis = {
-        scrollConsistency: this.calculateConsistency(deltas),
-        delayConsistency: this.calculateConsistency(delays),
-        averageDelta: deltas.reduce((a, b) => a + b, 0) / deltas.length,
-        averageDelay: delays.reduce((a, b) => a + b, 0) / delays.length,
-        totalPatterns: patterns.length,
-        errorRate: this.stats.session.errors / this.stats.session.totalSteps
-      };
-      
-      return analysis;
     } catch (error) {
-      logger.error('Error getting behavior analysis', { error });
-      return { error: 'Analysis failed' };
+      logger.error('Error exporting stats', { error, format });
+      throw error;
     }
   }
 
   /**
-   * Calculate consistency score
-   * @param {Array} values - Array of values
-   * @returns {number} - Consistency score (0-1)
+   * Convert stats to CSV format
+   * @param {Object} stats - Statistics object
+   * @returns {string} - CSV data
    */
-  calculateConsistency(values) {
+  convertToCSV(stats) {
     try {
-      if (values.length < 2) return 1;
+      const rows = [];
       
-      const mean = values.reduce((a, b) => a + b, 0) / values.length;
-      const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
-      const stdDev = Math.sqrt(variance);
+      // Session data
+      rows.push(['Metric', 'Value']);
+      rows.push(['Session Duration', stats.session.duration]);
+      rows.push(['Pages Visited', stats.session.pagesVisited]);
+      rows.push(['Total Scroll Distance', stats.session.totalScrollDistance]);
+      rows.push(['Total Steps', stats.session.totalSteps]);
+      rows.push(['Average Speed', stats.session.averageSpeed]);
+      rows.push(['Success Rate', stats.session.successRate]);
       
-      // Normalize consistency (lower std dev = higher consistency)
-      return Math.max(0, 1 - (stdDev / mean));
+      // Navigation data
+      rows.push(['Total Navigations', stats.navigation.totalNavigations]);
+      Object.entries(stats.navigation.navigationsByType).forEach(([type, count]) => {
+        rows.push([`Navigation ${type}`, count]);
+      });
+      
+      // Stealth data
+      rows.push(['Noise Events', stats.stealth.noiseEvents]);
+      rows.push(['Cursor Movements', stats.stealth.cursorMovements]);
+      rows.push(['Gesture Events', stats.stealth.gestureEvents]);
+      rows.push(['Dwell Time Events', stats.stealth.dwellTimeEvents]);
+      
+      // Performance data
+      rows.push(['Average Response Time', stats.performance.averageResponseTime]);
+      rows.push(['Error Rate', stats.performance.errorRate]);
+      rows.push(['Success Rate', stats.performance.successRate]);
+      
+      // Behavior data
+      rows.push(['User Behavior Score', stats.behavior.userBehaviorScore]);
+      
+      return rows.map(row => row.join(',')).join('\n');
     } catch (error) {
-      logger.error('Error calculating consistency', { error });
-      return 0;
-    }
-  }
-
-  /**
-   * Start auto-save timer
-   */
-  startAutoSave() {
-    if (this.saveTimer) {
-      clearInterval(this.saveTimer);
-    }
-    
-    this.saveTimer = setInterval(() => {
-      this.saveStats();
-    }, this.config.saveInterval);
-  }
-
-  /**
-   * Stop auto-save timer
-   */
-  stopAutoSave() {
-    if (this.saveTimer) {
-      clearInterval(this.saveTimer);
-      this.saveTimer = null;
+      logger.error('Error converting to CSV', { error });
+      return '';
     }
   }
 
@@ -493,137 +731,148 @@ export class StatsCollector {
    */
   async saveStats() {
     try {
-      const key = `autoscroll_stats_${this.stats.session.id}`;
-      await setStorage(key, this.stats);
+      const stats = this.getStats();
+      await setStorageValue('stats', stats);
       
-      logger.debug('Statistics saved', { sessionId: this.stats.session.id });
+      logger.info('Stats saved to storage');
       return true;
     } catch (error) {
-      logger.error('Error saving statistics', { error });
+      logger.error('Error saving stats', { error });
       return false;
     }
   }
 
   /**
    * Load statistics from storage
-   * @returns {Promise<boolean>} - Success status
+   * @returns {Promise<Object>} - Loaded statistics
    */
   async loadStats() {
     try {
-      // Load last session stats if available
-      const lastSessionKey = 'autoscroll_last_session';
-      const lastSession = await getStorage(lastSessionKey);
-      
-      if (lastSession) {
-        this.stats = { ...this.stats, ...lastSession };
-        logger.debug('Statistics loaded', { sessionId: this.stats.session.id });
+      const stats = await getStorageValue('stats');
+      if (stats) {
+        this.stats = { ...this.stats, ...stats };
+        logger.info('Stats loaded from storage');
       }
       
-      return true;
+      return this.stats;
     } catch (error) {
-      logger.error('Error loading statistics', { error });
-      return false;
+      logger.error('Error loading stats', { error });
+      return this.stats;
     }
   }
 
   /**
-   * Generate session ID
-   * @returns {string} - Unique session ID
+   * Clear statistics
+   * @returns {Promise<boolean>} - Success status
    */
-  generateSessionId() {
-    return `session_${Date.now()}_${randInt(1000, 9999)}`;
-  }
-
-  /**
-   * Reset statistics
-   */
-  resetStats() {
-    this.stats = {
-      session: {
-        id: this.generateSessionId(),
+  async clearStats() {
+    try {
+      this.stats = {
+        session: {
+          startTime: null,
+          endTime: null,
+          duration: 0,
+          pagesVisited: 0,
+          totalScrollDistance: 0,
+          totalSteps: 0,
+          totalPauses: 0,
+          totalErrors: 0,
+          averageSpeed: 0,
+          maxSpeed: 0,
+          minSpeed: Infinity
+        },
+        scroll: {
+          totalDistance: 0,
+          totalSteps: 0,
+          averageStep: 0,
+          maxStep: 0,
+          minStep: Infinity,
+          stepDistribution: {},
+          speedDistribution: {},
+          directionChanges: 0,
+          reverseScrolls: 0,
+          momentumScrolls: 0,
+          burstScrolls: 0
+        },
+        navigation: {
+          totalNavigations: 0,
+          navigationsByType: {
+            next: 0,
+            previous: 0,
+            related: 0,
+            recent: 0,
+            outbound: 0
+          },
+          averageNavigationDelay: 0,
+          hoverEvents: 0,
+          clickEvents: 0,
+          tabSwitches: 0
+        },
+        stealth: {
+          noiseEvents: 0,
+          cursorMovements: 0,
+          gestureEvents: 0,
+          dwellTimeEvents: 0,
+          errorSimulations: 0,
+          fingerprintVariations: 0,
+          tabAwarenessEvents: 0,
+          canvasNoiseEvents: 0
+        },
+        performance: {
+          averageResponseTime: 0,
+          maxResponseTime: 0,
+          minResponseTime: Infinity,
+          memoryUsage: 0,
+          cpuUsage: 0,
+          errorRate: 0,
+          successRate: 0
+        },
+        behavior: {
+          readingPatterns: {},
+          interactionPatterns: {},
+          timePatterns: {},
+          contentPatterns: {},
+          userBehaviorScore: 0
+        }
+      };
+      
+      this.history = [];
+      this.performanceMetrics = {
         startTime: null,
         endTime: null,
-        duration: 0,
-        totalSteps: 0,
-        totalDistance: 0,
-        totalPauseTime: 0,
-        averageStep: 0,
-        averageDelay: 0,
-        errors: 0,
-        strategy: null,
-        profile: null
-      },
-      realtime: {
-        currentStep: 0,
-        currentDistance: 0,
-        currentDelay: 0,
-        lastStepTime: null,
-        isPaused: false,
-        pauseStartTime: null,
-        pauseDuration: 0
-      },
-      behavior: {
-        scrollPatterns: [],
-        pausePatterns: [],
-        errorPatterns: [],
-        speedVariations: [],
-        directionChanges: 0,
-        idlePeriods: 0,
-        totalIdleTime: 0
-      },
-      performance: {
-        frameRate: 0,
-        averageFrameTime: 0,
-        droppedFrames: 0,
-        memoryUsage: 0,
-        cpuUsage: 0
-      },
-      stealth: {
-        noiseEvents: 0,
-        tabSwitches: 0,
-        focusChanges: 0,
-        humanLikeActions: 0,
-        detectionRisk: 0
-      }
-    };
-    
-    logger.debug('Statistics reset');
-  }
-
-  /**
-   * Update configuration
-   * @param {Object} newConfig - New configuration
-   */
-  updateConfig(newConfig) {
-    try {
-      this.config = { ...this.config, ...newConfig };
-      logger.info('Statistics collector configuration updated', { config: this.config });
+        operations: 0,
+        errors: 0
+      };
+      
+      logger.info('Stats cleared');
+      return true;
     } catch (error) {
-      logger.error('Error updating configuration', { error });
+      logger.error('Error clearing stats', { error });
+      return false;
     }
   }
 
   /**
    * Add event listener
    * @param {string} event - Event name
-   * @param {Function} listener - Event listener
+   * @param {Function} callback - Callback function
    */
-  on(event, listener) {
+  on(event, callback) {
     if (!this.eventListeners.has(event)) {
       this.eventListeners.set(event, []);
     }
-    this.eventListeners.get(event).push(listener);
+    this.eventListeners.get(event).push(callback);
   }
 
   /**
    * Remove event listener
    * @param {string} event - Event name
-   * @param {Function} listener - Event listener
+   * @param {Function} callback - Callback function
    */
-  off(event, listener) {
+  off(event, callback) {
     if (this.eventListeners.has(event)) {
       const listeners = this.eventListeners.get(event);
-      const index = listeners.indexOf(listener);
+      const index = listeners.indexOf(callback);
       if (index > -1) {
         listeners.splice(index, 1);
       }
@@ -631,50 +880,33 @@ export class StatsCollector {
   }
 
   /**
-   * Emit event
+   * Emit event to listeners
    * @param {string} event - Event name
-   * @param {...any} args - Event arguments
+   * @param {*} data - Event data
    */
-  emit(event, ...args) {
+  emit(event, data) {
     if (this.eventListeners.has(event)) {
-      const listeners = this.eventListeners.get(event);
-      listeners.forEach(listener => {
+      this.eventListeners.get(event).forEach(callback => {
         try {
-          listener(...args);
+          callback(data);
         } catch (error) {
           logger.error('Error in event listener', { error, event });
         }
       });
     }
   }
-
-  /**
-   * Cleanup resources
-   * @returns {Promise<boolean>} - Success status
-   */
-  async cleanup() {
-    try {
-      await this.stop();
-      this.resetStats();
-      logger.info('Statistics collector cleaned up');
-      return true;
-    } catch (error) {
-      logger.error('Error cleaning up statistics collector', { error });
-      return false;
-    }
-  }
 }
 
 /**
- * Create statistics collector instance
+ * Create stats collector instance
  * @param {Object} config - Configuration object
- * @returns {StatsCollector} - Collector instance
+ * @returns {StatsCollector} - Stats collector instance
  */
 export function createStatsCollector(config = {}) {
   return new StatsCollector(config);
 }
 
 /**
- * Default statistics collector instance
+ * Default stats collector instance
  */
 export const statsCollector = createStatsCollector();

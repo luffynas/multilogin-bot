@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=360, initial-scale=1.0">
+  <title>Smart Scroll Assistant</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <img src="icons/icon32.png" alt="Smart Scroll" class="logo-img">
+        <h1 class="title">Smart Scroll</h1>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="status-section">
+        <div class="status-indicator">
+          <div id="statusIcon" class="icon-inactive"></div>
+          <span id="statusText" class="status-text">Inactive</span>
+        </div>
+      </div>
+
+      <div class="controls-section">
+        <button id="toggleBtn" class="btn btn-primary">Start</button>
+      </div>
+
+      <div class="info-section">
+        <p class="info-text">
+          Intelligent scrolling assistance for better web browsing experience.
+        </p>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-buttons">
+        <button id="settingsBtn" class="btn btn-secondary btn-small">
+          <span class="btn-icon">⚙️</span>
+          Settings
+        </button>
+        <button id="infoBtn" class="btn btn-secondary btn-small">
+          <span class="btn-icon">ℹ️</span>
+          Info
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="popup.bundle.js"></script>
+</body>
+</html>

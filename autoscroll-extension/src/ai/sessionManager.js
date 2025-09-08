@@ -2,9 +2,9 @@
  * Session Manager for managing session variations and patterns
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice, jitter } from '@core/randomizer.js';
-import { delay } from '@utils/time.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice, jitter } from '../core/randomizer.js';
+import { delay } from '../utils/time.js';
 
 const logger = createLogger('session-manager');
 

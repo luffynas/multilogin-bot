@@ -2,9 +2,9 @@
  * Google AdSense detector for identifying and interacting with ads
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice } from '@core/randomizer.js';
-import { getElement, getElements, isElementVisible } from '@utils/dom.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice } from '../core/randomizer.js';
+import { safeQuerySelector, safeQuerySelectorAll, isElementVisible } from '../utils/dom.js';
 
 const logger = createLogger('adsense-detector');
 
@@ -191,7 +191,7 @@ export class AdSenseDetector {
       const ads = [];
       
       for (const selector of this.config.selectors.adsense) {
-        const elements = getElements(selector);
+        const elements = safeQuerySelectorAll(selector);
         
         for (const element of elements) {
           const ad = await this.analyzeAdElement(element, 'adsense');
@@ -217,7 +217,7 @@ export class AdSenseDetector {
       const ads = [];
       
       for (const selector of this.config.selectors.generic) {
-        const elements = getElements(selector);
+        const elements = safeQuerySelectorAll(selector);
         
         for (const element of elements) {
           const ad = await this.analyzeAdElement(element, 'generic');

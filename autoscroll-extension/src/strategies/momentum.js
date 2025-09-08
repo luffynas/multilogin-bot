@@ -2,8 +2,8 @@
  * Momentum scroll strategy - simulates natural momentum and inertia
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randScrollStep, randDelay, jitter } from '@core/randomizer.js';
+import { createLogger } from '../utils/logger.js';
+import { randScrollStep, randDelay, jitter } from '../core/randomizer.js';
 
 const logger = createLogger('momentum-strategy');
 

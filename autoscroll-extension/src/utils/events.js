@@ -29,17 +29,111 @@ export function createWheelEvent(options = {}) {
  * @returns {TouchEvent} - Touch event
  */
 export function createTouchEvent(type, options = {}) {
-  const defaultOptions = {
-    touches: [],
-    targetTouches: [],
-    changedTouches: [],
-    bubbles: true,
-    cancelable: true
+  try {
+    // Check if TouchEvent is supported
+    if (typeof TouchEvent === 'undefined') {
+      console.warn('TouchEvent not supported, using fallback');
+      return createTouchEventFallback(type, options);
+    }
+
+    const defaultOptions = {
+      touches: [],
+      targetTouches: [],
+      changedTouches: [],
+      bubbles: true,
+      cancelable: true
+    };
+    
+    const eventOptions = { ...defaultOptions, ...options };
+    
+    // Try to create TouchEvent with minimal options first
+    try {
+      return new TouchEvent(type, {
+        bubbles: eventOptions.bubbles,
+        cancelable: eventOptions.cancelable
+      });
+    } catch (minimalError) {
+      console.warn('TouchEvent with minimal options failed, trying with touch data');
+      
+      // Convert touch arrays to proper Touch objects if they contain touch data
+      if (eventOptions.touches && eventOptions.touches.length > 0) {
+        eventOptions.touches = eventOptions.touches.map(touch => createTouchObject(touch));
+      }
+      if (eventOptions.targetTouches && eventOptions.targetTouches.length > 0) {
+        eventOptions.targetTouches = eventOptions.targetTouches.map(touch => createTouchObject(touch));
+      }
+      if (eventOptions.changedTouches && eventOptions.changedTouches.length > 0) {
+        eventOptions.changedTouches = eventOptions.changedTouches.map(touch => createTouchObject(touch));
+      }
+      
+      return new TouchEvent(type, eventOptions);
+    }
+  } catch (error) {
+    console.error('Error creating TouchEvent:', error);
+    // Fallback: create a custom touch event
+    return createTouchEventFallback(type, options);
+  }
+}
+
+/**
+ * Create a Touch object
+ * @param {Object} touchData - Touch data
+ * @returns {Object} - Touch object
+ */
+function createTouchObject(touchData) {
+  return {
+    identifier: touchData.identifier || Date.now() + Math.random(),
+    target: touchData.target || document.body,
+    clientX: touchData.clientX || 0,
+    clientY: touchData.clientY || 0,
+    screenX: touchData.screenX || 0,
+    screenY: touchData.screenY || 0,
+    pageX: touchData.pageX || 0,
+    pageY: touchData.pageY || 0,
+    radiusX: touchData.radiusX || 0,
+    radiusY: touchData.radiusY || 0,
+    rotationAngle: touchData.rotationAngle || 0,
+    force: touchData.force || 0
   };
-  
-  const eventOptions = { ...defaultOptions, ...options };
-  
-  return new TouchEvent(type, eventOptions);
+}
+
+/**
+ * Create a fallback touch event when TouchEvent is not supported
+ * @param {string} type - Event type
+ * @param {Object} options - Event options
+ * @returns {Event} - Fallback event
+ */
+function createTouchEventFallback(type, options = {}) {
+  try {
+    // Create a custom event that mimics TouchEvent
+    const event = new CustomEvent(type, {
+      bubbles: options.bubbles !== false,
+      cancelable: options.cancelable !== false,
+      detail: {
+        touches: options.touches || [],
+        targetTouches: options.targetTouches || [],
+        changedTouches: options.changedTouches || [],
+        type: type,
+        timeStamp: Date.now()
+      }
+    });
+    
+    // Add TouchEvent-like properties
+    event.touches = options.touches || [];
+    event.targetTouches = options.targetTouches || [];
+    event.changedTouches = options.changedTouches || [];
+    event.type = type;
+    event.timeStamp = Date.now();
+    
+    return event;
+  } catch (error) {
+    console.error('Error creating touch event fallback:', error);
+    // Ultimate fallback: simple event
+    return new Event(type, { 
+      bubbles: options.bubbles !== false, 
+      cancelable: options.cancelable !== false 
+    });
+  }
 }
 
 /**
@@ -219,15 +313,25 @@ export function simulateNaturalTouchScroll(element, startY, endY, steps = 10, in
     const touchStep = () => {
       if (currentStep >= steps) {
         // End touch
+        const touchData = {
+          identifier: 1,
+          target: element,
+          clientX: 0,
+          clientY: endY,
+          screenX: 0,
+          screenY: endY,
+          pageX: 0,
+          pageY: endY,
+          radiusX: 10,
+          radiusY: 10,
+          rotationAngle: 0,
+          force: 1.0
+        };
+        
         const endEvent = createTouchEvent('touchend', {
-          changedTouches: [{
-            identifier: 1,
-            target: element,
-            clientX: 0,
-            clientY: endY,
-            screenX: 0,
-            screenY: endY
-          }]
+          touches: [],
+          targetTouches: [],
+          changedTouches: [touchData]
         });
         
         element.dispatchEvent(endEvent);
@@ -237,31 +341,36 @@ export function simulateNaturalTouchScroll(element, startY, endY, steps = 10, in
       
       const currentY = startY + (stepSize * currentStep);
       
+      const touchData = {
+        identifier: 1,
+        target: element,
+        clientX: 0,
+        clientY: currentY,
+        screenX: 0,
+        screenY: currentY,
+        pageX: 0,
+        pageY: currentY,
+        radiusX: 10,
+        radiusY: 10,
+        rotationAngle: 0,
+        force: 1.0
+      };
+      
       if (currentStep === 0) {
         // Start touch
         const startEvent = createTouchEvent('touchstart', {
-          touches: [{
-            identifier: 1,
-            target: element,
-            clientX: 0,
-            clientY: currentY,
-            screenX: 0,
-            screenY: currentY
-          }]
+          touches: [touchData],
+          targetTouches: [touchData],
+          changedTouches: [touchData]
         });
         
         element.dispatchEvent(startEvent);
       } else {
         // Move touch
         const moveEvent = createTouchEvent('touchmove', {
-          touches: [{
-            identifier: 1,
-            target: element,
-            clientX: 0,
-            clientY: currentY,
-            screenX: 0,
-            screenY: currentY
-          }]
+          touches: [touchData],
+          targetTouches: [touchData],
+          changedTouches: [touchData]
         });
         
         element.dispatchEvent(moveEvent);

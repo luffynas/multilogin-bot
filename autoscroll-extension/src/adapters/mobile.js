@@ -2,9 +2,9 @@
  * Mobile adapter - handles mobile scrolling with touch events
  */
 
-import { createLogger } from '@utils/logger.js';
-import { dispatchTouchEvent, simulateNaturalTouchScroll } from '@utils/events.js';
-import { getScrollPosition, getDocumentDimensions } from '@utils/dom.js';
+import { createLogger } from '../utils/logger.js';
+import { dispatchTouchEvent, simulateNaturalTouchScroll } from '../utils/events.js';
+import { getScrollPosition, getDocumentDimensions } from '../utils/dom.js';
 
 const logger = createLogger('mobile-adapter');
 
@@ -225,26 +225,31 @@ export async function tap(config = {}) {
     logger.debug('Executing tap gesture', { x, y, duration });
     
     // Create touch events for tap
+    const touchData = {
+      identifier: 1,
+      target: document.body,
+      clientX: x,
+      clientY: y,
+      screenX: x,
+      screenY: y,
+      pageX: x,
+      pageY: y,
+      radiusX: 10,
+      radiusY: 10,
+      rotationAngle: 0,
+      force: 1.0
+    };
+    
     const touchStart = {
-      touches: [{
-        identifier: 1,
-        target: document.body,
-        clientX: x,
-        clientY: y,
-        screenX: x,
-        screenY: y
-      }]
+      touches: [touchData],
+      targetTouches: [touchData],
+      changedTouches: [touchData]
     };
     
     const touchEnd = {
-      changedTouches: [{
-        identifier: 1,
-        target: document.body,
-        clientX: x,
-        clientY: y,
-        screenX: x,
-        screenY: y
-      }]
+      touches: [],
+      targetTouches: [],
+      changedTouches: [touchData]
     };
     
     // Dispatch touch events

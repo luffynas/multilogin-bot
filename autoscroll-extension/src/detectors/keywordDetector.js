@@ -2,9 +2,9 @@
  * Keyword detector for identifying and prioritizing links based on keywords
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice } from '@core/randomizer.js';
-import { getElement, getElements, isElementVisible } from '@utils/dom.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice } from '../core/randomizer.js';
+import { safeQuerySelector, safeQuerySelectorAll, isElementVisible } from '../utils/dom.js';
 
 const logger = createLogger('keyword-detector');
 
@@ -223,7 +223,7 @@ export class KeywordDetector {
       
       for (const selector of selectors) {
         try {
-          const elements = getElements(selector);
+          const elements = safeQuerySelectorAll(selector);
           
           for (const element of elements) {
             if (!isElementVisible(element)) continue;
@@ -255,7 +255,7 @@ export class KeywordDetector {
       
       for (const selector of selectors) {
         try {
-          const elements = getElements(selector);
+          const elements = safeQuerySelectorAll(selector);
           
           for (const element of elements) {
             if (!isElementVisible(element)) continue;
@@ -287,7 +287,7 @@ export class KeywordDetector {
       
       for (const selector of selectors) {
         try {
-          const elements = getElements(selector);
+          const elements = safeQuerySelectorAll(selector);
           
           for (const element of elements) {
             if (!isElementVisible(element)) continue;

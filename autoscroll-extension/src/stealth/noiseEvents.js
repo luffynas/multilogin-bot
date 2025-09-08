@@ -2,10 +2,10 @@
  * Noise events generator for human-like behavior simulation
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice } from '@core/randomizer.js';
-import { createMouseEvent, createTouchEvent, dispatchEventNatural } from '@utils/events.js';
-import { getViewportDimensions } from '@utils/dom.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice } from '../core/randomizer.js';
+import { createMouseEvent, createTouchEvent, dispatchEventNatural } from '../utils/events.js';
+import { getViewportDimensions } from '../utils/dom.js';
 
 const logger = createLogger('noise-events');
 
@@ -339,28 +339,34 @@ export class NoiseEventsGenerator {
       const x = randInt(50, viewport.width - 50);
       const y = randInt(50, viewport.height - 50);
       
+      // Create touch data
+      const touchData = {
+        identifier: 1,
+        target: document.body,
+        clientX: x,
+        clientY: y,
+        screenX: x,
+        screenY: y,
+        pageX: x,
+        pageY: y,
+        radiusX: 10,
+        radiusY: 10,
+        rotationAngle: 0,
+        force: 1.0
+      };
+      
       // Create touch start event
       const startEvent = createTouchEvent('touchstart', {
-        touches: [{
-          identifier: 1,
-          target: document.body,
-          clientX: x,
-          clientY: y,
-          screenX: x,
-          screenY: y
-        }]
+        touches: [touchData],
+        targetTouches: [touchData],
+        changedTouches: [touchData]
       });
       
       // Create touch end event
       const endEvent = createTouchEvent('touchend', {
-        changedTouches: [{
-          identifier: 1,
-          target: document.body,
-          clientX: x,
-          clientY: y,
-          screenX: x,
-          screenY: y
-        }]
+        touches: [],
+        targetTouches: [],
+        changedTouches: [touchData]
       });
       
       // Dispatch events

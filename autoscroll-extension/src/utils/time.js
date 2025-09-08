@@ -12,6 +12,15 @@ export function sleep(ms) {
 }
 
 /**
+ * Delay for specified milliseconds (alias for sleep)
+ * @param {number} ms - Milliseconds to delay
+ * @returns {Promise<void>} - Promise that resolves after delay
+ */
+export function delay(ms) {
+  return sleep(ms);
+}
+
+/**
  * Add jitter to a delay value
  * @param {number} baseDelay - Base delay in ms
  * @param {number} jitterPercent - Jitter percentage (0-1)

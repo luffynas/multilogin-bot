@@ -2,8 +2,8 @@
  * Navigation controller for managing page navigation and link interactions
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice } from '@core/randomizer.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice } from '../core/randomizer.js';
 import { adSenseDetector } from '../detectors/adsenseDetector.js';
 import { navigationDetector } from '../detectors/navigationDetector.js';
 import { paginationDetector } from '../detectors/paginationDetector.js';

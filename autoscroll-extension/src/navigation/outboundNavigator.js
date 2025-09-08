@@ -2,8 +2,8 @@
  * Outbound navigator for handling external link navigation
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice } from '@core/randomizer.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice } from '../core/randomizer.js';
 import { linkParser } from './linkParser.js';
 import { tabManager } from './tabManager.js';
 

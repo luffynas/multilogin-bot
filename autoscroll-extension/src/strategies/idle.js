@@ -2,9 +2,9 @@
  * Idle strategy - natural pauses and reading behavior
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice, randHumanPause, randHesitation } from '@core/randomizer.js';
-import { createReadingPause, createNaturalPause } from '@utils/time.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice, randHumanPause, randHesitation } from '../core/randomizer.js';
+import { createReadingPause, createNaturalPause } from '../utils/time.js';
 
 const logger = createLogger('idle-strategy');
 

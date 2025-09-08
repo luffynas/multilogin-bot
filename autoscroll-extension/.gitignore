@@ -10,6 +10,15 @@ build/
 *.tgz
 *.tar.gz
 
+# Coverage reports
+coverage/
+.nyc_output/
+*.lcov
+
+# Test results
+test-results.json
+junit.xml
+
 # Environment variables
 .env
 .env.local
@@ -17,7 +26,7 @@ build/
 .env.test.local
 .env.production.local
 
-# IDE and editor files
+# IDE files
 .vscode/
 .idea/
 *.swp
@@ -42,16 +51,6 @@ pids/
 *.pid
 *.seed
 *.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
-
-# nyc test coverage
-.nyc_output
-
-# Dependency directories
-jspm_packages/
 
 # Optional npm cache directory
 .npm
@@ -93,15 +92,9 @@ jspm_packages/
 # TernJS port file
 .tern-port
 
-# Extension specific
-*.crx
-*.pem
-*.zip
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
 
-# Test files
-test-results/
-screenshots/
-
-# Temporary files
+# Temporary folders
 tmp/
 temp/

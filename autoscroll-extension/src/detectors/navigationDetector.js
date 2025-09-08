@@ -2,9 +2,9 @@
  * Navigation detector for identifying next/prev/related/recent links
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice } from '@core/randomizer.js';
-import { getElement, getElements, isElementVisible } from '@utils/dom.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice } from '../core/randomizer.js';
+import { safeQuerySelector, safeQuerySelectorAll, isElementVisible } from '../utils/dom.js';
 
 const logger = createLogger('navigation-detector');
 
@@ -282,7 +282,7 @@ export class NavigationDetector {
       
       for (const selector of selectors) {
         try {
-          const elements = getElements(selector);
+          const elements = safeQuerySelectorAll(selector);
           
           for (const element of elements) {
             const link = await this.analyzeLinkElement(element, type);
@@ -326,7 +326,7 @@ export class NavigationDetector {
       }
       
       // Get all links on the page
-      const allLinks = getElements('a');
+      const allLinks = safeQuerySelectorAll('a');
       
       for (const link of allLinks) {
         const text = link.textContent?.trim() || '';
@@ -368,7 +368,7 @@ export class NavigationDetector {
       }
       
       // Get all links on the page
-      const allLinks = getElements('a');
+      const allLinks = safeQuerySelectorAll('a');
       
       for (const link of allLinks) {
         for (const attr of attributes) {

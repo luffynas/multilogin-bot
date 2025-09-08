@@ -2,8 +2,8 @@
  * Background script for autoscroll extension
  */
 
-import { createLogger } from '@utils/logger.js';
-import { getStorageValue, setStorageValue } from '@utils/storage.js';
+import { createLogger } from '../utils/logger.js';
+import { getStorageValue, setStorageValue } from '../utils/storage.js';
 
 const logger = createLogger('background');
 
@@ -14,7 +14,11 @@ class BackgroundService {
   constructor() {
     this.isInitialized = false;
     this.activeTabs = new Map();
-    this.initialize();
+    
+    // Initialize with error handling
+    this.initialize().catch(error => {
+      logger.error('Failed to initialize background service', { error });
+    });
   }
 
   /**
@@ -23,6 +27,12 @@ class BackgroundService {
   async initialize() {
     try {
       logger.info('Initializing background service');
+      
+      // Check if chrome APIs are available
+      if (typeof chrome === 'undefined' || !chrome.runtime) {
+        logger.error('Chrome APIs not available');
+        return;
+      }
       
       // Set up event listeners
       this.setupEventListeners();
@@ -34,6 +44,7 @@ class BackgroundService {
       logger.info('Background service initialized successfully');
     } catch (error) {
       logger.error('Error initializing background service', { error });
+      // Don't throw the error to prevent service worker from crashing
     }
   }
 
@@ -41,39 +52,59 @@ class BackgroundService {
    * Set up event listeners
    */
   setupEventListeners() {
-    // Extension installation/update
-    chrome.runtime.onInstalled.addListener((details) => {
-      this.handleInstall(details);
-    });
+    try {
+      // Extension installation/update
+      if (chrome.runtime && chrome.runtime.onInstalled) {
+        chrome.runtime.onInstalled.addListener((details) => {
+          this.handleInstall(details);
+        });
+      }
 
-    // Tab events
-    chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-      this.handleTabUpdate(tabId, changeInfo, tab);
-    });
+      // Tab events
+      if (chrome.tabs) {
+        if (chrome.tabs.onUpdated) {
+          chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+            this.handleTabUpdate(tabId, changeInfo, tab);
+          });
+        }
 
-    chrome.tabs.onRemoved.addListener((tabId) => {
-      this.handleTabRemoved(tabId);
-    });
+        if (chrome.tabs.onRemoved) {
+          chrome.tabs.onRemoved.addListener((tabId) => {
+            this.handleTabRemoved(tabId);
+          });
+        }
 
-    chrome.tabs.onActivated.addListener((activeInfo) => {
-      this.handleTabActivated(activeInfo);
-    });
+        if (chrome.tabs.onActivated) {
+          chrome.tabs.onActivated.addListener((activeInfo) => {
+            this.handleTabActivated(activeInfo);
+          });
+        }
+      }
 
-    // Message handling
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      this.handleMessage(message, sender, sendResponse);
-      return true; // Keep message channel open for async response
-    });
+      // Message handling
+      if (chrome.runtime && chrome.runtime.onMessage) {
+        chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+          this.handleMessage(message, sender, sendResponse);
+          return true; // Keep message channel open for async response
+        });
+      }
 
-    // Storage changes
-    chrome.storage.onChanged.addListener((changes, areaName) => {
-      this.handleStorageChange(changes, areaName);
-    });
+      // Storage changes
+      if (chrome.storage && chrome.storage.onChanged) {
+        chrome.storage.onChanged.addListener((changes, areaName) => {
+          this.handleStorageChange(changes, areaName);
+        });
+      }
 
-    // Alarm events
-    chrome.alarms.onAlarm.addListener((alarm) => {
-      this.handleAlarm(alarm);
-    });
+      // Alarm events
+      if (chrome.alarms && chrome.alarms.onAlarm) {
+        chrome.alarms.onAlarm.addListener((alarm) => {
+          this.handleAlarm(alarm);
+        });
+      }
+    } catch (error) {
+      logger.error('Error setting up event listeners', { error });
+    }
   }
 
   /**
@@ -469,13 +500,21 @@ class BackgroundService {
    */
   async initializeStorage() {
     try {
+      // Check if chrome storage is available
+      if (!chrome.storage) {
+        logger.warn('Chrome storage not available');
+        return;
+      }
+
       // Set default settings if not exists
       const settings = await getStorageValue('extensionSettings', null);
       if (!settings) {
         await this.setDefaultSettings();
       }
+      logger.info('Storage initialized successfully');
     } catch (error) {
       logger.error('Error initializing storage', { error });
+      // Don't throw the error to prevent service worker from crashing
     }
   }
 
@@ -484,6 +523,12 @@ class BackgroundService {
    */
   async setDefaultSettings() {
     try {
+      // Check if chrome storage is available
+      if (!chrome.storage) {
+        logger.warn('Chrome storage not available for setting default settings');
+        return;
+      }
+
       const defaultSettings = {
         activeProfile: 'default',
         activeStrategy: 'linear',
@@ -496,9 +541,10 @@ class BackgroundService {
       };
       
       await setStorageValue('extensionSettings', defaultSettings);
-      logger.info('Default settings set');
+      logger.info('Default settings set successfully');
     } catch (error) {
       logger.error('Error setting default settings', { error });
+      // Don't throw the error to prevent service worker from crashing
     }
   }
 
@@ -507,12 +553,18 @@ class BackgroundService {
    */
   async showWelcomePage() {
     try {
-      // Open welcome page in new tab
-      await chrome.tabs.create({
-        url: chrome.runtime.getURL('welcome.html')
-      });
+      // Check if chrome APIs are available
+      if (!chrome.tabs || !chrome.runtime) {
+        logger.warn('Chrome APIs not available for showing welcome page');
+        return;
+      }
+
+      // Open options page instead of welcome page
+      await chrome.runtime.openOptionsPage();
+      logger.info('Options page opened successfully');
     } catch (error) {
       logger.error('Error showing welcome page', { error });
+      // Don't throw the error to prevent service worker from crashing
     }
   }
 
@@ -700,5 +752,9 @@ class BackgroundService {
   }
 }
 
-// Initialize background service
-new BackgroundService();
+// Initialize background service with error handling
+try {
+  new BackgroundService();
+} catch (error) {
+  console.error('Failed to create background service:', error);
+}

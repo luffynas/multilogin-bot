@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Icons</title>
+</head>
+<body>
+    <canvas id="canvas16" width="16" height="16"></canvas>
+    <canvas id="canvas32" width="32" height="32"></canvas>
+    <canvas id="canvas48" width="48" height="48"></canvas>
+    <canvas id="canvas128" width="128" height="128"></canvas>
+    
+    <script>
+        function createIcon(size, canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Background
+            ctx.fillStyle = '#667eea';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Scroll icon
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = Math.max(1, size / 16);
+            ctx.beginPath();
+            
+            // Draw scroll arrows
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const arrowSize = size / 4;
+            
+            // Down arrow
+            ctx.moveTo(centerX, centerY - arrowSize);
+            ctx.lineTo(centerX, centerY + arrowSize);
+            ctx.moveTo(centerX - arrowSize/2, centerY + arrowSize/2);
+            ctx.lineTo(centerX, centerY + arrowSize);
+            ctx.lineTo(centerX + arrowSize/2, centerY + arrowSize/2);
+            
+            // Up arrow
+            ctx.moveTo(centerX, centerY - arrowSize);
+            ctx.lineTo(centerX - arrowSize/2, centerY - arrowSize/2);
+            ctx.moveTo(centerX, centerY - arrowSize);
+            ctx.lineTo(centerX + arrowSize/2, centerY - arrowSize/2);
+            
+            ctx.stroke();
+            
+            return canvas.toDataURL('image/png');
+        }
+        
+        // Create all icons
+        const icon16 = createIcon(16, 'canvas16');
+        const icon32 = createIcon(32, 'canvas32');
+        const icon48 = createIcon(48, 'canvas48');
+        const icon128 = createIcon(128, 'canvas128');
+        
+        // Download icons
+        function downloadIcon(dataUrl, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = dataUrl;
+            link.click();
+        }
+        
+        // Auto download after a short delay
+        setTimeout(() => {
+            downloadIcon(icon16, 'icon16.png');
+            setTimeout(() => downloadIcon(icon32, 'icon32.png'), 100);
+            setTimeout(() => downloadIcon(icon48, 'icon48.png'), 200);
+            setTimeout(() => downloadIcon(icon128, 'icon128.png'), 300);
+        }, 1000);
+    </script>
+</body>
+</html>

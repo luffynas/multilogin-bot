@@ -2,8 +2,8 @@
  * Linear scroll strategy - consistent, steady scrolling
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randScrollStep, randDelay, jitter } from '@core/randomizer.js';
+import { createLogger } from '../utils/logger.js';
+import { randScrollStep, randDelay, jitter } from '../core/randomizer.js';
 
 const logger = createLogger('linear-strategy');
 

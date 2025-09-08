@@ -2,9 +2,9 @@
  * Error simulator for human-like mistakes and corrections
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice, jitter } from '@core/randomizer.js';
-import { delay } from '@utils/time.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice, jitter } from '../core/randomizer.js';
+import { delay } from '../utils/time.js';
 
 const logger = createLogger('error-simulator');
 

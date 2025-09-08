@@ -1,8 +1,12 @@
-const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+import path from 'path';
+import CopyPlugin from 'copy-webpack-plugin';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { fileURLToPath } from 'url';
 
-module.exports = {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default {
   entry: {
     background: './src/background/background.js',
     content: './src/content/index.js',
@@ -12,7 +16,8 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
-    clean: true
+    clean: true,
+    publicPath: './'
   },
   module: {
     rules: [
@@ -43,18 +48,18 @@ module.exports = {
           from: 'src/ui/popup/popup.html',
           to: 'popup.html'
         },
-        {
-          from: 'src/ui/options/options.html',
-          to: 'options.html'
-        },
+        // {
+        //   from: 'src/ui/options/options.html',
+        //   to: 'options.html'
+        // },
         {
           from: 'src/ui/popup/popup.css',
           to: 'popup.css'
         },
-        {
-          from: 'src/ui/options/options.css',
-          to: 'options.css'
-        },
+        // {
+        //   from: 'src/ui/options/options.css',
+        //   to: 'options.css'
+        // },
         {
           from: 'src/profiles',
           to: 'profiles'
@@ -82,15 +87,7 @@ module.exports = {
   },
   devtool: 'source-map',
   optimization: {
-    splitChunks: {
-      chunks: 'all',
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all'
-        }
-      }
-    }
+    splitChunks: false,
+    runtimeChunk: false
   }
 };

@@ -2,9 +2,9 @@
  * Tab awareness for realistic behavior simulation
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randDelay, createHumanDelay } from '@utils/time.js';
-import { randFloat, randBool } from '@core/randomizer.js';
+import { createLogger } from '../utils/logger.js';
+import { createRandomDelay, createHumanBehaviorDelay } from '../utils/time.js';
+import { randFloat, randBool } from '../core/randomizer.js';
 
 const logger = createLogger('tab-awareness');
 
@@ -238,7 +238,7 @@ export class TabAwarenessManager {
     try {
       // Document focus is usually triggered after window focus
       // Add a small delay to simulate realistic behavior
-      const delay = createHumanDelay(this.config.focusDelay.minMs, 0.3);
+      const delay = createHumanBehaviorDelay('natural', { baseDelay: this.config.focusDelay.minMs, variation: 0.3 });
       await this.sleep(delay);
       
       logger.debug('Document focused');
@@ -254,7 +254,7 @@ export class TabAwarenessManager {
     try {
       // Document blur is usually triggered before window blur
       // Add a small delay to simulate realistic behavior
-      const delay = createHumanDelay(this.config.blurDelay.minMs, 0.3);
+      const delay = createHumanBehaviorDelay('natural', { baseDelay: this.config.blurDelay.minMs, variation: 0.3 });
       await this.sleep(delay);
       
       logger.debug('Document blurred');

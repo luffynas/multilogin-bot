@@ -2,9 +2,9 @@
  * Content script for autoscroll extension
  */
 
-import { createLogger } from '@utils/logger.js';
-import { engine, ENGINE_STATES, ENGINE_EVENTS } from '@core/engine.js';
-import { initializeProfiles } from '@core/profiles.js';
+import { createLogger } from '../utils/logger.js';
+import { engine, ENGINE_STATES, ENGINE_EVENTS } from '../core/engine.js';
+import { initializeProfiles } from '../core/profiles.js';
 
 const logger = createLogger('content');
 
@@ -152,18 +152,13 @@ class ContentScriptController {
    */
   async injectCoreModules() {
     try {
-      // Create script element to inject modules
-      const script = document.createElement('script');
-      script.textContent = `
-        // Inject core modules into page context
+      // Inject modules directly without creating script element
+      if (typeof window !== 'undefined') {
         window.autoscrollExtension = {
           engine: null,
           isInitialized: false
         };
-      `;
-      
-      document.head.appendChild(script);
-      document.head.removeChild(script);
+      }
       
       logger.info('Core modules injected successfully');
     } catch (error) {

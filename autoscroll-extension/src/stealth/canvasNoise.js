@@ -2,9 +2,9 @@
  * Canvas noise for fingerprint protection and anti-detection
  */
 
-import { createLogger } from '@utils/logger.js';
-import { randFloat, randInt, choice } from '@core/randomizer.js';
-import { delay } from '@utils/time.js';
+import { createLogger } from '../utils/logger.js';
+import { randFloat, randInt, choice } from '../core/randomizer.js';
+import { delay } from '../utils/time.js';
 
 const logger = createLogger('canvas-noise');
 
