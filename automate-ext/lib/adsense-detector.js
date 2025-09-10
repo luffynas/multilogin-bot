@@ -14,7 +14,7 @@ class ContentAnalyzer {
                 researcher: 1.3,  // Increased from 1.1
                 explorer: 1.2,    // Increased from 1.1
                 professional: 1.1, // Same
-                casual: 1.0       // Increased from 0.9
+                casual: 1.1       // Optimized from 1.0 to 1.1 for better RPM
             },
             valueMultipliers: {
                 highValue: 1.5,   // Increased from 1.2

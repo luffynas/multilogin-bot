@@ -20,7 +20,7 @@ class PersonalityEngine {
             DWELL_TIME: {
                 EXPLORER: { min: 30, max: 120 },
                 RESEARCHER: { min: 120, max: 300 },
-                CASUAL: { min: 15, max: 60 },
+                CASUAL: { min: 30, max: 120 },    // Optimized from 15-60s to 30-120s for better RPM
                 PROFESSIONAL: { min: 60, max: 180 }
             },
             
@@ -28,7 +28,7 @@ class PersonalityEngine {
             CLICK_PROBABILITY: {
                 EXPLORER: 0.25,     // Increased from 0.12
                 RESEARCHER: 0.30,   // Increased from 0.15
-                CASUAL: 0.20,       // Increased from 0.08
+                CASUAL: 0.25,       // Optimized from 0.20 to 0.25 for higher RPM
                 PROFESSIONAL: 0.22  // Increased from 0.10
             },
             
@@ -36,7 +36,7 @@ class PersonalityEngine {
             HOVER_PROBABILITY: {
                 EXPLORER: 0.8,
                 RESEARCHER: 0.6,
-                CASUAL: 0.4,
+                CASUAL: 0.6,        // Optimized from 0.4 to 0.6 for higher engagement
                 PROFESSIONAL: 0.5
             },
             
@@ -131,15 +131,15 @@ class PersonalityEngine {
             case 'casual':
                 return {
                     ...basePersonality,
-                    // Navigation behavior - Quick browsing with minimal engagement
-                    navigationStyle: 'low',             // Visits few pages, minimal exploration
+                    // Navigation behavior - Optimized for better RPM while maintaining casual nature
+                    navigationStyle: 'medium',          // Optimized: Visits moderate pages, balanced exploration
                     readingSpeed: 'medium',             // Moderate reading speed
-                    attentionSpan: 'short',             // Brief focus duration
-                    engagementLevel: 'low',             // Low interaction with content
-                    dwellTime: { min: 15, max: 60 },    // 15-60 seconds per page (quick browsing)
-                    scrollBehavior: 'quick',            // Fast scrolling, minimal pauses
-                    clickProbability: 0.20,             // 20% chance to click ads (lowest among personalities)
-                    hoverProbability: 0.4,              // 40% chance to hover over elements
+                    attentionSpan: 'medium',            // Optimized: Extended focus duration for better engagement
+                    engagementLevel: 'medium',          // Optimized: Medium interaction with content for higher RPM
+                    dwellTime: this.BEHAVIOR_CONSTANTS.DWELL_TIME.CASUAL,  // Use optimized constants (30-120s)
+                    scrollBehavior: 'moderate',         // Optimized: Moderate scrolling with some pauses
+                    clickProbability: this.BEHAVIOR_CONSTANTS.CLICK_PROBABILITY.CASUAL,  // Use optimized constants (25%)
+                    hoverProbability: this.BEHAVIOR_CONSTANTS.HOVER_PROBABILITY.CASUAL,  // Use optimized constants (60%)
                     tabSwitching: 'moderate',           // Moderate tab switching
                     searchBehavior: 'general'           // Searches for general, popular topics
                 };
