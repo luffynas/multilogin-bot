@@ -1212,39 +1212,61 @@ class PageProcessor {
                 const sessionStartTime = this.sessionStartTime || this.sessionManager?.currentSession?.startTime || Date.now();
                 const pageTime = Date.now() - sessionStartTime;
                 
-                console.log(`⏱️ Page time: ${(pageTime / 1000).toFixed(0)}s`);
+                if (this.automationConfig.debugMode) {
+                    console.log(`⏱️ Page time: ${Math.round(pageTime / 1000)}s`);
+                }
                 
-                // Navigation cooldown after reading (minimum 2 minutes on page)
-                if (pageTime < 120000) { // 2 minutes minimum
-                    console.log(`⏳ Navigation cooldown: ${(120 - pageTime / 1000).toFixed(0)}s remaining`);
-                    await this.delay(10000); // Wait 10 seconds before next check
+                // Navigation cooldown after reading (variable minimum time on page)
+                const minPageTime = 90000 + Math.random() * 60000; // 1.5-2.5 minutes variable
+                if (pageTime < minPageTime) {
+                    if (this.automationConfig.debugMode) {
+                        console.log(`⏳ Navigation cooldown: ${Math.round((minPageTime - pageTime) / 1000)}s remaining`);
+                    }
+                    // Variable delay between checks (5-15 seconds)
+                    const checkDelay = 5000 + Math.random() * 10000;
+                    await this.delay(checkDelay);
                 return;
                 }
                 
                 // Ensure reading is completed before allowing navigation
                 if (!this.readingCompleted) {
-                    console.log(`📚 Reading not completed yet, continuing...`);
-                    await this.delay(5000); // Wait 5 seconds before next check
+                    if (this.automationConfig.debugMode) {
+                        console.log(`📚 Reading not completed yet, continuing...`);
+                    }
+                    // Variable delay for reading completion check (3-8 seconds)
+                    const readingCheckDelay = 3000 + Math.random() * 5000;
+                    await this.delay(readingCheckDelay);
                 return;
                 }
                 
-                if (pageTime > 300000) { // 5 minutes
-                    console.log(`🚨 Force navigation after ${(pageTime / 1000).toFixed(0)}s on page`);
+                // Variable force navigation time (4-6 minutes)
+                const maxPageTime = 240000 + Math.random() * 120000; // 4-6 minutes variable
+                if (pageTime > maxPageTime) {
+                    if (this.automationConfig.debugMode) {
+                        console.log(`🚨 Force navigation after ${Math.round(pageTime / 1000)}s on page`);
+                    }
                     await this.simulateNavigation();
                 return; // Skip normal navigation logic
                 }
                 
-                // Add longer delay after reading before navigation
-                await this.delay(5000 + Math.random() * 10000); // 5-15 seconds
+                // Variable delay after reading before navigation (3-18 seconds)
+                const postReadingDelay = 3000 + Math.random() * 15000;
+                await this.delay(postReadingDelay);
                 
-                // Simulate navigation with reasonable frequency
-                const navigationProbability = Math.min(0.3, pageTime / 300000); // 30% max after 5 minutes
+                // Simulate navigation with variable probability
+                const baseProbability = Math.min(0.25, pageTime / 300000); // 25% max after 5 minutes
+                const personalityMultiplier = this.getPersonalityNavigationMultiplier();
+                const navigationProbability = baseProbability * personalityMultiplier;
                 
                 if (Math.random() < navigationProbability) {
-                    console.log(`🧭 Navigation probability: ${(navigationProbability * 100).toFixed(1)}% (page time: ${(pageTime / 1000).toFixed(0)}s)`);
+                    if (this.automationConfig.debugMode) {
+                        console.log(`🧭 Navigation probability: ${(navigationProbability * 100).toFixed(1)}% (page time: ${Math.round(pageTime / 1000)}s)`);
+                    }
                     await this.simulateNavigation();
                 } else {
-                    console.log(`⏳ Navigation skipped (${(navigationProbability * 100).toFixed(1)}% chance)`);
+                    if (this.automationConfig.debugMode) {
+                        console.log(`⏳ Navigation skipped (${(navigationProbability * 100).toFixed(1)}% chance)`);
+                    }
                 }
             } catch (error) {
             console.error('Automation step execution error:', error);
@@ -2542,6 +2564,32 @@ class PageProcessor {
             this.errorRecovery.handleError(error, 'context_invalidation').catch(recoveryError => {
                 console.error('Error recovery failed for context invalidation:', recoveryError);
             });
+        }
+    }
+
+    /**
+     * Get personality-based navigation multiplier
+     */
+    getPersonalityNavigationMultiplier() {
+        try {
+            const personality = this.personalityEngine.getCurrentPersonality();
+            if (!personality) return 1.0;
+            
+            switch (personality.type) {
+                case 'explorer':
+                    return 1.3; // More likely to navigate
+                case 'researcher':
+                    return 0.7; // Less likely to navigate (stays longer)
+                case 'casual':
+                    return 1.1; // Slightly more likely
+                case 'professional':
+                    return 0.9; // Slightly less likely
+                default:
+                    return 1.0;
+            }
+        } catch (error) {
+            console.warn('Error getting personality navigation multiplier:', error);
+            return 1.0;
         }
     }
 

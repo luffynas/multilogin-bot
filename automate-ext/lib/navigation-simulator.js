@@ -271,13 +271,17 @@ class NavigationSimulator {
         this.isNavigating = true;
         
         try {
-            // Add cooldown to prevent over-navigation (reduced for testing)
+            // Add variable cooldown to prevent over-navigation
             const now = Date.now();
             const lastNavigation = this.lastNavigationTime || 0;
-            const cooldownPeriod = 60000; // Reduced from 120 to 60 seconds (1 minute) cooldown for testing
+            const baseCooldownPeriod = 45000; // 45 seconds base
+            const cooldownVariation = Math.random() * 30000; // 0-30 seconds variation
+            const cooldownPeriod = baseCooldownPeriod + cooldownVariation; // 45-75 seconds variable
             
             if (now - lastNavigation < cooldownPeriod) {
-                console.debug(`Navigation in cooldown, skipping... (${Math.round((cooldownPeriod - (now - lastNavigation)) / 1000)}s remaining)`);
+                if (this.behaviorSimulator?.behaviorConfig?.debugMode) {
+                    console.debug(`Navigation in cooldown, skipping... (${Math.round((cooldownPeriod - (now - lastNavigation)) / 1000)}s remaining)`);
+                }
                 return false;
             }
             
@@ -286,14 +290,18 @@ class NavigationSimulator {
             const navigationProbability = this.calculateNavigationProbability(pageTime);
             
             if (Math.random() > navigationProbability) {
-                console.debug('Navigation skipped due to low probability');
+                if (this.behaviorSimulator?.behaviorConfig?.debugMode) {
+                    console.debug('Navigation skipped due to low probability');
+                }
                 return false;
             }
         
         const personality = this.behaviorSimulator?.currentPersonality;
         const navigationType = this.chooseNavigationType(personality, options);
             
-            console.log(`Navigating to: ${navigationType}`);
+            if (this.behaviorSimulator?.behaviorConfig?.debugMode) {
+                console.log(`Navigating to: ${navigationType}`);
+            }
             
             let navigationSuccess = false;
         

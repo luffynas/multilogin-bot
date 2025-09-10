@@ -523,7 +523,9 @@ class BehaviorSimulator {
         let hasReachedBottom = false;
         let hasReachedTop = false;
 
-        console.log(`📖 Starting comprehensive reading: ${numScrolls} scrolls, ${maxScrollDistance}px total distance`);
+        if (this.behaviorConfig.debugMode) {
+            console.log(`📖 Starting comprehensive reading: ${numScrolls} scrolls, ${maxScrollDistance}px total distance`);
+        }
 
         for (let i = 0; i < numScrolls; i++) {
             // Calculate scroll amount based on pattern and current position
@@ -546,12 +548,15 @@ class BehaviorSimulator {
             // Smooth scroll to position
             window.scrollTo({ top: currentPosition, behavior: 'smooth' });
 
-            // Real-time ad detection during scroll
-            await this.delay(1000);
+            // Real-time ad detection during scroll with variable timing
+            const scrollDetectionDelay = 800 + Math.random() * 1400; // 0.8-2.2 seconds
+            await this.delay(scrollDetectionDelay);
             const newAds = await this.detectNewAdsInViewport(detectedAds);
             
             if (newAds.length > 0) {
-                console.log(`🎯 Found ${newAds.length} new ads at position ${currentPosition}px`);
+                if (this.behaviorConfig.debugMode) {
+                    console.log(`🎯 Found ${newAds.length} new ads at position ${currentPosition}px`);
+                }
                 
                 for (const adInfo of newAds) {
                     detectedAds.add(adInfo.uniqueId);
@@ -567,18 +572,31 @@ class BehaviorSimulator {
                 }
             }
 
-            // Pause based on pattern and content
-            const pauseTime = this.calculateReadingPause(i, numScrolls, config.pattern, config, currentPosition, maxScrollDistance);
-            await this.delay(pauseTime * 1000);
+            // Pause based on pattern and content with human-like variation
+            const basePauseTime = this.calculateReadingPause(i, numScrolls, config.pattern, config, currentPosition, maxScrollDistance);
+            const pauseVariation = 0.7 + Math.random() * 0.6; // 70-130% of base time
+            const pauseTime = basePauseTime * pauseVariation;
+            
+            // Add occasional longer pauses (human reading behavior)
+            const longPauseChance = Math.random() < 0.15; // 15% chance
+            const finalPauseTime = longPauseChance ? pauseTime * (2 + Math.random() * 2) : pauseTime;
+            
+            await this.delay(finalPauseTime * 1000);
 
-            // Reading pause (increased frequency for better content consumption)
-            if (Math.random() < 0.5) { // Increased from 30% to 50% chance
-                const readingPause = (3 + Math.random() * 5) * config.thoroughnessMultiplier; // Increased from 2-3s to 3-5s
-                console.log(`📖 Reading pause at ${currentPosition}px: ${readingPause.toFixed(1)}s`);
+            // Reading pause with variable frequency and duration
+            const readingPauseChance = 0.3 + Math.random() * 0.4; // 30-70% chance (variable)
+            if (Math.random() < readingPauseChance) {
+                const baseReadingPause = (2 + Math.random() * 6) * config.thoroughnessMultiplier; // 2-8 seconds
+                const readingPauseVariation = 0.5 + Math.random() * 1.0; // 50-150% variation
+                const readingPause = baseReadingPause * readingPauseVariation;
+                
+                if (this.behaviorConfig.debugMode) {
+                    console.log(`📖 Reading pause at ${currentPosition}px: ${readingPause.toFixed(1)}s`);
+                }
                 
                 // Additional ad check during reading
                 const additionalAds = await this.detectNewAdsInViewport(detectedAds);
-                if (additionalAds.length > 0) {
+                if (additionalAds.length > 0 && this.behaviorConfig.debugMode) {
                     console.log(`🎯 READING PAUSE: Found ${additionalAds.length} additional ads`);
                 }
                 

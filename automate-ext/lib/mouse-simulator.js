@@ -82,35 +82,44 @@ class MouseSimulator {
      */
     generateNaturalPath(startX, startY, endX, endY, duration) {
         const path = [];
-        const steps = Math.floor(duration / 16); // 60fps
+        // Variable frame rate (45-75 fps) for more human-like movement
+        const fps = 45 + Math.random() * 30;
+        const steps = Math.floor(duration / (1000 / fps));
         const distance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
         
-        // Add some randomness to the path
+        // Add more randomness to the path
         const controlPoints = this.generateControlPoints(startX, startY, endX, endY);
         
         for (let i = 0; i <= steps; i++) {
             const t = i / steps;
             
-            // Apply easing function for natural acceleration
-            const easedT = this.easeInOutCubic(t);
+            // Apply variable easing function for more natural acceleration
+            const easedT = this.easeInOutCubic(t) + (Math.random() - 0.5) * 0.1;
             
-            // Calculate position using cubic Bezier curve
+            // Calculate position using cubic Bezier curve with imperfections
             const point = this.cubicBezier(
                 startX, startY,
                 controlPoints[0].x, controlPoints[0].y,
                 controlPoints[1].x, controlPoints[1].y,
                 endX, endY,
-                easedT
+                Math.max(0, Math.min(1, easedT))
             );
             
-            // Add slight jitter for realism
-            const jitterX = (Math.random() - 0.5) * 2;
-            const jitterY = (Math.random() - 0.5) * 2;
+            // Add enhanced natural jitter to make movement less perfect
+            const jitterX = (Math.random() - 0.5) * 4; // Increased jitter
+            const jitterY = (Math.random() - 0.5) * 4;
+            
+            // Add micro-tremors for human-like imperfection
+            const tremorX = (Math.random() - 0.5) * 1.5;
+            const tremorY = (Math.random() - 0.5) * 1.5;
+            
+            // Add occasional larger deviations (human hand tremor)
+            const largeDeviation = Math.random() < 0.05 ? (Math.random() - 0.5) * 8 : 0;
             
             path.push({
-                x: Math.round(point.x + jitterX),
-                y: Math.round(point.y + jitterY),
-                delay: this.calculateStepDelay(t, distance, duration)
+                x: Math.round(point.x + jitterX + tremorX + largeDeviation),
+                y: Math.round(point.y + jitterY + tremorY + largeDeviation),
+                delay: this.calculateVariableStepDelay(t, distance, duration, i, steps)
             });
         }
         
@@ -172,14 +181,57 @@ class MouseSimulator {
     }
 
     /**
+     * Calculate variable delay for each step with human-like imperfections
+     */
+    calculateVariableStepDelay(t, distance, duration, stepIndex, totalSteps) {
+        // Variable base delay (12-20ms for 50-83fps)
+        const baseDelay = 12 + Math.random() * 8;
+        
+        // Slower at start and end, faster in middle (natural acceleration)
+        const accelerationFactor = Math.sin(t * Math.PI);
+        
+        // Add random variation to timing
+        const randomVariation = (Math.random() - 0.5) * 0.3;
+        
+        // Add occasional micro-pauses (human-like)
+        const microPause = Math.random() < 0.02 ? Math.random() * 50 : 0;
+        
+        // Add fatigue factor (slightly slower over time)
+        const fatigueFactor = 1 + (stepIndex / totalSteps) * 0.1;
+        
+        return (baseDelay * (1 + accelerationFactor * 0.5 + randomVariation) * fatigueFactor) + microPause;
+    }
+
+    /**
      * Click on element with natural behavior
      */
     async click(element, options = {}) {
         if (!element) return false;
         
         const rect = element.getBoundingClientRect();
-        const clickX = options.x || rect.left + rect.width / 2;
-        const clickY = options.y || rect.top + rect.height / 2;
+        
+        // Add human-like click imperfection (not always perfect center)
+        let clickX, clickY;
+        if (options.x && options.y) {
+            // Use provided coordinates
+            clickX = options.x;
+            clickY = options.y;
+        } else {
+            // Add imperfection to center click
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            // Random offset within element bounds (human-like imperfection)
+            const maxOffsetX = Math.min(rect.width * 0.3, 20); // Max 30% of width or 20px
+            const maxOffsetY = Math.min(rect.height * 0.3, 20); // Max 30% of height or 20px
+            
+            clickX = centerX + (Math.random() - 0.5) * maxOffsetX;
+            clickY = centerY + (Math.random() - 0.5) * maxOffsetY;
+            
+            // Ensure click is within element bounds
+            clickX = Math.max(rect.left, Math.min(rect.right, clickX));
+            clickY = Math.max(rect.top, Math.min(rect.bottom, clickY));
+        }
         
         // Move to element first
         await this.moveTo(clickX, clickY, options.moveDuration || 800);
