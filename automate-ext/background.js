@@ -335,6 +335,8 @@ class BackgroundManager {
             
             // Inject content script with individual file injection for better error handling
             const scriptFiles = [
+                'lib/stealth-storage.js',
+                'lib/stealth-delay.js',
                 'lib/personality-engine.js',
                 'lib/behavior-simulator.js',
                 'lib/adsense-detector.js',
@@ -344,6 +346,9 @@ class BackgroundManager {
                 'lib/navigation-simulator.js',
                 'lib/session-manager.js',
                 'lib/stealth-monitor.js',
+                'lib/analytics-monitor.js',
+                'lib/dynamic-adaptation-engine.js',
+                'lib/enhanced-fraud-prevention.js',
                 'content-script.js'
             ];
             

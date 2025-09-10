@@ -36,6 +36,38 @@
     humanLikeChance: 0.4,
     mouseMovementChance: 0.2
   };
+
+  // Scroll behavior integration
+  let scrollBehaviorModule = null;
+  let currentScrollPattern = null;
+
+  // Initialize scroll behavior integration
+  function initializeScrollBehavior() {
+    if (typeof ScrollBehaviorModule !== 'undefined') {
+      scrollBehaviorModule = new ScrollBehaviorModule();
+      console.log('Inpage: Scroll behavior module initialized');
+      
+      // Listen for variant changes
+      window.addEventListener('reader-variant-changed', (event) => {
+        const variant = event.detail.variant;
+        console.log('Inpage: Reader variant changed to', variant);
+        updateScrollPattern(variant);
+      });
+      
+      // Set initial pattern if variant is already available
+      if (window.readerVariantSystem && window.readerVariantSystem.currentVariant) {
+        updateScrollPattern(window.readerVariantSystem.currentVariant);
+      }
+    }
+  }
+
+  // Update scroll pattern based on variant
+  function updateScrollPattern(variant) {
+    if (scrollBehaviorModule) {
+      currentScrollPattern = scrollBehaviorModule.getPattern(variant);
+      console.log('Inpage: Scroll pattern updated for variant', variant, currentScrollPattern);
+    }
+  }
   
   // Utility functions
   function randomBetween(min, max) {
@@ -61,9 +93,17 @@
     }
   }
   
-  // Get move step with gentle mode
+  // Get move step with gentle mode and variant-based pattern
   function getMoveStep() {
-    let baseStep = randomBetween(CONFIG.moveStep.min, CONFIG.moveStep.max);
+    let baseStep;
+    
+    // Use scroll pattern if available, otherwise use default CONFIG
+    if (currentScrollPattern && scrollBehaviorModule) {
+      baseStep = scrollBehaviorModule.generateScrollStep(currentScrollPattern);
+    } else {
+      baseStep = randomBetween(CONFIG.moveStep.min, CONFIG.moveStep.max);
+    }
+    
     if (isAdSenseDetected || isCloudflareDetected) {
       baseStep = Math.floor(baseStep * 0.6);
       baseStep = Math.max(baseStep, 15);
@@ -72,10 +112,18 @@
     const speedFactor = Math.min(totalMoved / 1000, 1);
     return Math.floor(baseStep * (0.8 + speedFactor * 0.2));
   }
-  
-  // Get move delay with gentle mode
+
+  // Get move delay with gentle mode and variant-based pattern
   function getMoveDelay() {
-    let baseDelay = randomBetween(CONFIG.moveDelay.min, CONFIG.moveDelay.max);
+    let baseDelay;
+    
+    // Use scroll pattern if available, otherwise use default CONFIG
+    if (currentScrollPattern && scrollBehaviorModule) {
+      baseDelay = scrollBehaviorModule.generateDelay(currentScrollPattern);
+    } else {
+      baseDelay = randomBetween(CONFIG.moveDelay.min, CONFIG.moveDelay.max);
+    }
+    
     if (isAdSenseDetected || isCloudflareDetected) {
       baseDelay = Math.floor(baseDelay * 1.5);
     }
@@ -87,9 +135,16 @@
   // Check if should pause
   function shouldPause() {
     let pauseChance = CONFIG.pauseChance;
-    if (isAdSenseDetected || isCloudflareDetected) {
-      pauseChance = 0.3;
+    
+    // Use scroll pattern if available
+    if (currentScrollPattern && scrollBehaviorModule) {
+      pauseChance = currentScrollPattern.pauseChance;
     }
+    
+    if (isAdSenseDetected || isCloudflareDetected) {
+      pauseChance = Math.min(pauseChance + 0.1, 0.4); // Increase pause chance for sensitive systems
+    }
+    
     return Math.random() < pauseChance;
   }
   
@@ -104,7 +159,15 @@
     const now = Date.now();
     
     if (shouldPause()) {
-      const pauseDuration = randomBetween(CONFIG.pauseDuration.min, CONFIG.pauseDuration.max);
+      let pauseDuration;
+      
+      // Use scroll pattern if available
+      if (currentScrollPattern && scrollBehaviorModule) {
+        pauseDuration = randomBetween(currentScrollPattern.pauseDuration.min, currentScrollPattern.pauseDuration.max);
+      } else {
+        pauseDuration = randomBetween(CONFIG.pauseDuration.min, CONFIG.pauseDuration.max);
+      }
+      
       console.log('performMove: Pausing for', pauseDuration + 'ms');
       setTimeout(() => {
         if (isActive) performMove();
@@ -112,7 +175,13 @@
       return;
     }
     
-    if (Math.random() < CONFIG.directionChangeChance) {
+    // Check direction change chance
+    let directionChangeChance = CONFIG.directionChangeChance;
+    if (currentScrollPattern && scrollBehaviorModule) {
+      directionChangeChance = currentScrollPattern.directionChangeChance;
+    }
+    
+    if (Math.random() < directionChangeChance) {
       currentDirection *= -1;
       console.log('performMove: Direction changed to', currentDirection > 0 ? 'down' : 'up');
     }
@@ -126,9 +195,20 @@
     totalMoved += Math.abs(moveAmount);
     lastMoveTime = now;
     
+    // Update scroll behavior tracking
+    if (scrollBehaviorModule) {
+      scrollBehaviorModule.updateTotalScrolled(moveAmount);
+    }
+    
     console.log('performMove: Total moved so far:', totalMoved);
     
-    if (totalMoved > CONFIG.maxMoveDistance) {
+    // Check max distance
+    let maxDistance = CONFIG.maxMoveDistance;
+    if (currentScrollPattern && scrollBehaviorModule) {
+      maxDistance = currentScrollPattern.maxScrollDistance;
+    }
+    
+    if (totalMoved > maxDistance) {
       console.log('performMove: Max distance reached, stopping');
       stopMoving();
       return;
@@ -185,6 +265,12 @@
   // Initialize
   function initialize() {
     console.log('Inpage: Initializing...');
+    
+    // Initialize scroll behavior integration
+    initializeScrollBehavior();
+    
+    // Detect sensitive systems
+    detectSensitiveSystems();
     
     // Start moving immediately
     startMoving();

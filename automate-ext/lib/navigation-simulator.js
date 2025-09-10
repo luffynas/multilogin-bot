@@ -18,7 +18,8 @@ class NavigationSimulator {
             backForward: true,
             tabSwitching: true,
             searchBehavior: true,
-            bookmarkBehavior: true
+            bookmarkBehavior: true,
+            highlightNavigation: true // Enable/disable URL highlighting
         };
     }
 
@@ -33,6 +34,214 @@ class NavigationSimulator {
         };
         
         this.addToHistory(this.currentPage);
+        
+        // Initialize highlight styles if enabled
+        if (this.navigationConfig.highlightNavigation) {
+            this.initializeHighlightStyles();
+        }
+    }
+    
+    /**
+     * Initialize highlight styles
+     */
+    initializeHighlightStyles() {
+        // Create or update highlight styles
+        let styleElement = document.getElementById('navigation-highlight-styles');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            styleElement.id = 'navigation-highlight-styles';
+            document.head.appendChild(styleElement);
+        }
+        
+        styleElement.textContent = `
+            .navigation-highlight {
+                background-color: #ffeb3b !important;
+                border: 2px solid #ff9800 !important;
+                box-shadow: 0 0 10px rgba(255, 152, 0, 0.5) !important;
+                animation: navigation-pulse 1s ease-in-out infinite alternate !important;
+                position: relative !important;
+                z-index: 9999 !important;
+            }
+            
+            .navigation-highlight::before {
+                content: "🚀 NAVIGATION TARGET" !important;
+                position: absolute !important;
+                top: -25px !important;
+                left: 0 !important;
+                background: #ff9800 !important;
+                color: white !important;
+                padding: 2px 6px !important;
+                font-size: 10px !important;
+                font-weight: bold !important;
+                border-radius: 3px !important;
+                white-space: nowrap !important;
+                z-index: 10000 !important;
+            }
+            
+            @keyframes navigation-pulse {
+                0% { 
+                    background-color: #ffeb3b !important;
+                    box-shadow: 0 0 10px rgba(255, 152, 0, 0.5) !important;
+                }
+                100% { 
+                    background-color: #ffc107 !important;
+                    box-shadow: 0 0 15px rgba(255, 152, 0, 0.8) !important;
+                }
+            }
+            
+            .navigation-highlight-removed {
+                transition: all 0.3s ease-out !important;
+                background-color: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                animation: none !important;
+            }
+        `;
+    }
+    
+    /**
+     * Highlight navigation URLs
+     */
+    highlightNavigationUrls(urls) {
+        if (!this.navigationConfig.highlightNavigation) {
+            return;
+        }
+        
+        // Remove existing highlights first
+        this.removeAllHighlights();
+        
+        urls.forEach(url => {
+            try {
+                // Find all links with this URL
+                const links = document.querySelectorAll(`a[href="${url}"], a[href*="${url}"]`);
+                links.forEach(link => {
+                    link.classList.add('navigation-highlight');
+                });
+                
+                // Also highlight elements that might contain this URL
+                const elements = document.querySelectorAll(`[href*="${url}"], [data-href*="${url}"], [onclick*="${url}"]`);
+                elements.forEach(element => {
+                    element.classList.add('navigation-highlight');
+                });
+            } catch (error) {
+                console.warn('Error highlighting URL:', url, error);
+            }
+        });
+        
+        console.log(`🎯 Highlighted ${urls.length} navigation URLs`);
+    }
+    
+    /**
+     * Remove all highlights
+     */
+    removeAllHighlights() {
+        const highlightedElements = document.querySelectorAll('.navigation-highlight');
+        highlightedElements.forEach(element => {
+            element.classList.remove('navigation-highlight');
+            element.classList.add('navigation-highlight-removed');
+            
+            // Remove the transition class after animation
+            setTimeout(() => {
+                element.classList.remove('navigation-highlight-removed');
+            }, 300);
+        });
+    }
+    
+    /**
+     * Highlight specific element
+     */
+    highlightElement(element) {
+        if (!this.navigationConfig.highlightNavigation) {
+            return;
+        }
+        
+        if (element && element.classList) {
+            element.classList.add('navigation-highlight');
+        }
+    }
+    
+    /**
+     * Remove highlight from specific element
+     */
+    removeHighlight(element) {
+        if (element && element.classList) {
+            element.classList.remove('navigation-highlight');
+            element.classList.add('navigation-highlight-removed');
+            
+            // Remove the transition class after animation
+            setTimeout(() => {
+                element.classList.remove('navigation-highlight-removed');
+            }, 300);
+        }
+    }
+    
+    /**
+     * Enable/disable highlight feature
+     */
+    setHighlightNavigation(enabled) {
+        this.navigationConfig.highlightNavigation = enabled;
+        
+        if (enabled) {
+            this.initializeHighlightStyles();
+            console.log('🎯 Navigation highlighting enabled');
+        } else {
+            this.removeAllHighlights();
+            console.log('🎯 Navigation highlighting disabled');
+        }
+    }
+    
+    /**
+     * Get highlight setting
+     */
+    isHighlightEnabled() {
+        return this.navigationConfig.highlightNavigation;
+    }
+    
+    /**
+     * Preview all navigation URLs that would be highlighted
+     */
+    previewNavigationUrls() {
+        if (!this.navigationConfig.highlightNavigation) {
+            console.log('🎯 Highlight feature is disabled. Enable it first with setHighlightNavigation(true)');
+            return;
+        }
+        
+        const allUrls = [];
+        
+        // Get all possible navigation URLs
+        const relatedLinks = this.findRelatedLinks();
+        const categoryLinks = this.findCategoryLinks();
+        const nextLinks = this.findNextPageLinks();
+        const prevLinks = this.findPreviousPageLinks();
+        const recentPostsLinks = this.findRecentPostsLinks();
+        const tagsLinks = this.findTagsLinks();
+        const legalLinks = this.findLegalLinks();
+        const randomLinks = this.findAnyValidLink();
+        
+        // Collect all URLs
+        [...relatedLinks, ...categoryLinks, ...nextLinks, ...prevLinks, ...recentPostsLinks, ...tagsLinks, ...legalLinks, ...randomLinks].forEach(link => {
+            if (link && link.href && !allUrls.includes(link.href)) {
+                allUrls.push(link.href);
+            }
+        });
+        
+        console.log(`🎯 Found ${allUrls.length} navigation URLs:`);
+        allUrls.forEach((url, index) => {
+            console.log(`  ${index + 1}. ${url}`);
+        });
+        
+        // Highlight all URLs
+        this.highlightNavigationUrls(allUrls);
+        
+        return allUrls;
+    }
+    
+    /**
+     * Clear all highlights
+     */
+    clearHighlights() {
+        this.removeAllHighlights();
+        console.log('🎯 All highlights cleared');
     }
 
     /**
@@ -95,8 +304,20 @@ class NavigationSimulator {
             case 'category':
                     navigationSuccess = await this.navigateToCategory();
                 break;
+            case 'next_page':
+                    navigationSuccess = await this.navigateToNextPage();
+                break;
+            case 'previous_page':
+                    navigationSuccess = await this.navigateToPreviousPage();
+                break;
             case 'previous_next':
                     navigationSuccess = await this.navigatePreviousNext();
+                break;
+            case 'recent_posts':
+                    navigationSuccess = await this.navigateToRecentPosts();
+                break;
+            case 'tags':
+                    navigationSuccess = await this.navigateToTags();
                 break;
             case 'random':
                     navigationSuccess = await this.navigateRandomPage();
@@ -131,6 +352,195 @@ class NavigationSimulator {
         this.isNavigating = false;
         }
     }
+
+    /**
+     * Simulate previous post navigation for testing
+     */
+    async simulatePreviousNavigation() {
+        try {
+            console.log('🧪 Testing previous post navigation...');
+            
+            // Look for previous post links
+            const previousSelectors = [
+                'a[rel="prev"]',
+                '.prev-post',
+                '.previous-post',
+                '.nav-previous',
+                '.pagination-prev',
+                '.post-navigation .prev',
+                'a:contains("Previous")',
+                'a:contains("Prev")',
+                'a:contains("←")',
+                'a:contains("&larr;")'
+            ];
+            
+            let previousLink = null;
+            for (const selector of previousSelectors) {
+                try {
+                    if (selector.includes(':contains')) {
+                        // Handle text-based selectors
+                        const links = document.querySelectorAll('a');
+                        for (const link of links) {
+                            if (link.textContent.toLowerCase().includes('previous') || 
+                                link.textContent.toLowerCase().includes('prev') ||
+                                link.textContent.includes('←')) {
+                                previousLink = link;
+                                break;
+                            }
+                        }
+                    } else {
+                        previousLink = document.querySelector(selector);
+                    }
+                    if (previousLink) break;
+                } catch (e) {
+                    continue;
+                }
+            }
+            
+            if (previousLink) {
+                const href = previousLink.href;
+                const title = previousLink.textContent.trim();
+                
+                console.log(`✅ Found previous post link: ${title} -> ${href}`);
+                console.log(`🚀 Navigating to previous post...`);
+                
+                // Simulate click with human-like behavior and navigate
+                await this.simulateHumanClick(previousLink);
+                
+                return {
+                    success: true,
+                    linkFound: true,
+                    href: href,
+                    title: title,
+                    method: 'navigation',
+                    navigating: true
+                };
+            } else {
+                console.log('⚠️ No previous post link found');
+                return {
+                    success: false,
+                    linkFound: false,
+                    message: 'No previous post link found on page'
+                };
+            }
+            
+        } catch (error) {
+            console.error('❌ Error in previous navigation test:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Simulate next post navigation for testing
+     */
+    async simulateNextNavigation() {
+        try {
+            console.log('🧪 Testing next post navigation...');
+            
+            // Look for next post links
+            const nextSelectors = [
+                'a[rel="next"]',
+                '.next-post',
+                '.next-post',
+                '.nav-next',
+                '.pagination-next',
+                '.post-navigation .next',
+                'a:contains("Next")',
+                'a:contains("→")',
+                'a:contains("&rarr;")'
+            ];
+            
+            let nextLink = null;
+            for (const selector of nextSelectors) {
+                try {
+                    if (selector.includes(':contains')) {
+                        // Handle text-based selectors
+                        const links = document.querySelectorAll('a');
+                        for (const link of links) {
+                            if (link.textContent.toLowerCase().includes('next') ||
+                                link.textContent.includes('→')) {
+                                nextLink = link;
+                                break;
+                            }
+                        }
+                    } else {
+                        nextLink = document.querySelector(selector);
+                    }
+                    if (nextLink) break;
+                } catch (e) {
+                    continue;
+                }
+            }
+            
+            if (nextLink) {
+                const href = nextLink.href;
+                const title = nextLink.textContent.trim();
+                
+                console.log(`✅ Found next post link: ${title} -> ${href}`);
+                console.log(`🚀 Navigating to next post...`);
+                
+                // Simulate click with human-like behavior and navigate
+                await this.simulateHumanClick(nextLink);
+                
+                return {
+                    success: true,
+                    linkFound: true,
+                    href: href,
+                    title: title,
+                    method: 'navigation',
+                    navigating: true
+                };
+            } else {
+                console.log('⚠️ No next post link found');
+                return {
+                    success: false,
+                    linkFound: false,
+                    message: 'No next post link found on page'
+                };
+            }
+            
+        } catch (error) {
+            console.error('❌ Error in next navigation test:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Simulate human-like click behavior and navigate
+     */
+    async simulateHumanClick(element) {
+        try {
+            // Add visual feedback
+            element.style.transition = 'all 0.2s ease';
+            element.style.transform = 'scale(0.95)';
+            element.style.opacity = '0.8';
+            
+            // Wait a bit
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Restore original state
+            element.style.transform = 'scale(1)';
+            element.style.opacity = '1';
+            
+            // Wait a bit more before actual click
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            // Perform actual navigation
+            console.log('🎯 Navigating to:', element.href);
+            
+            // Use window.location for navigation
+            window.location.href = element.href;
+            
+        } catch (error) {
+            console.warn('Error in human click simulation:', error);
+        }
+    }
     
     /**
      * Calculate navigation probability based on page time
@@ -156,7 +566,11 @@ class NavigationSimulator {
         const navigationTypes = [
             'related_content',
             'category', 
+            'next_page',
+            'previous_page',
             'previous_next',
+            'recent_posts',
+            'tags',
             'random',
             'search',
             'back',
@@ -192,7 +606,11 @@ class NavigationSimulator {
         const baseWeights = {
             related_content: 0.05,  // Reduced from 0.15 to 0.05
             category: 0.03,         // Reduced from 0.1 to 0.03
-            previous_next: 0.03,    // Reduced from 0.1 to 0.03
+            next_page: 0.04,        // New: optimized next page navigation
+            previous_page: 0.02,    // New: optimized previous page navigation
+            previous_next: 0.03,    // Reduced from 0.1 to 0.03 (legacy)
+            recent_posts: 0.03,     // New: recent posts navigation
+            tags: 0.02,             // New: tags navigation
             random: 0.02,           // Reduced from 0.05 to 0.02
             search: 0.02,           // Reduced from 0.05 to 0.02
             back: 0.01,             // Reduced from 0.02 to 0.01
@@ -208,28 +626,42 @@ class NavigationSimulator {
                     ...baseWeights,
                     random: 0.05,         // Reduced from 0.15 to 0.05
                     related_content: 0.08, // Reduced from 0.2 to 0.08
-                    category: 0.05        // Reduced from 0.1 to 0.05
+                    category: 0.05,        // Reduced from 0.1 to 0.05
+                    next_page: 0.06,       // New: explorers like to go forward
+                    recent_posts: 0.05,    // New: explorers like recent content
+                    tags: 0.04             // New: explorers like to explore topics
                 };
             case 'researcher':
                 return {
                     ...baseWeights,
                     related_content: 0.08, // Reduced from 0.25 to 0.08
                     category: 0.05,        // Reduced from 0.15 to 0.05
-                    search: 0.03           // Reduced from 0.1 to 0.03
+                    search: 0.03,          // Reduced from 0.1 to 0.03
+                    next_page: 0.05,       // New: researchers follow content sequences
+                    previous_page: 0.03,   // New: researchers also go back to review
+                    recent_posts: 0.04,    // New: researchers check recent content
+                    tags: 0.03             // New: researchers explore topics
                 };
             case 'casual':
                 return {
                     ...baseWeights,
-                    previous_next: 0.05,   // Reduced from 0.2 to 0.05
+                    next_page: 0.06,       // New: casual users prefer next page
+                    previous_next: 0.05,   // Reduced from 0.2 to 0.05 (legacy)
                     back: 0.03,            // Reduced from 0.1 to 0.03
-                    random: 0.03           // Reduced from 0.1 to 0.03
+                    random: 0.03,          // Reduced from 0.1 to 0.03
+                    recent_posts: 0.04,    // New: casual users like recent content
+                    tags: 0.02             // New: casual users occasionally explore tags
                 };
             case 'professional':
                 return {
                     ...baseWeights,
                     related_content: 0.08, // Reduced from 0.2 to 0.08
                     category: 0.05,        // Reduced from 0.15 to 0.05
-                    search: 0.03           // Reduced from 0.1 to 0.03
+                    search: 0.03,          // Reduced from 0.1 to 0.03
+                    next_page: 0.05,       // New: professionals follow structured content
+                    previous_page: 0.02,   // New: minimal back navigation
+                    recent_posts: 0.03,    // New: professionals check recent content
+                    tags: 0.02             // New: professionals occasionally explore topics
                 };
             default:
                 return baseWeights;
@@ -341,38 +773,143 @@ class NavigationSimulator {
     }
 
     /**
+     * Navigate to recent posts
+     */
+    async navigateToRecentPosts() {
+        try {
+            console.log('🧭 Searching for recent posts links...');
+            const recentPostsLinks = this.findRecentPostsLinks();
+            console.log(`🧭 Found ${recentPostsLinks.length} recent posts links`);
+            
+            if (recentPostsLinks.length > 0) {
+                const selectedLink = this.selectBestLink(recentPostsLinks);
+                console.log(`🧭 Selected recent post link: ${selectedLink.href}`);
+                const success = await this.clickLink(selectedLink);
+                console.log(`🧭 Recent post link click ${success ? 'successful' : 'failed'}`);
+            } else {
+                console.log('🧭 No recent posts links found, trying random navigation...');
+                // Fallback to random navigation
+                await this.navigateRandomPage();
+            }
+        } catch (error) {
+            // Silent error handling for stealth
+            console.warn('🧭 Recent posts navigation error:', error.message);
+        }
+    }
+
+    /**
+     * Navigate to tags
+     */
+    async navigateToTags() {
+        try {
+            console.log('🧭 Searching for tags links...');
+            const tagsLinks = this.findTagsLinks();
+            console.log(`🧭 Found ${tagsLinks.length} tags links`);
+            
+            if (tagsLinks.length > 0) {
+                const selectedLink = this.selectBestLink(tagsLinks);
+                console.log(`🧭 Selected tag link: ${selectedLink.href}`);
+                const success = await this.clickLink(selectedLink);
+                console.log(`🧭 Tag link click ${success ? 'successful' : 'failed'}`);
+            } else {
+                console.log('🧭 No tags links found, trying random navigation...');
+                // Fallback to random navigation
+                await this.navigateRandomPage();
+            }
+        } catch (error) {
+            // Silent error handling for stealth
+            console.warn('🧭 Tags navigation error:', error.message);
+        }
+    }
+
+    /**
      * Find category links
      */
     findCategoryLinks() {
         const links = [];
         const selectors = [
-            'a[href*="category"]',
-            'a[href*="cat"]',
-            'a[href*="tag"]',
-            'a[href*="section"]',
-            'a[href*="topic"]',
-            'a[href*="subject"]',
-            'a[href*="department"]',
-            'a[href*="genre"]',
-            'nav a',
+            // WordPress-specific selectors (highest priority)
+            '.menu-item.menu-item-type-taxonomy.menu-item-object-category a',
+            '.menu-item-object-category a',
+            '.menu-item-type-taxonomy a',
+            '.main-navigation .menu-item-object-category a',
+            '.primary-menu .menu-item-object-category a',
+            '.secondary-menu .menu-item-object-category a',
+            '.header-menu .menu-item-object-category a',
+            '.footer-menu .menu-item-object-category a',
+            '#main-menu .menu-item-object-category a',
+            '#primary-menu .menu-item-object-category a',
+            '#secondary-menu .menu-item-object-category a',
+            '#header-menu .menu-item-object-category a',
+            '#footer-menu .menu-item-object-category a',
+            
+            // Theme-specific selectors (medium priority)
+            '.jeg_menu .menu-item-object-category a',
+            '.jeg_main_menu .menu-item-object-category a',
+            '.jeg_nav_item .menu-item-object-category a',
+            '.jeg_mainmenu_wrap .menu-item-object-category a',
+            '#menu-home .menu-item-object-category a',
+            '.sf-menu .menu-item-object-category a',
+            '.menu .menu-item-object-category a',
+            '.main-menu .menu-item-object-category a',
+            '.primary-menu .menu-item-object-category a',
+            '.navigation .menu-item-object-category a',
+            '.nav-menu .menu-item-object-category a',
+            '.header-menu .menu-item-object-category a',
+            '.footer-menu .menu-item-object-category a',
+            
+            // URL pattern selectors (low priority)
+            'a[href*="/category/"]',
+            'a[href*="/cat/"]',
+            'a[href*="/categories/"]',
+            'a[href*="/section/"]',
+            'a[href*="/sections/"]',
+            'a[href*="/topic/"]',
+            'a[href*="/topics/"]',
+            'a[href*="/subject/"]',
+            'a[href*="/subjects/"]',
+            'a[href*="/department/"]',
+            'a[href*="/departments/"]',
+            'a[href*="/genre/"]',
+            'a[href*="/genres/"]',
+            'a[href*="/bisnis/"]',
+            'a[href*="/pendidikan/"]',
+            'a[href*="/teknologi/"]',
+            'a[href*="/tutorial/"]',
+            'a[href*="/komputer/"]',
+            'a[href*="/smartphone/"]',
+            'a[href*="/laptop/"]',
+            'a[href*="/kamera/"]',
+            'a[href*="/blog/"]',
+            
+            // Generic selectors (last resort)
+            'nav a[href*="category"]',
+            '.navigation a[href*="category"]',
+            '.menu a[href*="category"]',
+            '.main-menu a[href*="category"]',
+            '.primary-menu a[href*="category"]',
+            '.secondary-menu a[href*="category"]',
+            '.sidebar-menu a[href*="category"]',
+            '.footer-menu a[href*="category"]',
             '.category a',
             '.categories a',
-            '.tag a',
-            '.tags a',
+            '.cat a',
+            '.cats a',
             '.section a',
             '.sections a',
             '.topic a',
             '.topics a',
             '.subject a',
             '.subjects a',
-            '.navigation a',
-            '.menu a',
-            '.main-menu a',
-            '.primary-menu a',
-            '.secondary-menu a',
-            '.sidebar-menu a',
-            '.footer-menu a',
-            'ul.menu a',
+            '.department a',
+            '.departments a',
+            '.genre a',
+            '.genres a',
+            'ul.menu a[href*="category"]',
+            'ul.navigation a[href*="category"]',
+            'ul.categories a',
+            'ul.category-list a',
+            'ul.category-menu a',
             '.categories-menu a',
             '.tag-cloud a'
         ];
@@ -390,148 +927,268 @@ class NavigationSimulator {
     }
 
     /**
-     * Navigate to previous/next page
+     * Find recent posts links based on sample HTML analysis
      */
-    async navigatePreviousNext() {
-        try {
-        const prevNextLinks = this.findPreviousNextLinks();
+    findRecentPostsLinks() {
+        const links = [];
+        const selectors = [
+            // WordPress patterns
+            '.wp-block-latest-posts__post-title',
+            '.wp-block-latest-posts__list a',
+            '.wp-block-latest-posts a',
+            
+            // Cekmedia.com patterns
+            '.widget.widget_block .wp-block-latest-posts__post-title',
+            '#block-3 .wp-block-latest-posts__post-title',
+            
+            // Pintar.cekmedia.com patterns
+            '.bs-widget.widget_block .wp-block-latest-posts__post-title',
+            
+            // Pengajartekno.co.id patterns
+            '.gb-headline a', '.limit-title a', '.gb-headline-text a',
+            '.gb-query-loop-item a', '.gb-grid-column a',
+            
+            // Generic patterns
+            '.recent-posts a', '.latest-posts a', '.widget a',
+            'h2:contains("Recent Posts") + ul a',
+            'h2:contains("Latest Post") + div a',
+            '.sidebar .recent-posts a',
+            '.widget_recent_entries a',
+            '.latest-posts-widget a'
+        ];
         
-        if (prevNextLinks.length > 0) {
-                // Prefer next over previous (more natural behavior)
-                const nextLinks = prevNextLinks.filter(link => {
-                    const text = link.textContent.toLowerCase();
-                    const href = link.href.toLowerCase();
-                    return text.includes('next') || 
-                           text.includes('newer') || 
-                           href.includes('next') || 
-                           text.includes('→') || 
-                           text.includes('›') ||
-                           text.includes('>');
+        selectors.forEach(selector => {
+            try {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(element => {
+                    if (this.isValidLink(element)) {
+                        links.push(element);
+                    }
                 });
-                
-                let selectedLink;
-                if (nextLinks.length > 0) {
-                    // Prefer next links
-                    selectedLink = this.selectBestLink(nextLinks);
-        } else {
-                    // Fallback to any navigation link
-                    selectedLink = this.selectBestLink(prevNextLinks);
-                }
-                
+            } catch (error) {
+                // Skip invalid selectors
+                console.debug(`Invalid selector: ${selector}`);
+            }
+        });
+        
+        return links;
+    }
+
+    /**
+     * Find tags links based on sample HTML analysis
+     */
+    findTagsLinks() {
+        const links = [];
+        const selectors = [
+            // Standard patterns
+            'a[rel="tag"]',
+            
+            // Cekmedia.com patterns
+            '.jeg_post_tags a[rel="tag"]',
+            
+            // Pintar.cekmedia.com patterns
+            '.blogus-tags a', '.tag-links a',
+            
+            // Generic patterns
+            'a[href*="/tag/"]', 'a[href*="/tags/"]',
+            '.post-tags a', '.article-tags a',
+            '.tags a', '.tag-cloud a',
+            '.post-tag a', '.entry-tags a',
+            '.meta-tags a', '.content-tags a'
+        ];
+        
+        selectors.forEach(selector => {
+            try {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(element => {
+                    if (this.isValidLink(element)) {
+                        links.push(element);
+                    }
+                });
+            } catch (error) {
+                // Skip invalid selectors
+                console.debug(`Invalid selector: ${selector}`);
+            }
+        });
+        
+        return links;
+    }
+
+    /**
+     * Navigate to next page using optimized selectors
+     */
+    async navigateToNextPage() {
+        try {
+            const nextLinks = this.findNextPageLinks();
+            
+            if (nextLinks.length > 0) {
+                const selectedLink = this.selectBestLink(nextLinks);
                 if (selectedLink) {
                     await this.clickLink(selectedLink);
                     return true;
                 }
             }
             
-            // Fallback to back navigation
+            return false;
+        } catch (error) {
+            console.warn('Next page navigation error:', error.message);
+            return false;
+        }
+    }
+    
+    /**
+     * Navigate to previous page using optimized selectors
+     */
+    async navigateToPreviousPage() {
+        try {
+            const prevLinks = this.findPreviousPageLinks();
+            
+            if (prevLinks.length > 0) {
+                const selectedLink = this.selectBestLink(prevLinks);
+                if (selectedLink) {
+                    await this.clickLink(selectedLink);
+                    return true;
+                }
+            }
+            
+            return false;
+        } catch (error) {
+            console.warn('Previous page navigation error:', error.message);
+            return false;
+        }
+    }
+    
+    /**
+     * Navigate to previous/next page (legacy function for backward compatibility)
+     */
+    async navigatePreviousNext() {
+        try {
+            // Try next page first (more natural behavior)
+            const nextSuccess = await this.navigateToNextPage();
+            if (nextSuccess) {
+                return true;
+            }
+            
+            // Fallback to previous page
+            const prevSuccess = await this.navigateToPreviousPage();
+            if (prevSuccess) {
+                return true;
+            }
+            
+            // Final fallback to back navigation
             await this.navigateBack();
             return false;
         } catch (error) {
-            // Silent error handling for stealth
             console.warn('Previous/Next navigation error:', error.message);
             return false;
         }
     }
 
     /**
-     * Find previous/next links
+     * Find next page links using optimized selectors
      */
-    findPreviousNextLinks() {
+    findNextPageLinks() {
         const links = [];
-        const selectors = [
-            // Standard pagination selectors
-            'a[rel="prev"]',
+        const nextSelectors = [
+            // Standard selectors
             'a[rel="next"]',
-            'a[href*="prev"]',
-            'a[href*="next"]',
-            'a[href*="previous"]',
-            'a[href*="page"]',
-            'a[href*="p="]',
             
-            // CSS class selectors
-            '.prev a',
-            '.next a',
-            '.previous a',
-            '.pagination a',
-            '.nav-prev a',
+            // Cekmedia.com patterns
+            '.next-post', '.post.next-post',
+            '.jeg_prevnext_post .next-post',
+            
+            // Pintar.cekmedia.com patterns
             '.nav-next a',
-            '.nav-previous a',
-            '.pagination-prev a',
-            '.pagination-next a',
-            '.post-navigation a',
-            '.article-navigation a',
-            '.content-navigation a',
+            '.navigation.post-navigation .nav-next a',
+            '.nav-links .nav-next a',
             
-            // WordPress specific
-            '.nav-previous a',
-            '.nav-next a',
-            '.post-navigation a',
-            '.navigation a',
+            // Pengajartekno.co.id patterns
+            '.post-navigation-link-next a',
+            '.wp-block-post-navigation-link a[rel="next"]',
+            '#Post-Nav .post-navigation-link-next a',
             
-            // Bootstrap and other frameworks
-            '.pagination .prev a',
-            '.pagination .next a',
-            '.pagination .previous a',
-            '.pagination .page-item a',
-            
-            // Custom selectors
-            '[data-nav="prev"] a',
-            '[data-nav="next"] a',
-            '.navigation-prev a',
-            '.navigation-next a',
-            
-            // Text-based detection
-            'a:contains("Previous")',
-            'a:contains("Next")',
-            'a:contains("Older")',
-            'a:contains("Newer")',
-            'a:contains("←")',
-            'a:contains("→")',
-            'a:contains("‹")',
-            'a:contains("›")'
+            // Generic patterns
+            '.next', '.next-page',
+            '.pagination .next', '.page-nav .next',
+            '.post-navigation a[rel="next"]',
+            '.article-navigation a[rel="next"]',
+            '.navigation .next', '.nav .next'
         ];
         
-        selectors.forEach(selector => {
+        nextSelectors.forEach(selector => {
             try {
-            const elements = document.querySelectorAll(selector);
-            elements.forEach(element => {
-                if (this.isValidLink(element)) {
-                    links.push(element);
-                }
-            });
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(element => {
+                    // Handle both direct links and links within elements
+                    const link = element.tagName === 'A' ? element : element.querySelector('a');
+                    if (link && this.isValidLink(link)) {
+                        links.push(link);
+                    }
+                });
             } catch (error) {
                 // Silent error handling for stealth
             }
         });
         
-        // Additional text-based detection for links containing navigation keywords
-        const allLinks = document.querySelectorAll('a[href]');
-        const navigationKeywords = ['previous', 'next', 'older', 'newer', 'prev', 'next'];
-        const navigationSymbols = ['←', '→', '‹', '›', '<', '>'];
+        return links;
+    }
+    
+    /**
+     * Find previous page links using optimized selectors
+     */
+    findPreviousPageLinks() {
+        const links = [];
+        const prevSelectors = [
+            // Standard selectors
+            'a[rel="prev"]',
+            
+            // Cekmedia.com patterns
+            '.prev-post', '.post.prev-post',
+            '.jeg_prevnext_post .prev-post',
+            
+            // Pintar.cekmedia.com patterns
+            '.nav-previous a',
+            '.navigation.post-navigation .nav-previous a',
+            '.nav-links .nav-previous a',
+            
+            // Pengajartekno.co.id patterns
+            '.post-navigation-link-previous a',
+            '.wp-block-post-navigation-link a[rel="prev"]',
+            '#Post-Nav .post-navigation-link-previous a',
+            
+            // Generic patterns
+            '.prev', '.previous', '.previous-page',
+            '.pagination .prev', '.page-nav .prev',
+            '.post-navigation a[rel="prev"]',
+            '.article-navigation a[rel="prev"]',
+            '.navigation .prev', '.nav .prev'
+        ];
         
-        allLinks.forEach(link => {
-            if (this.isValidLink(link)) {
-                const text = link.textContent.toLowerCase().trim();
-                const href = link.href.toLowerCase();
-                
-                // Check for navigation keywords in text or href
-                const hasKeyword = navigationKeywords.some(keyword => 
-                    text.includes(keyword) || href.includes(keyword)
-                );
-                
-                // Check for navigation symbols
-                const hasSymbol = navigationSymbols.some(symbol => 
-                    link.textContent.includes(symbol)
-                );
-                
-                if (hasKeyword || hasSymbol) {
-                    links.push(link);
-                }
+        prevSelectors.forEach(selector => {
+            try {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(element => {
+                    // Handle both direct links and links within elements
+                    const link = element.tagName === 'A' ? element : element.querySelector('a');
+                    if (link && this.isValidLink(link)) {
+                        links.push(link);
+                    }
+                });
+            } catch (error) {
+                // Silent error handling for stealth
             }
         });
         
         return links;
+    }
+    
+    /**
+     * Find previous/next links (legacy function for backward compatibility)
+     */
+    findPreviousNextLinks() {
+        const nextLinks = this.findNextPageLinks();
+        const prevLinks = this.findPreviousPageLinks();
+        return [...nextLinks, ...prevLinks];
     }
 
     /**
@@ -564,10 +1221,11 @@ class NavigationSimulator {
         if (legalLinks.length > 0) {
             const selectedLink = this.selectBestLink(legalLinks);
             await this.clickLink(selectedLink);
-        } else {
-            // Fallback to random navigation
-            await this.navigateRandomPage();
-        }
+        } 
+        // else {
+        //     // Fallback to random navigation
+        //     await this.navigateRandomPage();
+        // }
     }
 
     /**
@@ -576,27 +1234,27 @@ class NavigationSimulator {
     findLegalLinks() {
         const links = [];
         const selectors = [
+            // WordPress standard page links
             'a[href*="about"]',
             'a[href*="contact"]',
-            'a[href*="privacy"]',
-            'a[href*="terms"]',
-            'a[href*="disclaimer"]',
-            'a[href*="faq"]',
-            'a[href*="help"]',
-            'a[href*="support"]',
-            'a[href*="legal"]',
-            'a[href*="policy"]',
-            'a[href*="cookies"]',
-            'a[href*="sitemap"]',
+            
+            // WordPress standard CSS classes
             '.about a',
             '.contact a',
-            '.privacy a',
-            '.terms a',
-            '.legal a',
-            '.footer a',
-            '.footer-links a',
-            '.legal-links a',
-            '.info-links a'
+            
+            // WordPress specific selectors
+            '.menu-item a[href*="about"]',
+            '.menu-item a[href*="contact"]',
+            '.wp-block-navigation a[href*="about"]',
+            '.wp-block-navigation a[href*="contact"]',
+            
+            // WordPress footer selectors
+            '.site-footer a[href*="about"]',
+            '.site-footer a[href*="contact"]',
+            
+            // WordPress widget selectors
+            '.widget a[href*="about"]',
+            '.widget a[href*="contact"]',
         ];
         
         selectors.forEach(selector => {
@@ -948,28 +1606,6 @@ class NavigationSimulator {
             // URL patterns
             '/category/',
             '/tag/',
-            '/blog/',
-            '/news/',
-            '/articles/',
-            '/posts/',
-            '/listing/',
-            '/search',
-            '?cat=',
-            '?category=',
-            '?tag=',
-            '?section=',
-            
-            // Page title patterns
-            'category:',
-            'tag:',
-            'blog',
-            'news',
-            'articles',
-            'posts',
-            'listing',
-            'search results',
-            'archives',
-            'all posts'
         ];
         
         // Check URL patterns
@@ -1173,9 +1809,18 @@ class NavigationSimulator {
         }
 
         try {
+            // Highlight the element before clicking
+            this.highlightElement(element);
+            
+            // Show highlight for a moment before clicking
+            await this.delay(1000);
+
             // Use behavior simulator if available
             if (this.behaviorSimulator && typeof this.behaviorSimulator.simulateNaturalClick === 'function') {
-                return await this.behaviorSimulator.simulateNaturalClick(element);
+                const result = await this.behaviorSimulator.simulateNaturalClick(element);
+                // Remove highlight after click
+                this.removeHighlight(element);
+                return result;
             }
 
             // Fallback to direct click
@@ -1203,9 +1848,14 @@ class NavigationSimulator {
             // Record navigation
             this.recordNavigation(element.href, 'click');
 
+            // Remove highlight after click
+            this.removeHighlight(element);
+
             return true;
         } catch (error) {
             console.warn('Link click failed:', error.message);
+            // Remove highlight on error
+            this.removeHighlight(element);
             return false;
         }
     }

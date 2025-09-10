@@ -338,8 +338,6 @@ if (typeof module !== 'undefined' && module.exports) {
     // Use stealth naming to avoid detection and ensure immediate availability
     window._stealth_delay = StealthDelay;
     
-    // Also export as a global function for immediate access
-    if (typeof window.StealthDelay === 'undefined') {
-        window.StealthDelay = StealthDelay;
-    }
+    // Always export as StealthDelay for module loading
+    window.StealthDelay = StealthDelay;
 }

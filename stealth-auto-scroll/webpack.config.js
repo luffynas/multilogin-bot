@@ -8,7 +8,14 @@ module.exports = {
     background: './src/background.js',
     bootstrap: './src/bootstrap.js',
     inpage: './src/inpage.js',
-    popup: './src/popup.js'
+    popup: './src/popup.js',
+    // Reader Variant System modules
+    'content-analyzer': './src/modules/content-analyzer.js',
+    'intent-analyzer': './src/modules/intent-analyzer.js',
+    'variant-predictor': './src/modules/variant-predictor.js',
+    'adaptive-behavior': './src/modules/adaptive-behavior.js',
+    'reader-variant-system': './src/modules/reader-variant-system.js',
+    'scroll-behavior': './src/modules/scroll-behavior.js'
   },
   output: {
     path: path.resolve(__dirname, 'dist'),

@@ -226,8 +226,6 @@ if (typeof module !== 'undefined' && module.exports) {
     // Use stealth naming to avoid detection and ensure immediate availability
     window._stealth_storage = StealthStorage;
     
-    // Also export as a global function for immediate access
-    if (typeof window.StealthStorage === 'undefined') {
-        window.StealthStorage = StealthStorage;
-    }
+    // Always export as StealthStorage for module loading
+    window.StealthStorage = StealthStorage;
 }

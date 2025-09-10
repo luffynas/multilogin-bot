@@ -2,12 +2,13 @@ class DynamicAdaptationEngine {
     constructor() {
         this.adaptationConfig = {
             enabled: true,
-            adaptationInterval: 60000, // 1 minute
+            adaptationInterval: 300000, // 5 minutes (increased from 1 minute)
+            adaptationCooldown: 120000, // 2 minutes cooldown between adaptations
             riskThresholds: {
-                critical: 80,
-                high: 60,
-                medium: 40,
-                low: 20,
+                critical: 120, // Increased from 80
+                high: 90,      // Increased from 60
+                medium: 60,    // Increased from 40
+                low: 30,       // Increased from 20
                 minimal: 0
             },
             adaptationStrategies: {
@@ -16,7 +17,9 @@ class DynamicAdaptationEngine {
                 medium: 'moderate',
                 low: 'light',
                 minimal: 'monitoring'
-            }
+            },
+            maxAdaptationsPerSession: 3, // Limit adaptations per session
+            adaptationHistoryLimit: 10    // Keep only last 10 adaptations
         };
         
         this.currentContext = {
@@ -31,6 +34,8 @@ class DynamicAdaptationEngine {
         };
         
         this.adaptationHistory = [];
+        this.sessionAdaptations = 0; // Track adaptations per session
+        this.lastAdaptationTime = 0; // Track last adaptation time for cooldown
         this.behaviorModifiers = {
             clickProbability: 1.0,
             navigationFrequency: 1.0,
@@ -137,19 +142,19 @@ class DynamicAdaptationEngine {
         riskFactors.forEach(factor => {
             switch (factor.type) {
                 case 'high_ctr':
-                    riskScore += 20;
+                    riskScore += 8; // Reduced from 20
                     break;
                 case 'rapid_navigation':
-                    riskScore += 15;
+                    riskScore += 6; // Reduced from 15
                     break;
                 case 'consistent_timing':
-                    riskScore += 25;
+                    riskScore += 10; // Reduced from 25
                     break;
                 case 'excessive_clicks':
-                    riskScore += 30;
+                    riskScore += 12; // Reduced from 30
                     break;
                 case 'unnatural_patterns':
-                    riskScore += 35;
+                    riskScore += 15; // Reduced from 35
                     break;
             }
         });
@@ -164,25 +169,25 @@ class DynamicAdaptationEngine {
     calculateContextRisk() {
         let risk = 0;
         
-        // Website-specific risk
+        // Website-specific risk (reduced)
         const highRiskSites = ['google.com', 'facebook.com', 'youtube.com', 'amazon.com'];
         if (highRiskSites.includes(this.currentContext.website)) {
-            risk += 10;
+            risk += 3; // Reduced from 10
         }
         
-        // Time-based risk
+        // Time-based risk (reduced)
         if (this.currentContext.timeOfDay === 'night') {
-            risk += 5; // Lower activity expected
+            risk += 2; // Reduced from 5
         }
         
-        // Session duration risk
+        // Session duration risk (reduced)
         if (this.currentContext.sessionDuration > 3600000) { // > 1 hour
-            risk += 10;
+            risk += 3; // Reduced from 10
         }
         
-        // Page type risk
+        // Page type risk (reduced)
         if (this.currentContext.pageType === 'search') {
-            risk += 5; // Search pages are more monitored
+            risk += 2; // Reduced from 5
         }
         
         return risk;
@@ -199,6 +204,17 @@ class DynamicAdaptationEngine {
     }
 
     adaptBehavior() {
+        // Check cooldown period
+        const now = Date.now();
+        if (now - this.lastAdaptationTime < this.adaptationConfig.adaptationCooldown) {
+            return; // Skip adaptation due to cooldown
+        }
+        
+        // Check session adaptation limit
+        if (this.sessionAdaptations >= this.adaptationConfig.maxAdaptationsPerSession) {
+            return; // Skip adaptation due to session limit
+        }
+        
         const strategy = this.getAdaptationStrategy();
         
         // Apply behavior modifications
@@ -213,12 +229,14 @@ class DynamicAdaptationEngine {
         // Apply context-specific adaptations
         this.applyContextAdaptations();
         
-        // Update current context
-        this.currentContext.lastAdaptation = Date.now();
+        // Update tracking variables
+        this.currentContext.lastAdaptation = now;
+        this.lastAdaptationTime = now;
+        this.sessionAdaptations++;
         
-        // Log adaptation for debugging
-        if (this.currentContext.riskLevel !== 'minimal') {
-            console.log(`🔄 Adaptation applied: ${this.currentContext.adaptationLevel} (Risk: ${this.currentContext.riskLevel})`);
+        // Log adaptation for debugging (only for significant changes)
+        if (this.currentContext.riskLevel !== 'minimal' && this.currentContext.riskLevel !== 'low') {
+            console.log(`🔄 Adaptation applied: ${this.currentContext.adaptationLevel} (Risk: ${this.currentContext.riskLevel}) [${this.sessionAdaptations}/${this.adaptationConfig.maxAdaptationsPerSession}]`);
         }
     }
 
@@ -227,32 +245,32 @@ class DynamicAdaptationEngine {
         
         const strategies = {
             emergency: {
-                clickProbability: 0.3, // Drastically reduce clicks
-                navigationFrequency: 0.2, // Minimal navigation
-                readingSpeed: 1.5, // Faster reading
-                interactionDelay: 2.0, // Much longer delays
-                stealthLevel: 2.0 // Maximum stealth
+                clickProbability: 0.4, // Less drastic reduction (was 0.3)
+                navigationFrequency: 0.3, // Less minimal (was 0.2)
+                readingSpeed: 1.3, // Less faster (was 1.5)
+                interactionDelay: 1.8, // Less longer delays (was 2.0)
+                stealthLevel: 1.8 // Less maximum stealth (was 2.0)
             },
             aggressive: {
-                clickProbability: 0.5,
-                navigationFrequency: 0.4,
-                readingSpeed: 1.3,
-                interactionDelay: 1.5,
-                stealthLevel: 1.5
+                clickProbability: 0.7, // Less aggressive (was 0.5)
+                navigationFrequency: 0.6, // Less aggressive (was 0.4)
+                readingSpeed: 1.2, // Less aggressive (was 1.3)
+                interactionDelay: 1.3, // Less aggressive (was 1.5)
+                stealthLevel: 1.3 // Less aggressive (was 1.5)
             },
             moderate: {
-                clickProbability: 0.7,
-                navigationFrequency: 0.6,
-                readingSpeed: 1.1,
-                interactionDelay: 1.2,
-                stealthLevel: 1.2
+                clickProbability: 0.8, // Less moderate (was 0.7)
+                navigationFrequency: 0.7, // Less moderate (was 0.6)
+                readingSpeed: 1.1, // Same
+                interactionDelay: 1.1, // Less moderate (was 1.2)
+                stealthLevel: 1.1 // Less moderate (was 1.2)
             },
             light: {
-                clickProbability: 0.9,
-                navigationFrequency: 0.8,
-                readingSpeed: 1.0,
-                interactionDelay: 1.1,
-                stealthLevel: 1.1
+                clickProbability: 0.95, // Less light (was 0.9)
+                navigationFrequency: 0.9, // Less light (was 0.8)
+                readingSpeed: 1.0, // Same
+                interactionDelay: 1.05, // Less light (was 1.1)
+                stealthLevel: 1.05 // Less light (was 1.1)
             },
             monitoring: {
                 clickProbability: 1.0,
@@ -493,6 +511,25 @@ class DynamicAdaptationEngine {
         }
         
         return recommendations;
+    }
+
+    // Reset session adaptations (call when starting new session)
+    resetSessionAdaptations() {
+        this.sessionAdaptations = 0;
+        this.lastAdaptationTime = 0;
+        this.adaptationHistory = this.adaptationHistory.slice(-this.adaptationConfig.adaptationHistoryLimit);
+    }
+
+    // Get adaptation statistics
+    getAdaptationStats() {
+        return {
+            sessionAdaptations: this.sessionAdaptations,
+            maxAdaptationsPerSession: this.adaptationConfig.maxAdaptationsPerSession,
+            lastAdaptationTime: this.lastAdaptationTime,
+            adaptationHistory: this.adaptationHistory.length,
+            currentRiskLevel: this.currentContext.riskLevel,
+            currentAdaptationLevel: this.currentContext.adaptationLevel
+        };
     }
 
     // Cleanup

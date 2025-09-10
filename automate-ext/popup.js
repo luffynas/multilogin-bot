@@ -110,6 +110,24 @@ class PopupManager {
             this.toggleMetrics();
         });
         
+        // Test navigation buttons
+        document.getElementById('testPreviousBtn').addEventListener('click', () => {
+            this.testPreviousPost();
+        });
+        
+        document.getElementById('testNextBtn').addEventListener('click', () => {
+            this.testNextPost();
+        });
+        
+        // Random ads buttons
+        document.getElementById('clickRandomAdsBtn').addEventListener('click', () => {
+            this.clickRandomAds();
+        });
+        
+        document.getElementById('detectAdsBtn').addEventListener('click', () => {
+            this.detectAds();
+        });
+        
         // Footer links
         document.getElementById('settingsLink').addEventListener('click', (e) => {
             e.preventDefault();
@@ -136,21 +154,22 @@ class PopupManager {
             
             if (response.status === 'success') {
                 this.status = response.data;
+                console.log('Status updated from content script:', this.status);
             } else {
                 throw new Error(response.message || 'Failed to get status');
             }
             
         } catch (error) {
             console.error('Failed to update status:', error);
-            // Set default status
+            // Set default status but preserve existing values
             this.status = {
                 isInitialized: false,
                 isRunning: false,
-                config: {},
-                personality: null,
-                session: null,
-                stealth: null,
-                adsense: null
+                config: this.status.config || {},
+                personality: this.status.personality || null,
+                session: this.status.session || null,
+                stealth: this.status.stealth || null,
+                adsense: this.status.adsense || null
             };
         }
     }
@@ -159,11 +178,20 @@ class PopupManager {
      * Update UI based on current status
      */
     updateUI() {
-        // Update status indicator
+        // Update status indicator with more detailed logic
         if (this.status.isInitialized) {
-            this.updateStatusUI('online', 'Ready');
+            if (this.status.isRunning) {
+                this.updateStatusUI('online', 'Running');
+            } else {
+                this.updateStatusUI('warning', 'Ready (Stopped)');
+            }
         } else {
-            this.updateStatusUI('error', 'Not initialized');
+            // Check if automation is running despite not being initialized
+            if (this.status.isRunning) {
+                this.updateStatusUI('warning', 'Running (Partial)');
+            } else {
+                this.updateStatusUI('error', 'Not initialized');
+            }
         }
         
         // Update automation status
@@ -198,8 +226,8 @@ class PopupManager {
         const automationText = document.getElementById('automationText');
         const toggleBtn = document.getElementById('toggleBtn');
         
-        // Default to running state
-        const isRunning = this.status.isRunning !== false;
+        // Use actual status from content script
+        const isRunning = this.status.isRunning === true;
         
         if (isRunning) {
             automationText.textContent = 'Running';
@@ -351,29 +379,48 @@ class PopupManager {
     }
 
     /**
-     * Detect ads
+     * Detect ads on page
      */
     async detectAds() {
         try {
             this.showLoading(true);
             
-            const response = await chrome.tabs.sendMessage(this.currentTab.id, { action: 'detectAds' });
+            const response = await chrome.tabs.sendMessage(this.currentTab.id, {
+                action: 'detectAds'
+            });
             
             if (response.status === 'success') {
-                const adsCount = response.data.length;
-                this.showNotification(`Detected ${adsCount} AdSense ads`, 'success');
+                const data = response.data;
+                this.showNotification(`Found ${data.length} ads on this page`, 'info');
+                console.log('Ads detected:', data);
                 
-                // Update stats
-                document.getElementById('adsDetected').textContent = adsCount;
+                // Update stats if element exists
+                const adsDetectedElement = document.getElementById('adsDetected');
+                if (adsDetectedElement) {
+                    adsDetectedElement.textContent = data.length;
+                }
+                
+                // Show detailed ad information in console
+                if (data.length > 0) {
+                    console.log('Ad details:', data.map(ad => ({
+                        selector: ad.selector,
+                        isAdSense: ad.isAdSense,
+                        clickable: ad.clickable,
+                        position: ad.position,
+                        size: ad.size,
+                        category: ad.category,
+                        isHighValue: ad.isHighValue
+                    })));
+                }
             } else {
-                throw new Error(response.message || 'Failed to detect ads');
+                this.showNotification('Failed to detect ads', 'error');
+                console.error('Ads detection error:', response.message);
             }
-            
         } catch (error) {
-            console.error('Failed to detect ads:', error);
+            console.error('Error detecting ads:', error);
             this.showNotification('Failed to detect ads', 'error');
         } finally {
-            this.showLoading(false);
+            this.hideLoading();
         }
     }
 
@@ -514,6 +561,14 @@ class PopupManager {
     }
 
     /**
+     * Hide loading overlay
+     */
+    hideLoading() {
+        const overlay = document.getElementById('loadingOverlay');
+        overlay.classList.remove('show');
+    }
+
+    /**
      * Show notification
      */
     showNotification(message, type = 'info') {
@@ -575,6 +630,117 @@ class PopupManager {
     openAbout() {
         chrome.tabs.create({ url: chrome.runtime.getURL('about.html') });
     }
+
+    /**
+     * Test previous post navigation
+     */
+    async testPreviousPost() {
+        try {
+            this.showLoading(true);
+            
+            const response = await chrome.tabs.sendMessage(this.currentTab.id, {
+                action: 'testNavigation',
+                direction: 'previous'
+            });
+            
+            if (response.status === 'success') {
+                const data = response.data;
+                if (data.navigating) {
+                    this.showNotification('Navigating to previous post...', 'info');
+                    console.log('Previous post navigation:', data);
+                    // Don't hide loading since page will navigate
+                } else if (data.linkFound) {
+                    this.showNotification('Previous post found but navigation failed', 'warning');
+                    console.log('Previous post found:', data);
+                    this.hideLoading();
+                } else {
+                    this.showNotification('No previous post link found on this page', 'warning');
+                    console.log('No previous post found:', data);
+                    this.hideLoading();
+                }
+            } else {
+                this.showNotification('Previous post navigation failed', 'error');
+                console.error('Previous post test error:', response.message);
+                this.hideLoading();
+            }
+        } catch (error) {
+            console.error('Error testing previous post:', error);
+            this.showNotification('Failed to test previous post navigation', 'error');
+            this.hideLoading();
+        }
+    }
+
+    /**
+     * Test next post navigation
+     */
+    async testNextPost() {
+        try {
+            this.showLoading(true);
+            
+            const response = await chrome.tabs.sendMessage(this.currentTab.id, {
+                action: 'testNavigation',
+                direction: 'next'
+            });
+            
+            if (response.status === 'success') {
+                const data = response.data;
+                if (data.navigating) {
+                    this.showNotification('Navigating to next post...', 'info');
+                    console.log('Next post navigation:', data);
+                    // Don't hide loading since page will navigate
+                } else if (data.linkFound) {
+                    this.showNotification('Next post found but navigation failed', 'warning');
+                    console.log('Next post found:', data);
+                    this.hideLoading();
+                } else {
+                    this.showNotification('No next post link found on this page', 'warning');
+                    console.log('No next post found:', data);
+                    this.hideLoading();
+                }
+            } else {
+                this.showNotification('Next post navigation failed', 'error');
+                console.error('Next post test error:', response.message);
+                this.hideLoading();
+            }
+        } catch (error) {
+            console.error('Error testing next post:', error);
+            this.showNotification('Failed to test next post navigation', 'error');
+            this.hideLoading();
+        }
+    }
+
+    /**
+     * Click random ads
+     */
+    async clickRandomAds() {
+        try {
+            this.showLoading(true);
+            
+            const response = await chrome.tabs.sendMessage(this.currentTab.id, {
+                action: 'clickRandomAds'
+            });
+            
+            if (response.status === 'success') {
+                const data = response.data;
+                if (data.adsClicked > 0) {
+                    this.showNotification(`Successfully clicked ${data.adsClicked} random ads`, 'success');
+                    console.log('Random ads click result:', data);
+                } else {
+                    this.showNotification('No ads found to click on this page', 'warning');
+                    console.log('No ads found:', data);
+                }
+            } else {
+                this.showNotification('Failed to click random ads', 'error');
+                console.error('Random ads click error:', response.message);
+            }
+        } catch (error) {
+            console.error('Error clicking random ads:', error);
+            this.showNotification('Failed to click random ads', 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
 }
 
 // Initialize popup when DOM is loaded

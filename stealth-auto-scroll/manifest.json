@@ -40,7 +40,13 @@
     {
       "resources": [
         "bootstrap.bundle.js",
-        "inpage.bundle.js"
+        "inpage.bundle.js",
+        "content-analyzer.bundle.js",
+        "intent-analyzer.bundle.js",
+        "variant-predictor.bundle.js",
+        "adaptive-behavior.bundle.js",
+        "reader-variant-system.bundle.js",
+        "scroll-behavior.bundle.js"
       ],
       "matches": ["<all_urls>"]
     }

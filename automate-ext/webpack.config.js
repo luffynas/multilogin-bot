@@ -4,7 +4,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
-    mode: 'production',
+    mode: 'development',
     entry: {
         // Main scripts
         'content-script': './content-script.js',
@@ -44,7 +44,7 @@ module.exports = {
         ]
     },
     optimization: {
-        minimize: true,
+        minimize: false,
         minimizer: [
             new TerserPlugin({
                 terserOptions: {
@@ -70,10 +70,11 @@ module.exports = {
                             'BackgroundManager', 'AdSenseAutomationPro', 'PersonalityEngine',
                             'AdSenseDetector', 'BehaviorSimulator', 'MouseSimulator',
                             'KeyboardSimulator', 'ReadingSimulator', 'NavigationSimulator',
-                                                    'SessionManager', 'StealthMonitor', 'MLBehaviorEngine',
-                        'AdvancedMousePhysics', 'NetworkTrafficSimulator',
-                        'AdvancedBotEvasion', 'AnalyticsMonitor',
-                        'DynamicAdaptationEngine', 'EnhancedFraudPrevention'
+                            'SessionManager', 'StealthMonitor', 'MLBehaviorEngine',
+                            'AdvancedMousePhysics', 'NetworkTrafficSimulator',
+                            'AdvancedBotEvasion', 'AnalyticsMonitor',
+                            'DynamicAdaptationEngine', 'EnhancedFraudPrevention',
+                            'StealthDelay', 'StealthStorage'
                         ]
                     },
                     format: {

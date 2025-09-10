@@ -24,12 +24,12 @@ class PersonalityEngine {
                 PROFESSIONAL: { min: 60, max: 180 }
             },
             
-            // Click probability ranges
+            // Click probability ranges (increased for better ad interaction)
             CLICK_PROBABILITY: {
-                EXPLORER: 0.12,
-                RESEARCHER: 0.15,
-                CASUAL: 0.08,
-                PROFESSIONAL: 0.10
+                EXPLORER: 0.25,     // Increased from 0.12
+                RESEARCHER: 0.30,   // Increased from 0.15
+                CASUAL: 0.20,       // Increased from 0.08
+                PROFESSIONAL: 0.22  // Increased from 0.10
             },
             
             // Hover probability ranges
@@ -122,7 +122,7 @@ class PersonalityEngine {
                     engagementLevel: 'very_high',       // Very high interaction with content
                     dwellTime: { min: 120, max: 300 },  // 2-5 minutes per page (longer reading)
                     scrollBehavior: 'analytical',       // Pauses to analyze content while scrolling
-                    clickProbability: 0.15,             // 15% chance to click ads (highest among personalities)
+                    clickProbability: 0.30,             // 30% chance to click ads (highest among personalities)
                     hoverProbability: 0.6,              // 60% chance to hover over elements
                     tabSwitching: 'rare',               // Rarely switches tabs, focuses on current content
                     searchBehavior: 'specific'          // Searches for specific, detailed information
@@ -138,7 +138,7 @@ class PersonalityEngine {
                     engagementLevel: 'low',             // Low interaction with content
                     dwellTime: { min: 15, max: 60 },    // 15-60 seconds per page (quick browsing)
                     scrollBehavior: 'quick',            // Fast scrolling, minimal pauses
-                    clickProbability: 0.08,             // 8% chance to click ads (lowest among personalities)
+                    clickProbability: 0.20,             // 20% chance to click ads (lowest among personalities)
                     hoverProbability: 0.4,              // 40% chance to hover over elements
                     tabSwitching: 'moderate',           // Moderate tab switching
                     searchBehavior: 'general'           // Searches for general, popular topics
@@ -154,7 +154,7 @@ class PersonalityEngine {
                     engagementLevel: 'high',            // High interaction with relevant content
                     dwellTime: { min: 60, max: 180 },   // 1-3 minutes per page (focused reading)
                     scrollBehavior: 'methodical',       // Systematic scrolling with purpose
-                    clickProbability: 0.10,             // 10% chance to click ads (moderate)
+                    clickProbability: 0.22,             // 22% chance to click ads (moderate)
                     hoverProbability: 0.5,              // 50% chance to hover over elements
                     tabSwitching: 'strategic',          // Strategic tab switching for efficiency
                     searchBehavior: 'targeted'          // Searches for specific, professional topics

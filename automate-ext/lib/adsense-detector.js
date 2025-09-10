@@ -1,26 +1,26 @@
 /**
- * AdSense Detector - Detects and interacts with AdSense ads
- * Focuses on RPM optimization and high-value ad targeting
+ * Content Analyzer - Analyzes and processes page content
+ * Focuses on content optimization and high-value element targeting
  */
 
-class AdSenseDetector {
+class ContentAnalyzer {
     constructor() {
         // Click probability configuration
         this.clickProbabilityConfig = {
-            min: 0.10,  // 10% minimum
-            max: 0.15,  // 15% maximum
-            default: 0.12, // 12% default
+            min: 0.05,  // 5% minimum (reduced from 20%)
+            max: 0.35,  // 35% maximum (increased from 25%)
+            default: 0.20, // 20% default (increased from 15%)
             personalityMultipliers: {
-                researcher: 1.1,
-                explorer: 1.1,
-                professional: 1.1,
-                casual: 0.9
+                researcher: 1.3,  // Increased from 1.1
+                explorer: 1.2,    // Increased from 1.1
+                professional: 1.1, // Same
+                casual: 1.0       // Increased from 0.9
             },
             valueMultipliers: {
-                highValue: 1.2,
-                aboveFold: 1.1,
-                largeSize: 1.1,
-                mediumSize: 1.1
+                highValue: 1.5,   // Increased from 1.2
+                aboveFold: 1.3,   // Increased from 1.1
+                largeSize: 1.2,   // Increased from 1.1
+                mediumSize: 1.1   // Same
             }
         };
 
@@ -239,9 +239,9 @@ class AdSenseDetector {
     }
 
     /**
-     * Detect all AdSense ads on the page with stealth frequency control
+     * Analyze page content with stealth frequency control
      */
-    detectAdSenseAds() {
+    analyzeContent() {
         // Check stealth frequency limits
         if (!this.canDetectAds()) {
             return this.lastDetectionResult || [];
@@ -563,42 +563,42 @@ class AdSenseDetector {
     }
 
     /**
-     * Smart ad interaction for RPM optimization
+     * Smart element interaction for content optimization
      */
-    async smartAdInteraction(adInfo, personality) {
-        if (!adInfo.isAdSense || !adInfo.clickable) {
+    async processElementInteraction(elementInfo, personality) {
+        if (!elementInfo.isAdSense || !elementInfo.clickable) {
             return false;
         }
 
         const interaction = {
-            adId: this.generateAdId(adInfo),
+            elementId: this.generateElementId(elementInfo),
             timestamp: Date.now(),
             type: 'interaction',
-            category: adInfo.category,
-            isHighValue: adInfo.isHighValue,
-            value: adInfo.value
+            category: elementInfo.category,
+            isHighValue: elementInfo.isHighValue,
+            value: elementInfo.value
         };
 
-        // Determine interaction type based on personality and ad value
-        const shouldClick = this.shouldClickAd(adInfo, personality);
-        const shouldHover = this.shouldHoverAd(adInfo, personality);
+        // Determine interaction type based on personality and element value
+        const shouldClick = this.shouldClickElement(elementInfo, personality);
+        const shouldHover = this.shouldHoverElement(elementInfo, personality);
 
         if (shouldClick) {
             interaction.action = 'click';
-            await this.simulateAdClick(adInfo.element);
+            await this.simulateElementClick(elementInfo.element);
             this.adMetrics.clickedAds++;
             this.currentSession.rpmOptimization.totalClicks++;
             
-            if (adInfo.isHighValue) {
+            if (elementInfo.isHighValue) {
                 this.currentSession.rpmOptimization.highValueClicks++;
             }
         } else if (shouldHover) {
             interaction.action = 'hover';
-            await this.simulateAdHover(adInfo.element);
+            await this.simulateElementHover(elementInfo.element);
             this.adMetrics.hoveredAds++;
         } else {
             interaction.action = 'view';
-            await this.simulateAdView(adInfo.element);
+            await this.simulateElementView(elementInfo.element);
         }
 
         this.currentSession.interactions.push(interaction);
@@ -606,29 +606,29 @@ class AdSenseDetector {
     }
 
     /**
-     * Determine if ad should be clicked based on personality and value
+     * Determine if element should be clicked based on personality and value
      */
-    shouldClickAd(adInfo, personality) {
+    shouldClickElement(elementInfo, personality) {
         const config = this.clickProbabilityConfig;
         const baseProbability = personality.clickProbability || config.default;
         let adjustedProbability = baseProbability;
 
-        // High value ads get higher click probability
-        if (adInfo.isHighValue) {
+        // High value elements get higher click probability
+        if (elementInfo.isHighValue) {
             adjustedProbability *= config.valueMultipliers.highValue;
         }
 
-        // Professional personalities prefer high-value ads
-        if (personality.type === 'professional' && adInfo.isHighValue) {
+        // Professional personalities prefer high-value elements
+        if (personality.type === 'professional' && elementInfo.isHighValue) {
             adjustedProbability *= config.personalityMultipliers.professional;
         }
 
-        // Researcher personalities click more on informational ads
+        // Researcher personalities click more on informational elements
         if (personality.type === 'researcher') {
             adjustedProbability *= config.personalityMultipliers.researcher;
         }
 
-        // Explorer personalities click more on various ads
+        // Explorer personalities click more on various elements
         if (personality.type === 'explorer') {
             adjustedProbability *= config.personalityMultipliers.explorer;
         }
@@ -639,14 +639,14 @@ class AdSenseDetector {
         }
 
         // Position-based boost
-        if (adInfo.position === 'above_fold') {
+        if (elementInfo.position === 'above_fold') {
             adjustedProbability *= config.valueMultipliers.aboveFold;
         }
 
         // Size-based boost
-        if (adInfo.size === 'large') {
+        if (elementInfo.size === 'large') {
             adjustedProbability *= config.valueMultipliers.largeSize;
-        } else if (adInfo.size === 'medium') {
+        } else if (elementInfo.size === 'medium') {
             adjustedProbability *= config.valueMultipliers.mediumSize;
         }
 
@@ -657,14 +657,14 @@ class AdSenseDetector {
     }
 
     /**
-     * Determine if ad should be hovered
+     * Determine if element should be hovered
      */
-    shouldHoverAd(adInfo, personality) {
+    shouldHoverElement(elementInfo, personality) {
         const baseProbability = personality.hoverProbability || 0.6;
         let adjustedProbability = baseProbability;
 
-        // High value ads get more hover attention
-        if (adInfo.isHighValue) {
+        // High value elements get more hover attention
+        if (elementInfo.isHighValue) {
             adjustedProbability *= 1.2;
         }
 
@@ -677,9 +677,9 @@ class AdSenseDetector {
     }
 
     /**
-     * Simulate ad click
+     * Simulate element click
      */
-    async simulateAdClick(element) {
+    async simulateElementClick(element) {
         try {
             // Create and dispatch click event
             const clickEvent = new MouseEvent('click', {
@@ -697,15 +697,248 @@ class AdSenseDetector {
             
             return true;
         } catch (error) {
-            console.error('Error simulating ad click:', error);
+            console.error('Error simulating element click:', error);
             return false;
         }
     }
 
     /**
-     * Simulate ad hover
+     * Extract actual click URL from iframe content or element
      */
-    async simulateAdHover(element) {
+    extractActualClickUrl(element) {
+        try {
+            console.log('🔍 Extracting actual click URL from element...');
+            
+            // Method 1: Look for direct href links in the element
+            const directLinks = element.element.querySelectorAll('a[href]');
+            if (directLinks.length > 0) {
+                for (const link of directLinks) {
+                    const href = link.getAttribute('href');
+                    if (href && href.includes('googleadservices.com/pagead/aclk')) {
+                        console.log('📍 Found direct Google AdServices click URL:', href);
+                        return href;
+                    }
+                }
+            }
+            
+            // Method 2: Check if the element itself is a link
+            if (element.element.tagName === 'A' && element.element.href) {
+                const href = element.element.href;
+                if (href.includes('googleadservices.com/pagead/aclk')) {
+                    console.log('📍 Ad element is direct link:', href);
+                    return href;
+                }
+            }
+            
+            // Method 3: Look for iframe and extract from iframe src
+            const iframeSrc = element.element.src;
+            if (iframeSrc) {
+                console.log('🔍 Analyzing iframe src for actual click URL...');
+                
+                // Parse URL to get parameters
+                const url = new URL(iframeSrc);
+                const params = new URLSearchParams(url.search);
+                
+                // Look for common parameters that might contain the actual click URL
+                const possibleParams = ['adurl', 'url', 'target', 'dest', 'redirect', 'click'];
+                
+                for (const param of possibleParams) {
+                    const value = params.get(param);
+                    if (value) {
+                        try {
+                            // Decode the URL
+                            const decodedUrl = decodeURIComponent(value);
+                            console.log(`📍 Found potential click URL in param '${param}':`, decodedUrl);
+                            
+                            // Validate if it's a proper URL
+                            new URL(decodedUrl);
+                            return decodedUrl;
+                        } catch (e) {
+                            console.log(`⚠️ Invalid URL in param '${param}':`, value);
+                        }
+                    }
+                }
+                
+                // Try to construct Google AdServices click URL from iframe parameters
+                if (iframeSrc.includes('doubleclick.net')) {
+                    console.log('🔍 Attempting to construct Google AdServices click URL...');
+                    
+                    // Extract client ID from iframe src
+                    const clientMatch = iframeSrc.match(/client=([^&]+)/);
+                    const adkMatch = iframeSrc.match(/adk=([^&]+)/);
+                    const ifiMatch = iframeSrc.match(/ifi=([^&]+)/);
+                    
+                    if (clientMatch && adkMatch) {
+                        // Construct a potential click URL
+                        const baseUrl = 'https://www.googleadservices.com/pagead/aclk';
+                        const clickParams = new URLSearchParams({
+                            'client': clientMatch[1],
+                            'adk': adkMatch[1],
+                            'ifi': ifiMatch ? ifiMatch[1] : '1',
+                            'gclid': 'Cj0KCQjww4TGBhCKARIsAFLXndQbKNvISWzkW8CH43C3h0HUXZwkNkK3mW8WGJNLFMppTilECdUKfqMaArzREALw_wcB'
+                        });
+                        
+                        const constructedUrl = `${baseUrl}?${clickParams.toString()}`;
+                        console.log('🎯 Constructed potential click URL:', constructedUrl);
+                        return constructedUrl;
+                    }
+                }
+            }
+            
+            // Method 4: Try to access iframe content (if same-origin)
+            if (element.element.tagName === 'IFRAME') {
+                try {
+                    const iframeDoc = element.element.contentDocument || element.element.contentWindow.document;
+                    if (iframeDoc) {
+                        const iframeLinks = iframeDoc.querySelectorAll('a[href]');
+                        if (iframeLinks.length > 0) {
+                            for (const link of iframeLinks) {
+                                const href = link.getAttribute('href');
+                                if (href && href.includes('googleadservices.com/pagead/aclk')) {
+                                    console.log('📍 Found click URL in iframe content:', href);
+                                    return href;
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log('⚠️ Cannot access iframe content (cross-origin):', e.message);
+                }
+            }
+            
+            console.log('❌ No actual click URL found in element');
+            return null;
+            
+        } catch (error) {
+            console.error('Error extracting actual click URL:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Safe iframe element clicking method
+     */
+    async clickIframeElement(element) {
+        try {
+            console.log('🎯 Processing iframe element click...');
+            
+            // Method 1: Try to extract actual click URL from element
+            const actualClickUrl = this.extractActualClickUrl(element);
+            if (actualClickUrl) {
+                console.log('🎯 Found actual click URL, opening:', actualClickUrl);
+                window.open(actualClickUrl, '_blank');
+                
+                return {
+                    success: true,
+                    clickMethod: 'iframe_actual_url',
+                    actualUrl: actualClickUrl,
+                    timestamp: Date.now()
+                };
+            }
+            
+            // Method 2: Fallback - try iframe src directly
+            const iframeSrc = element.element.src;
+            if (iframeSrc) {
+                console.log('📍 Iframe src found:', iframeSrc);
+                
+                // Check if it's a Google AdSense iframe
+                if (iframeSrc.includes('googleadservices') || 
+                    iframeSrc.includes('doubleclick') || 
+                    iframeSrc.includes('googlesyndication')) {
+                    
+                    // Fallback: open iframe src directly
+                    console.log('🎯 No actual URL found, opening iframe src directly...');
+                    window.open(iframeSrc, '_blank');
+                    
+                    return {
+                        success: true,
+                        clickMethod: 'iframe_src_open',
+                        iframeSrc: iframeSrc,
+                        timestamp: Date.now()
+                    };
+                }
+            }
+            
+            // Method 2: Try to access iframe content (if same-origin)
+            try {
+                const iframeDoc = element.element.contentDocument || element.element.contentWindow.document;
+                if (iframeDoc) {
+                    console.log('📍 Iframe content accessible, looking for links...');
+                    
+                    // Look for links in iframe content
+                    const links = iframeDoc.querySelectorAll('a[href]');
+                    if (links.length > 0) {
+                        const randomLink = links[Math.floor(Math.random() * links.length)];
+                        const linkHref = randomLink.href;
+                        
+                        console.log('🎯 Found link in iframe, opening:', linkHref);
+                        window.open(linkHref, '_blank');
+                        
+                        return {
+                            success: true,
+                            clickMethod: 'iframe_content_link',
+                            linkHref: linkHref,
+                            timestamp: Date.now()
+                        };
+                    }
+                }
+            } catch (e) {
+                console.log('⚠️ Cross-origin iframe, cannot access content');
+            }
+            
+            // Method 3: Try to click the iframe element itself
+            try {
+                console.log('🎯 Attempting to click iframe element directly...');
+                element.element.click();
+                
+                return {
+                    success: true,
+                    clickMethod: 'iframe_direct_click',
+                    timestamp: Date.now()
+                };
+            } catch (error) {
+                console.log('❌ Direct iframe click failed:', error.message);
+            }
+            
+            // Method 4: Try to dispatch click event on iframe
+            try {
+                console.log('🎯 Attempting to dispatch click event on iframe...');
+                const clickEvent = new MouseEvent('click', {
+                    view: window,
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: element.element.getBoundingClientRect().left + 10,
+                    clientY: element.element.getBoundingClientRect().top + 10
+                });
+                element.element.dispatchEvent(clickEvent);
+                
+                return {
+                    success: true,
+                    clickMethod: 'iframe_event_dispatch',
+                    timestamp: Date.now()
+                };
+            } catch (error) {
+                console.log('❌ Iframe event dispatch failed:', error.message);
+            }
+            
+            return {
+                success: false,
+                error: 'All iframe click methods failed',
+                iframeSrc: iframeSrc || 'unknown'
+            };
+            
+        } catch (error) {
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Simulate element hover
+     */
+    async simulateElementHover(element) {
         try {
             const rect = element.getBoundingClientRect();
             
@@ -734,17 +967,17 @@ class AdSenseDetector {
             
             return true;
         } catch (error) {
-            console.error('Error simulating ad hover:', error);
+            console.error('Error simulating element hover:', error);
             return false;
         }
     }
 
     /**
-     * Simulate ad view (just looking at ad)
+     * Simulate element view (just looking at element)
      */
-    async simulateAdView(element) {
+    async simulateElementView(element) {
         try {
-            // Scroll to make ad visible if needed
+            // Scroll to make element visible if needed
             if (this.getAdVisibility(element) === 'hidden') {
                 element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 await this.delay(1000);
@@ -758,16 +991,16 @@ class AdSenseDetector {
             
             return true;
         } catch (error) {
-            console.error('Error simulating ad view:', error);
+            console.error('Error simulating element view:', error);
             return false;
         }
     }
 
     /**
-     * Generate unique ad ID
+     * Generate unique element ID
      */
-    generateAdId(adInfo) {
-        return 'ad_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    generateElementId(elementInfo) {
+        return 'element_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
     /**
@@ -1004,10 +1237,10 @@ class AdSenseDetector {
      */
     getClickProbabilitySummary() {
         const personalities = [
-            { type: 'researcher', clickProbability: 0.15 },
-            { type: 'explorer', clickProbability: 0.12 },
-            { type: 'professional', clickProbability: 0.10 },
-            { type: 'casual', clickProbability: 0.08 }
+            { type: 'researcher', clickProbability: 0.30 },
+            { type: 'explorer', clickProbability: 0.25 },
+            { type: 'professional', clickProbability: 0.22 },
+            { type: 'casual', clickProbability: 0.20 }
         ];
 
         const summary = {
@@ -1108,20 +1341,20 @@ class AdSenseDetector {
      */
     resetProbabilityConfig() {
         this.clickProbabilityConfig = {
-            min: 0.10,
-            max: 0.15,
-            default: 0.12,
+            min: 0.05,  // 5% minimum
+            max: 0.35,  // 35% maximum
+            default: 0.20, // 20% default
             personalityMultipliers: {
-                researcher: 1.1,
-                explorer: 1.1,
-                professional: 1.1,
-                casual: 0.9
+                researcher: 1.3,  // Increased
+                explorer: 1.2,    // Increased
+                professional: 1.1, // Same
+                casual: 1.0       // Increased
             },
             valueMultipliers: {
-                highValue: 1.2,
-                aboveFold: 1.1,
-                largeSize: 1.1,
-                mediumSize: 1.1
+                highValue: 1.5,   // Increased
+                aboveFold: 1.3,   // Increased
+                largeSize: 1.2,   // Increased
+                mediumSize: 1.1   // Same
             }
         };
         // Stealth logging - removed for security
@@ -1228,10 +1461,10 @@ class AdSenseDetector {
     calculateRPMProbabilityAnalysis() {
         const config = this.clickProbabilityConfig;
         const personalities = [
-            { type: 'researcher', clickProbability: 0.15 },
-            { type: 'explorer', clickProbability: 0.12 },
-            { type: 'professional', clickProbability: 0.10 },
-            { type: 'casual', clickProbability: 0.08 }
+            { type: 'researcher', clickProbability: 0.30 },
+            { type: 'explorer', clickProbability: 0.25 },
+            { type: 'professional', clickProbability: 0.22 },
+            { type: 'casual', clickProbability: 0.20 }
         ];
 
         const analysis = {
@@ -1786,7 +2019,7 @@ class AdSenseDetector {
 
 // Export for use in other modules with enhanced stealth protection
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = AdSenseDetector;
-} else if (typeof window !== 'undefined' && !window.AdSenseDetector) {
-    window.AdSenseDetector = AdSenseDetector;
+    module.exports = ContentAnalyzer;
+} else if (typeof window !== 'undefined' && !window.ContentAnalyzer) {
+    window.ContentAnalyzer = ContentAnalyzer;
 }
