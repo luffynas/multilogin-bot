@@ -3,8 +3,11 @@ const TerserPlugin = require('terser-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-module.exports = {
-    mode: 'development',
+module.exports = (env, argv) => {
+    const isProduction = argv.mode === 'production';
+    
+    return {
+        mode: isProduction ? 'production' : 'development',
     entry: {
         // Main scripts
         'content-script': './content-script.js',
@@ -32,24 +35,24 @@ module.exports = {
                                 }
                             }]
                         ],
-                        plugins: [
+                        plugins: isProduction ? [
                             // Remove console.log statements in production
                             ['transform-remove-console', {
                                 exclude: ['error', 'warn']
                             }]
-                        ]
+                        ] : []
                     }
                 }
             }
         ]
     },
     optimization: {
-        minimize: false,
-        minimizer: [
+        minimize: isProduction,
+        minimizer: isProduction ? [
             new TerserPlugin({
                 terserOptions: {
                     compress: {
-                        // Remove console.log, console.info, console.debug
+                        // Remove console.log, console.info, console.debug in production
                         drop_console: true,
                         drop_debugger: true,
                         pure_funcs: ['console.log', 'console.info', 'console.debug'],
@@ -58,17 +61,25 @@ module.exports = {
                         // Remove unused variables
                         unused: true,
                         // Remove unreachable code
-                        passes: 2
+                        passes: 2,
+                        // Additional production optimizations
+                        sequences: true,
+                        conditionals: true,
+                        booleans: true,
+                        loops: true,
+                        if_return: true,
+                        join_vars: true,
+                        side_effects: false
                     },
                     mangle: {
-                        // Mangle variable names for obfuscation
+                        // Mangle variable names for obfuscation in production
                         toplevel: true,
                         reserved: [
                             'chrome', 'window', 'document', 'navigator', 'location',
                             'chrome.runtime', 'chrome.tabs', 'chrome.storage', 
                             'chrome.action', 'chrome.scripting', 'chrome.notifications',
-                            'BackgroundManager', 'AdSenseAutomationPro', 'PersonalityEngine',
-                            'AdSenseDetector', 'BehaviorSimulator', 'MouseSimulator',
+                            'BackgroundManager', 'PageProcessor', 'PersonalityEngine',
+                            'ContentAnalyzer', 'BehaviorSimulator', 'MouseSimulator',
                             'KeyboardSimulator', 'ReadingSimulator', 'NavigationSimulator',
                             'SessionManager', 'StealthMonitor', 'MLBehaviorEngine',
                             'AdvancedMousePhysics', 'NetworkTrafficSimulator',
@@ -78,15 +89,25 @@ module.exports = {
                         ]
                     },
                     format: {
-                        // Remove all comments
-                        comments: false
+                        // Remove all comments in production
+                        comments: false,
+                        // Minimize whitespace
+                        beautify: false
                     }
                 },
                 extractComments: false
             })
-        ],
+        ] : [],
         // Disable code splitting to keep individual files
-        splitChunks: false
+        splitChunks: false,
+        // Production optimizations
+        ...(isProduction && {
+            // Enable tree shaking
+            usedExports: true,
+            providedExports: true,
+            // Optimize module concatenation
+            concatenateModules: true
+        })
     },
     plugins: [
         // Clean dist folder before build
@@ -118,12 +139,14 @@ module.exports = {
     resolve: {
         extensions: ['.js']
     },
-    // Source maps for debugging (optional - can be disabled for production)
-    devtool: false,
+    // Source maps for debugging
+    devtool: isProduction ? false : 'source-map',
     // Performance hints
     performance: {
-        hints: 'warning',
-        maxEntrypointSize: 512000,
-        maxAssetSize: 512000
-    }
+        hints: isProduction ? 'error' : 'warning',
+        maxEntrypointSize: isProduction ? 256000 : 512000, // Stricter limits for production
+        maxAssetSize: isProduction ? 256000 : 512000
+    },
+    
+    };
 };
