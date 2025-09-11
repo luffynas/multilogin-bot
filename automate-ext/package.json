@@ -1,6 +1,6 @@
 {
   "name": "adsense-automation-pro",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Advanced automation extension for AdSense optimization and RPM improvement",
   "main": "content-script.js",
   "scripts": {
