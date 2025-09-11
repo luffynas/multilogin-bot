@@ -649,14 +649,19 @@ class AdvancedBotEvasion {
      */
     overrideKeyboardEvents() {
         const originalKeyEvent = window.KeyboardEvent;
+        const self = this; // Store reference to the class instance
         
         if (originalKeyEvent) {
             window.KeyboardEvent = function(type, init) {
                 const event = new originalKeyEvent(type, init);
                 
                 // Add human-like properties
-                if (this.evasionTechniques.signature) {
-                    this.evasionTechniques.signature.addHumanProperties(event);
+                if (self.evasionTechniques && self.evasionTechniques.signature) {
+                    try {
+                        self.evasionTechniques.signature.addHumanProperties(event);
+                    } catch (error) {
+                        console.debug('Error adding human properties to KeyboardEvent:', error);
+                    }
                 }
                 
                 return event;

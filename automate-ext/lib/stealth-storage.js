@@ -2,7 +2,9 @@
  * Stealth Storage - Secure storage system using localStorage to avoid chrome.storage detection
  */
 
-class StealthStorage {
+// Check if class already exists before declaring
+if (typeof window.StealthStorage === 'undefined') {
+    class StealthStorage {
     constructor() {
         this.prefix = '_stealth_';
         this.encryptionKey = this.generateEncryptionKey();
@@ -360,15 +362,21 @@ class StealthStorage {
             };
         }
     }
-}
+    }
 
-// Export for use in other modules with immediate availability
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = StealthStorage;
-} else if (typeof window !== 'undefined') {
-    // Use stealth naming to avoid detection and ensure immediate availability
-    window._stealth_storage = StealthStorage;
-    
-    // Always export as StealthStorage for module loading
-    window.StealthStorage = StealthStorage;
+    // Export for use in other modules with immediate availability
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = StealthStorage;
+    } else if (typeof window !== 'undefined') {
+        // Use stealth naming to avoid detection and ensure immediate availability
+        window._stealth_storage = StealthStorage;
+        
+        // Only export if not already exists
+        if (!window.StealthStorage) {
+            window.StealthStorage = StealthStorage;
+        }
+    }
+} else {
+    // Use existing class
+    console.debug('StealthStorage already exists, using existing instance');
 }

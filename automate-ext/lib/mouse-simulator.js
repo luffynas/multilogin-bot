@@ -181,25 +181,34 @@ class MouseSimulator {
     }
 
     /**
-     * Calculate variable delay for each step with human-like imperfections
+     * Calculate variable delay for each step with enhanced human-like imperfections
      */
     calculateVariableStepDelay(t, distance, duration, stepIndex, totalSteps) {
-        // Variable base delay (12-20ms for 50-83fps)
-        const baseDelay = 12 + Math.random() * 8;
+        // More natural base delay with wider variation (8-25ms for 40-125fps)
+        const baseDelay = 8 + Math.random() * 17;
         
-        // Slower at start and end, faster in middle (natural acceleration)
-        const accelerationFactor = Math.sin(t * Math.PI);
+        // More natural acceleration curve with human imperfection
+        const accelerationFactor = Math.sin(t * Math.PI) + (Math.random() - 0.5) * 0.2;
         
-        // Add random variation to timing
-        const randomVariation = (Math.random() - 0.5) * 0.3;
+        // Add more random variation to timing
+        const randomVariation = (Math.random() - 0.5) * 0.6; // Increased from 0.3 to 0.6
         
-        // Add occasional micro-pauses (human-like)
-        const microPause = Math.random() < 0.02 ? Math.random() * 50 : 0;
+        // Add occasional micro-pauses with more natural frequency
+        const microPauseChance = Math.random() < 0.05; // 5% chance (was 2%)
+        const microPause = microPauseChance ? Math.random() * 100 : 0; // 0-100ms (was 0-50ms)
         
-        // Add fatigue factor (slightly slower over time)
-        const fatigueFactor = 1 + (stepIndex / totalSteps) * 0.1;
+        // Add more realistic fatigue factor
+        const fatigueFactor = 1 + (stepIndex / totalSteps) * (0.05 + Math.random() * 0.15); // 1.0-1.2 (was 1.0-1.1)
         
-        return (baseDelay * (1 + accelerationFactor * 0.5 + randomVariation) * fatigueFactor) + microPause;
+        // Add human-like hesitation factor
+        const hesitationFactor = Math.random() < 0.08 ? (1.2 + Math.random() * 0.6) : 1.0; // 8% chance for 1.2-1.8x delay
+        
+        // Add attention factor (slower when distracted)
+        const attentionFactor = 0.8 + Math.random() * 0.4; // 0.8-1.2
+        
+        const finalDelay = (baseDelay * (1 + accelerationFactor * 0.5 + randomVariation) * fatigueFactor * hesitationFactor * attentionFactor) + microPause;
+        
+        return Math.max(5, Math.round(finalDelay)); // Minimum 5ms delay
     }
 
     /**
@@ -398,25 +407,40 @@ class MouseSimulator {
     }
 
     /**
-     * Calculate click delay based on personality
+     * Calculate click delay based on personality (Enhanced for Human-Like Behavior)
      */
     calculateClickDelay() {
         const personality = this.behaviorSimulator?.currentPersonality;
-        if (!personality) return 200 + Math.random() * 100;
         
-        const baseDelay = 200;
-        let multiplier = 1.0;
+        if (!personality) {
+            return 150 + Math.random() * 400; // 150-550ms default (was 200-300ms)
+        }
         
+        let baseDelay;
         switch (personality.readingSpeed) {
             case 'slow':
-                multiplier = 1.5;
+                baseDelay = 250 + Math.random() * 500; // 250-750ms
                 break;
             case 'fast':
-                multiplier = 0.7;
+                baseDelay = 100 + Math.random() * 300; // 100-400ms
+                break;
+            default:
+                baseDelay = 150 + Math.random() * 400; // 150-550ms
                 break;
         }
         
-        return baseDelay * multiplier + Math.random() * 100;
+        // Add human-like hesitation factor
+        const hesitationFactor = Math.random() < 0.12 ? (1.3 + Math.random() * 0.7) : 1.0; // 12% chance for 1.3-2.0x delay
+        baseDelay *= hesitationFactor;
+        
+        // Add attention factor
+        const attentionFactor = 0.7 + Math.random() * 0.6; // 0.7-1.3
+        baseDelay *= attentionFactor;
+        
+        // Add random human imperfection
+        baseDelay += (Math.random() - 0.5) * baseDelay * 0.3; // ±15% variation
+        
+        return Math.max(50, Math.round(baseDelay)); // Minimum 50ms delay
     }
 
     /**

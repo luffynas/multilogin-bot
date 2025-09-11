@@ -3,7 +3,9 @@
  * Implements mouse movement, scrolling, reading, and navigation patterns
  */
 
-class BehaviorSimulator {
+// Check if class already exists before declaring
+if (typeof window.BehaviorSimulator === 'undefined') {
+    class BehaviorSimulator {
     constructor(personalityEngine) {
         this.personalityEngine = personalityEngine;
         this.currentPersonality = null;
@@ -53,6 +55,50 @@ class BehaviorSimulator {
                 waitRandom: (min, max) => new Promise(resolve => setTimeout(resolve, Math.random() * (max - min) + min))
             };
         })());
+        
+        // Initialize cursor simulator with proper fallback
+        this.cursorSimulator = this.createCursorSimulator();
+    }
+
+    /**
+     * Create cursor simulator with proper fallback
+     */
+    createCursorSimulator() {
+        try {
+            if (window.CursorSimulator && typeof window.CursorSimulator === 'function') {
+                return new window.CursorSimulator(this);
+            } else {
+                console.debug('CursorSimulator not available, using fallback');
+                return this.createFallbackCursorSimulator();
+            }
+        } catch (error) {
+            console.debug('Error creating CursorSimulator:', error);
+            return this.createFallbackCursorSimulator();
+        }
+    }
+
+    /**
+     * Create fallback cursor simulator
+     */
+    createFallbackCursorSimulator() {
+        return {
+            cursorConfig: { enabled: false },
+            isActive: false,
+            currentPattern: 'idle',
+            simulateReadingCursorMovement: async (duration) => {
+                await new Promise(resolve => setTimeout(resolve, duration * 1000));
+            },
+            initialize: () => {},
+            updateConfig: (config) => {},
+            getPerformanceMetrics: () => ({
+                totalMovements: 0,
+                averageMovementTime: 0,
+                isActive: false,
+                currentPattern: 'idle',
+                fatigueLevel: 0
+            }),
+            stop: () => {}
+        };
     }
 
     /**
@@ -138,6 +184,20 @@ class BehaviorSimulator {
         }
         
         this.updateBehaviorConfig();
+        
+        // Initialize cursor simulator
+        if (this.cursorSimulator && typeof this.cursorSimulator.initialize === 'function') {
+            this.cursorSimulator.initialize();
+        } else {
+            // Try to re-create cursor simulator if it's still fallback
+            if (this.cursorSimulator && this.cursorSimulator.cursorConfig && !this.cursorSimulator.cursorConfig.enabled) {
+                this.cursorSimulator = this.createCursorSimulator();
+                if (this.cursorSimulator && typeof this.cursorSimulator.initialize === 'function') {
+                    this.cursorSimulator.initialize();
+                }
+            }
+        }
+        
         return this.currentPersonality;
     }
 
@@ -150,6 +210,15 @@ class BehaviorSimulator {
         const personality = this.currentPersonality;
         const patterns = this.personalityEngine.getBehaviorPatterns();
         const deviceBehavior = this.getDeviceSpecificBehavior();
+        
+        // Update cursor simulator configuration based on personality
+        if (this.cursorSimulator && typeof this.cursorSimulator.updateConfig === 'function') {
+            this.cursorSimulator.updateConfig({
+                enabled: this.behaviorConfig.mouseMovement.enabled,
+                intensity: personality.attentionSpan === 'long' ? 'high' : 
+                          personality.attentionSpan === 'short' ? 'low' : 'medium'
+            });
+        }
 
         // Adjust mouse movement based on personality and device
         this.behaviorConfig.mouseMovement.speed = patterns.mouseMovement.speed;
@@ -507,7 +576,7 @@ class BehaviorSimulator {
         const viewportHeight = window.innerHeight;
         const maxScrollDistance = pageHeight - viewportHeight;
         
-        // Ensure we scroll through the entire page content
+        // Calculate dynamic number of scrolls based on content length and personality
         let numScrolls = Math.max(5, Math.floor(maxScrollDistance / scrollStep));
         
         // Adjust based on thoroughness
@@ -516,9 +585,30 @@ class BehaviorSimulator {
         } else if (config.thoroughness === "low") {
             numScrolls = Math.floor(numScrolls * 0.8); // Increased from 0.7 to 0.8
         }
+        
+        // Adjust based on personality (human-like behavior)
+        if (personality) {
+            switch (personality.type) {
+                case 'researcher':
+                    numScrolls = Math.floor(numScrolls * 1.2); // Researchers read more thoroughly
+                    break;
+                case 'explorer':
+                    numScrolls = Math.floor(numScrolls * 0.8); // Explorers scroll less, explore more
+                    break;
+                case 'casual':
+                    numScrolls = Math.floor(numScrolls * 0.7); // Casual readers scroll less
+                    break;
+                case 'professional':
+                    numScrolls = Math.floor(numScrolls * 1.0); // Professionals read normally
+                    break;
+            }
+        }
+        
+        // Cap maximum scrolls to prevent excessive scrolling
+        numScrolls = Math.min(numScrolls, 50); // Maximum 50 scrolls
 
         let currentPosition = window.pageYOffset;
-        const detectedAds = new Set();
+        const detectedAds = [];
         const adInteractions = [];
         let hasReachedBottom = false;
         let hasReachedTop = false;
@@ -529,10 +619,21 @@ class BehaviorSimulator {
         }
 
         for (let i = 0; i < numScrolls; i++) {
+            // Optimize scroll behavior for ad viewability
+            const adOptimization = this.optimizeScrollForAdViewability(currentPosition, maxScrollDistance, detectedAds);
+            
             // Calculate scroll amount based on pattern and current position
-            const scrollAmount = this.calculateReadingScrollAmount(
+            let scrollAmount = this.calculateReadingScrollAmount(
                 i, numScrolls, scrollStep, config.pattern, currentPosition, maxScrollDistance
             );
+            
+            // Apply ad optimization to scroll amount
+            if (adOptimization.shouldSlowDown) {
+                scrollAmount *= adOptimization.slowDownFactor;
+                if (this.behaviorConfig.debugMode) {
+                    console.log(`🎯 AD OPTIMIZATION: Slowing scroll by ${(adOptimization.slowDownFactor * 100).toFixed(0)}% - ${adOptimization.reason}`);
+                }
+            }
 
             // Apply scroll
             currentPosition += scrollAmount;
@@ -560,71 +661,144 @@ class BehaviorSimulator {
                 }
                 
                 for (const adInfo of newAds) {
-                    detectedAds.add(adInfo.uniqueId);
-                    const interaction = await this.handleRealtimeAdInteraction(adInfo);
-                    if (interaction) {
-                        adInteractions.push({
-                            scrollPosition: currentPosition,
-                            adInfo: adInfo,
-                            interaction: interaction,
-                            timestamp: new Date().toISOString()
-                        });
+                    // Check if ad is already detected to avoid duplicates
+                    const isAlreadyDetected = detectedAds.some(ad => ad.uniqueId === adInfo.uniqueId);
+                    if (!isAlreadyDetected) {
+                        detectedAds.push(adInfo);
+                        const interaction = await this.handleRealtimeAdInteraction(adInfo);
+                        if (interaction) {
+                            adInteractions.push({
+                                scrollPosition: currentPosition,
+                                adInfo: adInfo,
+                                interaction: interaction,
+                                timestamp: new Date().toISOString()
+                            });
+                        }
                     }
                 }
             }
 
-            // Pause based on pattern and content with human-like variation
+            // Pause based on pattern and content with enhanced human-like variation
             const basePauseTime = this.calculateReadingPause(i, numScrolls, config.pattern, config, currentPosition, maxScrollDistance);
-            const pauseVariation = 0.7 + Math.random() * 0.6; // 70-130% of base time
+            
+            // More natural pause variation with human imperfection
+            const pauseVariation = 0.4 + Math.random() * 1.2; // 40-160% of base time (was 70-130%)
             const pauseTime = basePauseTime * pauseVariation;
             
-            // Add occasional longer pauses (human reading behavior)
-            const longPauseChance = Math.random() < 0.15; // 15% chance
-            const finalPauseTime = longPauseChance ? pauseTime * (2 + Math.random() * 2) : pauseTime;
+            // Add occasional longer pauses with more natural frequency
+            const longPauseChance = Math.random() < (0.08 + Math.random() * 0.12); // 8-20% chance (was 15%)
+            const longPauseMultiplier = 1.8 + Math.random() * 2.4; // 1.8-4.2x (was 2-4x)
+            const finalPauseTime = longPauseChance ? pauseTime * longPauseMultiplier : pauseTime;
+            
+            // Add random micro-pauses for more natural behavior
+            const microPauseChance = Math.random() < 0.12; // 12% chance for micro-pause
+            if (microPauseChance) {
+                const microPause = 0.2 + Math.random() * 0.8; // 0.2-1.0 seconds
+                await this.delay(microPause * 1000);
+            }
             
             await this.delay(finalPauseTime * 1000);
 
-            // Reading pause with variable frequency and duration
-            const readingPauseChance = 0.3 + Math.random() * 0.4; // 30-70% chance (variable)
+            // Reading pause with enhanced variable frequency and duration
+            const readingPauseChance = 0.12 + Math.random() * 0.8; // 12-92% chance (more variable, was 15-85%)
             if (Math.random() < readingPauseChance) {
-                const baseReadingPause = (2 + Math.random() * 6) * config.thoroughnessMultiplier; // 2-8 seconds
-                const readingPauseVariation = 0.5 + Math.random() * 1.0; // 50-150% variation
+                const baseReadingPause = (1.0 + Math.random() * 12.0) * config.thoroughnessMultiplier; // 1.0-13 seconds (was 1.5-10)
+                const readingPauseVariation = 0.2 + Math.random() * 1.6; // 20-180% variation (was 30-170%)
                 const readingPause = baseReadingPause * readingPauseVariation;
                 
+                // Add contextual pause factors
+                const contextualFactor = this.getContextualPauseFactor(currentPosition, maxScrollDistance);
+                const finalReadingPause = readingPause * contextualFactor;
+                
                 if (this.behaviorConfig.debugMode) {
-                    console.log(`📖 Reading pause at ${currentPosition}px: ${readingPause.toFixed(1)}s`);
+                    console.log(`📖 Reading pause at ${currentPosition}px: ${finalReadingPause.toFixed(1)}s (contextual factor: ${contextualFactor.toFixed(2)})`);
                 }
                 
-                // Additional ad check during reading
+                // Enhanced ad check during reading with RPM optimization
                 const additionalAds = await this.detectNewAdsInViewport(detectedAds);
-                if (additionalAds.length > 0 && this.behaviorConfig.debugMode) {
-                    console.log(`🎯 READING PAUSE: Found ${additionalAds.length} additional ads`);
+                if (additionalAds.length > 0) {
+                    if (this.behaviorConfig.debugMode) {
+                        console.log(`🎯 READING PAUSE: Found ${additionalAds.length} additional ads`);
+                    }
+                    
+                    // Optimize pause duration based on ad value for RPM
+                    const adValue = this.calculateAdValueForRPM(additionalAds);
+                    if (adValue > 2.0) {
+                        // High-value ads get longer pause for better viewability
+                        const adOptimizedPause = finalReadingPause * (1.2 + Math.random() * 0.3); // 1.2-1.5x
+                        await this.delay((adOptimizedPause - finalReadingPause) * 1000);
+                        
+                        if (this.behaviorConfig.debugMode) {
+                            console.log(`💰 HIGH-VALUE AD: Extended pause by ${(adOptimizedPause - finalReadingPause).toFixed(1)}s for RPM optimization`);
+                        }
+                    }
                 }
                 
-                await this.delay(readingPause * 1000);
+                // Use CursorSimulator for enhanced human-like behavior during reading pause
+                if (this.cursorSimulator && this.cursorSimulator.cursorConfig?.enabled) {
+                    await this.cursorSimulator.simulateReadingCursorMovement(
+                        finalReadingPause, 
+                        currentPosition, 
+                        personality
+                    );
+                } else {
+                    await this.delay(finalReadingPause * 1000);
+                }
             }
 
-            // Occasional scroll back for re-reading (reduced frequency)
-            if (Math.random() < 0.1 && !hasReachedBottom) { // Reduced from 15% to 10% chance
-                const backAmount = Math.random() * 100 + 50; // Reduced from 150+50 to 100+50
+            // Occasional scroll back for re-reading with more natural frequency
+            const scrollBackChance = Math.random() < (0.05 + Math.random() * 0.15); // 5-20% chance (more variable, was 10%)
+            if (scrollBackChance && !hasReachedBottom) {
+                const backAmount = Math.random() * 200 + 30; // 30-230px (more variable, was 50-150px)
                 currentPosition = Math.max(0, currentPosition - backAmount);
                 console.log(`⬅️ Re-reading scroll back: ${backAmount.toFixed(0)}px → Position: ${currentPosition}px`);
                 
                 window.scrollTo({ top: currentPosition, behavior: 'smooth' });
-                await this.delay(1000);
+                
+                // More natural pause after scroll back
+                const scrollBackPause = 0.8 + Math.random() * 2.4; // 0.8-3.2 seconds (was 1-2 seconds)
+                await this.delay(scrollBackPause * 1000);
                 
                 const backAds = await this.detectNewAdsInViewport(detectedAds);
                 if (backAds.length > 0) {
                     console.log(`🎯 SCROLL BACK: Found ${backAds.length} ads`);
                 }
                 
-                await this.delay(Math.random() * 1000 + 1000);
+                // More natural reading pause after scroll back
+                const readingPauseAfterBack = 1.2 + Math.random() * 2.8; // 1.2-4.0 seconds (was 1-2 seconds)
+                await this.delay(readingPauseAfterBack * 1000);
             }
 
-            // Progress logging
+            // Progress logging with actual page coverage
             if (i % Math.floor(numScrolls / 4) === 0) {
-                const progress = ((i / numScrolls) * 100).toFixed(1);
-                console.log(`📊 Reading progress: ${progress}% (${currentPosition}/${maxScrollDistance}px)`);
+                const actualProgress = Math.min(100, Math.round((currentPosition / maxScrollDistance) * 100));
+                const stepProgress = ((i / numScrolls) * 100).toFixed(1);
+                const status = hasReachedBottom ? "BOTTOM" : "SCROLLING";
+                console.log(`📊 Reading progress: ${actualProgress}% (${currentPosition}/${maxScrollDistance}px) - Step: ${stepProgress}% - Status: ${status}`);
+            }
+            
+            // Early termination if we've reached the bottom
+            if (hasReachedBottom && currentPosition >= maxScrollDistance) {
+                console.log(`✅ Early termination: Reached bottom at step ${i + 1}/${numScrolls}`);
+                break;
+            }
+            
+            // Early termination if progress is sufficient (human-like behavior)
+            const actualProgress = (currentPosition / maxScrollDistance) * 100;
+            if (actualProgress >= 95 && Math.random() < 0.3) { // 30% chance to stop at 95%
+                console.log(`✅ Early termination: Sufficient progress (${actualProgress.toFixed(1)}%) at step ${i + 1}/${numScrolls}`);
+                break;
+            }
+            
+            // Content-based termination (personality-specific)
+            if (!this.isContentWorthReading(currentPosition, maxScrollDistance, personality)) {
+                const contentReadPercentage = this.calculateContentReadPercentage(currentPosition, maxScrollDistance);
+                const terminationChance = personality?.type === 'explorer' ? 0.4 : 0.2; // Explorers more likely to stop early
+                
+                if (Math.random() < terminationChance) {
+                    console.log(`✅ Content-based termination: Read ${contentReadPercentage.toFixed(1)}% of content (${personality?.type || 'default'} personality) at step ${i + 1}/${numScrolls}`);
+                    break;
+                }
             }
         }
 
@@ -640,10 +814,18 @@ class BehaviorSimulator {
             await this.delay(finalReadingPause);
         }
 
-        // Scroll back to top for navigation
-        console.log("⬆️ Scroll back to top for navigation");
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        await this.delay(2000);
+        // Dynamic scroll to top behavior (personality-based and random)
+        await this.executeDynamicScrollToTop(personality, {
+            maxScrollDistance: maxScrollDistance,
+            currentPosition: currentPosition,
+            contentType: this.detectContentType(),
+            readingCompletion: this.calculateContentReadPercentage(currentPosition, maxScrollDistance)
+        }, {
+            timeSpent: Date.now() - startTime,
+            completionPercentage: this.calculateContentReadPercentage(currentPosition, maxScrollDistance),
+            adsDetected: detectedAds.length,
+            interactions: adInteractions.length
+        });
 
         // Final ad detection
         const finalAds = await this.detectNewAdsInViewport(detectedAds);
@@ -651,12 +833,12 @@ class BehaviorSimulator {
             console.log(`🎯 FINAL CHECK: Found ${finalAds.length} ads at top`);
         }
 
-        console.log(`✅ Comprehensive reading completed: ${detectedAds.size} ads detected, ${adInteractions.length} interactions, ${currentPosition}px covered`);
+        console.log(`✅ Comprehensive reading completed: ${detectedAds.length} ads detected, ${adInteractions.length} interactions, ${currentPosition}px covered`);
 
         return {
             success: true,
             totalScrolls: numScrolls,
-            adsDetected: detectedAds.size,
+            adsDetected: detectedAds.length,
             interactions: adInteractions.length,
             adInteractions: adInteractions,
             finalPosition: currentPosition,
@@ -666,86 +848,467 @@ class BehaviorSimulator {
             duration: Date.now() - startTime,
             personality: personality.type,
             config: config,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            cursorSimulation: this.cursorSimulator ? this.cursorSimulator.getPerformanceMetrics() : null
         };
     }
 
     /**
-     * Calculate reading scroll amount to ensure complete page coverage
+     * Enable or disable cursor simulation
+     */
+    setCursorSimulation(enabled) {
+        if (this.cursorSimulator) {
+            this.cursorSimulator.updateConfig({ enabled });
+            console.log(`🎯 Cursor simulation ${enabled ? 'enabled' : 'disabled'}`);
+        }
+    }
+
+    /**
+     * Get cursor simulation status
+     */
+    getCursorSimulationStatus() {
+        if (this.cursorSimulator) {
+            return {
+                enabled: this.cursorSimulator.cursorConfig.enabled,
+                isActive: this.cursorSimulator.isActive,
+                currentPattern: this.cursorSimulator.currentPattern,
+                performance: this.cursorSimulator.getPerformanceMetrics()
+            };
+        }
+        return null;
+    }
+
+    /**
+     * Calculate content read percentage based on scroll position
+     */
+    calculateContentReadPercentage(currentPosition, maxScrollDistance) {
+        if (maxScrollDistance <= 0) return 100;
+        return Math.min(100, (currentPosition / maxScrollDistance) * 100);
+    }
+
+    /**
+     * Check if content is worth continuing to read
+     */
+    isContentWorthReading(currentPosition, maxScrollDistance, personality) {
+        const contentReadPercentage = this.calculateContentReadPercentage(currentPosition, maxScrollDistance);
+        
+        // Different personalities have different stopping points
+        const stoppingPoints = {
+            researcher: 95,    // Researchers read almost everything
+            explorer: 85,      // Explorers stop earlier to explore other content
+            casual: 80,        // Casual readers stop earlier
+            professional: 90   // Professionals read most content
+        };
+        
+        const stoppingPoint = stoppingPoints[personality?.type] || 85;
+        return contentReadPercentage < stoppingPoint;
+    }
+
+    /**
+     * Execute dynamic scroll to top behavior based on personality and context
+     */
+    async executeDynamicScrollToTop(personality, contentInfo, readingStats) {
+        // Calculate scroll to top probability
+        const scrollProbability = this.calculateScrollToTopProbability(personality, contentInfo, readingStats);
+        
+        if (this.behaviorConfig.debugMode) {
+            console.log(`🎯 Scroll to top probability: ${(scrollProbability * 100).toFixed(1)}% (${personality?.type || 'default'} personality)`);
+        }
+        
+        // Decide whether to scroll to top
+        if (Math.random() < scrollProbability) {
+            // Select scroll pattern
+            const scrollPattern = this.selectScrollToTopPattern(personality, contentInfo);
+            
+            // Execute selected pattern
+            await this.executeScrollToTopPattern(scrollPattern, personality, contentInfo);
+        } else {
+            // Alternative behavior (stay, scroll to middle, etc.)
+            await this.executeAlternativeBehavior(personality, contentInfo);
+        }
+    }
+
+    /**
+     * Calculate scroll to top probability based on personality and context
+     */
+    calculateScrollToTopProbability(personality, contentInfo, readingStats) {
+        // Base probability by personality
+        const personalityProbabilities = {
+            researcher: 0.3,      // 30% chance - researchers often stay at bottom
+            explorer: 0.7,        // 70% chance - explorers like to navigate back
+            casual: 0.5,          // 50% chance - casual readers sometimes scroll to top
+            professional: 0.4     // 40% chance - professionals may scroll for navigation
+        };
+        
+        let baseProbability = personalityProbabilities[personality?.type] || 0.5;
+        
+        // Adjust based on content type
+        const contentMultipliers = {
+            article: 0.4,         // Articles: 40% of base probability
+            blog: 0.6,            // Blog posts: 60% of base probability
+            news: 0.3,            // News: 30% of base probability
+            tutorial: 0.8,        // Tutorials: 80% of base probability
+            product: 0.5          // Product pages: 50% of base probability
+        };
+        
+        const contentMultiplier = contentMultipliers[contentInfo.contentType] || 0.5;
+        baseProbability *= contentMultiplier;
+        
+        // Adjust based on reading completion
+        const completionMultipliers = {
+            fullRead: 0.6,        // Read 100%: 60% of base probability
+            partialRead: 0.3,     // Read <80%: 30% of base probability
+            quickScan: 0.1        // Quick scan: 10% of base probability
+        };
+        
+        let completionMultiplier;
+        if (readingStats.completionPercentage >= 95) {
+            completionMultiplier = completionMultipliers.fullRead;
+        } else if (readingStats.completionPercentage >= 80) {
+            completionMultiplier = completionMultipliers.partialRead;
+        } else {
+            completionMultiplier = completionMultipliers.quickScan;
+        }
+        
+        baseProbability *= completionMultiplier;
+        
+        // Adjust based on time spent reading
+        const timeSpentMinutes = readingStats.timeSpent / 60000;
+        const timeMultiplier = timeSpentMinutes > 5 ? 0.8 : 0.6; // Longer reading = less likely to scroll to top
+        baseProbability *= timeMultiplier;
+        
+        // Add random variation
+        const randomVariation = 0.8 + Math.random() * 0.4; // 80-120%
+        baseProbability *= randomVariation;
+        
+        return Math.min(1.0, Math.max(0.0, baseProbability));
+    }
+
+    /**
+     * Select scroll to top pattern based on personality and content
+     */
+    selectScrollToTopPattern(personality, contentInfo) {
+        const patterns = {
+            researcher: ['gradual', 'partial'],
+            explorer: ['direct', 'exploratory'],
+            casual: ['direct', 'partial'],
+            professional: ['direct', 'gradual']
+        };
+        
+        const availablePatterns = patterns[personality?.type] || ['direct', 'partial'];
+        const weights = this.getPatternWeights(personality, contentInfo);
+        
+        return this.weightedRandomSelect(availablePatterns, weights);
+    }
+
+    /**
+     * Get pattern weights based on personality and content
+     */
+    getPatternWeights(personality, contentInfo) {
+        const weights = {
+            direct: 0.4,      // 40% weight
+            gradual: 0.3,     // 30% weight
+            partial: 0.2,     // 20% weight
+            exploratory: 0.1  // 10% weight
+        };
+        
+        // Adjust weights based on personality
+        if (personality?.type === 'researcher') {
+            weights.gradual = 0.5;
+            weights.partial = 0.3;
+            weights.direct = 0.2;
+        } else if (personality?.type === 'explorer') {
+            weights.exploratory = 0.3;
+            weights.direct = 0.4;
+            weights.gradual = 0.2;
+            weights.partial = 0.1;
+        }
+        
+        return weights;
+    }
+
+    /**
+     * Weighted random selection
+     */
+    weightedRandomSelect(items, weights) {
+        const totalWeight = items.reduce((sum, item) => sum + (weights[item] || 0), 0);
+        let random = Math.random() * totalWeight;
+        
+        for (const item of items) {
+            random -= weights[item] || 0;
+            if (random <= 0) {
+                return item;
+            }
+        }
+        
+        return items[0]; // Fallback
+    }
+
+    /**
+     * Execute selected scroll to top pattern
+     */
+    async executeScrollToTopPattern(pattern, personality, contentInfo) {
+        switch (pattern) {
+            case 'direct':
+                await this.directScrollToTop(personality);
+                break;
+            case 'gradual':
+                await this.gradualScrollToTop(contentInfo.maxScrollDistance, personality);
+                break;
+            case 'partial':
+                await this.partialScrollToTop(contentInfo.maxScrollDistance, personality);
+                break;
+            case 'exploratory':
+                await this.exploratoryScrollToTop(contentInfo.maxScrollDistance, personality);
+                break;
+        }
+    }
+
+    /**
+     * Direct scroll to top
+     */
+    async directScrollToTop(personality) {
+        console.log(`⬆️ Direct scroll to top - ${personality?.type || 'default'} personality`);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        const delayTime = 1500 + Math.random() * 2000; // 1.5-3.5s
+        await this.delay(delayTime);
+    }
+
+    /**
+     * Gradual scroll to top in multiple steps
+     */
+    async gradualScrollToTop(maxDistance, personality) {
+        console.log(`⬆️ Gradual scroll to top - ${personality?.type || 'default'} personality`);
+        
+        const steps = 3 + Math.floor(Math.random() * 4); // 3-6 steps
+        const stepDistance = maxDistance / steps;
+        
+        for (let i = 0; i < steps; i++) {
+            const targetPosition = maxDistance - (stepDistance * (i + 1));
+            window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+            
+            // Variable pause between steps
+            const pauseTime = 800 + Math.random() * 1200; // 0.8-2.0s
+            await this.delay(pauseTime);
+        }
+    }
+
+    /**
+     * Partial scroll to top (not all the way)
+     */
+    async partialScrollToTop(maxDistance, personality) {
+        console.log(`⬆️ Partial scroll to top - ${personality?.type || 'default'} personality`);
+        
+        // Scroll to middle or quarter of page instead of top
+        const targetPosition = Math.random() * (maxDistance * 0.5); // 0-50% of page
+        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+        
+        const delayTime = 1000 + Math.random() * 1500; // 1.0-2.5s
+        await this.delay(delayTime);
+    }
+
+    /**
+     * Exploratory scroll to top with exploration
+     */
+    async exploratoryScrollToTop(maxDistance, personality) {
+        console.log(`⬆️ Exploratory scroll to top - ${personality?.type || 'default'} personality`);
+        
+        // Scroll to top with some exploration
+        const explorationPoints = [0.8, 0.6, 0.4, 0.2, 0]; // 80%, 60%, 40%, 20%, 0%
+        
+        for (const point of explorationPoints) {
+            const targetPosition = maxDistance * point;
+            window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+            
+            // Brief pause to "look around"
+            const pauseTime = 500 + Math.random() * 1000; // 0.5-1.5s
+            await this.delay(pauseTime);
+        }
+    }
+
+    /**
+     * Execute alternative behavior when not scrolling to top
+     */
+    async executeAlternativeBehavior(personality, contentInfo) {
+        const alternatives = [
+            'stay_at_bottom',
+            'scroll_to_middle',
+            'scroll_to_quarter',
+            'scroll_to_specific_section'
+        ];
+        
+        const selectedAlternative = alternatives[Math.floor(Math.random() * alternatives.length)];
+        
+        switch (selectedAlternative) {
+            case 'stay_at_bottom':
+                console.log(`🚪 Staying at bottom - ${personality?.type || 'default'} personality behavior`);
+                await this.delay(1000 + Math.random() * 2000); // 1-3s
+                break;
+                
+            case 'scroll_to_middle':
+                console.log(`⬆️ Scroll to middle - ${personality?.type || 'default'} personality behavior`);
+                const middlePosition = contentInfo.maxScrollDistance * 0.5;
+                window.scrollTo({ top: middlePosition, behavior: 'smooth' });
+                await this.delay(1500 + Math.random() * 1500); // 1.5-3s
+                break;
+                
+            case 'scroll_to_quarter':
+                console.log(`⬆️ Scroll to quarter - ${personality?.type || 'default'} personality behavior`);
+                const quarterPosition = contentInfo.maxScrollDistance * 0.25;
+                window.scrollTo({ top: quarterPosition, behavior: 'smooth' });
+                await this.delay(1200 + Math.random() * 1300); // 1.2-2.5s
+                break;
+                
+            case 'scroll_to_specific_section':
+                console.log(`⬆️ Scroll to specific section - ${personality?.type || 'default'} personality behavior`);
+                const sectionPosition = contentInfo.maxScrollDistance * (0.3 + Math.random() * 0.4); // 30-70%
+                window.scrollTo({ top: sectionPosition, behavior: 'smooth' });
+                await this.delay(1000 + Math.random() * 2000); // 1-3s
+                break;
+        }
+    }
+
+    /**
+     * Detect content type based on page elements
+     */
+    detectContentType() {
+        const url = window.location.href.toLowerCase();
+        const title = document.title.toLowerCase();
+        
+        if (url.includes('/tutorial') || title.includes('tutorial')) return 'tutorial';
+        if (url.includes('/blog') || title.includes('blog')) return 'blog';
+        if (url.includes('/news') || title.includes('news')) return 'news';
+        if (url.includes('/product') || title.includes('product')) return 'product';
+        if (url.includes('/article') || title.includes('article')) return 'article';
+        
+        // Default to article if no specific type detected
+        return 'article';
+    }
+
+    /**
+     * Calculate reading scroll amount to ensure complete page coverage (Enhanced for Human-Like Behavior)
      */
     calculateReadingScrollAmount(step, totalSteps, baseStep, pattern, currentPos, maxDistance) {
         const progress = step / totalSteps;
         const remainingDistance = maxDistance - currentPos;
         
+        // Add human-like fatigue and attention factors
+        const fatigueFactor = 1 + (step / totalSteps) * (0.1 + Math.random() * 0.3); // 1.0-1.4
+        const attentionFactor = 0.7 + Math.random() * 0.6; // 0.7-1.3
+        
         // Ensure we move forward most of the time
         if (remainingDistance > 0) {
+            let scrollAmount;
+            
             switch (pattern) {
                 case "linear":
-                    return baseStep + Math.random() * 100 - 50;
+                    scrollAmount = baseStep + Math.random() * 200 - 100; // Increased variation (was 100-50)
+                    break;
                 
                 case "exploratory":
-                    if (step % 3 === 0) {
-                        return baseStep * 1.5 + Math.random() * 60 - 30;
+                    // More natural exploration pattern
+                    if (Math.random() < 0.25) { // 25% chance (was step % 3 === 0)
+                        scrollAmount = baseStep * (1.2 + Math.random() * 1.0) + Math.random() * 120 - 60; // 1.2-2.2x
                     } else {
-                        return baseStep * 0.7 + Math.random() * 80 - 40;
+                        scrollAmount = baseStep * (0.5 + Math.random() * 0.6) + Math.random() * 100 - 50; // 0.5-1.1x
                     }
+                    break;
                 
                 case "careful":
-                    return baseStep * 0.8 + Math.random() * 40 - 20;
+                    scrollAmount = baseStep * (0.6 + Math.random() * 0.6) + Math.random() * 80 - 40; // 0.6-1.2x (was 0.8x)
+                    break;
                 
                 case "efficient":
-                    return baseStep * 1.2 + Math.random() * 60 - 30;
+                    scrollAmount = baseStep * (1.0 + Math.random() * 0.8) + Math.random() * 100 - 50; // 1.0-1.8x (was 1.2x)
+                    break;
                 
                 case "scanning":
-                    if (step % 4 === 0) {
-                        return baseStep * 0.5 + Math.random() * 40 - 20;
+                    // More natural scanning pattern
+                    if (Math.random() < 0.2) { // 20% chance (was step % 4 === 0)
+                        scrollAmount = baseStep * (0.3 + Math.random() * 0.4) + Math.random() * 60 - 30; // 0.3-0.7x
                     } else {
-                        return baseStep * 1.3 + Math.random() * 80 - 40;
+                        scrollAmount = baseStep * (1.1 + Math.random() * 0.8) + Math.random() * 120 - 60; // 1.1-1.9x
                     }
+                    break;
                 
                 case "casual":
-                    return baseStep + Math.random() * 160 - 80;
+                    scrollAmount = baseStep + Math.random() * 300 - 150; // Increased variation (was 160-80)
+                    break;
                 
                 default: // balanced
-                    return baseStep + Math.random() * 120 - 60;
+                    scrollAmount = baseStep + Math.random() * 200 - 100; // Increased variation (was 120-60)
+                    break;
             }
+            
+            // Apply human factors
+            scrollAmount *= fatigueFactor * attentionFactor;
+            
+            // Add random human imperfection
+            const imperfectionFactor = 0.8 + Math.random() * 0.4; // 0.8-1.2
+            scrollAmount *= imperfectionFactor;
+            
+            // Add occasional micro-adjustments
+            if (Math.random() < 0.15) { // 15% chance for micro-adjustment
+                scrollAmount += (Math.random() - 0.5) * 50; // ±25px micro-adjustment
+            }
+            
+            return Math.round(scrollAmount);
         } else {
-            // If we're at the bottom, occasionally scroll back up for re-reading
-            return -(baseStep * 0.5 + Math.random() * 100);
+            // If we're at the bottom, occasionally scroll back up for re-reading with more natural variation
+            const backScrollChance = Math.random() < 0.3; // 30% chance
+            if (backScrollChance) {
+                const backAmount = baseStep * (0.3 + Math.random() * 0.6) + Math.random() * 150; // 0.3-0.9x + 0-150px
+                return -Math.round(backAmount);
+            }
+            return 0; // No scroll if not going back
         }
     }
 
     /**
-     * Calculate reading pause time based on content and position
+     * Calculate reading pause time based on content and position (Enhanced for Human-Like Behavior)
      */
     calculateReadingPause(step, totalSteps, pattern, config, currentPos, maxDistance) {
-        const basePause = 1 + Math.random() * 2; // 1-3 seconds
+        // More natural base pause with wider variation
+        const basePause = 0.5 + Math.random() * 4.5; // 0.5-5 seconds (increased from 1-3)
         
+        // More varied pattern adjustments with human imperfection
         const patternAdjustments = {
-            linear: 1.0,
-            exploratory: 1.3,
-            careful: 1.5,
-            efficient: 0.8,
-            scanning: 0.6,
-            casual: 1.2,
-            balanced: 1.0
+            linear: 0.8 + Math.random() * 0.4,      // 0.8-1.2 (was 1.0)
+            exploratory: 1.1 + Math.random() * 0.6, // 1.1-1.7 (was 1.3)
+            careful: 1.3 + Math.random() * 0.8,     // 1.3-2.1 (was 1.5)
+            efficient: 0.6 + Math.random() * 0.6,   // 0.6-1.2 (was 0.8)
+            scanning: 0.4 + Math.random() * 0.6,    // 0.4-1.0 (was 0.6)
+            casual: 1.0 + Math.random() * 0.8,      // 1.0-1.8 (was 1.2)
+            balanced: 0.8 + Math.random() * 0.6     // 0.8-1.4 (was 1.0)
         };
 
-        const patternAdj = patternAdjustments[pattern] || 1.0;
+        const patternAdj = patternAdjustments[pattern] || (0.8 + Math.random() * 0.6);
         let pauseTime = basePause * patternAdj * config.thoroughnessMultiplier;
         
-        // Add extra pause when reading important content (headings, etc.)
+        // Add human-like fatigue factor
+        const fatigueFactor = 1 + (step / totalSteps) * (0.2 + Math.random() * 0.3); // 1.0-1.5
+        pauseTime *= fatigueFactor;
+        
+        // Add extra pause when reading important content (headings, etc.) with more variation
         if (this.isReadingImportantContent(currentPos)) {
-            pauseTime *= 1.5;
+            pauseTime *= (1.3 + Math.random() * 0.6); // 1.3-1.9 (was 1.5)
         }
         
-        // Add extra pause near the end of the page
+        // Add extra pause near the end of the page with more natural variation
         const progress = currentPos / maxDistance;
         if (progress > 0.8) {
-            pauseTime *= 1.3; // 30% longer pause near the end
+            pauseTime *= (1.1 + Math.random() * 0.5); // 1.1-1.6 (was 1.3)
         }
         
-        return pauseTime;
+        // Add random human distraction factor
+        const distractionFactor = Math.random() < 0.08 ? (1.5 + Math.random() * 2.0) : 1.0; // 8% chance for 1.5-3.5x longer pause
+        pauseTime *= distractionFactor;
+        
+        // Add micro-variations for more natural timing
+        pauseTime += (Math.random() - 0.5) * pauseTime * 0.4; // ±20% micro-variation
+        
+        return Math.max(0.3, pauseTime); // Minimum 0.3 seconds
     }
 
     /**
@@ -870,6 +1433,13 @@ class BehaviorSimulator {
             const personality = this.currentPersonality;
             const interactionProbability = personality ? personality.clickProbability : 0.1;
             
+            // Analyze content relevance for ad targeting
+            const contentRelevance = this.analyzeContentAdRelevance(adInfo);
+            const relevanceMultiplier = this.calculateRelevanceMultiplier(contentRelevance);
+            
+            // Adjust interaction probability based on content relevance
+            const adjustedProbability = interactionProbability * relevanceMultiplier;
+            
             // Standardized interaction object
             const interaction = {
                 success: true,
@@ -892,7 +1462,10 @@ class BehaviorSimulator {
                     visible: adInfo.rect.top >= 0 && adInfo.rect.bottom <= window.innerHeight
                 },
                 personality: personality ? personality.type : 'unknown',
-                probability: interactionProbability
+                probability: interactionProbability,
+                contentRelevance: contentRelevance,
+                relevanceMultiplier: relevanceMultiplier,
+                adjustedProbability: adjustedProbability
             };
 
             // Simulate hover (20% chance)
@@ -937,7 +1510,7 @@ class BehaviorSimulator {
 
         try {
             // Create intersection observer for real-time ad detection
-            window.detectedAds = new Set();
+            window.detectedAds = [];
             window.newAdsFound = [];
 
             window.adDetectionObserver = new IntersectionObserver((entries) => {
@@ -946,8 +1519,15 @@ class BehaviorSimulator {
                         const element = entry.target;
                         const adId = element.id || element.className || `ad-${Date.now()}`;
                         
-                        if (!window.detectedAds.has(adId)) {
-                            window.detectedAds.add(adId);
+                        // Check if ad is already detected to avoid duplicates
+                        const isAlreadyDetected = window.detectedAds.some(ad => ad.id === adId);
+                        if (!isAlreadyDetected) {
+                            window.detectedAds.push({
+                                element: element,
+                                id: adId,
+                                rect: entry.boundingClientRect,
+                                timestamp: Date.now()
+                            });
                             window.newAdsFound.push({
                                 element: element,
                                 id: adId,
@@ -2226,11 +2806,515 @@ class BehaviorSimulator {
             }
         };
     }
+    
+    /**
+     * Simulate human distraction and interruption
+     */
+    async simulateDistraction() {
+        const distractionTypes = [
+            'phone_notification',
+            'background_noise',
+            'visual_distraction',
+            'thinking_pause',
+            'environmental_interruption'
+        ];
+        
+        const distractionType = distractionTypes[Math.floor(Math.random() * distractionTypes.length)];
+        const distractionDuration = 2000 + Math.random() * 8000; // 2-10 seconds
+        
+        console.log(`🤔 Human distraction: ${distractionType} (${Math.round(distractionDuration/1000)}s)`);
+        
+        // Simulate different types of distractions
+        switch (distractionType) {
+            case 'phone_notification':
+                // Quick glance away and back
+                await this.delay(distractionDuration * 0.3);
+                break;
+            case 'background_noise':
+                // Longer pause to "listen"
+                await this.delay(distractionDuration * 0.7);
+                break;
+            case 'visual_distraction':
+                // Look away briefly
+                await this.delay(distractionDuration * 0.4);
+                break;
+            case 'thinking_pause':
+                // Longer pause for reflection
+                await this.delay(distractionDuration * 0.8);
+                break;
+            case 'environmental_interruption':
+                // Variable pause
+                await this.delay(distractionDuration * 0.5);
+                break;
+        }
+        
+        return {
+            type: distractionType,
+            duration: distractionDuration,
+            timestamp: Date.now()
+        };
+    }
+    
+    /**
+     * Get context-aware behavior modifiers
+     */
+    getContextAwareModifiers() {
+        const timeOfDay = new Date().getHours();
+        const dayOfWeek = new Date().getDay();
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+        
+        // Time-based modifiers
+        let timeModifier = 1.0;
+        if (timeOfDay >= 6 && timeOfDay <= 9) {
+            timeModifier = 0.8 + Math.random() * 0.4; // 0.8-1.2 (morning energy)
+        } else if (timeOfDay >= 10 && timeOfDay <= 14) {
+            timeModifier = 1.0 + Math.random() * 0.3; // 1.0-1.3 (peak hours)
+        } else if (timeOfDay >= 15 && timeOfDay <= 18) {
+            timeModifier = 0.9 + Math.random() * 0.4; // 0.9-1.3 (afternoon)
+        } else if (timeOfDay >= 19 && timeOfDay <= 22) {
+            timeModifier = 0.7 + Math.random() * 0.5; // 0.7-1.2 (evening)
+        } else {
+            timeModifier = 0.6 + Math.random() * 0.6; // 0.6-1.2 (late night/early morning)
+        }
+        
+        // Weekend vs weekday modifiers
+        const dayModifier = isWeekend ? (0.8 + Math.random() * 0.4) : (0.9 + Math.random() * 0.3);
+        
+        return {
+            timeOfDay: timeOfDay,
+            dayOfWeek: dayOfWeek,
+            isWeekend: isWeekend,
+            timeModifier: timeModifier,
+            dayModifier: dayModifier,
+            overallModifier: timeModifier * dayModifier
+        };
+    }
+    
+    /**
+     * Get contextual pause factor based on scroll position and content
+     */
+    getContextualPauseFactor(currentPosition, maxScrollDistance) {
+        const progress = currentPosition / maxScrollDistance;
+        let contextualFactor = 1.0;
+        
+        // Position-based factors
+        if (progress < 0.1) {
+            // Beginning of page - longer pauses to "get oriented"
+            contextualFactor *= (1.2 + Math.random() * 0.4); // 1.2-1.6x
+        } else if (progress > 0.9) {
+            // End of page - longer pauses to "finish reading"
+            contextualFactor *= (1.1 + Math.random() * 0.3); // 1.1-1.4x
+        } else if (progress > 0.7) {
+            // Near end - moderate pauses
+            contextualFactor *= (1.0 + Math.random() * 0.2); // 1.0-1.2x
+        }
+        
+        // Content-based factors
+        if (this.isReadingImportantContent(currentPosition)) {
+            contextualFactor *= (1.3 + Math.random() * 0.4); // 1.3-1.7x for important content
+        }
+        
+        // Check for images or media in viewport
+        if (this.hasMediaInViewport(currentPosition)) {
+            contextualFactor *= (1.2 + Math.random() * 0.3); // 1.2-1.5x for media content
+        }
+        
+        // Check for complex content (headings, lists, etc.)
+        if (this.hasComplexContentInViewport(currentPosition)) {
+            contextualFactor *= (1.1 + Math.random() * 0.2); // 1.1-1.3x for complex content
+        }
+        
+        // Add random human variation
+        contextualFactor *= (0.8 + Math.random() * 0.4); // 0.8-1.2x random variation
+        
+        return Math.max(0.5, Math.min(2.0, contextualFactor)); // Clamp between 0.5x and 2.0x
+    }
+    
+    /**
+     * Check if there's media content in current viewport
+     */
+    hasMediaInViewport(currentPosition) {
+        const viewportTop = currentPosition;
+        const viewportBottom = currentPosition + window.innerHeight;
+        
+        const mediaElements = document.querySelectorAll('img, video, iframe, canvas');
+        for (const element of mediaElements) {
+            const rect = element.getBoundingClientRect();
+            const elementTop = rect.top + window.pageYOffset;
+            const elementBottom = elementTop + rect.height;
+            
+            if (elementTop < viewportBottom && elementBottom > viewportTop) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Check if there's complex content in current viewport
+     */
+    hasComplexContentInViewport(currentPosition) {
+        const viewportTop = currentPosition;
+        const viewportBottom = currentPosition + window.innerHeight;
+        
+        const complexElements = document.querySelectorAll('h1, h2, h3, ul, ol, table, blockquote, pre, code');
+        for (const element of complexElements) {
+            const rect = element.getBoundingClientRect();
+            const elementTop = rect.top + window.pageYOffset;
+            const elementBottom = elementTop + rect.height;
+            
+            if (elementTop < viewportBottom && elementBottom > viewportTop) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Calculate ad value for RPM optimization
+     */
+    calculateAdValueForRPM(ads) {
+        if (!ads || ads.length === 0) return 0;
+        
+        let totalValue = 0;
+        let adCount = 0;
+        
+        ads.forEach(ad => {
+            let adValue = 1; // Base value
+            
+            // Position-based value
+            const rect = ad.element.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            const viewportWidth = window.innerWidth;
+            
+            // Above fold bonus
+            if (rect.top < viewportHeight && rect.bottom > 0) {
+                adValue *= 2.5; // Above fold multiplier
+            }
+            
+            // Size-based value
+            const adArea = rect.width * rect.height;
+            if (adArea > 300000) { // Large ads (>300k pixels)
+                adValue *= 2.0;
+            } else if (adArea > 100000) { // Medium ads (>100k pixels)
+                adValue *= 1.5;
+            }
+            
+            // Visibility-based value
+            const visibilityRatio = Math.min(1, (rect.width * rect.height) / (viewportWidth * viewportHeight));
+            if (visibilityRatio > 0.5) {
+                adValue *= 1.5; // High visibility
+            } else if (visibilityRatio > 0.25) {
+                adValue *= 1.2; // Medium visibility
+            }
+            
+            // Ad type-based value
+            if (ad.element.tagName === 'INS' && ad.element.className.includes('adsbygoogle')) {
+                adValue *= 1.3; // Google AdSense bonus
+            }
+            
+            // High-value category detection
+            const adText = ad.element.textContent || '';
+            const highValueKeywords = ['insurance', 'finance', 'investment', 'loan', 'credit', 'mortgage', 'business', 'software', 'technology'];
+            const hasHighValueKeyword = highValueKeywords.some(keyword => 
+                adText.toLowerCase().includes(keyword)
+            );
+            
+            if (hasHighValueKeyword) {
+                adValue *= 2.0; // High-value category bonus
+            }
+            
+            totalValue += adValue;
+            adCount++;
+        });
+        
+        return adCount > 0 ? totalValue / adCount : 0; // Average value per ad
+    }
+    
+    /**
+     * Optimize scroll behavior for ad viewability
+     */
+    optimizeScrollForAdViewability(currentPosition, maxScrollDistance, detectedAds) {
+        const viewportHeight = window.innerHeight;
+        const viewportTop = currentPosition;
+        const viewportBottom = currentPosition + viewportHeight;
+        
+        // Convert Set to Array if needed, or ensure it's an array
+        const adsArray = Array.isArray(detectedAds) ? detectedAds : Array.from(detectedAds || []);
+        
+        // Find ads in current viewport
+        const adsInViewport = adsArray.filter(ad => {
+            try {
+                const rect = ad.element.getBoundingClientRect();
+                const adTop = rect.top + window.pageYOffset;
+                const adBottom = adTop + rect.height;
+                
+                return adTop < viewportBottom && adBottom > viewportTop;
+            } catch (error) {
+                console.debug('Error filtering ad in viewport:', error);
+                return false;
+            }
+        });
+        
+        // If high-value ads in viewport, suggest slower scrolling
+        if (adsInViewport.length > 0) {
+            const avgAdValue = this.calculateAdValueForRPM(adsInViewport);
+            if (avgAdValue > 2.0) {
+                return {
+                    shouldSlowDown: true,
+                    slowDownFactor: 0.6 + Math.random() * 0.3, // 0.6-0.9x speed
+                    pauseExtension: 1.2 + Math.random() * 0.4, // 1.2-1.6x pause
+                    reason: 'high-value-ads-in-viewport'
+                };
+            }
+        }
+        
+        // Check for upcoming high-value ads
+        const upcomingAds = adsArray.filter(ad => {
+            try {
+                const rect = ad.element.getBoundingClientRect();
+                const adTop = rect.top + window.pageYOffset;
+                const adBottom = adTop + rect.height;
+                
+                // Ads that will be visible in next 2 viewport heights
+                return adTop > viewportBottom && adTop < viewportBottom + (viewportHeight * 2);
+            } catch (error) {
+                console.debug('Error filtering upcoming ad:', error);
+                return false;
+            }
+        });
+        
+        if (upcomingAds.length > 0) {
+            const avgUpcomingAdValue = this.calculateAdValueForRPM(upcomingAds);
+            if (avgUpcomingAdValue > 2.5) {
+                return {
+                    shouldSlowDown: true,
+                    slowDownFactor: 0.7 + Math.random() * 0.2, // 0.7-0.9x speed
+                    pauseExtension: 1.1 + Math.random() * 0.3, // 1.1-1.4x pause
+                    reason: 'high-value-ads-upcoming'
+                };
+            }
+        }
+        
+        return {
+            shouldSlowDown: false,
+            slowDownFactor: 1.0,
+            pauseExtension: 1.0,
+            reason: 'normal-scrolling'
+        };
+    }
+    
+    /**
+     * Analyze content-ad relevance for better targeting
+     */
+    analyzeContentAdRelevance(adInfo) {
+        const adText = adInfo.element.textContent || '';
+        const adTitle = adInfo.element.title || '';
+        const adAlt = adInfo.element.alt || '';
+        const adHref = adInfo.element.href || '';
+        
+        // Get current page content
+        const pageContent = this.getCurrentPageContent();
+        const pageKeywords = this.extractKeywords(pageContent);
+        
+        // Analyze ad content
+        const adKeywords = this.extractKeywords(adText + ' ' + adTitle + ' ' + adAlt);
+        
+        // Calculate relevance score
+        const relevanceScore = this.calculateRelevanceScore(pageKeywords, adKeywords);
+        
+        // Determine content categories
+        const pageCategory = this.categorizeContent(pageContent);
+        const adCategory = this.categorizeContent(adText + ' ' + adTitle);
+        
+        // Check for category match
+        const categoryMatch = this.checkCategoryMatch(pageCategory, adCategory);
+        
+        return {
+            score: relevanceScore,
+            pageKeywords: pageKeywords,
+            adKeywords: adKeywords,
+            pageCategory: pageCategory,
+            adCategory: adCategory,
+            categoryMatch: categoryMatch,
+            relevanceLevel: this.getRelevanceLevel(relevanceScore, categoryMatch)
+        };
+    }
+    
+    /**
+     * Get current page content for analysis
+     */
+    getCurrentPageContent() {
+        // Get visible content in viewport
+        const viewportTop = window.pageYOffset;
+        const viewportBottom = viewportTop + window.innerHeight;
+        
+        let content = '';
+        
+        // Get content from visible elements
+        const contentElements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, div, span, article, section');
+        contentElements.forEach(element => {
+            const rect = element.getBoundingClientRect();
+            const elementTop = rect.top + window.pageYOffset;
+            const elementBottom = elementTop + rect.height;
+            
+            // Check if element is in viewport
+            if (elementTop < viewportBottom && elementBottom > viewportTop) {
+                content += ' ' + (element.textContent || '');
+            }
+        });
+        
+        return content.trim();
+    }
+    
+    /**
+     * Extract keywords from content
+     */
+    extractKeywords(content) {
+        if (!content) return [];
+        
+        // Remove common words and extract meaningful keywords
+        const commonWords = ['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them'];
+        
+        const words = content.toLowerCase()
+            .replace(/[^\w\s]/g, ' ')
+            .split(/\s+/)
+            .filter(word => word.length > 3 && !commonWords.includes(word));
+        
+        // Count word frequency
+        const wordCount = {};
+        words.forEach(word => {
+            wordCount[word] = (wordCount[word] || 0) + 1;
+        });
+        
+        // Return top keywords
+        return Object.entries(wordCount)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 20)
+            .map(([word]) => word);
+    }
+    
+    /**
+     * Calculate relevance score between page and ad keywords
+     */
+    calculateRelevanceScore(pageKeywords, adKeywords) {
+        if (pageKeywords.length === 0 || adKeywords.length === 0) return 0;
+        
+        let matches = 0;
+        let totalWeight = 0;
+        
+        pageKeywords.forEach((pageKeyword, index) => {
+            const weight = pageKeywords.length - index; // Higher weight for more frequent keywords
+            
+            if (adKeywords.includes(pageKeyword)) {
+                matches += weight;
+            }
+            
+            totalWeight += weight;
+        });
+        
+        return totalWeight > 0 ? matches / totalWeight : 0;
+    }
+    
+    /**
+     * Categorize content based on keywords
+     */
+    categorizeContent(content) {
+        const categories = {
+            'technology': ['software', 'app', 'tech', 'computer', 'digital', 'internet', 'mobile', 'smartphone', 'laptop', 'programming', 'coding', 'development', 'ai', 'artificial', 'intelligence', 'data', 'cloud', 'security', 'network'],
+            'finance': ['money', 'bank', 'loan', 'credit', 'investment', 'finance', 'financial', 'insurance', 'mortgage', 'savings', 'budget', 'debt', 'payment', 'cash', 'dollar', 'profit', 'business', 'economy'],
+            'health': ['health', 'medical', 'doctor', 'medicine', 'treatment', 'therapy', 'fitness', 'exercise', 'diet', 'nutrition', 'wellness', 'care', 'hospital', 'clinic', 'pharmacy', 'supplement', 'vitamin'],
+            'education': ['education', 'school', 'university', 'college', 'learning', 'course', 'training', 'study', 'student', 'teacher', 'academic', 'degree', 'certificate', 'knowledge', 'skill', 'tutorial'],
+            'lifestyle': ['fashion', 'beauty', 'style', 'clothing', 'shopping', 'home', 'decor', 'travel', 'vacation', 'food', 'recipe', 'cooking', 'entertainment', 'music', 'movie', 'book', 'game'],
+            'automotive': ['car', 'vehicle', 'auto', 'automotive', 'truck', 'motorcycle', 'bike', 'engine', 'fuel', 'gas', 'electric', 'hybrid', 'driving', 'road', 'highway', 'transportation']
+        };
+        
+        const contentLower = content.toLowerCase();
+        let bestCategory = 'general';
+        let maxScore = 0;
+        
+        Object.entries(categories).forEach(([category, keywords]) => {
+            let score = 0;
+            keywords.forEach(keyword => {
+                if (contentLower.includes(keyword)) {
+                    score++;
+                }
+            });
+            
+            if (score > maxScore) {
+                maxScore = score;
+                bestCategory = category;
+            }
+        });
+        
+        return bestCategory;
+    }
+    
+    /**
+     * Check if page and ad categories match
+     */
+    checkCategoryMatch(pageCategory, adCategory) {
+        return pageCategory === adCategory;
+    }
+    
+    /**
+     * Get relevance level based on score and category match
+     */
+    getRelevanceLevel(score, categoryMatch) {
+        if (score > 0.7 && categoryMatch) return 'high';
+        if (score > 0.5 && categoryMatch) return 'medium';
+        if (score > 0.3 || categoryMatch) return 'low';
+        return 'none';
+    }
+    
+    /**
+     * Calculate relevance multiplier for click probability
+     */
+    calculateRelevanceMultiplier(contentRelevance) {
+        const { score, categoryMatch, relevanceLevel } = contentRelevance;
+        
+        let multiplier = 1.0;
+        
+        // Score-based multiplier
+        if (score > 0.7) {
+            multiplier *= 2.0; // High relevance
+        } else if (score > 0.5) {
+            multiplier *= 1.5; // Medium relevance
+        } else if (score > 0.3) {
+            multiplier *= 1.2; // Low relevance
+        }
+        
+        // Category match bonus
+        if (categoryMatch) {
+            multiplier *= 1.3; // Category match bonus
+        }
+        
+        // Relevance level bonus
+        switch (relevanceLevel) {
+            case 'high':
+                multiplier *= 1.5;
+                break;
+            case 'medium':
+                multiplier *= 1.2;
+                break;
+            case 'low':
+                multiplier *= 1.1;
+                break;
+            default:
+                multiplier *= 0.8; // Reduce for no relevance
+        }
+        
+        return Math.max(0.5, Math.min(3.0, multiplier)); // Clamp between 0.5x and 3.0x
+    }
 }
 
-// Export for use in other modules with enhanced stealth protection
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = BehaviorSimulator;
-} else if (typeof window !== 'undefined' && !window.BehaviorSimulator) {
-    window.BehaviorSimulator = BehaviorSimulator;
+    // Export for use in other modules with enhanced stealth protection
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = BehaviorSimulator;
+    } else if (typeof window !== 'undefined' && !window.BehaviorSimulator) {
+        window.BehaviorSimulator = BehaviorSimulator;
+    }
+} else {
+    // Use existing class
+    console.debug('BehaviorSimulator already exists, using existing instance');
 }

@@ -79,7 +79,8 @@ class ReadingSimulator {
             const timeOnPage = currentTime - startTime;
             
             // Calculate reading fatigue
-            const readingFatigue = Math.min(1.0, timeOnPage / 300000); // 5 minutes max fatigue
+            // const readingFatigue = Math.min(1.0, timeOnPage / 300000); // 5 minutes max fatigue
+            const readingFatigue = Math.min(1.0, timeOnPage / 180000); // 3 minutes max fatigue
             const segmentFatigue = Math.min(1.0, i / segments.length);
             
             console.log(`📖 Reading segment ${i + 1}/${segments.length}: ${Math.round(segment.duration/1000)}s (Fatigue: ${(readingFatigue * 100).toFixed(1)}%)`);
@@ -233,7 +234,7 @@ class ReadingSimulator {
     }
 
     /**
-     * Simulate eye movement across content (optimized for realistic timing)
+     * Simulate eye movement across content (Enhanced for Human-Like Behavior)
      */
     async simulateEyeMovement(content) {
         if (!content || !content.elements) return;
@@ -241,23 +242,76 @@ class ReadingSimulator {
         const elements = content.elements;
         const personality = this.behaviorSimulator?.currentPersonality;
         
-        // Limit elements to process to avoid excessive delays
-        const maxElements = Math.min(elements.length, 10); // Max 10 elements
-        const selectedElements = elements.slice(0, maxElements);
+        // More natural element selection with human-like attention
+        const maxElements = Math.min(elements.length, 8 + Math.floor(Math.random() * 7)); // 8-15 elements (was 10 fixed)
+        const selectedElements = this.selectElementsNaturally(elements, maxElements);
         
-        for (const element of selectedElements) {
-            // Move mouse to element (simulating eye focus) - reduced frequency
-            if (element.boundingRect && Math.random() < 0.3) { // 30% chance only
+        for (let i = 0; i < selectedElements.length; i++) {
+            const element = selectedElements[i];
+            
+            // More natural eye movement frequency with human attention patterns
+            const eyeMovementChance = 0.15 + Math.random() * 0.25; // 15-40% chance (was 30% fixed)
+            if (element.boundingRect && Math.random() < eyeMovementChance) {
                 const centerX = element.boundingRect.left + element.boundingRect.width / 2;
                 const centerY = element.boundingRect.top + element.boundingRect.height / 2;
                 
-                await this.behaviorSimulator.simulateMouseMovement(centerX, centerY, 200); // Reduced duration
+                // Add natural eye movement variation
+                const eyeMovementDuration = 150 + Math.random() * 300; // 150-450ms (was 200ms fixed)
+                await this.behaviorSimulator.simulateMouseMovement(centerX, centerY, eyeMovementDuration);
             }
             
-            // Pause for reading - reduced timing
-            const pauseTime = this.getReadingPauseTime(personality, element.type) * 0.3; // 70% reduction
-            await this.delay(pauseTime);
+            // More natural reading pause with human attention patterns
+            const basePauseTime = this.getReadingPauseTime(personality, element.type);
+            const attentionFactor = 0.4 + Math.random() * 0.8; // 0.4-1.2x
+            const pauseTime = basePauseTime * attentionFactor;
+            
+            // Add occasional longer pauses for important content
+            const importantContentChance = Math.random() < 0.2; // 20% chance
+            const finalPauseTime = importantContentChance ? pauseTime * (1.5 + Math.random() * 1.0) : pauseTime;
+            
+            await this.delay(finalPauseTime);
+            
+            // Add random micro-pauses between elements
+            if (Math.random() < 0.3) { // 30% chance for micro-pause
+                const microPause = 100 + Math.random() * 400; // 100-500ms
+                await this.delay(microPause);
+            }
         }
+    }
+    
+    /**
+     * Select elements naturally based on human attention patterns
+     */
+    selectElementsNaturally(elements, maxCount) {
+        // Prioritize headings, images, and important content
+        const importantElements = elements.filter(el => 
+            el.type === 'heading' || el.type === 'image' || el.type === 'important'
+        );
+        
+        const regularElements = elements.filter(el => 
+            el.type !== 'heading' && el.type !== 'image' && el.type !== 'important'
+        );
+        
+        // Select more important elements with higher probability
+        const selectedImportant = importantElements.slice(0, Math.min(importantElements.length, Math.floor(maxCount * 0.6)));
+        const remainingCount = maxCount - selectedImportant.length;
+        const selectedRegular = regularElements.slice(0, Math.min(regularElements.length, remainingCount));
+        
+        // Shuffle to create natural reading order
+        const allSelected = [...selectedImportant, ...selectedRegular];
+        return this.shuffleArray(allSelected);
+    }
+    
+    /**
+     * Shuffle array to create natural reading order
+     */
+    shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
     }
 
     /**
@@ -451,15 +505,57 @@ class ReadingSimulator {
     }
 
     /**
-     * Simulate comprehension pause (optimized for realistic timing)
+     * Simulate comprehension pause (Enhanced for Human-Like Behavior)
      */
     async simulateComprehensionPause() {
         const personality = this.behaviorSimulator?.currentPersonality;
-        const pauseTime = personality?.attentionSpan === 'long' ? 
-            500 + Math.random() * 1000 : // Reduced from 2-5s to 0.5-1.5s
-            300 + Math.random() * 700;   // Reduced from 1-3s to 0.3-1s
         
-        await this.delay(pauseTime);
+        // More natural base pause time with wider variation
+        let basePauseTime;
+        if (personality?.attentionSpan === 'long') {
+            basePauseTime = 800 + Math.random() * 2000; // 0.8-2.8s (was 0.5-1.5s)
+        } else {
+            basePauseTime = 400 + Math.random() * 1200; // 0.4-1.6s (was 0.3-1s)
+        }
+        
+        // Add personality-based variation
+        if (personality) {
+            switch (personality.type) {
+                case 'researcher':
+                    basePauseTime *= (1.2 + Math.random() * 0.6); // 1.2-1.8x
+                    break;
+                case 'explorer':
+                    basePauseTime *= (0.8 + Math.random() * 0.4); // 0.8-1.2x
+                    break;
+                case 'casual':
+                    basePauseTime *= (0.6 + Math.random() * 0.4); // 0.6-1.0x
+                    break;
+                case 'professional':
+                    basePauseTime *= (0.9 + Math.random() * 0.3); // 0.9-1.2x
+                    break;
+            }
+        }
+        
+        // Add content complexity factor
+        const contentComplexity = this.assessContentComplexity();
+        if (contentComplexity === 'high') {
+            basePauseTime *= (1.3 + Math.random() * 0.5); // 1.3-1.8x for complex content
+        } else if (contentComplexity === 'low') {
+            basePauseTime *= (0.7 + Math.random() * 0.3); // 0.7-1.0x for simple content
+        }
+        
+        // Add random thinking pause
+        const thinkingChance = Math.random() < 0.2; // 20% chance for longer thinking pause
+        if (thinkingChance) {
+            basePauseTime *= (1.5 + Math.random() * 1.0); // 1.5-2.5x for thinking
+        }
+        
+        // Add natural micro-variations
+        const microVariation = (Math.random() - 0.5) * basePauseTime * 0.2; // ±10% variation
+        const finalPauseTime = Math.max(200, Math.round(basePauseTime + microVariation)); // Minimum 200ms
+        
+        console.log(`🤔 Comprehension pause: ${finalPauseTime}ms`);
+        await this.delay(finalPauseTime);
     }
 
     /**
@@ -777,55 +873,256 @@ class ReadingSimulator {
     }
 
     /**
-     * Calculate reading time (optimized for realistic timing)
+     * Calculate reading time based on word count (Enhanced for Human-Like Behavior)
      */
     calculateReadingTime(personality, contentType, contentQuality, options = {}) {
-        let baseTime = 15000; // Increased from 12000ms to 15000ms (15 seconds base)
+        // Get content for word count analysis
+        const content = options.content || this.getCurrentPageContent();
+        const wordCount = this.countWords(content);
         
-        // Adjust based on personality reading speed
+        // Calculate base reading time based on word count and WPM
+        const wordsPerMinute = this.getWordsPerMinute(personality, contentType, contentQuality);
+        const baseReadingTime = (wordCount / wordsPerMinute) * 60 * 1000; // Convert to milliseconds
+        
+        // Apply content complexity adjustments
+        const complexityMultiplier = this.getContentComplexityMultiplier(content);
+        let adjustedTime = baseReadingTime * complexityMultiplier;
+        
+        // Apply personality-based adjustments
         if (personality) {
             switch (personality.readingSpeed) {
                 case 'slow':
-                    baseTime *= 2.0; // Increased from 1.8 to 2.0
+                    adjustedTime *= (1.4 + Math.random() * 0.6); // 1.4-2.0x
                     break;
                 case 'fast':
-                    baseTime *= 0.8; // Increased from 0.7 to 0.8
+                    adjustedTime *= (0.7 + Math.random() * 0.3); // 0.7-1.0x
+                    break;
+                default:
+                    adjustedTime *= (0.9 + Math.random() * 0.2); // 0.9-1.1x for normal speed
+                    break;
+            }
+        }
+        
+        // Apply content type adjustments
+        switch (contentType) {
+            case 'article':
+                adjustedTime *= (1.3 + Math.random() * 0.4); // 1.3-1.7x
+                break;
+            case 'technical':
+                adjustedTime *= (1.6 + Math.random() * 0.6); // 1.6-2.2x
+                break;
+            case 'news':
+                adjustedTime *= (1.1 + Math.random() * 0.3); // 1.1-1.4x
+                break;
+            case 'blog':
+                adjustedTime *= (1.2 + Math.random() * 0.4); // 1.2-1.6x
+                break;
+            case 'casual':
+                adjustedTime *= (0.9 + Math.random() * 0.2); // 0.9-1.1x
+                break;
+            default:
+                adjustedTime *= (1.0 + Math.random() * 0.3); // 1.0-1.3x for general content
+                break;
+        }
+        
+        // Apply content quality adjustments
+        if (contentQuality === 'high') {
+            adjustedTime *= (1.2 + Math.random() * 0.4); // 1.2-1.6x
+        } else if (contentQuality === 'low') {
+            adjustedTime *= (0.8 + Math.random() * 0.3); // 0.8-1.1x for low quality
+        }
+        
+        // Add human-like attention and distraction factors
+        const attentionFactor = 0.8 + Math.random() * 0.4; // 0.8-1.2
+        adjustedTime *= attentionFactor;
+        
+        // Add random distraction factor
+        const distractionFactor = Math.random() < 0.12 ? (1.3 + Math.random() * 1.2) : 1.0; // 12% chance for 1.3-2.5x longer
+        adjustedTime *= distractionFactor;
+        
+        // Add natural reading variations
+        const naturalVariation = 0.8 + Math.random() * 0.4; // 0.8-1.2x
+        adjustedTime *= naturalVariation;
+        
+        // Add fatigue factor (longer reading over time)
+        const fatigueFactor = 1 + Math.random() * 0.2; // 1.0-1.2
+        adjustedTime *= fatigueFactor;
+        
+        // Ensure minimum reading time for proper content consumption
+        const minTime = Math.max(3000, wordCount * 50); // Minimum 3 seconds or 50ms per word
+        const calculatedTime = Math.round(adjustedTime);
+        
+        return Math.max(calculatedTime, minTime);
+    }
+    
+    /**
+     * Get words per minute based on personality and content
+     */
+    getWordsPerMinute(personality, contentType, contentQuality) {
+        let baseWPM = 200; // Average adult reading speed
+        
+        // Adjust based on personality
+        if (personality) {
+            switch (personality.readingSpeed) {
+                case 'slow':
+                    baseWPM = 150 + Math.random() * 50; // 150-200 WPM
+                    break;
+                case 'fast':
+                    baseWPM = 250 + Math.random() * 100; // 250-350 WPM
+                    break;
+                default:
+                    baseWPM = 180 + Math.random() * 60; // 180-240 WPM for normal speed
                     break;
             }
         }
         
         // Adjust based on content type
         switch (contentType) {
-            case 'article':
-                baseTime *= 2.0; // Increased from 1.8 to 2.0
-                break;
             case 'technical':
-                baseTime *= 2.5; // Increased from 2.2 to 2.5
+                baseWPM *= 0.6; // Much slower for technical content
+                break;
+            case 'article':
+                baseWPM *= 0.8; // Slower for articles
                 break;
             case 'news':
-                baseTime *= 1.5; // Added news type
+                baseWPM *= 1.2; // Faster for news
                 break;
             case 'blog':
-                baseTime *= 1.8; // Added blog type
+                baseWPM *= 0.9; // Slightly slower for blogs
                 break;
             case 'casual':
-                baseTime *= 1.2; // Increased from 1.0 to 1.2
+                baseWPM *= 1.1; // Faster for casual content
                 break;
         }
         
         // Adjust based on content quality
         if (contentQuality === 'high') {
-            baseTime *= 1.5; // Increased from 1.4 to 1.5
+            baseWPM *= 0.8; // Slower for high-quality content
+        } else if (contentQuality === 'low') {
+            baseWPM *= 1.2; // Faster for low-quality content
         }
         
-        // Add randomness (increased for more natural variation)
-        baseTime += (Math.random() - 0.5) * baseTime * 0.3; // Increased from 0.2 to 0.3
+        return Math.round(baseWPM);
+    }
+    
+    /**
+     * Count words in content
+     */
+    countWords(content) {
+        if (!content || typeof content !== 'string') return 0;
         
-        // Ensure minimum reading time for proper content consumption
-        const minTime = 12000; // Increased from 8 seconds to 12 seconds minimum
-        const calculatedTime = Math.round(baseTime);
+        // Remove HTML tags and extra whitespace
+        const cleanContent = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
         
-        return Math.max(calculatedTime, minTime);
+        // Split by whitespace and filter out empty strings
+        const words = cleanContent.split(/\s+/).filter(word => word.length > 0);
+        
+        return words.length;
+    }
+    
+    /**
+     * Get content complexity multiplier
+     */
+    getContentComplexityMultiplier(content) {
+        if (!content) return 1.0;
+        
+        const wordCount = this.countWords(content);
+        const sentenceCount = (content.match(/[.!?]+/g) || []).length;
+        const avgWordsPerSentence = sentenceCount > 0 ? wordCount / sentenceCount : 0;
+        
+        let complexityMultiplier = 1.0;
+        
+        // Adjust based on average words per sentence
+        if (avgWordsPerSentence > 20) {
+            complexityMultiplier *= 1.4; // Complex sentences
+        } else if (avgWordsPerSentence > 15) {
+            complexityMultiplier *= 1.2; // Moderately complex
+        } else if (avgWordsPerSentence < 10) {
+            complexityMultiplier *= 0.8; // Simple sentences
+        }
+        
+        // Adjust based on word length (longer words = more complex)
+        const avgWordLength = this.getAverageWordLength(content);
+        if (avgWordLength > 6) {
+            complexityMultiplier *= 1.3; // Long words
+        } else if (avgWordLength < 4) {
+            complexityMultiplier *= 0.9; // Short words
+        }
+        
+        // Adjust based on technical terms
+        const technicalTerms = this.countTechnicalTerms(content);
+        if (technicalTerms > 5) {
+            complexityMultiplier *= 1.2; // Technical content
+        }
+        
+        return Math.max(0.5, Math.min(2.0, complexityMultiplier)); // Clamp between 0.5x and 2.0x
+    }
+    
+    /**
+     * Get average word length
+     */
+    getAverageWordLength(content) {
+        if (!content) return 0;
+        
+        const words = content.split(/\s+/).filter(word => word.length > 0);
+        if (words.length === 0) return 0;
+        
+        const totalLength = words.reduce((sum, word) => sum + word.length, 0);
+        return totalLength / words.length;
+    }
+    
+    /**
+     * Count technical terms in content
+     */
+    countTechnicalTerms(content) {
+        if (!content) return 0;
+        
+        const technicalKeywords = [
+            'algorithm', 'analysis', 'application', 'architecture', 'assessment', 'authentication',
+            'automation', 'benchmark', 'configuration', 'deployment', 'development', 'encryption',
+            'framework', 'implementation', 'infrastructure', 'integration', 'optimization',
+            'performance', 'protocol', 'specification', 'synchronization', 'transformation',
+            'validation', 'verification', 'methodology', 'paradigm', 'scalability', 'reliability'
+        ];
+        
+        const lowerContent = content.toLowerCase();
+        let count = 0;
+        
+        technicalKeywords.forEach(term => {
+            const regex = new RegExp(`\\b${term}\\b`, 'g');
+            const matches = lowerContent.match(regex);
+            if (matches) {
+                count += matches.length;
+            }
+        });
+        
+        return count;
+    }
+    
+    /**
+     * Get current page content for analysis
+     */
+    getCurrentPageContent() {
+        // Get visible content in viewport
+        const viewportTop = window.pageYOffset;
+        const viewportBottom = viewportTop + window.innerHeight;
+        
+        let content = '';
+        
+        // Get content from visible elements
+        const contentElements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, div, span, article, section');
+        contentElements.forEach(element => {
+            const rect = element.getBoundingClientRect();
+            const elementTop = rect.top + window.pageYOffset;
+            const elementBottom = elementTop + rect.height;
+            
+            // Check if element is in viewport
+            if (elementTop < viewportBottom && elementBottom > viewportTop) {
+                content += ' ' + (element.textContent || '');
+            }
+        });
+        
+        return content.trim();
     }
 
     /**
@@ -954,37 +1251,65 @@ class ReadingSimulator {
     }
 
     /**
-     * Get reading pause time (optimized for realistic timing)
+     * Get reading pause time (Enhanced for Human-Like Behavior)
      */
     getReadingPauseTime(personality, elementType) {
-        const baseTime = 200; // Reduced from 500ms to 200ms
+        // More natural base time with wider variation
+        const baseTime = 150 + Math.random() * 300; // 150-450ms (was 200ms fixed)
         let multiplier = 1.0;
         
         if (personality) {
             switch (personality.readingSpeed) {
                 case 'slow':
-                    multiplier = 1.3; // Reduced from 1.5 to 1.3
+                    multiplier = 1.2 + Math.random() * 0.6; // 1.2-1.8x (was 1.3x fixed)
                     break;
                 case 'fast':
-                    multiplier = 0.6; // Reduced from 0.7 to 0.6
+                    multiplier = 0.5 + Math.random() * 0.3; // 0.5-0.8x (was 0.6x fixed)
+                    break;
+                default:
+                    multiplier = 0.8 + Math.random() * 0.4; // 0.8-1.2x for normal speed
                     break;
             }
         }
         
-        // Adjust based on element type
+        // Adjust based on element type with more natural variation
         switch (elementType) {
             case 'h1':
             case 'h2':
-                multiplier *= 1.2; // Reduced from 1.3 to 1.2
+                multiplier *= (1.1 + Math.random() * 0.4); // 1.1-1.5x (was 1.2x fixed)
+                break;
+            case 'h3':
+            case 'h4':
+                multiplier *= (1.0 + Math.random() * 0.3); // 1.0-1.3x
                 break;
             case 'p':
-                multiplier *= 1.0;
+                multiplier *= (0.9 + Math.random() * 0.3); // 0.9-1.2x (was 1.0x fixed)
+                break;
+            case 'img':
+                multiplier *= (1.3 + Math.random() * 0.5); // 1.3-1.8x for images
+                break;
+            case 'blockquote':
+                multiplier *= (1.2 + Math.random() * 0.4); // 1.2-1.6x for quotes
                 break;
             default:
-                multiplier *= 0.7; // Reduced from 0.8 to 0.7
+                multiplier *= (0.6 + Math.random() * 0.4); // 0.6-1.0x (was 0.7x fixed)
+                break;
         }
         
-        return baseTime * multiplier + Math.random() * 100; // Reduced randomness
+        // Add human-like attention factor
+        const attentionFactor = 0.7 + Math.random() * 0.6; // 0.7-1.3
+        multiplier *= attentionFactor;
+        
+        // Add occasional longer pauses for comprehension
+        const comprehensionChance = Math.random() < 0.15; // 15% chance
+        const comprehensionMultiplier = comprehensionChance ? (1.5 + Math.random() * 1.0) : 1.0; // 1.5-2.5x
+        
+        const finalTime = baseTime * multiplier * comprehensionMultiplier;
+        
+        // Add natural micro-variations
+        const microVariation = (Math.random() - 0.5) * finalTime * 0.3; // ±15% variation
+        
+        return Math.max(50, Math.round(finalTime + microVariation)); // Minimum 50ms
     }
 
     /**

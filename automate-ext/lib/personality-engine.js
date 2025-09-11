@@ -4,7 +4,9 @@
  * Each personality type has unique behavior patterns that influence automation
  */
 
-class PersonalityEngine {
+// Check if class already exists before declaring
+if (typeof window.PersonalityEngine === 'undefined') {
+    class PersonalityEngine {
     constructor() {
         // Define available personality types for user behavior simulation
         this.personalityTypes = {
@@ -443,11 +445,15 @@ class PersonalityEngine {
         }
         return null;
     }
-}
+    }
 
-// Export for use in other modules with enhanced stealth protection
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = PersonalityEngine;
-} else if (typeof window !== 'undefined' && !window.PersonalityEngine) {
-    window.PersonalityEngine = PersonalityEngine;
+    // Export for use in other modules with enhanced stealth protection
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = PersonalityEngine;
+    } else if (typeof window !== 'undefined' && !window.PersonalityEngine) {
+        window.PersonalityEngine = PersonalityEngine;
+    }
+} else {
+    // Use existing class
+    console.debug('PersonalityEngine already exists, using existing instance');
 }

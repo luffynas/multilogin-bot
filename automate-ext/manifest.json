@@ -27,6 +27,7 @@
         "lib/stealth-storage.js",
         "lib/stealth-delay.js",
         "lib/personality-engine.js",
+        "lib/cursor-simulator.js",
         "lib/behavior-simulator.js",
         "lib/adsense-detector.js",
         "lib/mouse-simulator.js",
