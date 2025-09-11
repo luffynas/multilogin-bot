@@ -83,10 +83,7 @@ class BotManager:
                 profile_info = self.running_profiles[profile_id]["profile"]
                 
                 # Stop the profile
-                response = self.launcher_api.stop_browser_profile(
-                    folder_id=profile_info.folder_id,
-                    profile_id=profile_id
-                )
+                response = self.launcher_api.stop_browser_profile(profile_id)
                 
                 if response.success:
                     # Remove from running profiles
@@ -212,19 +209,90 @@ class BotManager:
         
         return results
     
-    def stop_all_bots(self) -> List[Dict[str, Any]]:
+    def stop_all_bots(self, profile_type: str = "all") -> List[Dict[str, Any]]:
         """Stop all running bots"""
-        results = []
-        profile_ids = list(self.running_profiles.keys())
-        
-        for profile_id in profile_ids:
-            result = self.stop_profile_bot(profile_id)
-            results.append(result)
-        
-        return results
+        try:
+            # Use API to stop all profiles
+            response = self.launcher_api.stop_all_profiles(profile_type)
+            
+            if response.success:
+                # Clear all running profiles from memory
+                stopped_count = len(self.running_profiles)
+                self.running_profiles.clear()
+                
+                return [{
+                    "success": True,
+                    "message": f"Stopped {stopped_count} profiles",
+                    "profile_type": profile_type
+                }]
+            else:
+                return [{
+                    "success": False,
+                    "message": f"Failed to stop profiles: {response.error}",
+                    "profile_type": profile_type
+                }]
+                
+        except Exception as e:
+            return [{
+                "success": False,
+                "message": f"Error stopping profiles: {str(e)}",
+                "profile_type": profile_type
+            }]
     
     def get_running_profiles_status(self) -> Dict[str, Any]:
         """Get status of all running profiles"""
+        try:
+            # Use API to get all profiles status
+            response = self.launcher_api.get_all_profiles_status()
+            
+            if response.success:
+                # Parse API response
+                data = response.data.get("data", {})
+                states = data.get("states", {})
+                active_counter = data.get("active_counter", {})
+                
+                # Convert to our format
+                status_info = {}
+                current_time = datetime.now()
+                
+                for profile_id, profile_data in states.items():
+                    # Calculate runtime if we have this profile in our running list
+                    runtime = 0
+                    remaining_time = 0
+                    
+                    if profile_id in self.running_profiles:
+                        start_time = self.running_profiles[profile_id]["start_time"]
+                        runtime = (current_time - start_time).total_seconds()
+                        remaining_time = max(0, self.max_runtime - runtime)
+                    
+                    status_info[profile_id] = {
+                        "profile_name": profile_data.get("name", "Unknown"),
+                        "status": profile_data.get("status", "unknown"),
+                        "start_time": self.running_profiles.get(profile_id, {}).get("start_time", current_time).isoformat() if profile_id in self.running_profiles else None,
+                        "runtime_seconds": runtime,
+                        "remaining_seconds": remaining_time,
+                        "port": profile_data.get("port"),
+                        "browser_type": profile_data.get("browser_type"),
+                        "is_quick": profile_data.get("is_quick", False),
+                        "last_launched_at": profile_data.get("last_launched_at"),
+                        "in_use_by": profile_data.get("in_use_by")
+                    }
+                
+                # Add active counter info
+                status_info["_active_counter"] = active_counter
+                
+                return status_info
+            else:
+                # Fallback to local data if API fails
+                return self._get_local_running_status()
+                
+        except Exception as e:
+            print(f"Error getting profiles status from API: {e}")
+            # Fallback to local data
+            return self._get_local_running_status()
+    
+    def _get_local_running_status(self) -> Dict[str, Any]:
+        """Fallback method to get local running profiles status"""
         current_time = datetime.now()
         status_info = {}
         

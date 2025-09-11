@@ -70,9 +70,10 @@ This tool helps you automate Multilogin browser profiles with:
 7. Import Cookies
 8. Start Bot (Single Profile)
 9. Start Bot (Multiple Profiles)
-10. Stop All Profiles
-11. View Running Profiles Status
-12. Exit
+10. Stop Profile
+11. Stop All Profiles
+12. View Running Profiles Status
+13. Exit
         """
         
         panel = Panel(menu_text, title="Main Menu", border_style="green")
@@ -80,7 +81,7 @@ This tool helps you automate Multilogin browser profiles with:
         
         choice = Prompt.ask(
             "Select an option",
-            choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+            choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"],
             default="1"
         )
         
@@ -671,15 +672,38 @@ This tool helps you automate Multilogin browser profiles with:
             self.console.print(f"✅ Successful: {successful}")
             self.console.print(f"❌ Failed: {failed}")
     
+    def stop_single_profile(self):
+        """Stop a single profile"""
+        self.console.print("\n🛑 Stop Single Profile")
+        
+        profile_id = Prompt.ask("Enter profile ID to stop")
+        
+        result = self.bot_manager.stop_profile_bot(profile_id)
+        
+        if result["success"]:
+            self.console.print(f"✅ {result['message']}")
+        else:
+            self.console.print(f"❌ {result['message']}")
+    
     def stop_all_profiles(self):
         """Stop all running profiles"""
         self.console.print("\n🛑 Stop All Profiles")
         
-        if Confirm.ask("Are you sure you want to stop all profiles?"):
-            results = self.bot_manager.stop_all_bots()
+        # Get profile type
+        profile_type = Prompt.ask(
+            "Enter profile type to stop", 
+            choices=["all", "regular", "quick"], 
+            default="all"
+        )
+        
+        if Confirm.ask(f"Are you sure you want to stop all {profile_type} profiles?"):
+            results = self.bot_manager.stop_all_bots(profile_type)
             
             successful = sum(1 for r in results if r["success"])
-            self.console.print(f"✅ Stopped {successful} profiles")
+            if successful > 0:
+                self.console.print(f"✅ {results[0]['message']}")
+            else:
+                self.console.print(f"❌ {results[0]['message']}")
     
     def view_running_status(self):
         """View status of running profiles"""
@@ -688,28 +712,46 @@ This tool helps you automate Multilogin browser profiles with:
         status_info = self.bot_manager.get_running_profiles_status()
         
         if status_info:
-            table = Table(title="Running Profiles")
-            table.add_column("Profile ID", style="cyan")
-            table.add_column("Name", style="green")
-            table.add_column("Status", style="yellow")
-            table.add_column("Runtime", style="magenta")
-            table.add_column("Remaining", style="red")
-            table.add_column("Port", style="blue")
+            # Display active counter if available
+            active_counter = status_info.get("_active_counter", {})
+            if active_counter:
+                self.console.print(f"\n📈 Active Profiles Summary:")
+                self.console.print(f"   Cloud: {active_counter.get('cloud', 0)}")
+                self.console.print(f"   Local: {active_counter.get('local', 0)}")
+                self.console.print(f"   Quick: {active_counter.get('quick', 0)}")
             
-            for profile_id, info in status_info.items():
-                runtime_min = int(info["runtime_seconds"] / 60)
-                remaining_min = int(info["remaining_seconds"] / 60)
+            # Filter out the active counter from the main data
+            profile_data = {k: v for k, v in status_info.items() if k != "_active_counter"}
+            
+            if profile_data:
+                table = Table(title="Profile Status Details")
+                table.add_column("Profile ID", style="cyan", width=12)
+                table.add_column("Name", style="green", width=20)
+                table.add_column("Status", style="yellow", width=15)
+                table.add_column("Browser", style="blue", width=10)
+                table.add_column("Runtime", style="magenta", width=8)
+                table.add_column("Remaining", style="red", width=8)
+                table.add_column("Port", style="blue", width=6)
+                table.add_column("Quick", style="cyan", width=6)
                 
-                table.add_row(
-                    profile_id[:8] + "...",
-                    info["profile_name"],
-                    info["status"],
-                    f"{runtime_min}m",
-                    f"{remaining_min}m",
-                    str(info.get("port", "N/A"))
-                )
-            
-            self.console.print(table)
+                for profile_id, info in profile_data.items():
+                    runtime_min = int(info["runtime_seconds"] / 60) if info["runtime_seconds"] > 0 else 0
+                    remaining_min = int(info["remaining_seconds"] / 60) if info["remaining_seconds"] > 0 else 0
+                    
+                    table.add_row(
+                        profile_id[:8] + "...",
+                        info["profile_name"][:20] + "..." if len(info["profile_name"]) > 20 else info["profile_name"],
+                        info["status"],
+                        info.get("browser_type", "N/A"),
+                        f"{runtime_min}m",
+                        f"{remaining_min}m",
+                        str(info.get("port", "N/A")),
+                        "Yes" if info.get("is_quick", False) else "No"
+                    )
+                
+                self.console.print(table)
+            else:
+                self.console.print("ℹ️ No profile details available")
         else:
             self.console.print("ℹ️ No profiles currently running")
     
@@ -740,15 +782,17 @@ This tool helps you automate Multilogin browser profiles with:
                 elif choice == "9":
                     self.start_multiple_bots()
                 elif choice == "10":
-                    self.stop_all_profiles()
+                    self.stop_single_profile()
                 elif choice == "11":
-                    self.view_running_status()
+                    self.stop_all_profiles()
                 elif choice == "12":
+                    self.view_running_status()
+                elif choice == "13":
                     self.console.print("👋 Goodbye!")
                     break
                 
                 # Pause before showing menu again
-                if choice != "12":
+                if choice != "13":
                     Prompt.ask("\nPress Enter to continue...")
                     
             except KeyboardInterrupt:

@@ -45,13 +45,9 @@ class LauncherAPI(BaseAPIClient):
         
         return response
     
-    def stop_browser_profile(
-        self, 
-        folder_id: str, 
-        profile_id: str
-    ) -> BaseResponse:
+    def stop_browser_profile(self, profile_id: str) -> BaseResponse:
         """Stop a browser profile"""
-        url = f"{self.launcher_url}/api/v2/profile/f/{folder_id}/p/{profile_id}/stop"
+        url = f"{self.launcher_url}/api/v1/profile/stop/p/{profile_id}"
         
         response = self.get(url)
         
@@ -63,16 +59,17 @@ class LauncherAPI(BaseAPIClient):
         
         return response
     
-    def stop_all_profiles(self) -> BaseResponse:
+    def stop_all_profiles(self, profile_type: str = "all") -> BaseResponse:
         """Stop all running profiles"""
-        url = f"{self.launcher_url}/api/v2/profile/stop-all"
+        url = f"{self.launcher_url}/api/v1/profile/stop_all"
+        params = {"type": profile_type}
         
-        response = self.get(url)
+        response = self.get(url, params=params)
         
         if response.success:
             return BaseResponse(
                 success=True,
-                message="All profiles stopped successfully"
+                message=f"All {profile_type} profiles stopped successfully"
             )
         
         return response
@@ -107,6 +104,21 @@ class LauncherAPI(BaseAPIClient):
         return response
     
     def get_all_profiles_status(self) -> BaseResponse:
+        """Get status of all profiles"""
+        url = f"{self.launcher_url}/api/v1/profile/statuses"
+        
+        response = self.get(url)
+        
+        if response.success:
+            return BaseResponse(
+                success=True,
+                message="All profiles status retrieved successfully",
+                data=response.data
+            )
+        
+        return response
+    
+    def get_all_profiles_status_old(self) -> BaseResponse:
         """Get status of all profiles"""
         url = f"{self.launcher_url}/api/v2/profile/status"
         
