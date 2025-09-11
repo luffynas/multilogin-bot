@@ -529,6 +529,40 @@ class PopupManager {
                 if (metrics.stealth) {
                     document.getElementById('humanBehaviorScore').textContent = (metrics.stealth.humanBehaviorScore || 0).toFixed(2);
                 }
+                
+                // ✅ INTEGRATED: Display new metrics from integrated functions
+                if (metrics.behavior) {
+                    document.getElementById('behaviorStatus').textContent = metrics.behavior.isSimulating ? 'Active' : 'Inactive';
+                    document.getElementById('deviceType').textContent = metrics.behavior.deviceType || 'Unknown';
+                }
+                
+                if (metrics.scrollBehavior) {
+                    document.getElementById('scrollPatterns').textContent = Object.keys(metrics.scrollBehavior.patterns || {}).length;
+                }
+                
+                if (metrics.navigation) {
+                    document.getElementById('navigationMaturity').textContent = (metrics.navigation.maturityScore || 0).toFixed(1);
+                }
+                
+                if (metrics.evasion) {
+                    document.getElementById('evasionScore').textContent = (metrics.evasion.riskLevel || 0).toFixed(1);
+                }
+                
+                if (metrics.clickProbability) {
+                    document.getElementById('clickProbability').textContent = metrics.clickProbability.averageProbability || '0%';
+                }
+                
+                if (metrics.rpmProbability) {
+                    document.getElementById('rpmScore').textContent = metrics.rpmProbability.averageCase?.probability || '0%';
+                }
+                
+                if (metrics.mlMetrics) {
+                    document.getElementById('mlScore').textContent = (metrics.mlMetrics.adaptationScore || 0).toFixed(1);
+                }
+                
+                if (metrics.fraudPreventionSummary) {
+                    document.getElementById('fraudPrevention').textContent = metrics.fraudPreventionSummary.hourlyClicks || 0;
+                }
             }
             
         } catch (error) {

@@ -136,6 +136,32 @@ class AutomationModuleFactory {
         return new StealthDelay();
     }
     
+    // ✅ INTEGRATED: Add missing create functions for flow-chart modules
+    async createAdvancedMousePhysics() {
+        const AdvancedMousePhysics = await this.moduleLoader.loadModule('AdvancedMousePhysics', 'lib/advanced-mouse-physics.js');
+        return new AdvancedMousePhysics();
+    }
+    
+    async createNetworkTrafficSimulator() {
+        const NetworkTrafficSimulator = await this.moduleLoader.loadModule('NetworkTrafficSimulator', 'lib/network-traffic-simulator.js');
+        return new NetworkTrafficSimulator();
+    }
+    
+    async createMLBehaviorEngine() {
+        const MLBehaviorEngine = await this.moduleLoader.loadModule('MLBehaviorEngine', 'lib/ml-behavior-engine.js');
+        return new MLBehaviorEngine();
+    }
+    
+    async createAdvancedBotEvasion() {
+        const AdvancedBotEvasion = await this.moduleLoader.loadModule('AdvancedBotEvasion', 'lib/advanced-bot-evasion.js');
+        return new AdvancedBotEvasion();
+    }
+    
+    async createStealthStorage() {
+        const StealthStorage = await this.moduleLoader.loadModule('StealthStorage', 'lib/stealth-storage.js');
+        return new StealthStorage();
+    }
+    
     async createAllModules() {
         // Load StealthDelay first as it's a dependency for other modules
         const stealthDelay = await this.createStealthDelay();
@@ -153,6 +179,13 @@ class AutomationModuleFactory {
         const dynamicAdaptationEngine = await this.createDynamicAdaptationEngine();
         const enhancedFraudPrevention = await this.createEnhancedFraudPrevention();
         
+        // ✅ INTEGRATED: Add missing modules from flow-chart
+        const advancedMousePhysics = await this.createAdvancedMousePhysics();
+        const networkTrafficSimulator = await this.createNetworkTrafficSimulator();
+        const mlBehaviorEngine = await this.createMLBehaviorEngine();
+        const advancedBotEvasion = await this.createAdvancedBotEvasion();
+        const stealthStorage = await this.createStealthStorage();
+        
         return {
             stealthDelay,
             personalityEngine,
@@ -166,7 +199,13 @@ class AutomationModuleFactory {
             stealthMonitor,
             analyticsMonitor,
             dynamicAdaptationEngine,
-            enhancedFraudPrevention
+            enhancedFraudPrevention,
+            // ✅ INTEGRATED: Missing modules
+            advancedMousePhysics,
+            networkTrafficSimulator,
+            mlBehaviorEngine,
+            advancedBotEvasion,
+            stealthStorage
         };
     }
 }
@@ -444,6 +483,13 @@ class PageProcessor {
         this.dynamicAdaptationEngine = dependencies.dynamicAdaptationEngine;
         this.enhancedFraudPrevention = dependencies.enhancedFraudPrevention;
         
+        // ✅ INTEGRATED: Inject missing modules from flow-chart
+        this.advancedMousePhysics = dependencies.advancedMousePhysics;
+        this.networkTrafficSimulator = dependencies.networkTrafficSimulator;
+        this.mlBehaviorEngine = dependencies.mlBehaviorEngine;
+        this.advancedBotEvasion = dependencies.advancedBotEvasion;
+        this.stealthStorage = dependencies.stealthStorage;
+        
         // Initialize state machine and error recovery
         this.stateMachine = new AutomationStateMachine();
         this.errorRecovery = new ErrorRecoveryManager();
@@ -573,6 +619,13 @@ class PageProcessor {
             this.dynamicAdaptationEngine.resetSessionAdaptations(); // Reset adaptations for new session
             
             this.enhancedFraudPrevention.initialize();
+            
+            // ✅ INTEGRATED: Initialize missing modules from flow-chart
+            this.advancedMousePhysics.initialize();
+            this.networkTrafficSimulator.initialize();
+            this.mlBehaviorEngine.initialize();
+            this.advancedBotEvasion.initialize();
+            this.stealthStorage.initialize();
             } catch (initError) {
                 console.error('Component initialization error:', initError);
                 const recovery = await this.errorRecovery.handleError(initError, 'component_initialization');
@@ -1013,6 +1066,9 @@ class PageProcessor {
             // Transition to running state after successful session start
             this.stateMachine.transition('running');
             
+            // ✅ INTEGRATED: Start behavior simulation
+            this.behaviorSimulator.startSimulation();
+            
             // Start automation loop
             this.automationLoop(options);
             
@@ -1048,6 +1104,9 @@ class PageProcessor {
             
             this.stateMachine.transition('stopping');
             this.isRunning = false;
+            
+            // ✅ INTEGRATED: Stop behavior simulation
+            this.behaviorSimulator.stopSimulation();
             
             // End session with error recovery
             try {
@@ -1216,8 +1275,8 @@ class PageProcessor {
                     console.log(`⏱️ Page time: ${Math.round(pageTime / 1000)}s`);
                 }
                 
-                // Navigation cooldown after reading (variable minimum time on page)
-                const minPageTime = 90000 + Math.random() * 60000; // 1.5-2.5 minutes variable
+                // Navigation cooldown after reading (reduced for testing)
+                const minPageTime = 30000 + Math.random() * 30000; // 30-60 seconds variable (reduced for testing)
                 if (pageTime < minPageTime) {
                     if (this.automationConfig.debugMode) {
                         console.log(`⏳ Navigation cooldown: ${Math.round((minPageTime - pageTime) / 1000)}s remaining`);
@@ -1253,20 +1312,16 @@ class PageProcessor {
                 const postReadingDelay = 3000 + Math.random() * 15000;
                 await this.delay(postReadingDelay);
                 
-                // Simulate navigation with variable probability
-                const baseProbability = Math.min(0.25, pageTime / 300000); // 25% max after 5 minutes
+                // Simulate navigation with variable probability (increased for testing)
+                const baseProbability = Math.min(0.8, pageTime / 120000); // 80% max after 2 minutes (increased for testing)
                 const personalityMultiplier = this.getPersonalityNavigationMultiplier();
                 const navigationProbability = baseProbability * personalityMultiplier;
                 
                 if (Math.random() < navigationProbability) {
-                    if (this.automationConfig.debugMode) {
-                        console.log(`🧭 Navigation probability: ${(navigationProbability * 100).toFixed(1)}% (page time: ${Math.round(pageTime / 1000)}s)`);
-                    }
+                    console.log(`🧭 Navigation triggered! Probability: ${(navigationProbability * 100).toFixed(1)}% (page time: ${Math.round(pageTime / 1000)}s)`);
                     await this.simulateNavigation();
                 } else {
-                    if (this.automationConfig.debugMode) {
-                        console.log(`⏳ Navigation skipped (${(navigationProbability * 100).toFixed(1)}% chance)`);
-                    }
+                    console.log(`⏳ Navigation skipped (${(navigationProbability * 100).toFixed(1)}% chance) - will try again next loop`);
                 }
             } catch (error) {
             console.error('Automation step execution error:', error);
@@ -1527,18 +1582,34 @@ class PageProcessor {
                 return;
             }
             
-            // Check navigation cooldown
+            // Check navigation cooldown (reduced for testing)
             const now = Date.now();
             const timeSinceLastNavigation = now - this.navigationState.lastNavigationTime;
-            const navigationCooldown = 60000; // 1 minute cooldown
+            const navigationCooldown = 15000; // 15 seconds cooldown (reduced for testing)
             
             if (timeSinceLastNavigation < navigationCooldown) {
                 console.log(`⏳ Navigation cooldown: ${Math.round((navigationCooldown - timeSinceLastNavigation) / 1000)}s remaining`);
                 return;
             }
             
-            // Intelligent navigation based on personality
-            const navigationResult = await this.navigationSimulator.simulateIntelligentNavigation();
+            // Intelligent navigation based on personality with explicit Previous/Next Post
+            let navigationResult;
+            
+            // Try Previous/Next Post navigation first (more specific for blog posts)
+            const navigationType = Math.random() < 0.5 ? 'next' : 'previous';
+            console.log(`🎯 Attempting ${navigationType} post navigation...`);
+            
+            if (navigationType === 'next') {
+                navigationResult = await this.navigationSimulator.navigatePreviousNext();
+            } else {
+                navigationResult = await this.navigationSimulator.navigateToPreviousPage();
+            }
+            
+            // Fallback to intelligent navigation if Previous/Next fails
+            if (!navigationResult) {
+                console.log('🔄 Previous/Next navigation failed, trying intelligent navigation...');
+                navigationResult = await this.navigationSimulator.simulateIntelligentNavigation();
+            }
             
             if (navigationResult) {
                 console.log('🧭 Navigation completed, starting reading on new page...');
@@ -1641,6 +1712,18 @@ class PageProcessor {
             analytics: this.analyticsMonitor.getAnalyticsReport(),
             adaptation: this.dynamicAdaptationEngine.getCurrentRiskAssessment(),
                 fraudPrevention: this.enhancedFraudPrevention.riskAssessment,
+            
+            // ✅ INTEGRATED MISSING FUNCTIONS
+            behavior: this.behaviorSimulator.getBehaviorStatus(),
+            scrollBehavior: this.behaviorSimulator.getScrollBehaviorSummary(),
+            deviceBehavior: this.behaviorSimulator.getDeviceComparisonSummary(),
+            navigation: this.navigationSimulator.getNavigationMaturitySummary(),
+            evasion: this.advancedBotEvasion.getEvasionMetrics(),
+            adaptationStats: this.dynamicAdaptationEngine.getAdaptationStats(),
+            fraudPreventionSummary: this.adsenseDetector.getFraudPreventionSummary(),
+            clickProbability: this.adsenseDetector.getClickProbabilitySummary(),
+            rpmProbability: this.adsenseDetector.getRPMProbabilitySummary(),
+            mlMetrics: this.mlBehaviorEngine.getMLMetrics(),
                 errorRecovery: {
                     errorCount: this.errorRecovery.errorHistory.length,
                     lastError: this.errorRecovery.errorHistory[this.errorRecovery.errorHistory.length - 1],
@@ -1689,6 +1772,17 @@ class PageProcessor {
             analytics: this.analyticsMonitor.getAnalyticsReport(),
             adaptation: this.dynamicAdaptationEngine.getCurrentRiskAssessment(),
                 fraudPrevention: this.enhancedFraudPrevention.riskAssessment,
+            
+            // ✅ INTEGRATED: Add missing metrics from integrated functions
+            scrollBehavior: this.behaviorSimulator.getScrollBehaviorSummary(),
+            deviceBehavior: this.behaviorSimulator.getDeviceComparisonSummary(),
+            navigation: this.navigationSimulator.getNavigationMaturitySummary(),
+            evasion: this.advancedBotEvasion.getEvasionMetrics(),
+            adaptationStats: this.dynamicAdaptationEngine.getAdaptationStats(),
+            fraudPreventionSummary: this.adsenseDetector.getFraudPreventionSummary(),
+            clickProbability: this.adsenseDetector.getClickProbabilitySummary(),
+            rpmProbability: this.adsenseDetector.getRPMProbabilitySummary(),
+            mlMetrics: this.mlBehaviorEngine.getMLMetrics(),
                 stateMachine: {
                     currentState: this.stateMachine.currentState,
                     stateHistory: this.stateMachine.stateHistory,

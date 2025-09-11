@@ -522,6 +522,7 @@ class BehaviorSimulator {
         const adInteractions = [];
         let hasReachedBottom = false;
         let hasReachedTop = false;
+        const startTime = Date.now();
 
         if (this.behaviorConfig.debugMode) {
             console.log(`📖 Starting comprehensive reading: ${numScrolls} scrolls, ${maxScrollDistance}px total distance`);
@@ -653,11 +654,19 @@ class BehaviorSimulator {
         console.log(`✅ Comprehensive reading completed: ${detectedAds.size} ads detected, ${adInteractions.length} interactions, ${currentPosition}px covered`);
 
         return {
-            totalAdsDetected: detectedAds.size,
-            totalInteractions: adInteractions.length,
+            success: true,
+            totalScrolls: numScrolls,
+            adsDetected: detectedAds.size,
+            interactions: adInteractions.length,
             adInteractions: adInteractions,
-            scrollPositions: numScrolls,
-            pageCoverage: `${currentPosition}/${maxScrollDistance}px`
+            finalPosition: currentPosition,
+            maxScrollDistance: maxScrollDistance,
+            pageCoverage: `${currentPosition}/${maxScrollDistance}px`,
+            coveragePercentage: Math.round((currentPosition / maxScrollDistance) * 100),
+            duration: Date.now() - startTime,
+            personality: personality.type,
+            config: config,
+            timestamp: Date.now()
         };
     }
 
@@ -858,30 +867,63 @@ class BehaviorSimulator {
      */
     async handleRealtimeAdInteraction(adInfo) {
         try {
-            // Basic interaction simulation
+            const personality = this.currentPersonality;
+            const interactionProbability = personality ? personality.clickProbability : 0.1;
+            
+            // Standardized interaction object
             const interaction = {
+                success: true,
                 type: 'scroll_detection',
                 adId: adInfo.uniqueId,
+                action: 'view', // Default action
                 timestamp: Date.now(),
                 position: {
                     x: adInfo.rect.left + adInfo.rect.width / 2,
                     y: adInfo.rect.top + adInfo.rect.height / 2
-                }
+                },
+                element: {
+                    tagName: adInfo.element.tagName,
+                    className: adInfo.element.className,
+                    id: adInfo.element.id
+                },
+                viewport: {
+                    width: adInfo.rect.width,
+                    height: adInfo.rect.height,
+                    visible: adInfo.rect.top >= 0 && adInfo.rect.bottom <= window.innerHeight
+                },
+                personality: personality ? personality.type : 'unknown',
+                probability: interactionProbability
             };
 
             // Simulate hover (20% chance)
             if (Math.random() < 0.2) {
                 interaction.action = 'hover';
+                interaction.hoverDuration = 500 + Math.random() * 1000;
                 await this.simulateHover(adInfo.element);
             }
 
-            // Simulate view (always track)
-            interaction.action = interaction.action || 'view';
+            // Simulate click (based on personality probability)
+            if (Math.random() < interactionProbability) {
+                interaction.action = 'click';
+                interaction.clickDelay = 200 + Math.random() * 800;
+                await this.delay(interaction.clickDelay);
+                // Note: Actual click would be handled by calling function
+            }
+
+            // Always track view
+            if (interaction.action === 'view') {
+                interaction.viewDuration = 1000 + Math.random() * 2000;
+            }
             
             return interaction;
         } catch (error) {
             console.error('Error handling real-time ad interaction:', error);
-            return null;
+            return {
+                success: false,
+                error: error.message,
+                timestamp: Date.now(),
+                adId: adInfo.uniqueId || 'unknown'
+            };
         }
     }
 
@@ -1184,6 +1226,47 @@ class BehaviorSimulator {
     }
 
     /**
+     * Analyze content complexity for reading comprehension
+     */
+    analyzeContentComplexity(content) {
+        if (!content) return 1;
+        
+        const wordCount = content.split(' ').length;
+        const sentenceCount = content.split(/[.!?]+/).length;
+        const avgWordsPerSentence = wordCount / sentenceCount;
+        
+        // Complexity scoring
+        let complexity = 1;
+        if (avgWordsPerSentence > 20) complexity += 1;
+        if (wordCount > 100) complexity += 1;
+        if (content.includes('technical') || content.includes('complex')) complexity += 1;
+        if (content.includes('analysis') || content.includes('research')) complexity += 1;
+        if (content.includes('algorithm') || content.includes('methodology')) complexity += 1;
+        
+        return Math.min(complexity, 5); // Max complexity of 5
+    }
+
+    /**
+     * Simulate comprehension pause based on content complexity
+     */
+    async simulateComprehensionPause(content, personality) {
+        const contentComplexity = this.analyzeContentComplexity(content);
+        const basePause = contentComplexity * 200; // 200ms per complexity unit
+        const personalityMultiplier = personality.readingSpeed === 'slow' ? 1.8 : 1.0;
+        
+        const pauseTime = basePause * personalityMultiplier;
+        await this.delay(pauseTime);
+        
+        return {
+            duration: pauseTime,
+            complexity: contentComplexity,
+            personality: personality.type,
+            contentLength: content ? content.length : 0,
+            timestamp: Date.now()
+        };
+    }
+
+    /**
      * Simulate natural click with device-specific behavior
      */
     async simulateNaturalClick(element, x, y) {
@@ -1339,7 +1422,7 @@ class BehaviorSimulator {
 
             // Occasional pause for thinking
             if (this.shouldPauseForThinking(personality)) {
-                await this.delay(500 + Math.random() * 1000);
+                await this.simulateThinkingPause(personality, 'typing');
             }
         }
     }
@@ -1408,6 +1491,25 @@ class BehaviorSimulator {
     }
 
     /**
+     * Simulate thinking pause with personality-based timing
+     */
+    async simulateThinkingPause(personality, context = 'typing') {
+        const basePause = context === 'typing' ? 500 : 1000;
+        const variation = Math.random() * 1000;
+        const personalityMultiplier = personality.attentionSpan === 'long' ? 1.5 : 1.0;
+        
+        const pauseTime = (basePause + variation) * personalityMultiplier;
+        await this.delay(pauseTime);
+        
+        return {
+            duration: pauseTime,
+            context: context,
+            personality: personality.type,
+            timestamp: Date.now()
+        };
+    }
+
+    /**
      * Insert text into element
      */
     insertText(element, text) {
@@ -1456,27 +1558,66 @@ class BehaviorSimulator {
     }
 
     /**
-     * Simulate reading behavior
+     * Simulate reading behavior with enhanced parameters
      */
-    async simulateReadingBehavior(contentType = 'general', contentQuality = 'medium') {
-        if (!this.behaviorConfig.reading.enabled) return;
+    async simulateReadingBehavior(contentType = 'general', contentQuality = 'medium', options = {}) {
+        if (!this.behaviorConfig.reading.enabled) return {
+            success: false,
+            reason: 'reading_disabled',
+            timestamp: Date.now()
+        };
+
+        const {
+            enableTextSelection = true,
+            enableComprehensionPauses = true,
+            enableReReading = true,
+            customReadingTime = null,
+            content = null
+        } = options;
 
         const personality = this.currentPersonality;
         const readingPattern = this.getReadingPattern(personality, contentType, contentQuality);
 
         // Simulate reading time
-        const readingTime = this.calculateReadingTime(personality, contentType, contentQuality);
+        const readingTime = customReadingTime || this.calculateReadingTime(personality, contentType, contentQuality);
         await this.delay(readingTime);
 
+        const results = {
+            success: true,
+            readingTime: readingTime,
+            textSelection: false,
+            comprehensionPauses: 0,
+            reReading: false,
+            scrollActions: 0,
+            timestamp: Date.now()
+        };
+
         // Simulate text selection
-        if (readingPattern.selectionProbability > Math.random()) {
+        if (enableTextSelection && readingPattern.selectionProbability > Math.random()) {
             await this.simulateTextSelection();
+            results.textSelection = true;
+        }
+
+        // Simulate comprehension pauses
+        if (enableComprehensionPauses && content) {
+            const comprehensionPause = await this.simulateComprehensionPause(content, personality);
+            results.comprehensionPauses = 1;
+            results.comprehensionDuration = comprehensionPause.duration;
         }
 
         // Simulate scrolling while reading (reduced frequency)
         if (readingPattern.scrollWhileReading && Math.random() < 0.3) { // Only 30% chance
             await this.simulateReadingScroll();
+            results.scrollActions = 1;
         }
+
+        // Simulate re-reading
+        if (enableReReading && readingPattern.reReadProbability > Math.random()) {
+            await this.delay(readingTime * 0.3); // 30% of original reading time
+            results.reReading = true;
+        }
+
+        return results;
     }
 
     /**

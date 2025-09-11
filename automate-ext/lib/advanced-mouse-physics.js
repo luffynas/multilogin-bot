@@ -472,6 +472,7 @@ class AdvancedMousePhysics {
 // Export for use in other modules with enhanced stealth protection
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = AdvancedMousePhysics;
-} else if (typeof window !== 'undefined' && !window.AdvancedMousePhysics) {
+} else if (typeof window !== 'undefined') {
+    // Always assign to window, overwriting if exists to prevent conflicts
     window.AdvancedMousePhysics = AdvancedMousePhysics;
 }

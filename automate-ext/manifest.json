@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Web Assistant",
   "version": "1.0.0",
-  "description": "General web browsing assistant and productivity tool",
+  "description": "General web browsing assistant and productivity tool by GengSego",
   "permissions": [
     "activeTab",
     "storage",

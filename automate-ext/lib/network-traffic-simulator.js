@@ -735,6 +735,7 @@ class NetworkTrafficSimulator {
 // Export for use in other modules with enhanced stealth protection
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = NetworkTrafficSimulator;
-} else if (typeof window !== 'undefined' && !window.NetworkTrafficSimulator) {
+} else if (typeof window !== 'undefined') {
+    // Always assign to window, overwriting if exists to prevent conflicts
     window.NetworkTrafficSimulator = NetworkTrafficSimulator;
 }

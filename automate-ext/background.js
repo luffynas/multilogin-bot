@@ -349,6 +349,10 @@ class BackgroundManager {
                 'lib/analytics-monitor.js',
                 'lib/dynamic-adaptation-engine.js',
                 'lib/enhanced-fraud-prevention.js',
+                'lib/advanced-mouse-physics.js',
+                'lib/network-traffic-simulator.js',
+                'lib/ml-behavior-engine.js',
+                'lib/advanced-bot-evasion.js',
                 'content-script.js'
             ];
             

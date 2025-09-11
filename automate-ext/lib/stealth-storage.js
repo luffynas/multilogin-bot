@@ -8,6 +8,149 @@ class StealthStorage {
         this.encryptionKey = this.generateEncryptionKey();
         this.compressionEnabled = true;
         this.maxStorageSize = 5 * 1024 * 1024; // 5MB limit
+        this.isInitialized = false;
+    }
+
+    /**
+     * Initialize stealth storage system
+     */
+    initialize() {
+        console.log('StealthStorage: Initializing stealth storage system');
+        
+        try {
+            // Check if localStorage is available
+            this.checkLocalStorageAvailability();
+            
+            // Setup storage monitoring
+            this.setupStorageMonitoring();
+            
+            // Initialize storage cleanup
+            this.initializeStorageCleanup();
+            
+            // Setup storage encryption
+            this.setupStorageEncryption();
+            
+            this.isInitialized = true;
+            console.log('StealthStorage: Initialized successfully');
+            
+            return this;
+        } catch (error) {
+            console.error('StealthStorage: Initialization failed:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Check if localStorage is available
+     */
+    checkLocalStorageAvailability() {
+        try {
+            const testKey = this.prefix + 'test';
+            localStorage.setItem(testKey, 'test');
+            localStorage.removeItem(testKey);
+            console.log('StealthStorage: localStorage is available');
+        } catch (error) {
+            console.warn('StealthStorage: localStorage not available:', error);
+            throw new Error('localStorage is not available');
+        }
+    }
+
+    /**
+     * Setup storage monitoring
+     */
+    setupStorageMonitoring() {
+        console.log('StealthStorage: Setting up storage monitoring');
+        
+        // Monitor storage usage
+        this.monitorStorageUsage();
+        
+        // Monitor storage access
+        this.monitorStorageAccess();
+    }
+
+    /**
+     * Initialize storage cleanup
+     */
+    initializeStorageCleanup() {
+        console.log('StealthStorage: Initializing storage cleanup');
+        
+        // Clean up old data
+        this.cleanupOldData();
+        
+        // Setup periodic cleanup
+        this.setupPeriodicCleanup();
+    }
+
+    /**
+     * Setup storage encryption
+     */
+    setupStorageEncryption() {
+        console.log('StealthStorage: Setting up storage encryption');
+        
+        // Generate new encryption key if needed
+        if (!this.encryptionKey) {
+            this.encryptionKey = this.generateEncryptionKey();
+        }
+    }
+
+    /**
+     * Monitor storage usage
+     */
+    monitorStorageUsage() {
+        console.log('StealthStorage: Monitoring storage usage');
+        // Implementation for monitoring storage usage
+    }
+
+    /**
+     * Monitor storage access
+     */
+    monitorStorageAccess() {
+        console.log('StealthStorage: Monitoring storage access');
+        // Implementation for monitoring storage access
+    }
+
+    /**
+     * Clean up old data
+     */
+    cleanupOldData() {
+        console.log('StealthStorage: Cleaning up old data');
+        
+        try {
+            const keys = Object.keys(localStorage);
+            const stealthKeys = keys.filter(key => key.startsWith(this.prefix));
+            
+            // Remove old data (older than 7 days)
+            const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+            
+            stealthKeys.forEach(key => {
+                try {
+                    const data = localStorage.getItem(key);
+                    if (data) {
+                        const parsed = this.deobfuscate(data);
+                        if (parsed.timestamp && parsed.timestamp < sevenDaysAgo) {
+                            localStorage.removeItem(key);
+                        }
+                    }
+                } catch (error) {
+                    // Remove corrupted data
+                    localStorage.removeItem(key);
+                }
+            });
+        } catch (error) {
+            console.warn('StealthStorage: Cleanup failed:', error);
+        }
+    }
+
+    /**
+     * Setup periodic cleanup
+     */
+    setupPeriodicCleanup() {
+        console.log('StealthStorage: Setting up periodic cleanup');
+        
+        // Run cleanup every hour
+        setInterval(() => {
+            this.cleanupOldData();
+        }, 60 * 60 * 1000);
     }
 
     /**

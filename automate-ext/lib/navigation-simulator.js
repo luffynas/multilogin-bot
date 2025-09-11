@@ -571,18 +571,31 @@ class NavigationSimulator {
      * Choose navigation type based on personality
      */
     chooseNavigationType(personality, options = {}) {
+        // const navigationTypes = [
+        //     'related_content',
+        //     'category', 
+        //     'next_page',
+        //     'previous_page',
+        //     'previous_next',
+        //     'recent_posts',
+        //     'tags',
+        //     'random',
+        //     'search',
+        //     'back',
+        //     'forward'
+        // ];
         const navigationTypes = [
             'related_content',
-            'category', 
+            // 'category', 
             'next_page',
             'previous_page',
             'previous_next',
             'recent_posts',
             'tags',
-            'random',
-            'search',
-            'back',
-            'forward'
+            // 'random',
+            // 'search',
+            // 'back',
+            // 'forward'
         ];
         
         const weights = this.getNavigationWeights(personality);

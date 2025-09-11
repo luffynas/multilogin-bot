@@ -558,6 +558,7 @@ class MLBehaviorEngine {
 // Export for use in other modules with enhanced stealth protection
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = MLBehaviorEngine;
-} else if (typeof window !== 'undefined' && !window.MLBehaviorEngine) {
+} else if (typeof window !== 'undefined') {
+    // Always assign to window, overwriting if exists to prevent conflicts
     window.MLBehaviorEngine = MLBehaviorEngine;
 }
