@@ -643,7 +643,7 @@ This tool helps you automate Multilogin browser profiles with:
         # Get automation type
         automation_type = Prompt.ask(
             "Enter automation type", 
-            choices=["none", "mimic", "stealthfox"], 
+            choices=["none", "selenium", "puppeteer", "playwright"], 
             default="none"
         )
         
