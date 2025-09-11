@@ -10,19 +10,262 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from api.launcher import LauncherAPI
 from api.profile_management import ProfileManagementAPI
+from api.proxy import ProxyAPI
+from core.auth import AuthManager
 from models.base import ProfileInfo
 from config import Config
 
 class BotManager:
     """Manages concurrent bot execution with time limits"""
     
-    def __init__(self, launcher_api: LauncherAPI, profile_api: ProfileManagementAPI):
+    def __init__(self, launcher_api: LauncherAPI, profile_api: ProfileManagementAPI, auth_manager: AuthManager, proxy_api: ProxyAPI):
         self.launcher_api = launcher_api
         self.profile_api = profile_api
+        self.auth_manager = auth_manager
+        self.proxy_api = proxy_api
         self.running_profiles: Dict[str, Dict[str, Any]] = {}
         self.max_runtime = Config.MAX_PROFILE_RUNTIME
         self.min_interval = Config.MIN_START_INTERVAL
         self.max_interval = Config.MAX_START_INTERVAL
+    
+    def validate_and_refresh_token(self) -> bool:
+        """Validate token and auto-refresh if expired before running profiles"""
+        print("🔐 Validating authentication token...")
+        
+        # Check if token is valid
+        if not self.auth_manager.is_token_valid():
+            print("⚠️  Token expired or invalid, attempting to refresh...")
+            
+            # Try to refresh token first
+            if self.auth_manager._current_token and self.auth_manager._current_token.refresh_token:
+                refresh_result = self.auth_manager.refresh_token()
+                if refresh_result.success:
+                    print("✅ Token refreshed successfully")
+                    return True
+                else:
+                    print(f"❌ Token refresh failed: {refresh_result.error}")
+            
+            # If refresh fails, try to sign in again
+            print("🔄 Attempting to sign in again...")
+            signin_result = self.auth_manager.sign_in()
+            if signin_result.success:
+                print("✅ Re-authentication successful")
+                return True
+            else:
+                print(f"❌ Re-authentication failed: {signin_result.error}")
+                return False
+        else:
+            print("✅ Token is valid")
+            return True
+    
+    def _extract_proxy_config_from_profile(self, profile: ProfileInfo) -> Optional[Dict[str, Any]]:
+        """Extract proxy configuration from profile data"""
+        try:
+            # Get profile metadata to access proxy configuration
+            all_profile_ids = self.profile_api.get_profile_ids_list()
+            if not all_profile_ids:
+                return None
+            
+            metas_response = self.profile_api.get_profile_metas(all_profile_ids)
+            if not metas_response.success:
+                return None
+            
+            # Extract profiles from response structure
+            if isinstance(metas_response.data, dict) and "data" in metas_response.data:
+                data_section = metas_response.data.get("data", {})
+                if isinstance(data_section, dict) and "profiles" in data_section:
+                    metas_data = data_section.get("profiles", [])
+                else:
+                    metas_data = []
+            else:
+                metas_data = []
+            
+            # Find the specific profile metadata
+            profile_meta = None
+            for meta in metas_data:
+                if meta.get("id") == profile.id:
+                    profile_meta = meta
+                    break
+            
+            if not profile_meta:
+                return None
+            
+            # Extract proxy configuration from profile parameters
+            parameters = profile_meta.get("parameters", {})
+            proxy_config = parameters.get("proxy", {})
+            
+            # Check if proxy configuration exists and has required fields
+            if proxy_config and proxy_config.get("host") and proxy_config.get("port"):
+                return proxy_config
+            
+            return None
+            
+        except Exception as e:
+            print(f"⚠️  Error extracting proxy config for profile {profile.name}: {str(e)}")
+            return None
+    
+    def validate_profile_proxy(self, profile: ProfileInfo) -> bool:
+        """Validate proxy configuration for a specific profile with auto-update capability"""
+        print(f"🔍 Validating proxy for profile: {profile.name}")
+        
+        # Extract proxy configuration from profile
+        proxy_config = self._extract_proxy_config_from_profile(profile)
+        
+        if not proxy_config:
+            print(f"⚠️  No proxy configuration found for profile {profile.name}")
+            return True  # Allow profiles without proxy to continue
+        
+        # Validate proxy configuration with auto-update
+        max_retries = 3
+        retry_count = 0
+        current_proxy_config = proxy_config.copy()
+        
+        while retry_count < max_retries:
+            validate_response = self.proxy_api.validate_proxy(current_proxy_config)
+            
+            if validate_response.success:
+                print(f"✅ Proxy validation successful for profile {profile.name}")
+                return True
+            else:
+                retry_count += 1
+                print(f"⚠️  Proxy validation failed for profile {profile.name} (attempt {retry_count}/{max_retries}): {validate_response.error}")
+                
+                if retry_count < max_retries:
+                    print(f"🔄 Attempting to get new proxy for profile {profile.name}...")
+                    
+                    # Try to get new proxy connection
+                    new_proxy_config = self._get_new_proxy_connection(current_proxy_config)
+                    
+                    if new_proxy_config:
+                        # Update profile with new proxy
+                        if self._update_profile_proxy(profile, new_proxy_config):
+                            current_proxy_config = new_proxy_config
+                            print(f"🔄 Using new proxy configuration for retry")
+                        else:
+                            print(f"❌ Failed to update profile with new proxy, retrying with current proxy")
+                    else:
+                        print(f"❌ Failed to get new proxy, retrying with current proxy")
+                    
+                    time.sleep(2)  # Wait 2 seconds before retry
+        
+        print(f"❌ Proxy validation failed for profile {profile.name} after {max_retries} attempts")
+        return False
+    
+    def _get_new_proxy_connection(self, proxy_config: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Get new proxy connection URL when current proxy fails validation"""
+        try:
+            # Extract proxy type from current config
+            proxy_type = proxy_config.get("type", "socks5")
+            
+            # Map proxy types to connection parameters
+            if proxy_type.lower() in ["socks5", "socks4"]:
+                protocol = "socks5"
+            else:
+                protocol = "http"
+            
+            # Get new connection URL
+            connection_response = self.proxy_api.get_connection_url(
+                country="us",  # Default to US as per memory
+                protocol=protocol,
+                connection_type="residential"
+            )
+            
+            if not connection_response.success:
+                print(f"❌ Failed to get new connection URL: {connection_response.error}")
+                return None
+            
+            # Parse new connection URL
+            connection_data = connection_response.data.get("data", {})
+            connection_urls = connection_data.get("connection_urls", [])
+            
+            if not connection_urls:
+                print("❌ No connection URLs received")
+                return None
+            
+            # Parse the first connection URL
+            connection_url = connection_urls[0]
+            parts = connection_url.split(":")
+            
+            if len(parts) < 4:
+                print("❌ Invalid connection URL format")
+                return None
+            
+            # Create new proxy configuration
+            new_proxy_config = {
+                "type": protocol,
+                "host": parts[0],
+                "port": int(parts[1]),
+                "username": parts[2],
+                "password": parts[3]
+            }
+            
+            print(f"✅ Generated new proxy configuration: {new_proxy_config['host']}:{new_proxy_config['port']}")
+            return new_proxy_config
+            
+        except Exception as e:
+            print(f"❌ Error getting new proxy connection: {str(e)}")
+            return None
+    
+    def _update_profile_proxy(self, profile: ProfileInfo, new_proxy_config: Dict[str, Any]) -> bool:
+        """Update profile with new proxy configuration"""
+        try:
+            print(f"🔄 Updating proxy for profile: {profile.name}")
+            
+            # Get current profile metadata
+            all_profile_ids = self.profile_api.get_profile_ids_list()
+            if not all_profile_ids:
+                return False
+            
+            metas_response = self.profile_api.get_profile_metas(all_profile_ids)
+            if not metas_response.success:
+                return False
+            
+            # Extract profiles from response structure
+            if isinstance(metas_response.data, dict) and "data" in metas_response.data:
+                data_section = metas_response.data.get("data", {})
+                if isinstance(data_section, dict) and "profiles" in data_section:
+                    metas_data = data_section.get("profiles", [])
+                else:
+                    metas_data = []
+            else:
+                metas_data = []
+            
+            # Find the specific profile metadata
+            profile_meta = None
+            for meta in metas_data:
+                if meta.get("id") == profile.id:
+                    profile_meta = meta
+                    break
+            
+            if not profile_meta:
+                print(f"❌ Profile metadata not found for {profile.name}")
+                return False
+            
+            # Update proxy configuration in profile metadata
+            parameters = profile_meta.get("parameters", {})
+            parameters["proxy"] = new_proxy_config
+            
+            # Prepare update data
+            update_data = {
+                "profile_id": profile.id,
+                "name": profile.name,
+                "tags": profile_meta.get("tags", []),
+                "parameters": parameters
+            }
+            
+            # Update profile with new proxy
+            update_response = self.profile_api.partial_update_profile(profile.id, update_data)
+            
+            if update_response.success:
+                print(f"✅ Successfully updated proxy for profile {profile.name}")
+                return True
+            else:
+                print(f"❌ Failed to update profile {profile.name}: {update_response.error}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Error updating profile proxy: {str(e)}")
+            return False
     
     def get_all_profiles(self) -> List[ProfileInfo]:
         """Get all available profiles"""
@@ -34,6 +277,24 @@ class BotManager:
     
     def start_profile_bot(self, profile: ProfileInfo, automation_type: str = "none", headless_mode: bool = False) -> Dict[str, Any]:
         """Start a single profile bot"""
+        # Validate token before starting profile
+        if not self.validate_and_refresh_token():
+            return {
+                "success": False,
+                "profile_id": profile.id,
+                "message": f"Authentication failed. Cannot start profile {profile.name} without valid token.",
+                "error": "Token validation failed"
+            }
+        
+        # Validate proxy before starting profile
+        if not self.validate_profile_proxy(profile):
+            return {
+                "success": False,
+                "profile_id": profile.id,
+                "message": f"Proxy validation failed. Cannot start profile {profile.name} with invalid proxy.",
+                "error": "Proxy validation failed"
+            }
+        
         start_time = datetime.now()
         profile_id = profile.id
         folder_id = profile.folder_id
@@ -146,6 +407,14 @@ class BotManager:
         headless_mode: bool = False
     ) -> List[Dict[str, Any]]:
         """Run bots concurrently with random start intervals"""
+        # Validate and refresh token before starting profiles
+        if not self.validate_and_refresh_token():
+            return [{
+                "success": False,
+                "message": "Authentication failed. Cannot start profiles without valid token.",
+                "error": "Token validation failed"
+            }]
+        
         results = []
         profiles_queue = profiles.copy()
         random.shuffle(profiles_queue)  # Randomize order

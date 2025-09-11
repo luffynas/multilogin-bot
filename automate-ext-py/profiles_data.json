@@ -21,7 +21,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:46:16.260357Z"
+    "updated_at": "2025-09-11T19:23:58.269743Z"
   },
   {
     "abp_status": true,
@@ -66,7 +66,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-27T18:27:09.824128Z"
+    "updated_at": "2025-09-11T19:24:10.599563Z"
   },
   {
     "abp_status": true,
@@ -102,7 +102,7 @@
     "id": "0f2c6035-8348-42df-aa2f-8e896069b1c7",
     "in_use_by": "",
     "is_local": true,
-    "last_launched_at": "2025-09-11T15:43:39.797181Z",
+    "last_launched_at": "2025-09-11T16:05:50.39381Z",
     "last_launched_by": "blankblank026@gmail.com",
     "last_launched_on": "81fa4e67795726ef4d8918a93e4caa40dc89ffe2b9cb63eaf1e52908b68f5cb9",
     "last_updated_by": "blankblank026@gmail.com",
@@ -114,7 +114,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-08-27T22:13:51.138176Z"
+    "updated_at": "2025-09-11T19:24:19.661417Z"
   },
   {
     "abp_status": true,
@@ -138,7 +138,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-08-27T22:14:04.982606Z"
+    "updated_at": "2025-09-11T19:24:25.83349Z"
   },
   {
     "abp_status": true,
@@ -163,7 +163,7 @@
       "CA",
       "US"
     ],
-    "updated_at": "2025-09-11T15:42:39.565793Z"
+    "updated_at": "2025-09-11T19:24:36.100954Z"
   },
   {
     "abp_status": true,
@@ -188,7 +188,7 @@
       "CA",
       "US"
     ],
-    "updated_at": "2025-09-11T15:42:23.471871Z"
+    "updated_at": "2025-09-11T19:24:46.989297Z"
   },
   {
     "abp_status": true,
@@ -212,7 +212,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:42:07.052324Z"
+    "updated_at": "2025-09-11T19:24:51.184513Z"
   },
   {
     "abp_status": true,
@@ -224,7 +224,7 @@
     "id": "8eb92878-3e44-4e15-881d-a233963079f3",
     "in_use_by": "",
     "is_local": true,
-    "last_launched_at": "2025-09-11T15:47:57.707297Z",
+    "last_launched_at": "2025-09-11T16:09:36.106689Z",
     "last_launched_by": "blankblank026@gmail.com",
     "last_launched_on": "81fa4e67795726ef4d8918a93e4caa40dc89ffe2b9cb63eaf1e52908b68f5cb9",
     "last_updated_by": "blankblank026@gmail.com",
@@ -236,7 +236,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:41:49.323582Z"
+    "updated_at": "2025-09-11T19:24:55.823027Z"
   },
   {
     "abp_status": true,
@@ -262,7 +262,7 @@
       "Mobile",
       "US"
     ],
-    "updated_at": "2025-09-11T15:41:33.123644Z"
+    "updated_at": "2025-09-11T19:25:00.75244Z"
   },
   {
     "abp_status": true,
@@ -288,7 +288,7 @@
       "Mobile",
       "US"
     ],
-    "updated_at": "2025-09-11T15:41:15.649783Z"
+    "updated_at": "2025-09-11T19:25:05.151419Z"
   },
   {
     "abp_status": true,
@@ -314,7 +314,7 @@
       "Mobile",
       "US"
     ],
-    "updated_at": "2025-09-11T15:41:00.01486Z"
+    "updated_at": "2025-09-11T19:25:12.087559Z"
   },
   {
     "abp_status": true,
@@ -339,7 +339,7 @@
       "Android",
       "Us"
     ],
-    "updated_at": "2025-09-11T15:40:35.366148Z"
+    "updated_at": "2025-09-11T19:25:19.05642Z"
   },
   {
     "abp_status": true,
@@ -360,7 +360,7 @@
     "os_type": "android",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-09-11T15:40:19.134161Z"
+    "updated_at": "2025-09-11T19:25:24.564172Z"
   },
   {
     "abp_status": true,
@@ -372,7 +372,7 @@
     "id": "2ebdd8cb-0ba2-418d-90e1-02efe5ef92f6",
     "in_use_by": "",
     "is_local": false,
-    "last_launched_at": "2025-09-11T15:50:02.31242Z",
+    "last_launched_at": "2025-09-11T16:10:44.478932Z",
     "last_launched_by": "blankblank026@gmail.com",
     "last_launched_on": "81fa4e67795726ef4d8918a93e4caa40dc89ffe2b9cb63eaf1e52908b68f5cb9",
     "last_updated_by": "blankblank026@gmail.com",
@@ -381,7 +381,7 @@
     "os_type": "android",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-09-11T15:39:59.467383Z"
+    "updated_at": "2025-09-11T19:25:29.42059Z"
   },
   {
     "abp_status": true,
@@ -402,7 +402,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-28T04:09:53.3289Z"
+    "updated_at": "2025-09-11T19:25:34.706626Z"
   },
   {
     "abp_status": true,
@@ -423,7 +423,7 @@
     "os_type": "android",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-28T04:09:53.330354Z"
+    "updated_at": "2025-09-11T19:25:39.304701Z"
   },
   {
     "abp_status": true,
@@ -444,7 +444,7 @@
     "os_type": "android",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-28T04:09:53.327256Z"
+    "updated_at": "2025-09-11T19:25:45.979839Z"
   },
   {
     "abp_status": true,
@@ -465,7 +465,7 @@
     "os_type": "android",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-28T04:09:53.332209Z"
+    "updated_at": "2025-09-11T19:25:53.425115Z"
   },
   {
     "abp_status": true,
@@ -486,7 +486,7 @@
     "os_type": "android",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-09-11T15:36:51.115028Z"
+    "updated_at": "2025-09-11T19:25:57.89943Z"
   },
   {
     "abp_status": true,
@@ -510,7 +510,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:35:51.41627Z"
+    "updated_at": "2025-09-11T19:26:03.098827Z"
   },
   {
     "abp_status": true,
@@ -534,7 +534,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:35:37.606101Z"
+    "updated_at": "2025-09-11T19:26:09.319231Z"
   },
   {
     "abp_status": true,
@@ -558,7 +558,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:35:22.513175Z"
+    "updated_at": "2025-09-11T19:26:13.73806Z"
   },
   {
     "abp_status": true,
@@ -582,7 +582,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:35:07.747425Z"
+    "updated_at": "2025-09-11T19:26:20.134746Z"
   },
   {
     "abp_status": true,
@@ -606,7 +606,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:34:50.658632Z"
+    "updated_at": "2025-09-11T19:26:24.439276Z"
   },
   {
     "abp_status": true,
@@ -618,9 +618,9 @@
     "id": "55ce0126-d007-4be1-944b-57437e9e2d57",
     "in_use_by": "",
     "is_local": true,
-    "last_launched_at": "2025-08-25T03:33:31.685247Z",
-    "last_launched_by": "",
-    "last_launched_on": "localhost",
+    "last_launched_at": "2025-09-11T16:04:31.443376Z",
+    "last_launched_by": "blankblank026@gmail.com",
+    "last_launched_on": "81fa4e67795726ef4d8918a93e4caa40dc89ffe2b9cb63eaf1e52908b68f5cb9",
     "last_updated_by": "blankblank026@gmail.com",
     "name": "US - New York - FB",
     "notes": "",
@@ -630,7 +630,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:34:34.107992Z"
+    "updated_at": "2025-09-11T19:26:28.589777Z"
   },
   {
     "abp_status": true,
@@ -654,7 +654,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:34:19.445654Z"
+    "updated_at": "2025-09-11T19:26:35.28007Z"
   },
   {
     "abp_status": true,
@@ -678,7 +678,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:34:03.802952Z"
+    "updated_at": "2025-09-11T19:26:40.449233Z"
   },
   {
     "abp_status": true,
@@ -726,7 +726,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:33:26.904684Z"
+    "updated_at": "2025-09-11T19:26:51.607205Z"
   },
   {
     "abp_status": true,
@@ -750,7 +750,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:32:58.987631Z"
+    "updated_at": "2025-09-11T19:26:55.942528Z"
   },
   {
     "abp_status": true,
@@ -774,7 +774,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:32:44.399262Z"
+    "updated_at": "2025-09-11T19:27:00.956254Z"
   },
   {
     "abp_status": true,
@@ -798,7 +798,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:32:29.606668Z"
+    "updated_at": "2025-09-11T19:27:06.31098Z"
   },
   {
     "abp_status": true,
@@ -822,7 +822,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:32:12.713843Z"
+    "updated_at": "2025-09-11T19:27:11.650212Z"
   },
   {
     "abp_status": true,
@@ -846,7 +846,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:31:56.752151Z"
+    "updated_at": "2025-09-11T19:27:17.615528Z"
   },
   {
     "abp_status": true,
@@ -870,7 +870,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:31:37.272531Z"
+    "updated_at": "2025-09-11T19:27:21.989531Z"
   },
   {
     "abp_status": true,
@@ -942,7 +942,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:30:22.757675Z"
+    "updated_at": "2025-09-11T19:27:34.127133Z"
   },
   {
     "abp_status": true,
@@ -966,7 +966,7 @@
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:29:27.068784Z"
+    "updated_at": "2025-09-11T19:27:38.499772Z"
   },
   {
     "abp_status": true,
@@ -983,14 +983,14 @@
     "last_launched_on": "81fa4e67795726ef4d8918a93e4caa40dc89ffe2b9cb63eaf1e52908b68f5cb9",
     "last_updated_by": "blankblank026@gmail.com",
     "name": "US - Illinois - FB - WIN - 20",
-    "notes": "<p>IP rusak</p>",
+    "notes": "",
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
     "tags": [
       "US"
     ],
-    "updated_at": "2025-09-11T15:52:06.563361Z"
+    "updated_at": "2025-09-11T19:27:43.018663Z"
   },
   {
     "abp_status": true,
@@ -1002,16 +1002,16 @@
     "id": "252b415b-bd79-4b21-a7d0-a14dccb5ac1a",
     "in_use_by": "",
     "is_local": true,
-    "last_launched_at": "2025-09-11T15:27:15.226305Z",
+    "last_launched_at": "2025-09-11T16:21:28.533742Z",
     "last_launched_by": "blankblank026@gmail.com",
     "last_launched_on": "81fa4e67795726ef4d8918a93e4caa40dc89ffe2b9cb63eaf1e52908b68f5cb9",
-    "last_updated_by": "",
+    "last_updated_by": "blankblank026@gmail.com",
     "name": "ID - Template",
     "notes": "",
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-28T04:12:22.561126Z"
+    "updated_at": "2025-09-11T19:27:50.823453Z"
   },
   {
     "abp_status": true,
@@ -1032,7 +1032,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-28T04:24:06.741535Z"
+    "updated_at": "2025-09-11T19:27:57.415528Z"
   },
   {
     "abp_status": true,
@@ -1053,7 +1053,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-28T04:23:47.428001Z"
+    "updated_at": "2025-09-11T19:28:01.905607Z"
   },
   {
     "abp_status": true,
@@ -1074,7 +1074,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-28T04:23:36.007241Z"
+    "updated_at": "2025-09-11T19:28:08.750145Z"
   },
   {
     "abp_status": true,
@@ -1116,7 +1116,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-30T09:08:24.808324Z"
+    "updated_at": "2025-09-11T19:28:18.48896Z"
   },
   {
     "abp_status": true,
@@ -1137,7 +1137,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-30T09:08:18.084533Z"
+    "updated_at": "2025-09-11T19:28:24.502911Z"
   },
   {
     "abp_status": true,
@@ -1149,7 +1149,7 @@
     "id": "3e6ca2ab-76ec-457f-8da8-e7644142d2ee",
     "in_use_by": "",
     "is_local": true,
-    "last_launched_at": "2025-09-11T15:24:59.834542Z",
+    "last_launched_at": "2025-09-11T16:01:30.291739Z",
     "last_launched_by": "blankblank026@gmail.com",
     "last_launched_on": "81fa4e67795726ef4d8918a93e4caa40dc89ffe2b9cb63eaf1e52908b68f5cb9",
     "last_updated_by": "blankblank026@gmail.com",
@@ -1158,7 +1158,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-30T09:08:10.361014Z"
+    "updated_at": "2025-09-11T19:28:28.665668Z"
   },
   {
     "abp_status": true,
@@ -1179,7 +1179,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-30T09:08:02.260093Z"
+    "updated_at": "2025-09-11T19:28:33.324566Z"
   },
   {
     "abp_status": true,
@@ -1200,7 +1200,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-09-11T15:24:10.053924Z"
+    "updated_at": "2025-09-11T19:28:40.780608Z"
   },
   {
     "abp_status": true,
@@ -1212,7 +1212,7 @@
     "id": "7d9ec794-2d0b-473b-b571-c4d788b1cbc6",
     "in_use_by": "",
     "is_local": true,
-    "last_launched_at": "2025-09-11T15:23:43.004471Z",
+    "last_launched_at": "2025-09-11T16:23:45.88628Z",
     "last_launched_by": "blankblank026@gmail.com",
     "last_launched_on": "81fa4e67795726ef4d8918a93e4caa40dc89ffe2b9cb63eaf1e52908b68f5cb9",
     "last_updated_by": "blankblank026@gmail.com",
@@ -1221,7 +1221,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-09-11T15:23:40.976286Z"
+    "updated_at": "2025-09-11T19:28:44.820098Z"
   },
   {
     "abp_status": true,
@@ -1263,7 +1263,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-30T09:07:35.658625Z"
+    "updated_at": "2025-09-11T19:28:53.204334Z"
   },
   {
     "abp_status": true,
@@ -1284,7 +1284,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-30T09:07:25.354435Z"
+    "updated_at": "2025-09-11T19:28:57.480613Z"
   },
   {
     "abp_status": true,
@@ -1305,7 +1305,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-30T09:07:19.559211Z"
+    "updated_at": "2025-09-11T19:29:02.429891Z"
   },
   {
     "abp_status": true,
@@ -1326,7 +1326,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-09-11T15:21:50.224356Z"
+    "updated_at": "2025-09-11T19:29:10.403912Z"
   },
   {
     "abp_status": true,
@@ -1347,7 +1347,7 @@
     "os_type": "android",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-09-11T15:20:53.392618Z"
+    "updated_at": "2025-09-11T19:29:15.868721Z"
   },
   {
     "abp_status": true,
@@ -1372,7 +1372,7 @@
       "Mobile",
       "SG"
     ],
-    "updated_at": "2025-09-11T15:20:17.656288Z"
+    "updated_at": "2025-09-11T19:29:19.789502Z"
   },
   {
     "abp_status": true,
@@ -1397,7 +1397,7 @@
       "mobile",
       "MY"
     ],
-    "updated_at": "2025-09-11T15:19:42.155883Z"
+    "updated_at": "2025-09-11T19:29:24.558702Z"
   },
   {
     "abp_status": true,
@@ -1409,7 +1409,7 @@
     "id": "b6d5fa5e-46e4-45bd-8430-5fcca53f8488",
     "in_use_by": "",
     "is_local": true,
-    "last_launched_at": "2025-09-11T15:19:08.627938Z",
+    "last_launched_at": "2025-09-11T16:12:26.494423Z",
     "last_launched_by": "blankblank026@gmail.com",
     "last_launched_on": "81fa4e67795726ef4d8918a93e4caa40dc89ffe2b9cb63eaf1e52908b68f5cb9",
     "last_updated_by": "blankblank026@gmail.com",
@@ -1422,7 +1422,7 @@
       "mobile",
       "MY"
     ],
-    "updated_at": "2025-08-30T09:06:46.811083Z"
+    "updated_at": "2025-09-11T19:29:29.638834Z"
   },
   {
     "abp_status": true,
@@ -1443,7 +1443,7 @@
     "os_type": "android",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-08-30T09:06:39.274116Z"
+    "updated_at": "2025-09-11T19:29:34.230757Z"
   },
   {
     "abp_status": true,
@@ -1468,7 +1468,7 @@
       "Mobile",
       "SG"
     ],
-    "updated_at": "2025-08-30T09:13:52.243349Z"
+    "updated_at": "2025-09-11T19:29:38.338029Z"
   },
   {
     "abp_status": true,
@@ -1493,7 +1493,7 @@
       "Mobile",
       "SG"
     ],
-    "updated_at": "2025-08-30T09:13:11.23795Z"
+    "updated_at": "2025-09-11T19:29:44.354394Z"
   },
   {
     "abp_status": true,
@@ -1518,7 +1518,7 @@
       "mobile",
       "MY"
     ],
-    "updated_at": "2025-09-01T05:49:47.870385Z"
+    "updated_at": "2025-09-11T19:29:49.640448Z"
   },
   {
     "abp_status": true,
@@ -1543,7 +1543,7 @@
       "mobile",
       "MY"
     ],
-    "updated_at": "2025-09-01T05:49:41.013309Z"
+    "updated_at": "2025-09-11T19:29:55.224537Z"
   },
   {
     "abp_status": true,
@@ -1564,7 +1564,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-09-01T05:49:34.849305Z"
+    "updated_at": "2025-09-11T19:29:59.802645Z"
   },
   {
     "abp_status": true,
@@ -1585,7 +1585,7 @@
     "os_type": "android",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-09-01T05:49:00.198783Z"
+    "updated_at": "2025-09-11T19:30:04.794855Z"
   },
   {
     "abp_status": true,
@@ -1606,7 +1606,7 @@
     "os_type": "windows",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-09-01T05:48:47.12822Z"
+    "updated_at": "2025-09-11T19:30:10.909739Z"
   },
   {
     "abp_status": true,
@@ -1618,7 +1618,7 @@
     "id": "6f5b58df-7938-4d66-a111-8985b0342ab2",
     "in_use_by": "",
     "is_local": true,
-    "last_launched_at": "2025-09-11T15:14:14.940499Z",
+    "last_launched_at": "2025-09-11T16:16:30.921265Z",
     "last_launched_by": "blankblank026@gmail.com",
     "last_launched_on": "81fa4e67795726ef4d8918a93e4caa40dc89ffe2b9cb63eaf1e52908b68f5cb9",
     "last_updated_by": "blankblank026@gmail.com",
@@ -1627,7 +1627,7 @@
     "os_type": "android",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-09-11T15:14:13.308594Z"
+    "updated_at": "2025-09-11T19:30:17.022019Z"
   },
   {
     "abp_status": true,
@@ -1652,7 +1652,7 @@
       "Mobile",
       "SG"
     ],
-    "updated_at": "2025-09-01T05:48:10.834252Z"
+    "updated_at": "2025-09-11T19:30:27.892264Z"
   },
   {
     "abp_status": true,
@@ -1673,7 +1673,7 @@
     "os_type": "android",
     "password_protected": false,
     "password_restricted": null,
-    "updated_at": "2025-09-11T15:13:10.014735Z"
+    "updated_at": "2025-09-11T19:30:32.788328Z"
   },
   {
     "abp_status": true,
@@ -1698,7 +1698,7 @@
       "Mobile",
       "US"
     ],
-    "updated_at": "2025-09-01T19:10:29.495591Z"
+    "updated_at": "2025-09-11T19:30:57.413029Z"
   },
   {
     "abp_status": true,
@@ -1723,7 +1723,7 @@
       "Mobile",
       "US"
     ],
-    "updated_at": "2025-09-01T19:10:00.582867Z"
+    "updated_at": "2025-09-11T19:31:24.003773Z"
   },
   {
     "abp_status": true,
@@ -1773,7 +1773,7 @@
       "Mobile",
       "US"
     ],
-    "updated_at": "2025-08-30T10:40:32.516825Z"
+    "updated_at": "2025-09-11T19:31:56.719835Z"
   },
   {
     "abp_status": true,
@@ -1823,7 +1823,7 @@
       "Mobile",
       "US"
     ],
-    "updated_at": "2025-09-11T15:06:24.963468Z"
+    "updated_at": "2025-09-11T19:32:13.421478Z"
   },
   {
     "abp_status": true,
@@ -1848,7 +1848,7 @@
       "Mobile",
       "US"
     ],
-    "updated_at": "2025-09-01T19:04:32.729329Z"
+    "updated_at": "2025-09-11T19:32:18.059068Z"
   },
   {
     "abp_status": true,
@@ -1873,7 +1873,7 @@
       "Mobile",
       "US"
     ],
-    "updated_at": "2025-09-01T19:54:42.61586Z"
+    "updated_at": "2025-09-11T19:32:22.324472Z"
   },
   {
     "abp_status": true,
@@ -1923,7 +1923,7 @@
       "Mobile",
       "US"
     ],
-    "updated_at": "2025-09-10T20:26:21.988879Z"
+    "updated_at": "2025-09-11T19:32:30.916942Z"
   },
   {
     "abp_status": true,
@@ -1938,7 +1938,7 @@
     "last_launched_at": "2025-09-11T15:04:28.869301Z",
     "last_launched_by": "blankblank026@gmail.com",
     "last_launched_on": "81fa4e67795726ef4d8918a93e4caa40dc89ffe2b9cb63eaf1e52908b68f5cb9",
-    "last_updated_by": "",
+    "last_updated_by": "blankblank026@gmail.com",
     "name": "US - Rexdl - Win",
     "notes": "",
     "os_type": "windows",
@@ -1948,7 +1948,7 @@
       "US",
       "Windows"
     ],
-    "updated_at": "2025-09-01T19:40:59.707659Z"
+    "updated_at": "2025-09-11T19:32:35.201206Z"
   },
   {
     "abp_status": true,
@@ -1973,7 +1973,7 @@
       "US",
       "Windows"
     ],
-    "updated_at": "2025-09-01T19:43:09.266323Z"
+    "updated_at": "2025-09-11T19:32:41.684266Z"
   },
   {
     "abp_status": true,
@@ -1998,7 +1998,7 @@
       "US",
       "Windows"
     ],
-    "updated_at": "2025-09-01T19:43:51.357809Z"
+    "updated_at": "2025-09-11T19:32:45.677882Z"
   },
   {
     "abp_status": true,
@@ -2023,7 +2023,7 @@
       "US",
       "Windows"
     ],
-    "updated_at": "2025-09-01T19:45:51.812723Z"
+    "updated_at": "2025-09-11T19:32:49.946473Z"
   },
   {
     "abp_status": true,
@@ -2048,7 +2048,7 @@
       "US",
       "Windows"
     ],
-    "updated_at": "2025-09-01T19:46:23.401934Z"
+    "updated_at": "2025-09-11T19:32:56.870966Z"
   },
   {
     "abp_status": true,
@@ -2073,7 +2073,7 @@
       "US",
       "Windows"
     ],
-    "updated_at": "2025-09-01T19:46:43.181795Z"
+    "updated_at": "2025-09-11T19:33:01.055526Z"
   },
   {
     "abp_status": true,
@@ -2098,7 +2098,7 @@
       "US",
       "Windows"
     ],
-    "updated_at": "2025-09-01T19:50:05.314861Z"
+    "updated_at": "2025-09-11T19:33:07.581031Z"
   },
   {
     "abp_status": true,
@@ -2123,7 +2123,7 @@
       "US",
       "Windows"
     ],
-    "updated_at": "2025-09-01T19:50:50.715843Z"
+    "updated_at": "2025-09-11T19:33:13.026339Z"
   },
   {
     "abp_status": true,
@@ -2173,6 +2173,6 @@
       "US",
       "Windows"
     ],
-    "updated_at": "2025-09-10T20:28:31.628125Z"
+    "updated_at": "2025-09-11T19:33:22.750448Z"
   }
 ]

@@ -61,7 +61,7 @@ def main():
         
         # Initialize bot manager
         print("🤖 Initializing bot manager...")
-        bot_manager = BotManager(launcher_api, profile_api)
+        bot_manager = BotManager(launcher_api, profile_api, auth_manager, proxy_api)
         
         # Initialize menu system
         print("📋 Initializing menu system...")
