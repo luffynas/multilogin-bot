@@ -1,0 +1,1 @@
+{"data":{"accuracy":200,"altitude":100,"country_code":"US","ip":"97.146.67.40","latitude":36.7969,"longitude":-76.1797,"timezone":"America/New_York"},"status":{"error_code":"","http_code":200,"message":""}}

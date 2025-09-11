@@ -1,0 +1,1 @@
+{"status":{"error_code":"","http_code":200,"message":"Proxy setup settings retrieved successfully"},"data":{"country":"us","protocol":"","session_type":"sticky"}}
