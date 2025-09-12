@@ -436,32 +436,172 @@ if (typeof window.BehaviorSimulator === 'undefined') {
     }
 
     /**
-     * Safe scroll method with browser compatibility
+     * Safe scroll method with browser compatibility and human-like speed
      */
     safeScrollTo(x, y) {
         try {
-            // Try modern smooth scrolling first
-            if (window.scrollTo && typeof window.scrollTo === 'function') {
-                if (window.scrollTo.length >= 2) {
-                    // Modern browsers support options object
-                    window.scrollTo({ top: y, left: x, behavior: 'smooth' });
-                } else {
-                    // Fallback for older browsers
-                    window.scrollTo(x, y);
-                }
-            } else {
-                // Fallback for very old browsers
-                window.scrollTop = y;
-                window.scrollLeft = x;
-            }
+            // Use custom animation instead of browser native smooth scrolling
+            // to avoid bot detection from too-fast scrolling
+            this.animateScrollTo(y, this.getHumanLikeScrollDuration(y));
         } catch (error) {
-            console.debug('Smooth scrolling not supported, using fallback:', error.message);
-            // Ultimate fallback
+            console.debug('Custom scroll animation failed, using fallback:', error.message);
+            // Fallback to instant scroll
             try {
                 window.scrollTo(x, y);
             } catch (fallbackError) {
                 console.warn('All scrolling methods failed:', fallbackError.message);
             }
+        }
+    }
+
+    /**
+     * Get human-like scroll duration based on distance and personality
+     */
+    getHumanLikeScrollDuration(targetY) {
+        const currentY = window.pageYOffset;
+        const distance = Math.abs(targetY - currentY);
+        
+        // Human scroll speed: 30-80 pixels per second
+        const baseSpeed = 30 + Math.random() * 50; // 30-80 px/s
+        
+        // Personality-based speed adjustments
+        let personalityMultiplier = 1.0;
+        if (this.currentPersonality) {
+            switch (this.currentPersonality.type) {
+                case 'researcher':
+                    personalityMultiplier = 0.3 + Math.random() * 0.4; // 30-70% of base (9-56 px/s)
+                    break;
+                case 'explorer':
+                    personalityMultiplier = 0.8 + Math.random() * 0.6; // 80-140% of base (24-112 px/s)
+                    break;
+                case 'casual':
+                    personalityMultiplier = 0.6 + Math.random() * 0.4; // 60-100% of base (18-80 px/s)
+                    break;
+                case 'professional':
+                    personalityMultiplier = 0.7 + Math.random() * 0.5; // 70-120% of base (21-96 px/s)
+                    break;
+            }
+        }
+        
+        const adjustedSpeed = baseSpeed * personalityMultiplier;
+        const duration = (distance / adjustedSpeed) * 1000; // Convert to milliseconds
+        
+        // Add random variation (80-120% of calculated duration)
+        const variation = 0.8 + Math.random() * 0.4;
+        return Math.max(500, Math.min(5000, duration * variation)); // Clamp between 500ms and 5s
+    }
+
+    /**
+     * Custom scroll animation with human-like behavior
+     */
+    async animateScrollTo(targetY, duration, easing = 'easeInOut') {
+        const startY = window.pageYOffset;
+        const distance = targetY - startY;
+        const startTime = performance.now();
+        
+        // 30% chance for scroll with bounce/correction
+        if (Math.random() < 0.3) {
+            return await this.animateScrollWithBounce(targetY, duration);
+        }
+        
+        // 20% chance for scroll with micro-pauses
+        if (Math.random() < 0.2) {
+            return await this.animateScrollWithVariations(targetY, duration);
+        }
+        
+        // Normal smooth scroll
+        return new Promise((resolve) => {
+            const animate = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Apply easing function
+                const easedProgress = this.applyEasing(progress, easing);
+                
+                // Calculate current position
+                const currentY = startY + (distance * easedProgress);
+                
+                // Apply scroll
+                window.scrollTo(0, currentY);
+                
+                // Continue animation if not complete
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    resolve();
+                }
+            };
+            
+            requestAnimationFrame(animate);
+        });
+    }
+
+    /**
+     * Animate scroll with natural bounce/correction
+     */
+    async animateScrollWithBounce(targetY, duration) {
+        const startY = window.pageYOffset;
+        const distance = targetY - startY;
+        
+        // Add slight overshoot (5-15% of distance)
+        const overshoot = distance * (0.05 + Math.random() * 0.1);
+        const overshootTarget = targetY + overshoot;
+        
+        // First phase: scroll to overshoot position
+        await this.animateScrollTo(overshootTarget, duration * 0.7, 'easeOut');
+        
+        // Brief pause
+        await this.delay(50 + Math.random() * 100);
+        
+        // Second phase: correct to final position
+        await this.animateScrollTo(targetY, duration * 0.3, 'easeIn');
+    }
+
+    /**
+     * Animate scroll with micro-pauses and variations
+     */
+    async animateScrollWithVariations(targetY, duration) {
+        const startY = window.pageYOffset;
+        const distance = targetY - startY;
+        const steps = 20 + Math.floor(Math.random() * 20); // 20-40 steps
+        
+        for (let i = 0; i < steps; i++) {
+            const progress = i / steps;
+            const currentY = startY + (distance * progress);
+            
+            // Apply scroll
+            window.scrollTo(0, currentY);
+            
+            // Variable delay between steps
+            const baseDelay = duration / steps;
+            const variation = 0.5 + Math.random() * 1.0; // 50-150% variation
+            const microPause = Math.random() < 0.1 ? Math.random() * 50 : 0; // 10% chance for micro-pause
+            
+            await this.delay(baseDelay * variation + microPause);
+        }
+    }
+
+    /**
+     * Apply easing functions for natural scroll animation
+     */
+    applyEasing(t, easing) {
+        switch (easing) {
+            case 'easeInOut':
+                return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+            case 'easeOut':
+                return t * (2 - t);
+            case 'easeIn':
+                return t * t;
+            case 'natural':
+                // Natural scroll with slight overshoot
+                if (t < 0.5) {
+                    return 2 * t * t;
+                } else {
+                    const overshoot = 0.1 * Math.sin((t - 0.5) * Math.PI);
+                    return 1 + overshoot - (1 + overshoot) * (2 * t - 1) * (2 * t - 1);
+                }
+            default:
+                return t;
         }
     }
 
@@ -647,8 +787,8 @@ if (typeof window.BehaviorSimulator === 'undefined') {
                 hasReachedTop = true;
             }
 
-            // Smooth scroll to position
-            window.scrollTo({ top: currentPosition, behavior: 'smooth' });
+            // Use custom animation for human-like scrolling
+            await this.animateScrollTo(currentPosition, this.getHumanLikeScrollDuration(currentPosition));
 
             // Real-time ad detection during scroll with variable timing
             const scrollDetectionDelay = 800 + Math.random() * 1400; // 0.8-2.2 seconds
@@ -805,7 +945,7 @@ if (typeof window.BehaviorSimulator === 'undefined') {
         // Ensure we reach the bottom of the page
         if (!hasReachedBottom) {
             console.log("⬇️ Final scroll to bottom of page");
-            window.scrollTo({ top: maxScrollDistance, behavior: 'smooth' });
+            await this.animateScrollTo(maxScrollDistance, this.getHumanLikeScrollDuration(maxScrollDistance));
             await this.delay(2000);
             
             // Final reading pause at bottom
@@ -1069,7 +1209,7 @@ if (typeof window.BehaviorSimulator === 'undefined') {
      */
     async directScrollToTop(personality) {
         console.log(`⬆️ Direct scroll to top - ${personality?.type || 'default'} personality`);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        await this.animateScrollTo(0, this.getHumanLikeScrollDuration(0));
         
         const delayTime = 1500 + Math.random() * 2000; // 1.5-3.5s
         await this.delay(delayTime);
@@ -1086,7 +1226,7 @@ if (typeof window.BehaviorSimulator === 'undefined') {
         
         for (let i = 0; i < steps; i++) {
             const targetPosition = maxDistance - (stepDistance * (i + 1));
-            window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+            await this.animateScrollTo(targetPosition, this.getHumanLikeScrollDuration(targetPosition));
             
             // Variable pause between steps
             const pauseTime = 800 + Math.random() * 1200; // 0.8-2.0s
@@ -1102,7 +1242,7 @@ if (typeof window.BehaviorSimulator === 'undefined') {
         
         // Scroll to middle or quarter of page instead of top
         const targetPosition = Math.random() * (maxDistance * 0.5); // 0-50% of page
-        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+        await this.animateScrollTo(targetPosition, this.getHumanLikeScrollDuration(targetPosition));
         
         const delayTime = 1000 + Math.random() * 1500; // 1.0-2.5s
         await this.delay(delayTime);
@@ -1119,7 +1259,7 @@ if (typeof window.BehaviorSimulator === 'undefined') {
         
         for (const point of explorationPoints) {
             const targetPosition = maxDistance * point;
-            window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+            await this.animateScrollTo(targetPosition, this.getHumanLikeScrollDuration(targetPosition));
             
             // Brief pause to "look around"
             const pauseTime = 500 + Math.random() * 1000; // 0.5-1.5s
@@ -1149,21 +1289,21 @@ if (typeof window.BehaviorSimulator === 'undefined') {
             case 'scroll_to_middle':
                 console.log(`⬆️ Scroll to middle - ${personality?.type || 'default'} personality behavior`);
                 const middlePosition = contentInfo.maxScrollDistance * 0.5;
-                window.scrollTo({ top: middlePosition, behavior: 'smooth' });
+                await this.animateScrollTo(middlePosition, this.getHumanLikeScrollDuration(middlePosition));
                 await this.delay(1500 + Math.random() * 1500); // 1.5-3s
                 break;
                 
             case 'scroll_to_quarter':
                 console.log(`⬆️ Scroll to quarter - ${personality?.type || 'default'} personality behavior`);
                 const quarterPosition = contentInfo.maxScrollDistance * 0.25;
-                window.scrollTo({ top: quarterPosition, behavior: 'smooth' });
+                await this.animateScrollTo(quarterPosition, this.getHumanLikeScrollDuration(quarterPosition));
                 await this.delay(1200 + Math.random() * 1300); // 1.2-2.5s
                 break;
                 
             case 'scroll_to_specific_section':
                 console.log(`⬆️ Scroll to specific section - ${personality?.type || 'default'} personality behavior`);
                 const sectionPosition = contentInfo.maxScrollDistance * (0.3 + Math.random() * 0.4); // 30-70%
-                window.scrollTo({ top: sectionPosition, behavior: 'smooth' });
+                await this.animateScrollTo(sectionPosition, this.getHumanLikeScrollDuration(sectionPosition));
                 await this.delay(1000 + Math.random() * 2000); // 1-3s
                 break;
         }

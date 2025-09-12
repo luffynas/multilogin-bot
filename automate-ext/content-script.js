@@ -217,12 +217,12 @@ class AutomationStateMachine {
     constructor() {
         this.currentState = 'idle';
         this.states = {
-            idle: { next: ['initializing', 'stopped'] },
+            idle: { next: ['initializing', 'stopped', 'error'] },
             initializing: { next: ['idle', 'running', 'error'] },
             running: { next: ['paused', 'stopping', 'error'] },
-            paused: { next: ['running', 'stopping'] },
+            paused: { next: ['running', 'stopping', 'error'] },
             stopping: { next: ['stopped', 'error'] },
-            stopped: { next: ['idle'] },
+            stopped: { next: ['idle', 'error'] },
             error: { next: ['idle', 'stopped'] }
         };
         this.stateHistory = [];
@@ -245,6 +245,44 @@ class AutomationStateMachine {
     
     canTransitionTo(state) {
         return this.states[this.currentState].next.includes(state);
+    }
+    
+    /**
+     * Safe state transition with error handling
+     */
+    safeTransition(newState) {
+        try {
+            if (this.canTransitionTo(newState)) {
+                return this.transition(newState);
+            } else {
+                console.warn(`Cannot transition from ${this.currentState} to ${newState}, forcing transition`);
+                // Force transition for error recovery
+                this.stateHistory.push({
+                    from: this.currentState,
+                    to: newState,
+                    timestamp: Date.now(),
+                    forced: true
+                });
+                this.currentState = newState;
+                return this.currentState;
+            }
+        } catch (error) {
+            console.warn(`State transition failed: ${error.message}, forcing to ${newState}`);
+            this.currentState = newState;
+            return this.currentState;
+        }
+    }
+    
+    /**
+     * Validate current state
+     */
+    validateState() {
+        const validStates = ['idle', 'initializing', 'running', 'paused', 'stopping', 'stopped', 'error'];
+        if (!validStates.includes(this.currentState)) {
+            console.warn(`Invalid state detected: ${this.currentState}, resetting to idle`);
+            this.currentState = 'idle';
+        }
+        return this.currentState;
     }
 }
 
@@ -369,7 +407,8 @@ class AutomationManager {
     
     async _performCleanup() {
         try {
-            this.state = 'stopped';
+            // Don't set state to 'stopped' immediately
+            // Let the cleanup process determine the final state
             
             // Stop automation if running
             if (this.automationInstance && this.automationInstance.isRunning) {
@@ -383,11 +422,11 @@ class AutomationManager {
             
             this.automationInstance = null;
             this.isInitialized = false;
-            this.state = 'idle';
+            this.state = 'idle';  // Set to idle only if cleanup succeeds
             
         } catch (error) {
             console.error('Error during automation cleanup:', error);
-            this.state = 'error';
+            this.state = 'error';  // Can transition to 'error' from any state
         }
     }
     
@@ -2907,9 +2946,10 @@ class PageProcessor {
      */
     cleanup() {
         try {
-            // Transition to stopping state
-            if (this.stateMachine.currentState !== 'stopped') {
-                this.stateMachine.transition('stopping');
+            // Transition to stopping state only if not already stopped or error
+            if (this.stateMachine.currentState !== 'stopped' && 
+                this.stateMachine.currentState !== 'error') {
+                this.stateMachine.safeTransition('stopping');
             }
             
             // Stop automation if running
@@ -2955,12 +2995,23 @@ class PageProcessor {
                 }
             });
             
-            // Transition to stopped state
-            this.stateMachine.transition('stopped');
+            // Transition to stopped state only if not already stopped
+            if (this.stateMachine.currentState !== 'stopped') {
+                this.stateMachine.safeTransition('stopped');
+            }
             
         } catch (error) {
             console.warn('Error during cleanup:', error);
-            this.stateMachine.transition('error');
+            // Transition to error state
+            try {
+                if (this.stateMachine.currentState !== 'error') {
+                    this.stateMachine.safeTransition('error');
+                }
+            } catch (transitionError) {
+                console.warn('Error transitioning to error state:', transitionError);
+                // Force set to error state if transition fails
+                this.stateMachine.currentState = 'error';
+            }
             
             // Handle error with recovery manager
             this.errorRecovery.handleError(error, 'cleanup').catch(recoveryError => {

@@ -170,27 +170,27 @@ if (typeof window.StealthDelay === 'undefined') {
      * Wait with natural scrolling delay (Enhanced for Human-Like Behavior)
      */
     async waitForScrolling(scrollDistance, personality = null) {
-        // More natural base scroll speed with wider variation
-        const baseScrollSpeed = 60 + Math.random() * 140; // 60-200 pixels per second (was 100 fixed)
+        // Human-like base scroll speed (30-80 pixels per second)
+        const baseScrollSpeed = 30 + Math.random() * 50; // 30-80 pixels per second (human-like)
         let scrollSpeed = baseScrollSpeed;
         
-        // Personality adjustments with more natural variation
+        // Personality adjustments with human-like variation
         if (personality) {
             switch (personality) {
                 case 'researcher':
-                    scrollSpeed *= (0.5 + Math.random() * 0.3); // 0.5-0.8x (was 0.6x fixed)
+                    scrollSpeed *= (0.3 + Math.random() * 0.4); // 30-70% of base (9-56 px/s)
                     break;
                 case 'explorer':
-                    scrollSpeed *= (1.2 + Math.random() * 0.6); // 1.2-1.8x (was 1.4x fixed)
+                    scrollSpeed *= (0.8 + Math.random() * 0.6); // 80-140% of base (24-112 px/s)
                     break;
                 case 'casual':
-                    scrollSpeed *= (0.8 + Math.random() * 0.4); // 0.8-1.2x (was 1.0x fixed)
+                    scrollSpeed *= (0.6 + Math.random() * 0.4); // 60-100% of base (18-80 px/s)
                     break;
                 case 'professional':
-                    scrollSpeed *= (1.0 + Math.random() * 0.4); // 1.0-1.4x (was 1.2x fixed)
+                    scrollSpeed *= (0.7 + Math.random() * 0.5); // 70-120% of base (21-96 px/s)
                     break;
                 default:
-                    scrollSpeed *= (0.7 + Math.random() * 0.6); // 0.7-1.3x for unknown personality
+                    scrollSpeed *= (0.5 + Math.random() * 0.5); // 50-100% of base (15-80 px/s)
                     break;
             }
         }
