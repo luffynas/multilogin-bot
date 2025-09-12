@@ -68,6 +68,27 @@ def test_validation():
         profiles = bot_manager.get_all_profiles()
         print(f"✅ Retrieved {len(profiles)} profiles")
         
+        # Test folder filtering functionality
+        print("\n📁 Testing folder filtering functionality...")
+        folders = bot_manager.get_available_folders()
+        if folders:
+            print(f"✅ Found {len(folders)} folders:")
+            for folder in folders:
+                folder_name = folder.get("name", "Unknown")
+                folder_id = folder.get("folder_id", "")
+                profiles_count = folder.get("profiles_count", 0)
+                print(f"  - {folder_name} (ID: {folder_id[:8]}..., Profiles: {profiles_count})")
+            
+            # Test filtering by first folder
+            if folders:
+                test_folder_id = folders[0].get("folder_id")
+                test_folder_name = folders[0].get("name", "Unknown")
+                print(f"\n🔍 Testing profile filtering for folder: {test_folder_name}")
+                filtered_profiles = bot_manager.get_all_profiles(test_folder_id)
+                print(f"✅ Found {len(filtered_profiles)} profiles in folder '{test_folder_name}'")
+        else:
+            print("⚠️  No folders found")
+        
         if profiles:
             # Test proxy validation for profiles (with auto-update capability)
             print(f"\n🔍 Testing proxy validation with auto-update for profiles...")
@@ -112,7 +133,29 @@ def test_validation():
             else:
                 print(f"❌ Failed to start profile: {result['message']}")
         
-        print("\n🎉 All token and proxy validation (with auto-update) tests completed successfully!")
+        # Test concurrent execution (if multiple profiles available)
+        if len(profiles) > 1:
+            print(f"\n🚀 Testing concurrent execution with {min(2, len(profiles))} profiles...")
+            test_profiles = profiles[:2]  # Test with first 2 profiles
+            concurrent_results = bot_manager.run_concurrent_bots(
+                test_profiles, 
+                max_concurrent=2, 
+                automation_type="none", 
+                headless_mode=True
+            )
+            
+            successful_concurrent = sum(1 for r in concurrent_results if r["success"])
+            print(f"✅ Concurrent execution completed: {successful_concurrent}/{len(concurrent_results)} successful")
+            
+            # Stop any running profiles from concurrent test
+            for profile in test_profiles:
+                stop_result = bot_manager.stop_profile_bot(profile.id)
+                if stop_result["success"]:
+                    print(f"🛑 Stopped test profile: {profile.name}")
+        else:
+            print(f"\n⚠️  Only {len(profiles)} profile available, skipping concurrent execution test")
+        
+        print("\n🎉 All token, proxy validation (with auto-update), and concurrent execution tests completed successfully!")
         return True
         
     except Exception as e:

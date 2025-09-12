@@ -267,13 +267,25 @@ class BotManager:
             print(f"❌ Error updating profile proxy: {str(e)}")
             return False
     
-    def get_all_profiles(self) -> List[ProfileInfo]:
-        """Get all available profiles"""
-        response = self.profile_api.list_profiles()
+    def get_all_profiles(self, folder_id: Optional[str] = None) -> List[ProfileInfo]:
+        """Get all available profiles, optionally filtered by folder_id"""
+        response = self.profile_api.list_profiles(folder_id)
         if response.success and response.data:
             profiles_data = response.data.get("profiles", [])
             return [ProfileInfo(**profile) for profile in profiles_data]
         return []
+    
+    def get_available_folders(self) -> List[Dict[str, Any]]:
+        """Get list of available folders"""
+        try:
+            response = self.profile_api.get_workspace_folders()
+            if response.success and response.data:
+                folders_data = response.data.get("data", {}).get("folders", [])
+                return folders_data
+            return []
+        except Exception as e:
+            print(f"⚠️  Error getting folders: {str(e)}")
+            return []
     
     def start_profile_bot(self, profile: ProfileInfo, automation_type: str = "none", headless_mode: bool = False) -> Dict[str, Any]:
         """Start a single profile bot"""
@@ -423,8 +435,17 @@ class BotManager:
             # Submit initial batch
             futures = {}
             started_count = 0
+            max_wait_time = 300  # Maximum 5 minutes wait for any future
+            start_time = time.time()
             
             while profiles_queue or futures:
+                # Check for overall timeout
+                if time.time() - start_time > max_wait_time:
+                    print("⚠️  Maximum wait time reached, cancelling remaining futures...")
+                    for future in futures:
+                        future.cancel()
+                    break
+                
                 # Start new profiles if we have capacity and profiles in queue
                 while (len(futures) < max_concurrent and 
                        started_count < len(profiles) and 
@@ -441,33 +462,50 @@ class BotManager:
                         print(f"Waiting {delay} seconds before starting next profile...")
                         time.sleep(delay)
                 
-                # Check for completed profiles
+                # Check for completed profiles with longer timeout
                 completed_futures = []
-                for future in as_completed(futures, timeout=1):
-                    try:
-                        result = future.result()
-                        results.append(result)
-                        completed_futures.append(future)
-                        
-                        if result["success"]:
-                            print(f"✅ {result['message']}")
-                        else:
-                            print(f"❌ {result['message']}")
+                try:
+                    for future in as_completed(futures, timeout=10):  # Increased timeout to 10 seconds
+                        try:
+                            result = future.result()
+                            results.append(result)
+                            completed_futures.append(future)
                             
-                    except Exception as e:
-                        profile = futures[future]
-                        error_result = {
-                            "success": False,
-                            "profile_id": profile.id,
-                            "message": f"Exception in profile {profile.name}: {str(e)}"
-                        }
-                        results.append(error_result)
-                        completed_futures.append(future)
-                        print(f"❌ {error_result['message']}")
+                            if result["success"]:
+                                print(f"✅ {result['message']}")
+                            else:
+                                print(f"❌ {result['message']}")
+                                
+                        except Exception as e:
+                            profile = futures.get(future)
+                            if profile:
+                                error_result = {
+                                    "success": False,
+                                    "profile_id": profile.id,
+                                    "message": f"Exception in profile {profile.name}: {str(e)}"
+                                }
+                                results.append(error_result)
+                                completed_futures.append(future)
+                                print(f"❌ {error_result['message']}")
+                            else:
+                                completed_futures.append(future)
+                                print(f"❌ Exception in unknown profile: {str(e)}")
+                                
+                except TimeoutError:
+                    # Handle timeout - check if any futures are still running
+                    print("⚠️  Timeout waiting for futures to complete, checking status...")
+                    for future in list(futures.keys()):
+                        if future.done():
+                            completed_futures.append(future)
+                        else:
+                            print(f"⚠️  Future still running, cancelling...")
+                            future.cancel()
+                            completed_futures.append(future)
                 
                 # Remove completed futures
                 for future in completed_futures:
-                    del futures[future]
+                    if future in futures:
+                        del futures[future]
                 
                 # Check for timeout profiles and stop them
                 timeout_results = self.stop_timeout_profiles()
@@ -475,6 +513,11 @@ class BotManager:
                     if result not in results:
                         results.append(result)
                         print(f"⏰ {result['message']} (timeout)")
+                
+                # Safety check to prevent infinite loop
+                if not profiles_queue and futures:
+                    print("⚠️  No more profiles to start but futures still running, waiting...")
+                    time.sleep(5)  # Wait 5 seconds before next iteration
         
         return results
     

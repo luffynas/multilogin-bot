@@ -650,11 +650,42 @@ This tool helps you automate Multilogin browser profiles with:
         # Get headless mode
         headless_mode = Confirm.ask("Enable headless mode?", default=False)
         
-        # Get all profiles
-        profiles = self.bot_manager.get_all_profiles()
+        # Get folder selection
+        self.console.print("\n📁 Folder Selection:")
+        folders = self.bot_manager.get_available_folders()
+        
+        if folders:
+            self.console.print("Available folders:")
+            folder_choices = ["all"]  # Default option
+            for i, folder in enumerate(folders, 1):
+                folder_name = folder.get("name", "Unknown")
+                folder_id = folder.get("folder_id", "")
+                profiles_count = folder.get("profiles_count", 0)
+                self.console.print(f"  {i}. {folder_name} (ID: {folder_id[:8]}..., Profiles: {profiles_count})")
+                folder_choices.append(folder_id)
+            
+            folder_choice = Prompt.ask(
+                "Select folder (enter number or 'all' for all folders)", 
+                choices=[str(i) for i in range(1, len(folders) + 1)] + ["all"],
+                default="all"
+            )
+            
+            if folder_choice == "all":
+                selected_folder_id = None
+                self.console.print("📁 Selected: All folders")
+            else:
+                selected_folder_id = folder_choices[int(folder_choice)]
+                selected_folder_name = folders[int(folder_choice) - 1].get("name", "Unknown")
+                self.console.print(f"📁 Selected: {selected_folder_name}")
+        else:
+            self.console.print("⚠️  No folders found, using all profiles")
+            selected_folder_id = None
+        
+        # Get profiles based on folder selection
+        profiles = self.bot_manager.get_all_profiles(selected_folder_id)
         
         if not profiles:
-            self.console.print("❌ No profiles available")
+            self.console.print("❌ No profiles available in selected folder")
             return
         
         self.console.print(f"📋 Found {len(profiles)} profiles")
