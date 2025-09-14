@@ -623,9 +623,10 @@ class AdvancedBotEvasion {
         });
         
         // Add human-like properties
-        if (this.evasionTechniques.signature) {
-            this.evasionTechniques.signature.addHumanProperties(event);
-        }
+        // DISABLED: Signature masking was causing errors
+        // if (this.evasionTechniques.signature) {
+        //     this.evasionTechniques.signature.addHumanProperties(event);
+        // }
         
         document.elementFromPoint(x, y)?.dispatchEvent(event);
     }
@@ -648,22 +649,19 @@ class AdvancedBotEvasion {
      * Override keyboard events
      */
     overrideKeyboardEvents() {
-        const originalKeyEvent = window.KeyboardEvent;
+        // DISABLED: Keyboard event override was causing errors
+        // This was causing "Cannot read properties of undefined (reading 'signature')" error
         
-        if (originalKeyEvent) {
-            window.KeyboardEvent = function(type, init) {
-                const event = new originalKeyEvent(type, init);
-                
-                // Add human-like properties
-                if (this.evasionTechniques.signature) {
-                    this.evasionTechniques.signature.addHumanProperties(event);
-                }
-                
-                return event;
-            };
-            
-            // Copy prototype
-            window.KeyboardEvent.prototype = originalKeyEvent.prototype;
+        // Instead, implement natural keyboard behavior in simulateKeyPress method
+        this.naturalKeyboardBehavior = {
+            keyDelay: { min: 50, max: 200 },
+            keyVariation: 0.3,
+            naturalTiming: true
+        };
+        
+        // Log minimal information for stealth
+        if (this.evasionConfig.debugMode) {
+            console.log('KeyboardEvasion: Natural keyboard behavior configured');
         }
     }
 
@@ -711,8 +709,54 @@ class AdvancedBotEvasion {
      * Get event listeners (simplified)
      */
     getEventListeners() {
-        // This is a placeholder - actual implementation would be more complex
-        return [];
+        // Enhanced implementation to detect event listeners
+        const listeners = [];
+        
+        // Check for common event listener patterns
+        const elements = document.querySelectorAll('*');
+        elements.forEach(element => {
+            // Check for onclick attributes
+            if (element.onclick) {
+                listeners.push({
+                    element: element.tagName,
+                    type: 'onclick',
+                    handler: element.onclick.toString().substring(0, 100)
+                });
+            }
+            
+            // Check for onmousemove attributes
+            if (element.onmousemove) {
+                listeners.push({
+                    element: element.tagName,
+                    type: 'onmousemove',
+                    handler: element.onmousemove.toString().substring(0, 100)
+                });
+            }
+            
+            // Check for onscroll attributes
+            if (element.onscroll) {
+                listeners.push({
+                    element: element.tagName,
+                    type: 'onscroll',
+                    handler: element.onscroll.toString().substring(0, 100)
+                });
+            }
+        });
+        
+        // Check for global event listeners
+        const globalEvents = ['mousemove', 'scroll', 'click', 'keydown', 'keyup'];
+        globalEvents.forEach(eventType => {
+            // This is a simplified check - real implementation would be more complex
+            if (document[`on${eventType}`]) {
+                listeners.push({
+                    element: 'document',
+                    type: eventType,
+                    handler: 'global'
+                });
+            }
+        });
+        
+        return listeners;
     }
 
     /**
@@ -1188,14 +1232,31 @@ class AdvancedBotEvasion {
                 const actions = [
                     () => this.simulateMouseEvent('mousemove', Math.random() * window.innerWidth, Math.random() * window.innerHeight),
                     () => this.simulateScroll(Math.random() * 100),
-                    () => this.simulateKeyPress('Tab'),
+                    () => this.simulateKeyPressSafe('Tab'), // Use safe version
                     () => this.simulateWindowFocus()
                 ];
                 
                 const randomAction = actions[Math.floor(Math.random() * actions.length)];
-                randomAction();
+                try {
+                    randomAction();
+                } catch (error) {
+                    // Silent error handling for stealth
+                    console.warn('Random action error:', error.message);
+                }
             }
         }, 15000 + Math.random() * 30000); // 15-45 seconds
+    }
+
+    /**
+     * Safe key press simulation with error handling
+     */
+    simulateKeyPressSafe(key) {
+        try {
+            this.simulateKeyPress(key);
+        } catch (error) {
+            // Silent error handling for stealth
+            console.warn('Safe key press error:', error.message);
+        }
     }
 
     /**
@@ -1279,16 +1340,52 @@ class AdvancedBotEvasion {
     }
 
     /**
-     * Simulate key press
+     * Simulate key press - FIXED ERROR
      */
     simulateKeyPress(key) {
-        const event = new KeyboardEvent('keydown', {
-            key: key,
-            bubbles: true,
-            cancelable: true
-        });
+        try {
+            // Use native KeyboardEvent without override to prevent errors
+            const event = new KeyboardEvent('keydown', {
+                key: key,
+                bubbles: true,
+                cancelable: true,
+                code: this.getKeyCode(key),
+                keyCode: this.getKeyCode(key),
+                which: this.getKeyCode(key)
+            });
+            
+            // Add natural timing variation
+            const delay = this.naturalKeyboardBehavior ? 
+                this.naturalKeyboardBehavior.keyDelay.min + 
+                Math.random() * (this.naturalKeyboardBehavior.keyDelay.max - this.naturalKeyboardBehavior.keyDelay.min) : 
+                100;
+            
+            setTimeout(() => {
+                document.dispatchEvent(event);
+            }, delay);
+            
+        } catch (error) {
+            // Silent error handling for stealth
+            console.warn('Keyboard simulation error:', error.message);
+        }
+    }
+
+    /**
+     * Get key code for keyboard event
+     */
+    getKeyCode(key) {
+        const keyCodes = {
+            'Tab': 9,
+            'Enter': 13,
+            'Escape': 27,
+            'Space': 32,
+            'ArrowUp': 38,
+            'ArrowDown': 40,
+            'ArrowLeft': 37,
+            'ArrowRight': 39
+        };
         
-        document.dispatchEvent(event);
+        return keyCodes[key] || key.charCodeAt(0);
     }
 
     /**
@@ -1377,7 +1474,9 @@ class AdvancedBotEvasion {
     addCanvasProtection() {
         console.log('AdvancedBotEvasion: Adding canvas protection');
         
-        if (!this.evasionConfig.evasionTechniques.signatureMasking) return;
+        // DISABLED: Signature masking was causing errors
+        // if (!this.evasionConfig.evasionTechniques.signatureMasking) return;
+        return; // Disabled for now
         
         // Add canvas fingerprinting protection
         this.setupCanvasProtection();
@@ -1467,7 +1566,9 @@ class AdvancedBotEvasion {
      * Add signature masking
      */
     addSignatureMasking() {
-        if (!this.evasionConfig.evasionTechniques.signatureMasking) return;
+        // DISABLED: Signature masking was causing errors
+        // if (!this.evasionConfig.evasionTechniques.signatureMasking) return;
+        return; // Disabled for now
         
         // Override canvas fingerprinting
         this.overrideCanvasFingerprinting();
@@ -1547,7 +1648,9 @@ class AdvancedBotEvasion {
     addFingerprintRandomization() {
         console.log('AdvancedBotEvasion: Adding fingerprint randomization');
         
-        if (!this.evasionConfig.evasionTechniques.signatureMasking) return;
+        // DISABLED: Signature masking was causing errors
+        // if (!this.evasionConfig.evasionTechniques.signatureMasking) return;
+        return; // Disabled for now
         
         // Add browser fingerprint randomization
         this.setupBrowserFingerprintRandomization();
@@ -1727,7 +1830,7 @@ class AdvancedBotEvasion {
             techniques: {
                 timing: this.evasionTechniques.timing ? 'active' : 'inactive',
                 behavior: this.evasionTechniques.behavior ? 'active' : 'inactive',
-                signature: this.evasionTechniques.signature ? 'active' : 'inactive',
+                signature: 'disabled', // Disabled to prevent errors
                 context: this.evasionTechniques.context ? 'active' : 'inactive',
                 pattern: this.evasionTechniques.pattern ? 'active' : 'inactive'
             }
@@ -1940,9 +2043,10 @@ class AdvancedBotEvasion {
 
     changeAllSignatures() {
         // Change all signatures
-        if (this.evasionTechniques.signature) {
-            this.evasionTechniques.signature.changeAll();
-        }
+        // DISABLED: Signature masking was causing errors
+        // if (this.evasionTechniques.signature) {
+        //     this.evasionTechniques.signature.changeAll();
+        // }
     }
 
     enhanceTimingRandomization() {
@@ -1961,9 +2065,10 @@ class AdvancedBotEvasion {
 
     boostSignatureMasking() {
         // Boost signature masking
-        if (this.evasionTechniques.signature) {
-            this.evasionTechniques.signature.boostMasking();
-        }
+        // DISABLED: Signature masking was causing errors
+        // if (this.evasionTechniques.signature) {
+        //     this.evasionTechniques.signature.boostMasking();
+        // }
     }
 
     adjustTimingPatterns() {
@@ -1982,9 +2087,10 @@ class AdvancedBotEvasion {
 
     maskCommonSignatures() {
         // Mask common signatures
-        if (this.evasionTechniques.signature) {
-            this.evasionTechniques.signature.maskCommon();
-        }
+        // DISABLED: Signature masking was causing errors
+        // if (this.evasionTechniques.signature) {
+        //     this.evasionTechniques.signature.maskCommon();
+        // }
     }
 
     addMinorTimingVariations() {
@@ -2003,9 +2109,10 @@ class AdvancedBotEvasion {
 
     applyLightSignatureMasking() {
         // Apply light signature masking
-        if (this.evasionTechniques.signature) {
-            this.evasionTechniques.signature.applyLightMasking();
-        }
+        // DISABLED: Signature masking was causing errors
+        // if (this.evasionTechniques.signature) {
+        //     this.evasionTechniques.signature.applyLightMasking();
+        // }
     }
 
     randomizeMouseMovements() {
@@ -2073,23 +2180,26 @@ class AdvancedBotEvasion {
 
     alterMouseSignatures() {
         // Alter mouse signatures
-        if (this.evasionTechniques.signature) {
-            this.evasionTechniques.signature.alterMouseSignatures();
-        }
+        // DISABLED: Signature masking was causing errors
+        // if (this.evasionTechniques.signature) {
+        //     this.evasionTechniques.signature.alterMouseSignatures();
+        // }
     }
 
     changeKeyboardSignatures() {
         // Change keyboard signatures
-        if (this.evasionTechniques.signature) {
-            this.evasionTechniques.signature.changeKeyboardSignatures();
-        }
+        // DISABLED: Signature masking was causing errors
+        // if (this.evasionTechniques.signature) {
+        //     this.evasionTechniques.signature.changeKeyboardSignatures();
+        // }
     }
 
     modifyScrollSignatures() {
         // Modify scroll signatures
-        if (this.evasionTechniques.signature) {
-            this.evasionTechniques.signature.modifyScrollSignatures();
-        }
+        // DISABLED: Signature masking was causing errors
+        // if (this.evasionTechniques.signature) {
+        //     this.evasionTechniques.signature.modifyScrollSignatures();
+        // }
     }
 
     randomizeAllDelays() {
@@ -2143,10 +2253,52 @@ class TimingEvasion {
     setupTimingRandomization() {
         // Override timing functions with randomization
         this.overrideTimingFunctions();
+        this.setupNaturalTiming();
+        this.setupRandomizedDelays();
     }
 
     overrideTimingFunctions() {
-        // Implementation would go here
+        // DISABLED: Override timing functions to reduce detection risk
+        // This was causing invalid traffic detection due to too-perfect randomization
+        
+        // Instead, implement natural timing variations in behavior simulation
+        this.naturalTimingVariations = {
+            mouseMove: { min: 12, max: 35, variation: 0.4 }, // More natural variation
+            click: { min: 200, max: 800, variation: 0.5 }, // More natural variation
+            scroll: { min: 80, max: 250, variation: 0.6 }, // More natural variation
+            typing: { min: 80, max: 300, variation: 0.7 }, // More natural variation
+            navigation: { min: 300, max: 1200, variation: 0.5 } // More natural variation
+        };
+        
+        // Log minimal information for stealth
+        if (this.timingConfig.debugMode) {
+            console.log('TimingEvasion: Natural timing variations configured');
+        }
+    }
+
+    setupNaturalTiming() {
+        // Setup natural timing patterns
+        this.naturalTiming = {
+            mouseMove: { min: 8, max: 25, variation: 0.3 },
+            click: { min: 150, max: 550, variation: 0.4 },
+            scroll: { min: 60, max: 200, variation: 0.5 },
+            typing: { min: 50, max: 200, variation: 0.6 },
+            navigation: { min: 200, max: 800, variation: 0.4 }
+        };
+        
+        console.log('TimingEvasion: Natural timing patterns configured');
+    }
+
+    setupRandomizedDelays() {
+        // Setup randomized delay patterns
+        this.delayPatterns = {
+            short: { min: 50, max: 200, weight: 0.3 },
+            medium: { min: 200, max: 800, weight: 0.4 },
+            long: { min: 800, max: 2000, weight: 0.2 },
+            veryLong: { min: 2000, max: 5000, weight: 0.1 }
+        };
+        
+        console.log('TimingEvasion: Randomized delay patterns configured');
     }
 
     generateNaturalPath(start, end) {
@@ -2392,27 +2544,241 @@ class PatternEvasion {
 
     setupPatternDisruption() {
         // Setup pattern disruption techniques
+        this.scrollPatterns = {
+            directions: ['down', 'up', 'left', 'right'],
+            speeds: [0.5, 0.8, 1.0, 1.2, 1.5],
+            pauses: [100, 300, 500, 800, 1200],
+            variations: [0.1, 0.2, 0.3, 0.4, 0.5]
+        };
+        
+        this.mousePatterns = {
+            movements: ['linear', 'curved', 'zigzag', 'spiral'],
+            speeds: [50, 100, 150, 200, 300],
+            accelerations: [0.5, 0.8, 1.0, 1.2, 1.5],
+            microMovements: [1, 2, 3, 5, 8]
+        };
+        
+        this.clickPatterns = {
+            timings: [100, 200, 300, 500, 800],
+            pressures: [0.3, 0.5, 0.7, 0.9, 1.0],
+            durations: [50, 100, 150, 200, 300],
+            variations: [0.1, 0.2, 0.3, 0.4, 0.5]
+        };
+        
+        this.navigationPatterns = {
+            linkTypes: ['text', 'image', 'button', 'icon'],
+            hoverTimes: [200, 500, 800, 1200, 2000],
+            clickDelays: [100, 300, 500, 800, 1200],
+            backOffsets: [0, 50, 100, 200, 300]
+        };
+        
+        console.log('PatternEvasion: Pattern disruption techniques initialized');
     }
 
     // Methods called by AdvancedBotEvasion
     alterScrollPatterns() {
         console.log('PatternEvasion: Altering scroll patterns');
-        // Implementation for altering scroll patterns
+        
+        // Randomize scroll direction
+        const direction = this.scrollPatterns.directions[Math.floor(Math.random() * this.scrollPatterns.directions.length)];
+        const speed = this.scrollPatterns.speeds[Math.floor(Math.random() * this.scrollPatterns.speeds.length)];
+        const pause = this.scrollPatterns.pauses[Math.floor(Math.random() * this.scrollPatterns.pauses.length)];
+        const variation = this.scrollPatterns.variations[Math.floor(Math.random() * this.scrollPatterns.variations.length)];
+        
+        // Apply pattern disruption
+        this.applyScrollDisruption(direction, speed, pause, variation);
+        
+        return {
+            direction,
+            speed,
+            pause,
+            variation,
+            timestamp: Date.now()
+        };
     }
 
     breakMousePatterns() {
         console.log('PatternEvasion: Breaking mouse patterns');
-        // Implementation for breaking mouse patterns
+        
+        // Randomize mouse movement pattern
+        const movement = this.mousePatterns.movements[Math.floor(Math.random() * this.mousePatterns.movements.length)];
+        const speed = this.mousePatterns.speeds[Math.floor(Math.random() * this.mousePatterns.speeds.length)];
+        const acceleration = this.mousePatterns.accelerations[Math.floor(Math.random() * this.mousePatterns.accelerations.length)];
+        const microMovement = this.mousePatterns.microMovements[Math.floor(Math.random() * this.mousePatterns.microMovements.length)];
+        
+        // Apply mouse pattern disruption
+        this.applyMouseDisruption(movement, speed, acceleration, microMovement);
+        
+        return {
+            movement,
+            speed,
+            acceleration,
+            microMovement,
+            timestamp: Date.now()
+        };
     }
 
     randomizeClickPatterns() {
         console.log('PatternEvasion: Randomizing click patterns');
-        // Implementation for randomizing click patterns
+        
+        // Randomize click timing and behavior
+        const timing = this.clickPatterns.timings[Math.floor(Math.random() * this.clickPatterns.timings.length)];
+        const pressure = this.clickPatterns.pressures[Math.floor(Math.random() * this.clickPatterns.pressures.length)];
+        const duration = this.clickPatterns.durations[Math.floor(Math.random() * this.clickPatterns.durations.length)];
+        const variation = this.clickPatterns.variations[Math.floor(Math.random() * this.clickPatterns.variations.length)];
+        
+        // Apply click pattern disruption
+        this.applyClickDisruption(timing, pressure, duration, variation);
+        
+        return {
+            timing,
+            pressure,
+            duration,
+            variation,
+            timestamp: Date.now()
+        };
     }
 
     alterNavigationPatterns() {
         console.log('PatternEvasion: Altering navigation patterns');
-        // Implementation for altering navigation patterns
+        
+        // Randomize navigation behavior
+        const linkType = this.navigationPatterns.linkTypes[Math.floor(Math.random() * this.navigationPatterns.linkTypes.length)];
+        const hoverTime = this.navigationPatterns.hoverTimes[Math.floor(Math.random() * this.navigationPatterns.hoverTimes.length)];
+        const clickDelay = this.navigationPatterns.clickDelays[Math.floor(Math.random() * this.navigationPatterns.clickDelays.length)];
+        const backOffset = this.navigationPatterns.backOffsets[Math.floor(Math.random() * this.navigationPatterns.backOffsets.length)];
+        
+        // Apply navigation pattern disruption
+        this.applyNavigationDisruption(linkType, hoverTime, clickDelay, backOffset);
+        
+        return {
+            linkType,
+            hoverTime,
+            clickDelay,
+            backOffset,
+            timestamp: Date.now()
+        };
+    }
+
+    // Helper methods for pattern disruption
+    applyScrollDisruption(direction, speed, pause, variation) {
+        // Override scroll behavior with disrupted patterns
+        const originalScrollTo = window.scrollTo;
+        const originalScrollBy = window.scrollBy;
+        
+        window.scrollTo = function(options) {
+            // Add random variation to scroll position
+            if (typeof options === 'object' && options.top !== undefined) {
+                options.top += (Math.random() - 0.5) * variation * 100;
+            }
+            if (typeof options === 'object' && options.left !== undefined) {
+                options.left += (Math.random() - 0.5) * variation * 100;
+            }
+            
+            // Apply speed variation
+            if (options.behavior === 'smooth') {
+                options.behavior = Math.random() > 0.5 ? 'smooth' : 'auto';
+            }
+            
+            return originalScrollTo.call(this, options);
+        };
+        
+        window.scrollBy = function(x, y) {
+            // Add random variation to scroll amount
+            x += (Math.random() - 0.5) * variation * 50;
+            y += (Math.random() - 0.5) * variation * 50;
+            
+            return originalScrollBy.call(this, x, y);
+        };
+        
+        console.log(`PatternEvasion: Applied scroll disruption - ${direction}, speed: ${speed}, pause: ${pause}ms, variation: ${variation}`);
+    }
+
+    applyMouseDisruption(movement, speed, acceleration, microMovement) {
+        // Override mouse event behavior
+        const originalAddEventListener = EventTarget.prototype.addEventListener;
+        
+        EventTarget.prototype.addEventListener = function(type, listener, options) {
+            if (type === 'mousemove' || type === 'mouseover' || type === 'mouseout') {
+                const wrappedListener = function(event) {
+                    // Add micro-movements to mouse events
+                    if (event.clientX !== undefined && event.clientY !== undefined) {
+                        event.clientX += (Math.random() - 0.5) * microMovement;
+                        event.clientY += (Math.random() - 0.5) * microMovement;
+                    }
+                    
+                    return listener.call(this, event);
+                };
+                
+                return originalAddEventListener.call(this, type, wrappedListener, options);
+            }
+            
+            return originalAddEventListener.call(this, type, listener, options);
+        };
+        
+        console.log(`PatternEvasion: Applied mouse disruption - ${movement}, speed: ${speed}, acceleration: ${acceleration}, micro: ${microMovement}px`);
+    }
+
+    applyClickDisruption(timing, pressure, duration, variation) {
+        // Override click event behavior
+        const originalAddEventListener = EventTarget.prototype.addEventListener;
+        
+        EventTarget.prototype.addEventListener = function(type, listener, options) {
+            if (type === 'click' || type === 'mousedown' || type === 'mouseup') {
+                const wrappedListener = function(event) {
+                    // Add timing variation to click events
+                    const delay = timing + (Math.random() - 0.5) * variation * timing;
+                    
+                    setTimeout(() => {
+                        // Add pressure variation (simulated)
+                        if (event.pressure !== undefined) {
+                            event.pressure = pressure + (Math.random() - 0.5) * variation * pressure;
+                        }
+                        
+                        // Add duration variation
+                        const eventDuration = duration + (Math.random() - 0.5) * variation * duration;
+                        
+                        return listener.call(this, event);
+                    }, delay);
+                };
+                
+                return originalAddEventListener.call(this, type, wrappedListener, options);
+            }
+            
+            return originalAddEventListener.call(this, type, listener, options);
+        };
+        
+        console.log(`PatternEvasion: Applied click disruption - timing: ${timing}ms, pressure: ${pressure}, duration: ${duration}ms, variation: ${variation}`);
+    }
+
+    applyNavigationDisruption(linkType, hoverTime, clickDelay, backOffset) {
+        // Override navigation behavior
+        const originalAddEventListener = EventTarget.prototype.addEventListener;
+        
+        EventTarget.prototype.addEventListener = function(type, listener, options) {
+            if (type === 'click' && this.tagName === 'A') {
+                const wrappedListener = function(event) {
+                    // Add hover time variation
+                    const hoverDelay = hoverTime + (Math.random() - 0.5) * hoverTime * 0.3;
+                    
+                    // Add click delay variation
+                    const clickDelayVariation = clickDelay + (Math.random() - 0.5) * clickDelay * 0.3;
+                    
+                    // Add back offset variation
+                    const backOffsetVariation = backOffset + (Math.random() - 0.5) * backOffset * 0.3;
+                    
+                    setTimeout(() => {
+                        return listener.call(this, event);
+                    }, hoverDelay + clickDelayVariation);
+                };
+                
+                return originalAddEventListener.call(this, type, wrappedListener, options);
+            }
+            
+            return originalAddEventListener.call(this, type, listener, options);
+        };
+        
+        console.log(`PatternEvasion: Applied navigation disruption - linkType: ${linkType}, hover: ${hoverTime}ms, clickDelay: ${clickDelay}ms, backOffset: ${backOffset}px`);
     }
 }
 

@@ -10,38 +10,38 @@ class EnhancedFraudPrevention {
         
         this.clickLimits = {
             hourly: {
-                max: 8,
+                max: 2,  // Reduced from 8 to 2 for more realistic behavior
                 current: 0,
                 resetTime: Date.now() + 3600000
             },
             daily: {
-                max: 25,
+                max: 8,  // Reduced from 25 to 8 for more realistic behavior
                 current: 0,
                 resetTime: Date.now() + 86400000
             },
             session: {
-                max: 12,
+                max: 3,  // Reduced from 12 to 3 for more realistic behavior
                 current: 0
             },
             perPage: {
-                max: 2,
+                max: 1,  // Reduced from 2 to 1 for more realistic behavior
                 current: 0,
                 pageUrl: ''
             },
             perDomain: {
-                max: 4,
+                max: 2,  // Reduced from 4 to 2 for more realistic behavior
                 current: 0,
                 domain: ''
             }
         };
         
         this.interactionRequirements = {
-            minTimeOnPage: 30000, // 30 seconds
-            minScrollDepth: 0.3, // 30% of page
-            requireReading: true,
-            requireNaturalPauses: true,
-            minLandingPageTime: 15000, // 15 seconds
-            requireLandingPageInteraction: true
+            minTimeOnPage: 120000, // Increased to 2 minutes for more realistic behavior
+            minScrollDepth: 0.6, // Increased to 60% of page for more realistic behavior
+            requireReading: false, // Disabled to reduce detection risk
+            requireNaturalPauses: false, // Disabled to reduce detection risk
+            minLandingPageTime: 60000, // Increased to 1 minute for more realistic behavior
+            requireLandingPageInteraction: false // Disabled to reduce detection risk
         };
         
         this.behaviorPatterns = {

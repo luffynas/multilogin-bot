@@ -1034,27 +1034,105 @@ class NavigationSimulator {
         
         return links;
     }
-
+    
     /**
-     * Navigate to next page using optimized selectors
+     * Find next page links using expanded selectors for better coverage
+     */
+    findNextPageLinksExpanded() {
+        const links = [];
+        const expandedSelectors = [
+            // More generic patterns
+            'a[href*="next"]', 'a[href*="continue"]', 'a[href*="more"]',
+            'a[href*="page"]', 'a[href*="post"]', 'a[href*="article"]',
+            
+            // Text-based patterns
+            'a:contains("Next")', 'a:contains("Continue")', 'a:contains("More")',
+            'a:contains("Read More")', 'a:contains("View More")',
+            
+            // Position-based patterns
+            '.pagination a:last-child', '.page-nav a:last-child',
+            '.navigation a:last-child', '.nav a:last-child',
+            
+            // Class-based patterns
+            '.btn-next', '.button-next', '.link-next',
+            '.more-link', '.continue-link', '.read-more'
+        ];
+        
+        expandedSelectors.forEach(selector => {
+            try {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(element => {
+                    if (this.isValidLink(element)) {
+                        // Additional validation for expanded selectors
+                        const text = element.textContent.toLowerCase();
+                        const href = element.href.toLowerCase();
+                        
+                        if (text.includes('next') || text.includes('continue') || 
+                            text.includes('more') || href.includes('next') || 
+                            href.includes('continue') || href.includes('more')) {
+                            links.push(element);
+                        }
+                    }
+                });
+            } catch (error) {
+                // Skip invalid selectors
+            }
+        });
+        
+        return links;
+    }
+    
+    /**
+     * Navigate to next page using optimized selectors with retry mechanism
      */
     async navigateToNextPage() {
-        try {
-            const nextLinks = this.findNextPageLinks();
-            
-            if (nextLinks.length > 0) {
-                const selectedLink = this.selectBestLink(nextLinks);
-                if (selectedLink) {
-                    await this.clickLink(selectedLink);
-                    return true;
+        const maxRetries = 2;
+        
+        for (let attempt = 0; attempt < maxRetries; attempt++) {
+            try {
+                const nextLinks = this.findNextPageLinks();
+                
+                if (nextLinks.length > 0) {
+                    const selectedLink = this.selectBestLink(nextLinks);
+                    if (selectedLink) {
+                        const clickSuccess = await this.clickLink(selectedLink);
+                        if (clickSuccess) {
+                            if (this.behaviorSimulator?.behaviorConfig?.debugMode) {
+                                console.log(`✅ Next page navigation successful (attempt ${attempt + 1})`);
+                            }
+                            return true;
+                        }
+                    }
                 }
+                
+                // If no links found, try with expanded selectors
+                if (attempt === 0) {
+                    const expandedLinks = this.findNextPageLinksExpanded();
+                    if (expandedLinks.length > 0) {
+                        const selectedLink = this.selectBestLink(expandedLinks);
+                        if (selectedLink) {
+                            const clickSuccess = await this.clickLink(selectedLink);
+                            if (clickSuccess) {
+                                if (this.behaviorSimulator?.behaviorConfig?.debugMode) {
+                                    console.log(`✅ Next page navigation successful with expanded selectors`);
+                                }
+                                return true;
+                            }
+                        }
+                    }
+                }
+                
+            } catch (error) {
+                console.warn(`Next page navigation error (attempt ${attempt + 1}):`, error.message);
+                if (attempt === maxRetries - 1) {
+                    return false;
+                }
+                // Wait before retry
+                await this.delay(500 + Math.random() * 1000);
             }
-            
-            return false;
-        } catch (error) {
-            console.warn('Next page navigation error:', error.message);
-            return false;
         }
+        
+        return false;
     }
     
     /**
@@ -1080,19 +1158,48 @@ class NavigationSimulator {
     }
     
     /**
-     * Navigate to previous/next page (legacy function for backward compatibility)
+     * Navigate to previous/next page with enhanced logic and personality-based behavior
      */
     async navigatePreviousNext() {
         try {
-            // Try next page first (more natural behavior)
-            const nextSuccess = await this.navigateToNextPage();
-            if (nextSuccess) {
-                return true;
+            const personality = this.behaviorSimulator?.currentPersonality;
+            
+            // Personality-based navigation preference
+            let navigationOrder = this.getNavigationOrder(personality);
+            
+            // Try navigation in personality-based order
+            for (const navType of navigationOrder) {
+                let success = false;
+                
+                switch (navType) {
+                    case 'next':
+                        success = await this.navigateToNextPage();
+                        break;
+                    case 'previous':
+                        success = await this.navigateToPreviousPage();
+                        break;
+                    case 'related':
+                        success = await this.navigateRelatedContent();
+                        break;
+                    case 'category':
+                        success = await this.navigateToCategory();
+                        break;
+                    case 'recent':
+                        success = await this.navigateToRecentPosts();
+                        break;
+                }
+                
+                if (success) {
+                    if (this.behaviorSimulator?.behaviorConfig?.debugMode) {
+                        console.log(`✅ Navigation successful: ${navType}`);
+                    }
+                    return true;
+                }
             }
             
-            // Fallback to previous page
-            const prevSuccess = await this.navigateToPreviousPage();
-            if (prevSuccess) {
+            // Enhanced fallback with retry mechanism
+            const fallbackSuccess = await this.enhancedFallbackNavigation();
+            if (fallbackSuccess) {
                 return true;
             }
             
@@ -1101,6 +1208,70 @@ class NavigationSimulator {
             return false;
         } catch (error) {
             console.warn('Previous/Next navigation error:', error.message);
+            return false;
+        }
+    }
+    
+    /**
+     * Get navigation order based on personality
+     */
+    getNavigationOrder(personality) {
+        if (!personality) {
+            return ['next', 'previous', 'related', 'category', 'recent'];
+        }
+        
+        switch (personality.type) {
+            case 'researcher':
+                // Researchers prefer systematic navigation
+                return ['next', 'related', 'category', 'previous', 'recent'];
+            case 'explorer':
+                // Explorers prefer variety and discovery
+                return ['related', 'category', 'next', 'recent', 'previous'];
+            case 'casual':
+                // Casual users prefer simple navigation
+                return ['next', 'previous', 'recent', 'related', 'category'];
+            case 'professional':
+                // Professionals prefer efficient navigation
+                return ['next', 'category', 'related', 'previous', 'recent'];
+            default:
+                return ['next', 'previous', 'related', 'category', 'recent'];
+        }
+    }
+    
+    /**
+     * Enhanced fallback navigation with retry mechanism
+     */
+    async enhancedFallbackNavigation() {
+        try {
+            // Try generic selectors as fallback
+            const genericSelectors = [
+                'a[href*="next"]', 'a[href*="previous"]',
+                'a[href*="prev"]', 'a[href*="continue"]',
+                '.pagination a', '.page-nav a',
+                '.navigation a', '.nav a'
+            ];
+            
+            for (const selector of genericSelectors) {
+                try {
+                    const elements = document.querySelectorAll(selector);
+                    const validLinks = Array.from(elements).filter(el => this.isValidLink(el));
+                    
+                    if (validLinks.length > 0) {
+                        const selectedLink = this.selectBestLink(validLinks);
+                        if (selectedLink) {
+                            await this.clickLink(selectedLink);
+                            return true;
+                        }
+                    }
+                } catch (error) {
+                    // Continue to next selector
+                    continue;
+                }
+            }
+            
+            return false;
+        } catch (error) {
+            console.warn('Enhanced fallback navigation error:', error.message);
             return false;
         }
     }

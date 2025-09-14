@@ -5,7 +5,7 @@
 class NetworkTrafficSimulator {
     constructor() {
         this.networkConfig = {
-            enabled: true,
+            enabled: false, // DISABLED: Network simulation was causing invalid traffic detection
             baseLatency: 50,
             latencyVariation: 20,
             bandwidthLimit: 1000000, // 1MB/s
@@ -573,6 +573,398 @@ class NetworkTrafficSimulator {
     }
 
     /**
+     * Simulate network requests
+     */
+    simulateNetworkRequests() {
+        console.log('NetworkTrafficSimulator: Simulating network requests...');
+        
+        // Generate realistic request patterns
+        const requests = this.generateRealisticRequests();
+        
+        // Simulate request timing
+        this.simulateRequestTiming(requests);
+        
+        // Simulate network conditions
+        this.simulateNetworkConditions(requests);
+        
+        // Record request patterns
+        this.recordRequestPatterns(requests);
+        
+        console.log(`NetworkTrafficSimulator: Simulated ${requests.length} network requests`);
+        return requests;
+    }
+
+    /**
+     * Generate traffic patterns
+     */
+    generateTrafficPatterns() {
+        console.log('NetworkTrafficSimulator: Generating traffic patterns...');
+        
+        // Generate browsing session patterns
+        const browsingPatterns = this.generateBrowsingSessionPatterns();
+        
+        // Generate request cluster patterns
+        const clusterPatterns = this.generateRequestClusterPatterns();
+        
+        // Generate idle period patterns
+        const idlePatterns = this.generateIdlePeriodPatterns();
+        
+        // Generate burst patterns
+        const burstPatterns = this.generateBurstPatterns();
+        
+        const patterns = {
+            browsing: browsingPatterns,
+            clusters: clusterPatterns,
+            idle: idlePatterns,
+            bursts: burstPatterns,
+            timestamp: Date.now()
+        };
+        
+        console.log('NetworkTrafficSimulator: Traffic patterns generated');
+        return patterns;
+    }
+
+    /**
+     * Generate realistic requests
+     */
+    generateRealisticRequests() {
+        const requests = [];
+        const currentTime = Date.now();
+        
+        // Generate different types of requests
+        const requestTypes = [
+            { type: 'html', count: 1, size: { min: 30000, max: 100000 } },
+            { type: 'css', count: 3, size: { min: 5000, max: 50000 } },
+            { type: 'js', count: 5, size: { min: 10000, max: 80000 } },
+            { type: 'image', count: 8, size: { min: 2000, max: 200000 } },
+            { type: 'font', count: 2, size: { min: 8000, max: 30000 } },
+            { type: 'analytics', count: 2, size: { min: 500, max: 2000 } },
+            { type: 'api', count: 3, size: { min: 1000, max: 10000 } }
+        ];
+        
+        requestTypes.forEach(requestType => {
+            for (let i = 0; i < requestType.count; i++) {
+                const request = {
+                    type: requestType.type,
+                    timestamp: currentTime + Math.random() * 5000, // Spread over 5 seconds
+                    size: requestType.size.min + Math.random() * (requestType.size.max - requestType.size.min),
+                    latency: this.generateLatency(requestType.type),
+                    pattern: 'realistic',
+                    priority: this.getRequestPriority(requestType.type)
+                };
+                
+                requests.push(request);
+            }
+        });
+        
+        return requests.sort((a, b) => a.timestamp - b.timestamp);
+    }
+
+    /**
+     * Simulate request timing
+     */
+    simulateRequestTiming(requests) {
+        requests.forEach(request => {
+            // Add natural timing variations
+            const timingVariation = (Math.random() - 0.5) * 100; // ±50ms variation
+            request.timestamp += timingVariation;
+            
+            // Simulate network latency
+            const latencyVariation = (Math.random() - 0.5) * 20; // ±10ms variation
+            request.actualLatency = Math.max(5, request.latency + latencyVariation);
+            
+            // Simulate transfer time based on size
+            const transferTime = request.size / this.networkConfig.bandwidthLimit * 1000;
+            request.transferTime = transferTime;
+            
+            // Calculate total time
+            request.totalTime = request.actualLatency + request.transferTime;
+        });
+    }
+
+    /**
+     * Simulate network conditions
+     */
+    simulateNetworkConditions(requests) {
+        // Simulate bandwidth variations
+        const bandwidthVariation = 0.8 + Math.random() * 0.4; // 80-120% of base bandwidth
+        this.networkConfig.currentBandwidth = this.networkConfig.bandwidthLimit * bandwidthVariation;
+        
+        // Simulate packet loss
+        const packetLossRate = Math.random() * 0.02; // 0-2% packet loss
+        this.networkConfig.packetLossRate = packetLossRate;
+        
+        // Simulate jitter
+        const jitter = Math.random() * 10; // 0-10ms jitter
+        this.networkConfig.jitter = jitter;
+        
+        // Apply conditions to requests
+        requests.forEach(request => {
+            // Apply bandwidth constraints
+            request.transferTime = request.size / this.networkConfig.currentBandwidth * 1000;
+            
+            // Apply packet loss
+            if (Math.random() < packetLossRate) {
+                request.packetLoss = true;
+                request.retransmissionDelay = 100 + Math.random() * 200; // 100-300ms retransmission
+            }
+            
+            // Apply jitter
+            request.jitter = (Math.random() - 0.5) * jitter;
+            request.totalTime += request.jitter;
+        });
+    }
+
+    /**
+     * Record request patterns
+     */
+    recordRequestPatterns(requests) {
+        const pattern = {
+            timestamp: Date.now(),
+            requestCount: requests.length,
+            totalSize: requests.reduce((sum, req) => sum + req.size, 0),
+            avgLatency: requests.reduce((sum, req) => sum + req.actualLatency, 0) / requests.length,
+            avgTransferTime: requests.reduce((sum, req) => sum + req.transferTime, 0) / requests.length,
+            packetLossRate: this.networkConfig.packetLossRate,
+            bandwidth: this.networkConfig.currentBandwidth,
+            jitter: this.networkConfig.jitter
+        };
+        
+        this.trafficPatterns.patterns.push(pattern);
+        
+        // Limit pattern history
+        if (this.trafficPatterns.patterns.length > 1000) {
+            this.trafficPatterns.patterns.shift();
+        }
+    }
+
+    /**
+     * Generate browsing session patterns
+     */
+    generateBrowsingSessionPatterns() {
+        const patterns = [];
+        
+        // Generate different session types
+        const sessionTypes = [
+            { type: 'quick_browse', duration: 30000, requestCount: 15 },
+            { type: 'normal_browse', duration: 120000, requestCount: 45 },
+            { type: 'deep_browse', duration: 300000, requestCount: 80 },
+            { type: 'extended_browse', duration: 600000, requestCount: 120 }
+        ];
+        
+        sessionTypes.forEach(sessionType => {
+            const pattern = {
+                type: sessionType.type,
+                duration: sessionType.duration,
+                requestCount: sessionType.requestCount,
+                requestInterval: sessionType.duration / sessionType.requestCount,
+                burstPatterns: this.generateBurstPatternsForSession(sessionType.type),
+                idlePeriods: this.generateIdlePeriodsForSession(sessionType.type)
+            };
+            
+            patterns.push(pattern);
+        });
+        
+        return patterns;
+    }
+
+    /**
+     * Generate request cluster patterns
+     */
+    generateRequestClusterPatterns() {
+        const patterns = [];
+        
+        // Generate different cluster types
+        const clusterTypes = [
+            { type: 'page_load', size: 8, interval: 100 },
+            { type: 'ajax_burst', size: 5, interval: 200 },
+            { type: 'image_lazy_load', size: 3, interval: 500 },
+            { type: 'analytics_batch', size: 2, interval: 1000 }
+        ];
+        
+        clusterTypes.forEach(clusterType => {
+            const pattern = {
+                type: clusterType.type,
+                size: clusterType.size,
+                interval: clusterType.interval,
+                timing: this.generateClusterTiming(clusterType),
+                distribution: this.generateClusterDistribution(clusterType)
+            };
+            
+            patterns.push(pattern);
+        });
+        
+        return patterns;
+    }
+
+    /**
+     * Generate idle period patterns
+     */
+    generateIdlePeriodPatterns() {
+        const patterns = [];
+        
+        // Generate different idle types
+        const idleTypes = [
+            { type: 'reading_pause', duration: { min: 5000, max: 30000 } },
+            { type: 'thinking_pause', duration: { min: 2000, max: 10000 } },
+            { type: 'distraction_pause', duration: { min: 10000, max: 60000 } },
+            { type: 'break_pause', duration: { min: 30000, max: 300000 } }
+        ];
+        
+        idleTypes.forEach(idleType => {
+            const pattern = {
+                type: idleType.type,
+                duration: idleType.duration.min + Math.random() * (idleType.duration.max - idleType.duration.min),
+                frequency: this.calculateIdleFrequency(idleType.type),
+                context: this.getIdleContext(idleType.type)
+            };
+            
+            patterns.push(pattern);
+        });
+        
+        return patterns;
+    }
+
+    /**
+     * Generate burst patterns
+     */
+    generateBurstPatterns() {
+        const patterns = [];
+        
+        // Generate different burst types
+        const burstTypes = [
+            { type: 'scroll_burst', intensity: 'high', duration: 2000 },
+            { type: 'click_burst', intensity: 'medium', duration: 1000 },
+            { type: 'navigation_burst', intensity: 'high', duration: 3000 },
+            { type: 'search_burst', intensity: 'medium', duration: 1500 }
+        ];
+        
+        burstTypes.forEach(burstType => {
+            const pattern = {
+                type: burstType.type,
+                intensity: burstType.intensity,
+                duration: burstType.duration,
+                requestRate: this.calculateBurstRequestRate(burstType.intensity),
+                timing: this.generateBurstTiming(burstType)
+            };
+            
+            patterns.push(pattern);
+        });
+        
+        return patterns;
+    }
+
+    /**
+     * Helper methods
+     */
+    getRequestPriority(type) {
+        const priorities = {
+            'html': 'high',
+            'css': 'high',
+            'js': 'medium',
+            'image': 'low',
+            'font': 'medium',
+            'analytics': 'low',
+            'api': 'medium'
+        };
+        
+        return priorities[type] || 'medium';
+    }
+
+    generateLatency(type) {
+        const baseLatency = {
+            'html': 50,
+            'css': 30,
+            'js': 40,
+            'image': 20,
+            'font': 35,
+            'analytics': 10,
+            'api': 60
+        };
+        
+        const base = baseLatency[type] || 30;
+        return base + Math.random() * 20; // Add 0-20ms variation
+    }
+
+    generateBurstPatternsForSession(sessionType) {
+        const patterns = {
+            'quick_browse': { count: 2, intensity: 'low' },
+            'normal_browse': { count: 4, intensity: 'medium' },
+            'deep_browse': { count: 6, intensity: 'high' },
+            'extended_browse': { count: 8, intensity: 'high' }
+        };
+        
+        return patterns[sessionType] || { count: 3, intensity: 'medium' };
+    }
+
+    generateIdlePeriodsForSession(sessionType) {
+        const periods = {
+            'quick_browse': { count: 1, duration: 5000 },
+            'normal_browse': { count: 3, duration: 10000 },
+            'deep_browse': { count: 5, duration: 15000 },
+            'extended_browse': { count: 8, duration: 20000 }
+        };
+        
+        return periods[sessionType] || { count: 2, duration: 8000 };
+    }
+
+    generateClusterTiming(clusterType) {
+        return {
+            startDelay: Math.random() * 1000,
+            intervalVariation: 0.2,
+            endDelay: Math.random() * 500
+        };
+    }
+
+    generateClusterDistribution(clusterType) {
+        return {
+            uniform: 0.6,
+            exponential: 0.3,
+            burst: 0.1
+        };
+    }
+
+    calculateIdleFrequency(idleType) {
+        const frequencies = {
+            'reading_pause': 0.3,
+            'thinking_pause': 0.2,
+            'distraction_pause': 0.1,
+            'break_pause': 0.05
+        };
+        
+        return frequencies[idleType] || 0.15;
+    }
+
+    getIdleContext(idleType) {
+        const contexts = {
+            'reading_pause': 'content_consumption',
+            'thinking_pause': 'decision_making',
+            'distraction_pause': 'external_interruption',
+            'break_pause': 'session_break'
+        };
+        
+        return contexts[idleType] || 'general';
+    }
+
+    calculateBurstRequestRate(intensity) {
+        const rates = {
+            'low': 2,
+            'medium': 5,
+            'high': 10
+        };
+        
+        return rates[intensity] || 3;
+    }
+
+    generateBurstTiming(burstType) {
+        return {
+            rampUp: 200,
+            sustain: burstType.duration - 400,
+            rampDown: 200
+        };
+    }
+
+    /**
      * Get network metrics
      */
     getNetworkMetrics() {
@@ -584,7 +976,18 @@ class NetworkTrafficSimulator {
             avgLatency: recentPatterns.reduce((sum, p) => sum + p.avgLatency, 0) / recentPatterns.length || 0,
             currentPattern: this.currentSession.currentPattern,
             sessionDuration: Date.now() - this.currentSession.startTime,
-            humanPatterns: this.humanPatterns.browsingSessions.length
+            humanPatterns: this.humanPatterns.browsingSessions.length,
+            networkConditions: {
+                bandwidth: this.networkConfig.currentBandwidth,
+                packetLoss: this.networkConfig.packetLossRate,
+                jitter: this.networkConfig.jitter
+            },
+            trafficPatterns: {
+                browsing: this.generateBrowsingSessionPatterns().length,
+                clusters: this.generateRequestClusterPatterns().length,
+                idle: this.generateIdlePeriodPatterns().length,
+                bursts: this.generateBurstPatterns().length
+            }
         };
     }
 

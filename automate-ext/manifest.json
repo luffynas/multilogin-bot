@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Web Assistant",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "General web browsing assistant and productivity tool by GengSego",
   "permissions": [
     "activeTab",
@@ -37,14 +37,12 @@
         "lib/stealth-monitor.js",
         "lib/ml-behavior-engine.js",
         "lib/advanced-mouse-physics.js",
-        "lib/network-traffic-simulator.js",
-        "lib/advanced-bot-evasion.js",
         "lib/analytics-monitor.js",
         "lib/dynamic-adaptation-engine.js",
         "lib/enhanced-fraud-prevention.js",
         "content-script.js"
       ],
-      "run_at": "document_start"
+      "run_at": "document_idle"
     }
   ],
   "action": {

@@ -165,36 +165,46 @@ class StealthDelay {
     }
 
     /**
-     * Wait with natural scrolling delay
+     * Wait with natural scrolling delay (Enhanced for Human-Like Behavior)
      */
     async waitForScrolling(scrollDistance, personality = null) {
-        const baseScrollSpeed = 100; // pixels per second
+        // More natural base scroll speed with wider variation
+        const baseScrollSpeed = 60 + Math.random() * 140; // 60-200 pixels per second (was 100 fixed)
         let scrollSpeed = baseScrollSpeed;
         
-        // Personality adjustments
+        // Personality adjustments with more natural variation
         if (personality) {
             switch (personality) {
                 case 'researcher':
-                    scrollSpeed *= 0.6; // Slower, careful scrolling
+                    scrollSpeed *= (0.5 + Math.random() * 0.3); // 0.5-0.8x (was 0.6x fixed)
                     break;
                 case 'explorer':
-                    scrollSpeed *= 1.4; // Faster, exploratory scrolling
+                    scrollSpeed *= (1.2 + Math.random() * 0.6); // 1.2-1.8x (was 1.4x fixed)
                     break;
                 case 'casual':
-                    scrollSpeed *= 1.0; // Normal speed
+                    scrollSpeed *= (0.8 + Math.random() * 0.4); // 0.8-1.2x (was 1.0x fixed)
                     break;
                 case 'professional':
-                    scrollSpeed *= 1.2; // Slightly faster
+                    scrollSpeed *= (1.0 + Math.random() * 0.4); // 1.0-1.4x (was 1.2x fixed)
+                    break;
+                default:
+                    scrollSpeed *= (0.7 + Math.random() * 0.6); // 0.7-1.3x for unknown personality
                     break;
             }
         }
         
         const scrollTime = (scrollDistance / scrollSpeed) * 1000; // Convert to milliseconds
-        const variation = this.randomBetween(0.8, 1.2);
+        
+        // More natural variation with human imperfection
+        const variation = this.randomBetween(0.5, 1.8); // 50-180% (was 80-120%)
         const finalDelay = scrollTime * variation;
         
-        await this.wait(Math.round(finalDelay));
-        return Math.round(finalDelay);
+        // Add human-like hesitation factor
+        const hesitationFactor = Math.random() < 0.1 ? (1.2 + Math.random() * 0.8) : 1.0; // 10% chance for 1.2-2.0x delay
+        const finalDelayWithHesitation = finalDelay * hesitationFactor;
+        
+        await this.wait(Math.round(finalDelayWithHesitation));
+        return Math.round(finalDelayWithHesitation);
     }
 
     /**

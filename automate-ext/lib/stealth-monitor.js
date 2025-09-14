@@ -29,16 +29,18 @@ class StealthMonitor {
         
         this.stealthConfig = {
             enabled: true,
-            monitoringInterval: 30000, // 30 seconds - increased for stealth
-            maxPatternHistory: 200, // Reduced history for better stealth
-            riskThreshold: 0.95, // Very high threshold to reduce false positives
-            humanThreshold: 0.3, // Lowered threshold for more realistic assessment
-            suspiciousPatternThreshold: 0.98, // Very high threshold for suspicious patterns
+            monitoringInterval: 300000, // Increased to 5 minutes for better stealth
+            maxPatternHistory: 50, // Further reduced history for better stealth
+            riskThreshold: 0.99, // Even higher threshold to reduce false positives
+            humanThreshold: 0.2, // Further lowered threshold for more realistic assessment
+            suspiciousPatternThreshold: 0.99, // Even higher threshold for suspicious patterns
             debugMode: false, // Disable debug logging for stealth
             stealthMode: true, // Enable enhanced stealth mode
             consoleLogging: false, // Disable all console logging
             windowExposure: false, // Disable window object exposure
-            chromeStorage: false // Disable chrome storage usage
+            chromeStorage: false, // Disable chrome storage usage
+            reducedMonitoring: true, // Enable reduced monitoring mode
+            minimalDataCollection: true // Enable minimal data collection
         };
         
         this.monitoringTimer = null;
@@ -750,8 +752,283 @@ class StealthMonitor {
     }
 
     analyzeHoverBeforeClick(clicks) {
-        // This would need to be implemented based on actual hover data
-        return Math.random() * 0.8 + 0.2; // Placeholder
+        // Enhanced implementation to analyze hover before click
+        if (clicks.length === 0) return 0;
+        
+        let hoverBeforeClickCount = 0;
+        let totalClicks = clicks.length;
+        
+        clicks.forEach(click => {
+            // Check if there was a hover event before the click
+            const hoverEvents = this.getHoverEventsBeforeClick(click);
+            
+            if (hoverEvents.length > 0) {
+                hoverBeforeClickCount++;
+                
+                // Analyze hover duration
+                const hoverDuration = this.calculateHoverDuration(hoverEvents);
+                click.hoverDuration = hoverDuration;
+                
+                // Analyze hover distance
+                const hoverDistance = this.calculateHoverDistance(hoverEvents);
+                click.hoverDistance = hoverDistance;
+                
+                // Analyze hover pattern
+                const hoverPattern = this.analyzeHoverPattern(hoverEvents);
+                click.hoverPattern = hoverPattern;
+            }
+        });
+        
+        const hoverRatio = hoverBeforeClickCount / totalClicks;
+        
+        // Calculate naturalness score based on hover behavior
+        const naturalnessScore = this.calculateHoverNaturalness(clicks);
+        
+        return {
+            hoverRatio: hoverRatio,
+            naturalnessScore: naturalnessScore,
+            averageHoverDuration: this.calculateAverageHoverDuration(clicks),
+            averageHoverDistance: this.calculateAverageHoverDistance(clicks),
+            hoverPatterns: this.analyzeHoverPatterns(clicks)
+        };
+    }
+
+    /**
+     * Get hover events before click
+     */
+    getHoverEventsBeforeClick(click) {
+        const hoverEvents = [];
+        const clickTime = click.timestamp;
+        const clickElement = click.element;
+        
+        // Look for hover events on the same element within 2 seconds before click
+        this.behaviorData.mouseEvents.forEach(event => {
+            if (event.type === 'mouseover' || event.type === 'mouseenter') {
+                if (event.timestamp < clickTime && 
+                    event.timestamp > clickTime - 2000 && 
+                    event.element === clickElement) {
+                    hoverEvents.push(event);
+                }
+            }
+        });
+        
+        return hoverEvents.sort((a, b) => a.timestamp - b.timestamp);
+    }
+
+    /**
+     * Calculate hover duration
+     */
+    calculateHoverDuration(hoverEvents) {
+        if (hoverEvents.length === 0) return 0;
+        
+        const firstHover = hoverEvents[0];
+        const lastHover = hoverEvents[hoverEvents.length - 1];
+        
+        return lastHover.timestamp - firstHover.timestamp;
+    }
+
+    /**
+     * Calculate hover distance
+     */
+    calculateHoverDistance(hoverEvents) {
+        if (hoverEvents.length < 2) return 0;
+        
+        let totalDistance = 0;
+        
+        for (let i = 1; i < hoverEvents.length; i++) {
+            const prev = hoverEvents[i - 1];
+            const curr = hoverEvents[i];
+            
+            const distance = Math.sqrt(
+                Math.pow(curr.x - prev.x, 2) + Math.pow(curr.y - prev.y, 2)
+            );
+            
+            totalDistance += distance;
+        }
+        
+        return totalDistance;
+    }
+
+    /**
+     * Analyze hover pattern
+     */
+    analyzeHoverPattern(hoverEvents) {
+        if (hoverEvents.length === 0) return 'none';
+        
+        const pattern = {
+            type: 'unknown',
+            confidence: 0,
+            characteristics: {}
+        };
+        
+        // Analyze hover characteristics
+        const durations = hoverEvents.map(e => e.duration || 0);
+        const distances = this.calculateHoverDistances(hoverEvents);
+        
+        // Determine pattern type
+        if (durations.some(d => d > 1000)) {
+            pattern.type = 'long_hover';
+            pattern.confidence = 0.8;
+        } else if (durations.some(d => d < 100)) {
+            pattern.type = 'quick_hover';
+            pattern.confidence = 0.7;
+        } else if (distances.some(d => d > 50)) {
+            pattern.type = 'movement_hover';
+            pattern.confidence = 0.6;
+        } else {
+            pattern.type = 'static_hover';
+            pattern.confidence = 0.5;
+        }
+        
+        pattern.characteristics = {
+            averageDuration: durations.reduce((a, b) => a + b, 0) / durations.length,
+            averageDistance: distances.reduce((a, b) => a + b, 0) / distances.length,
+            eventCount: hoverEvents.length
+        };
+        
+        return pattern;
+    }
+
+    /**
+     * Calculate hover naturalness
+     */
+    calculateHoverNaturalness(clicks) {
+        let naturalnessScore = 0;
+        let totalScore = 0;
+        
+        clicks.forEach(click => {
+            if (click.hoverDuration && click.hoverDistance) {
+                // Natural hover duration (100-800ms)
+                const durationScore = this.scoreHoverDuration(click.hoverDuration);
+                
+                // Natural hover distance (10-100px)
+                const distanceScore = this.scoreHoverDistance(click.hoverDistance);
+                
+                // Natural hover pattern
+                const patternScore = this.scoreHoverPattern(click.hoverPattern);
+                
+                const clickScore = (durationScore + distanceScore + patternScore) / 3;
+                naturalnessScore += clickScore;
+                totalScore++;
+            }
+        });
+        
+        return totalScore > 0 ? naturalnessScore / totalScore : 0;
+    }
+
+    /**
+     * Score hover duration
+     */
+    scoreHoverDuration(duration) {
+        if (duration >= 100 && duration <= 800) {
+            return 1.0; // Perfect natural duration
+        } else if (duration >= 50 && duration <= 1200) {
+            return 0.7; // Acceptable duration
+        } else if (duration >= 20 && duration <= 2000) {
+            return 0.4; // Questionable duration
+        } else {
+            return 0.1; // Unnatural duration
+        }
+    }
+
+    /**
+     * Score hover distance
+     */
+    scoreHoverDistance(distance) {
+        if (distance >= 10 && distance <= 100) {
+            return 1.0; // Perfect natural distance
+        } else if (distance >= 5 && distance <= 200) {
+            return 0.7; // Acceptable distance
+        } else if (distance >= 1 && distance <= 500) {
+            return 0.4; // Questionable distance
+        } else {
+            return 0.1; // Unnatural distance
+        }
+    }
+
+    /**
+     * Score hover pattern
+     */
+    scoreHoverPattern(pattern) {
+        if (!pattern || pattern.type === 'unknown') return 0.5;
+        
+        const patternScores = {
+            'long_hover': 0.8,
+            'quick_hover': 0.6,
+            'movement_hover': 0.9,
+            'static_hover': 0.4
+        };
+        
+        return patternScores[pattern.type] || 0.5;
+    }
+
+    /**
+     * Calculate average hover duration
+     */
+    calculateAverageHoverDuration(clicks) {
+        const durations = clicks
+            .filter(click => click.hoverDuration)
+            .map(click => click.hoverDuration);
+        
+        if (durations.length === 0) return 0;
+        
+        return durations.reduce((a, b) => a + b, 0) / durations.length;
+    }
+
+    /**
+     * Calculate average hover distance
+     */
+    calculateAverageHoverDistance(clicks) {
+        const distances = clicks
+            .filter(click => click.hoverDistance)
+            .map(click => click.hoverDistance);
+        
+        if (distances.length === 0) return 0;
+        
+        return distances.reduce((a, b) => a + b, 0) / distances.length;
+    }
+
+    /**
+     * Analyze hover patterns
+     */
+    analyzeHoverPatterns(clicks) {
+        const patterns = {
+            long_hover: 0,
+            quick_hover: 0,
+            movement_hover: 0,
+            static_hover: 0,
+            none: 0
+        };
+        
+        clicks.forEach(click => {
+            if (click.hoverPattern) {
+                patterns[click.hoverPattern.type]++;
+            } else {
+                patterns.none++;
+            }
+        });
+        
+        return patterns;
+    }
+
+    /**
+     * Calculate hover distances
+     */
+    calculateHoverDistances(hoverEvents) {
+        const distances = [];
+        
+        for (let i = 1; i < hoverEvents.length; i++) {
+            const prev = hoverEvents[i - 1];
+            const curr = hoverEvents[i];
+            
+            const distance = Math.sqrt(
+                Math.pow(curr.x - prev.x, 2) + Math.pow(curr.y - prev.y, 2)
+            );
+            
+            distances.push(distance);
+        }
+        
+        return distances;
     }
 
     calculateScrollSpeeds(scrolls) {

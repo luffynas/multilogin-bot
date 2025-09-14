@@ -543,6 +543,304 @@ class MLBehaviorEngine {
     }
 
     /**
+     * Learn from behavior patterns
+     */
+    learnFromPatterns() {
+        if (!this.mlConfig.enabled) return;
+        
+        console.log('MLBehaviorEngine: Learning from behavior patterns...');
+        
+        // Analyze successful patterns
+        this.analyzeSuccessfulPatterns();
+        
+        // Analyze failed patterns
+        this.analyzeFailedPatterns();
+        
+        // Update adaptation rules
+        this.updateAdaptationRules();
+        
+        // Save learned patterns
+        this.saveLearnedPatterns();
+        
+        console.log('MLBehaviorEngine: Pattern learning completed');
+    }
+
+    /**
+     * Analyze successful patterns
+     */
+    analyzeSuccessfulPatterns() {
+        const successfulPatterns = this.learnedPatterns.successfulPatterns;
+        
+        if (successfulPatterns.length === 0) return;
+        
+        // Group patterns by context
+        const contextGroups = this.groupPatternsByContext(successfulPatterns);
+        
+        // Extract common characteristics
+        Object.keys(contextGroups).forEach(context => {
+            const patterns = contextGroups[context];
+            const characteristics = this.extractPatternCharacteristics(patterns);
+            
+            // Store successful characteristics
+            if (!this.learnedPatterns.contextPatterns[context]) {
+                this.learnedPatterns.contextPatterns[context] = {};
+            }
+            
+            this.learnedPatterns.contextPatterns[context].successful = characteristics;
+        });
+        
+        console.log(`MLBehaviorEngine: Analyzed ${successfulPatterns.length} successful patterns`);
+    }
+
+    /**
+     * Analyze failed patterns
+     */
+    analyzeFailedPatterns() {
+        const failedPatterns = this.learnedPatterns.failedPatterns;
+        
+        if (failedPatterns.length === 0) return;
+        
+        // Group patterns by context
+        const contextGroups = this.groupPatternsByContext(failedPatterns);
+        
+        // Extract common characteristics
+        Object.keys(contextGroups).forEach(context => {
+            const patterns = contextGroups[context];
+            const characteristics = this.extractPatternCharacteristics(patterns);
+            
+            // Store failed characteristics
+            if (!this.learnedPatterns.contextPatterns[context]) {
+                this.learnedPatterns.contextPatterns[context] = {};
+            }
+            
+            this.learnedPatterns.contextPatterns[context].failed = characteristics;
+        });
+        
+        console.log(`MLBehaviorEngine: Analyzed ${failedPatterns.length} failed patterns`);
+    }
+
+    /**
+     * Update adaptation rules based on learned patterns
+     */
+    updateAdaptationRules() {
+        const rules = [];
+        
+        // Generate rules from context patterns
+        Object.keys(this.learnedPatterns.contextPatterns).forEach(context => {
+            const contextPatterns = this.learnedPatterns.contextPatterns[context];
+            
+            if (contextPatterns.successful && contextPatterns.failed) {
+                // Compare successful vs failed patterns
+                const rule = this.generateAdaptationRule(context, contextPatterns.successful, contextPatterns.failed);
+                if (rule) {
+                    rules.push(rule);
+                }
+            }
+        });
+        
+        // Update adaptation rules
+        this.learnedPatterns.adaptationRules = rules;
+        
+        console.log(`MLBehaviorEngine: Updated ${rules.length} adaptation rules`);
+    }
+
+    /**
+     * Adapt behavior based on learned patterns
+     */
+    adaptBehavior() {
+        if (!this.mlConfig.enabled) return null;
+        
+        console.log('MLBehaviorEngine: Adapting behavior based on learned patterns...');
+        
+        // Get current context
+        const currentContext = this.analyzeWebsiteContext();
+        const contextKey = this.getContextKey(currentContext);
+        
+        // Find applicable rules
+        const applicableRules = this.findApplicableRules(contextKey);
+        
+        if (applicableRules.length === 0) {
+            console.log('MLBehaviorEngine: No applicable rules found');
+            return null;
+        }
+        
+        // Apply best rule
+        const bestRule = this.selectBestRule(applicableRules);
+        const adaptedBehavior = this.applyAdaptationRule(bestRule);
+        
+        console.log(`MLBehaviorEngine: Applied adaptation rule: ${bestRule.type}`);
+        return adaptedBehavior;
+    }
+
+    /**
+     * Predict optimal behavior for current context
+     */
+    predictOptimalBehavior() {
+        if (!this.mlConfig.enabled) return null;
+        
+        console.log('MLBehaviorEngine: Predicting optimal behavior...');
+        
+        // Get current context
+        const currentContext = this.analyzeWebsiteContext();
+        const contextKey = this.getContextKey(currentContext);
+        
+        // Get context patterns
+        const contextPatterns = this.learnedPatterns.contextPatterns[contextKey];
+        
+        if (!contextPatterns || !contextPatterns.successful) {
+            console.log('MLBehaviorEngine: No successful patterns found for context');
+            return null;
+        }
+        
+        // Predict optimal parameters
+        const optimalBehavior = this.calculateOptimalParameters(contextPatterns.successful);
+        
+        console.log('MLBehaviorEngine: Optimal behavior predicted');
+        return optimalBehavior;
+    }
+
+    /**
+     * Group patterns by context
+     */
+    groupPatternsByContext(patterns) {
+        const groups = {};
+        
+        patterns.forEach(pattern => {
+            const contextKey = this.getContextKey(pattern.context);
+            if (!groups[contextKey]) {
+                groups[contextKey] = [];
+            }
+            groups[contextKey].push(pattern);
+        });
+        
+        return groups;
+    }
+
+    /**
+     * Extract pattern characteristics
+     */
+    extractPatternCharacteristics(patterns) {
+        if (patterns.length === 0) return {};
+        
+        const characteristics = {
+            mouseSpeed: this.calculateAverage(patterns.map(p => p.mouseSpeed)),
+            clickDelay: this.calculateAverage(patterns.map(p => p.clickDelay)),
+            scrollSpeed: this.calculateAverage(patterns.map(p => p.scrollSpeed)),
+            readingTime: this.calculateAverage(patterns.map(p => p.readingTime)),
+            navigationDelay: this.calculateAverage(patterns.map(p => p.navigationDelay)),
+            successRate: this.calculateAverage(patterns.map(p => p.successRate))
+        };
+        
+        return characteristics;
+    }
+
+    /**
+     * Generate adaptation rule
+     */
+    generateAdaptationRule(context, successful, failed) {
+        const rule = {
+            context: context,
+            type: 'behavior_adaptation',
+            conditions: this.generateRuleConditions(successful, failed),
+            actions: this.generateRuleActions(successful, failed),
+            confidence: this.calculateRuleConfidence(successful, failed),
+            timestamp: Date.now()
+        };
+        
+        return rule.confidence > this.mlConfig.adaptationThreshold ? rule : null;
+    }
+
+    /**
+     * Find applicable rules for context
+     */
+    findApplicableRules(contextKey) {
+        return this.learnedPatterns.adaptationRules.filter(rule => 
+            rule.context === contextKey && rule.confidence > this.mlConfig.adaptationThreshold
+        );
+    }
+
+    /**
+     * Select best rule from applicable rules
+     */
+    selectBestRule(rules) {
+        return rules.reduce((best, current) => 
+            current.confidence > best.confidence ? current : best
+        );
+    }
+
+    /**
+     * Apply adaptation rule
+     */
+    applyAdaptationRule(rule) {
+        const adaptedBehavior = {
+            mouseSpeed: rule.actions.mouseSpeed || 1.0,
+            clickDelay: rule.actions.clickDelay || 1.0,
+            scrollSpeed: rule.actions.scrollSpeed || 1.0,
+            readingTime: rule.actions.readingTime || 1.0,
+            navigationDelay: rule.actions.navigationDelay || 1.0,
+            confidence: rule.confidence,
+            ruleType: rule.type
+        };
+        
+        return adaptedBehavior;
+    }
+
+    /**
+     * Calculate optimal parameters
+     */
+    calculateOptimalParameters(successfulPatterns) {
+        return {
+            mouseSpeed: this.calculateOptimalValue(successfulPatterns.mouseSpeed),
+            clickDelay: this.calculateOptimalValue(successfulPatterns.clickDelay),
+            scrollSpeed: this.calculateOptimalValue(successfulPatterns.scrollSpeed),
+            readingTime: this.calculateOptimalValue(successfulPatterns.readingTime),
+            navigationDelay: this.calculateOptimalValue(successfulPatterns.navigationDelay),
+            confidence: successfulPatterns.successRate
+        };
+    }
+
+    /**
+     * Helper methods
+     */
+    getContextKey(context) {
+        return `${context.website}_${context.pageType}_${context.contentType}`;
+    }
+
+    calculateAverage(values) {
+        return values.reduce((sum, val) => sum + val, 0) / values.length;
+    }
+
+    calculateOptimalValue(value) {
+        // Simple optimization: use the value with highest success rate
+        return value;
+    }
+
+    generateRuleConditions(successful, failed) {
+        return {
+            mouseSpeed: { min: successful.mouseSpeed * 0.9, max: successful.mouseSpeed * 1.1 },
+            clickDelay: { min: successful.clickDelay * 0.9, max: successful.clickDelay * 1.1 },
+            scrollSpeed: { min: successful.scrollSpeed * 0.9, max: successful.scrollSpeed * 1.1 }
+        };
+    }
+
+    generateRuleActions(successful, failed) {
+        return {
+            mouseSpeed: successful.mouseSpeed,
+            clickDelay: successful.clickDelay,
+            scrollSpeed: successful.scrollSpeed,
+            readingTime: successful.readingTime,
+            navigationDelay: successful.navigationDelay
+        };
+    }
+
+    calculateRuleConfidence(successful, failed) {
+        // Calculate confidence based on success rate difference
+        const successRate = successful.successRate || 0.8;
+        const failureRate = failed.successRate || 0.2;
+        return Math.abs(successRate - failureRate);
+    }
+
+    /**
      * Get ML metrics
      */
     getMLMetrics() {
@@ -550,8 +848,20 @@ class MLBehaviorEngine {
             patternsLearned: this.learnedPatterns.successfulPatterns.length + this.learnedPatterns.failedPatterns.length,
             adaptationRules: this.learnedPatterns.adaptationRules.length,
             currentContext: this.currentContext,
-            learningEnabled: this.mlConfig.enabled
+            learningEnabled: this.mlConfig.enabled,
+            contextPatterns: Object.keys(this.learnedPatterns.contextPatterns).length,
+            averageConfidence: this.calculateAverageConfidence()
         };
+    }
+
+    /**
+     * Calculate average confidence of adaptation rules
+     */
+    calculateAverageConfidence() {
+        if (this.learnedPatterns.adaptationRules.length === 0) return 0;
+        
+        const totalConfidence = this.learnedPatterns.adaptationRules.reduce((sum, rule) => sum + rule.confidence, 0);
+        return totalConfidence / this.learnedPatterns.adaptationRules.length;
     }
 }
 

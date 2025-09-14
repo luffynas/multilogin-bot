@@ -24,13 +24,15 @@ class ContentAnalyzer {
             }
         };
 
-        // Stealth configuration
+        // Stealth configuration - FURTHER REDUCED for better stealth
         this.stealthConfig = {
-            detectionInterval: 60000, // 1 minute instead of real-time
-            maxDetectionFrequency: 5, // Max 5 detections per minute
+            detectionInterval: 300000, // Increased to 5 minutes instead of 1 minute
+            maxDetectionFrequency: 1, // Reduced from 5 to 1 detection per 5 minutes
             lastDetectionTime: 0,
             detectionCount: 0,
-            stealthMode: true
+            stealthMode: true,
+            reducedDetection: true, // Enable reduced detection mode
+            passiveMode: true // Enable passive detection mode
         };
 
         // Comprehensive AdSense selectors matching Python Selenium implementation

@@ -24,20 +24,20 @@ class PersonalityEngine {
                 PROFESSIONAL: { min: 60, max: 180 }
             },
             
-            // Click probability ranges (increased for better ad interaction)
+            // Click probability ranges (REDUCED for more realistic behavior)
             CLICK_PROBABILITY: {
-                EXPLORER: 0.25,     // Increased from 0.12
-                RESEARCHER: 0.30,   // Increased from 0.15
-                CASUAL: 0.25,       // Optimized from 0.20 to 0.25 for higher RPM
-                PROFESSIONAL: 0.22  // Increased from 0.10
+                EXPLORER: 0.08,     // Reduced from 0.25 to 0.08 for more realistic behavior
+                RESEARCHER: 0.05,   // Reduced from 0.30 to 0.05 for more realistic behavior
+                CASUAL: 0.06,       // Reduced from 0.25 to 0.06 for more realistic behavior
+                PROFESSIONAL: 0.04  // Reduced from 0.22 to 0.04 for more realistic behavior
             },
             
-            // Hover probability ranges
+            // Hover probability ranges (REDUCED for more realistic behavior)
             HOVER_PROBABILITY: {
-                EXPLORER: 0.8,
-                RESEARCHER: 0.6,
-                CASUAL: 0.6,        // Optimized from 0.4 to 0.6 for higher engagement
-                PROFESSIONAL: 0.5
+                EXPLORER: 0.3,      // Reduced from 0.8 to 0.3 for more realistic behavior
+                RESEARCHER: 0.2,    // Reduced from 0.6 to 0.2 for more realistic behavior
+                CASUAL: 0.25,       // Reduced from 0.6 to 0.25 for more realistic behavior
+                PROFESSIONAL: 0.15  // Reduced from 0.5 to 0.15 for more realistic behavior
             },
             
             // Session ID configuration

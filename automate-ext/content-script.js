@@ -143,8 +143,32 @@ class AutomationModuleFactory {
     }
     
     async createNetworkTrafficSimulator() {
-        const NetworkTrafficSimulator = await this.moduleLoader.loadModule('NetworkTrafficSimulator', 'lib/network-traffic-simulator.js');
-        return new NetworkTrafficSimulator();
+        // DISABLED: NetworkTrafficSimulator was causing invalid traffic detection
+        // Return a mock object to prevent errors
+        return {
+            initialize: () => {},
+            simulateNetworkRequests: () => [],
+            generateTrafficPatterns: () => ({}),
+            getNetworkMetrics: () => ({
+                totalRequests: 0,
+                totalTraffic: 0,
+                avgLatency: 0,
+                currentPattern: 'disabled',
+                sessionDuration: 0,
+                humanPatterns: 0,
+                networkConditions: {
+                    bandwidth: 0,
+                    packetLoss: 0,
+                    jitter: 0
+                },
+                trafficPatterns: {
+                    browsing: 0,
+                    clusters: 0,
+                    idle: 0,
+                    bursts: 0
+                }
+            })
+        };
     }
     
     async createMLBehaviorEngine() {
