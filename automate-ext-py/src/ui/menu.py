@@ -2,6 +2,9 @@
 Main menu system for the application
 """
 from typing import List, Dict, Any, Optional
+import time
+import random
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
@@ -712,7 +715,7 @@ This tool helps you automate Multilogin browser profiles with:
         self.console.print("\n🚀 Start Bot Script-Runner (Multiple Profiles)")
         
         # Get script file name
-        script_file = Prompt.ask("Enter script file name (e.g., 'example.py')")
+        script_file = Prompt.ask("Enter script file name (e.g., 'example.py')", default="advanced_website_robot.py")
         
         # Get max concurrent profiles
         max_concurrent = int(Prompt.ask("Enter max concurrent profiles", default="5"))
@@ -776,51 +779,135 @@ This tool helps you automate Multilogin browser profiles with:
                 self.console.print("❌ No valid profile IDs found")
                 return
             
-            # Start Script Runner
+            # Process profiles with true concurrent control using ThreadPoolExecutor
+            self.console.print(f"🔄 Processing {len(profile_ids)} profiles with max {max_concurrent} concurrent")
+            
+            all_results = []
+            
+            # Use ThreadPoolExecutor to truly limit concurrent execution
+            with ThreadPoolExecutor(max_workers=max_concurrent) as executor:
+                # Submit all tasks
+                future_to_profile = {}
+                for profile_id in profile_ids:
+                    future = executor.submit(
+                        self._start_single_script_runner,
+                        script_file=script_file,
+                        profile_id=profile_id,
+                        is_headless=is_headless
+                    )
+                    future_to_profile[future] = profile_id
+                
+                # Process completed tasks
+                completed_count = 0
+                for future in as_completed(future_to_profile):
+                    profile_id = future_to_profile[future]
+                    completed_count += 1
+                    
+                    try:
+                        result = future.result()
+                        all_results.append(result)
+                        
+                        if result.get("status") == "success":
+                            self.console.print(f"  ✅ [{completed_count}/{len(profile_ids)}] Profile {profile_id[:8]}... started successfully")
+                        else:
+                            error_msg = result.get("message", "Unknown error")
+                            self.console.print(f"  ❌ [{completed_count}/{len(profile_ids)}] Profile {profile_id[:8]}... failed: {error_msg}")
+                            
+                    except Exception as e:
+                        error_result = {
+                            "profile_id": profile_id,
+                            "status": "error",
+                            "message": f"Exception: {str(e)}"
+                        }
+                        all_results.append(error_result)
+                        self.console.print(f"  ❌ [{completed_count}/{len(profile_ids)}] Profile {profile_id[:8]}... exception: {str(e)}")
+                    
+                    # Add small delay between completions to avoid overwhelming the system
+                    if completed_count < len(profile_ids):
+                        time.sleep(random.uniform(0.5, 1.5))
+            
+            # Display final results summary
+            if all_results:
+                successful = sum(1 for r in all_results if r.get("status") == "success")
+                failed = len(all_results) - successful
+                
+                self.console.print(f"\n📊 Final Script Runner Results:")
+                self.console.print(f"✅ Total Successful: {successful}")
+                self.console.print(f"❌ Total Failed: {failed}")
+                self.console.print(f"📦 Total Batches: {len(batches)}")
+                
+                # Show details for failed profiles
+                if failed > 0:
+                    self.console.print("\n❌ Failed profiles:")
+                    for result in all_results:
+                        if result.get("status") != "success":
+                            profile_id = result.get("profile_id", "Unknown")
+                            error_message = result.get("message", "Unknown error")
+                            self.console.print(f"  - {profile_id[:8]}...: {error_message}")
+                
+                # Show details for successful profiles
+                if successful > 0:
+                    self.console.print("\n✅ Successful profiles:")
+                    for result in all_results:
+                        if result.get("status") == "success":
+                            profile_id = result.get("profile_id", "Unknown")
+                            message = result.get("message", "Started successfully")
+                            self.console.print(f"  - {profile_id[:8]}...: {message}")
+                
+                # Overall status message
+                if successful == len(all_results):
+                    self.console.print(f"\n🎉 All {len(all_results)} profiles started successfully!")
+                elif successful > 0:
+                    self.console.print(f"\n⚠️  Partial success: {successful}/{len(all_results)} profiles started")
+                else:
+                    self.console.print(f"\n❌ All {len(all_results)} profiles failed to start")
+            else:
+                self.console.print(f"\n❌ No results received from Script Runner")
+    
+    def _start_single_script_runner(self, script_file: str, profile_id: str, is_headless: bool = False) -> Dict[str, Any]:
+        """
+        Start Script Runner for a single profile
+        
+        Args:
+            script_file: Name of the script file
+            profile_id: Profile ID to run script on
+            is_headless: Whether to run in headless mode
+            
+        Returns:
+            Dict with result information
+        """
+        try:
+            # Start Script Runner for single profile
             response = self.script_runner_api.start_script_runner(
                 script_file=script_file,
-                profile_ids=profile_ids,
+                profile_ids=[profile_id],
                 is_headless=is_headless
             )
             
-            # Display results if available
-            if response.data:
+            # Process response
+            if response.data and "data" in response.data:
                 results = response.data.get("data", [])
                 if results:
-                    successful = sum(1 for r in results if r.get("status") == "success")
-                    failed = len(results) - successful
-                    
-                    self.console.print(f"\n📊 Script Runner Results:")
-                    self.console.print(f"✅ Successful: {successful}")
-                    self.console.print(f"❌ Failed: {failed}")
-                    
-                    # Show details for failed profiles
-                    if failed > 0:
-                        self.console.print("\n❌ Failed profiles:")
-                        for result in results:
-                            if result.get("status") != "success":
-                                profile_id = result.get("profile_id", "Unknown")
-                                error_message = result.get("message", "Unknown error")
-                                self.console.print(f"  - {profile_id[:8]}...: {error_message}")
-                    
-                    # Show details for successful profiles
-                    if successful > 0:
-                        self.console.print("\n✅ Successful profiles:")
-                        for result in results:
-                            if result.get("status") == "success":
-                                profile_id = result.get("profile_id", "Unknown")
-                                message = result.get("message", "Started successfully")
-                                self.console.print(f"  - {profile_id[:8]}...: {message}")
-                    
-                    # Overall status message
-                    if successful == len(results):
-                        self.console.print(f"\n🎉 All {len(results)} profiles started successfully!")
-                    elif successful > 0:
-                        self.console.print(f"\n⚠️  Partial success: {successful}/{len(results)} profiles started")
-                    else:
-                        self.console.print(f"\n❌ All {len(results)} profiles failed to start")
+                    return results[0]  # Return first (and only) result
+                else:
+                    return {
+                        "profile_id": profile_id,
+                        "status": "error",
+                        "message": "No results in response"
+                    }
             else:
-                self.console.print(f"❌ Failed to start Script Runner: {response.error}")
+                return {
+                    "profile_id": profile_id,
+                    "status": "error",
+                    "message": response.error or "Unknown error"
+                }
+                
+        except Exception as e:
+            return {
+                "profile_id": profile_id,
+                "status": "error",
+                "message": f"Exception: {str(e)}"
+            }
     
     def stop_single_profile(self):
         """Stop a single profile"""

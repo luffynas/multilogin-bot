@@ -54,6 +54,14 @@ class ScriptRunnerAPI(BaseAPIClient):
                 error=response.error if not all_success else None
             )
         
+        # If no data in response, check if it's a network/connection error
+        if not response.data and response.error:
+            return BaseResponse(
+                success=False,
+                data=None,
+                error=f"Script Runner API error: {response.error}"
+            )
+        
         return response
     
     def stop_script_runner(self, profile_ids: List[str]) -> BaseResponse:
