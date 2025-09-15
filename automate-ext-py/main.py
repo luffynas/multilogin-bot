@@ -18,6 +18,7 @@ from api.proxy import ProxyAPI
 from api.cookies import CookiesAPI
 from api.object_storage import ObjectStorageAPI
 from api.extension import ExtensionAPI
+from api.script_runner import ScriptRunnerAPI
 from bot.manager import BotManager
 from ui.menu import MenuSystem
 from config import Config
@@ -58,6 +59,7 @@ def main():
         cookies_api = CookiesAPI(auth_manager)
         object_storage_api = ObjectStorageAPI(auth_manager)
         extension_api = ExtensionAPI(auth_manager)
+        script_runner_api = ScriptRunnerAPI(auth_manager)
         
         # Initialize bot manager
         print("🤖 Initializing bot manager...")
@@ -73,6 +75,7 @@ def main():
             cookies_api=cookies_api,
             object_storage_api=object_storage_api,
             extension_api=extension_api,
+            script_runner_api=script_runner_api,
             bot_manager=bot_manager
         )
         

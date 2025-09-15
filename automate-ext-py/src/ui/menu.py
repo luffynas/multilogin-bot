@@ -15,6 +15,7 @@ from api.proxy import ProxyAPI
 from api.cookies import CookiesAPI
 from api.object_storage import ObjectStorageAPI
 from api.extension import ExtensionAPI
+from api.script_runner import ScriptRunnerAPI
 from bot.manager import BotManager
 from models.base import ProfileInfo
 
@@ -30,6 +31,7 @@ class MenuSystem:
         cookies_api: CookiesAPI,
         object_storage_api: ObjectStorageAPI,
         extension_api: ExtensionAPI,
+        script_runner_api: ScriptRunnerAPI,
         bot_manager: BotManager
     ):
         self.console = Console()
@@ -40,6 +42,7 @@ class MenuSystem:
         self.cookies_api = cookies_api
         self.object_storage_api = object_storage_api
         self.extension_api = extension_api
+        self.script_runner_api = script_runner_api
         self.bot_manager = bot_manager
     
     def display_welcome(self):
@@ -70,10 +73,11 @@ This tool helps you automate Multilogin browser profiles with:
 7. Import Cookies
 8. Start Bot (Single Profile)
 9. Start Bot (Multiple Profiles)
-10. Stop Profile
-11. Stop All Profiles
-12. View Running Profiles Status
-13. Exit
+10. Start Bot Script-Runner (Multiple Profiles)
+11. Stop Profile
+12. Stop All Profiles
+13. View Running Profiles Status
+14. Exit
         """
         
         panel = Panel(menu_text, title="Main Menu", border_style="green")
@@ -81,7 +85,7 @@ This tool helps you automate Multilogin browser profiles with:
         
         choice = Prompt.ask(
             "Select an option",
-            choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"],
+            choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"],
             default="1"
         )
         
@@ -703,6 +707,121 @@ This tool helps you automate Multilogin browser profiles with:
             self.console.print(f"✅ Successful: {successful}")
             self.console.print(f"❌ Failed: {failed}")
     
+    def start_script_runner_multiple_profiles(self):
+        """Start Script Runner for multiple profiles"""
+        self.console.print("\n🚀 Start Bot Script-Runner (Multiple Profiles)")
+        
+        # Get script file name
+        script_file = Prompt.ask("Enter script file name (e.g., 'example.py')")
+        
+        # Get max concurrent profiles
+        max_concurrent = int(Prompt.ask("Enter max concurrent profiles", default="5"))
+        
+        # Note: Script Runner uses selenium by default, no automation type selection needed
+        
+        # Get headless mode
+        is_headless = Confirm.ask("Enable headless mode?", default=False)
+        
+        # Get folder selection
+        self.console.print("\n📁 Folder Selection:")
+        folders = self.bot_manager.get_available_folders()
+        
+        if folders:
+            self.console.print("Available folders:")
+            folder_choices = ["all"]  # Default option
+            for i, folder in enumerate(folders, 1):
+                folder_name = folder.get("name", "Unknown")
+                folder_id = folder.get("folder_id", "")
+                profiles_count = folder.get("profiles_count", 0)
+                self.console.print(f"  {i}. {folder_name} (ID: {folder_id[:8]}..., Profiles: {profiles_count})")
+                folder_choices.append(folder_id)
+            
+            folder_choice = Prompt.ask(
+                "Select folder (enter number or 'all' for all folders)", 
+                choices=[str(i) for i in range(1, len(folders) + 1)] + ["all"],
+                default="all"
+            )
+            
+            if folder_choice == "all":
+                selected_folder_id = None
+                self.console.print("📁 Selected: All folders")
+            else:
+                selected_folder_id = folder_choices[int(folder_choice)]
+                selected_folder_name = folders[int(folder_choice) - 1].get("name", "Unknown")
+                self.console.print(f"📁 Selected: {selected_folder_name}")
+        else:
+            self.console.print("⚠️  No folders found, using all profiles")
+            selected_folder_id = None
+        
+        # Get profiles based on folder selection
+        profiles = self.bot_manager.get_all_profiles(selected_folder_id)
+        
+        if not profiles:
+            self.console.print("❌ No profiles available in selected folder")
+            return
+        
+        self.console.print(f"📋 Found {len(profiles)} profiles")
+        
+        if Confirm.ask("Start Script Runner for all profiles?"):
+            self.console.print("🚀 Starting Script Runner for multiple profiles...")
+            self.console.print(f"📊 Max concurrent profiles: {max_concurrent}")
+            self.console.print(f"🔧 Automation type: selenium (default)")
+            self.console.print(f"👁️  Headless mode: {'Enabled' if is_headless else 'Disabled'}")
+            self.console.print(f"📄 Script file: {script_file}")
+            
+            # Extract profile IDs
+            profile_ids = [profile.id for profile in profiles if profile.id]
+            
+            if not profile_ids:
+                self.console.print("❌ No valid profile IDs found")
+                return
+            
+            # Start Script Runner
+            response = self.script_runner_api.start_script_runner(
+                script_file=script_file,
+                profile_ids=profile_ids,
+                is_headless=is_headless
+            )
+            
+            # Display results if available
+            if response.data:
+                results = response.data.get("data", [])
+                if results:
+                    successful = sum(1 for r in results if r.get("status") == "success")
+                    failed = len(results) - successful
+                    
+                    self.console.print(f"\n📊 Script Runner Results:")
+                    self.console.print(f"✅ Successful: {successful}")
+                    self.console.print(f"❌ Failed: {failed}")
+                    
+                    # Show details for failed profiles
+                    if failed > 0:
+                        self.console.print("\n❌ Failed profiles:")
+                        for result in results:
+                            if result.get("status") != "success":
+                                profile_id = result.get("profile_id", "Unknown")
+                                error_message = result.get("message", "Unknown error")
+                                self.console.print(f"  - {profile_id[:8]}...: {error_message}")
+                    
+                    # Show details for successful profiles
+                    if successful > 0:
+                        self.console.print("\n✅ Successful profiles:")
+                        for result in results:
+                            if result.get("status") == "success":
+                                profile_id = result.get("profile_id", "Unknown")
+                                message = result.get("message", "Started successfully")
+                                self.console.print(f"  - {profile_id[:8]}...: {message}")
+                    
+                    # Overall status message
+                    if successful == len(results):
+                        self.console.print(f"\n🎉 All {len(results)} profiles started successfully!")
+                    elif successful > 0:
+                        self.console.print(f"\n⚠️  Partial success: {successful}/{len(results)} profiles started")
+                    else:
+                        self.console.print(f"\n❌ All {len(results)} profiles failed to start")
+            else:
+                self.console.print(f"❌ Failed to start Script Runner: {response.error}")
+    
     def stop_single_profile(self):
         """Stop a single profile"""
         self.console.print("\n🛑 Stop Single Profile")
@@ -813,17 +932,19 @@ This tool helps you automate Multilogin browser profiles with:
                 elif choice == "9":
                     self.start_multiple_bots()
                 elif choice == "10":
-                    self.stop_single_profile()
+                    self.start_script_runner_multiple_profiles()
                 elif choice == "11":
-                    self.stop_all_profiles()
+                    self.stop_single_profile()
                 elif choice == "12":
-                    self.view_running_status()
+                    self.stop_all_profiles()
                 elif choice == "13":
+                    self.view_running_status()
+                elif choice == "14":
                     self.console.print("👋 Goodbye!")
                     break
                 
                 # Pause before showing menu again
-                if choice != "13":
+                if choice != "14":
                     Prompt.ask("\nPress Enter to continue...")
                     
             except KeyboardInterrupt:
