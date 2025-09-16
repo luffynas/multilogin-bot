@@ -110,7 +110,7 @@ class ProfileManagementAPI(BaseAPIClient):
         # Add required parameters for profile search in request body
         search_data = {
             "is_removed": False,
-            "core_version": 139,
+            "core_version": 140,
             "limit": 100,  # Get up to 100 profiles
             "offset": 0,
             "search_text": "",  # Empty string to get all profiles
@@ -218,6 +218,28 @@ class ProfileManagementAPI(BaseAPIClient):
         if response.success:
             return BaseResponse(
                 success=True,
+                data=response.data
+            )
+        
+        return response
+    
+    def convert_profile_storage(self, profile_id: str, workspace_id: str, convert_to_local: bool = False) -> BaseResponse:
+        """Convert profile storage between local and cloud"""
+        # Use launcher URL for convert endpoint as per the sample request
+        url = f"{self.launcher_url}/api/v1/profile/{profile_id}/convert"
+        
+        # Request body based on the sample request
+        request_data = {
+            "workspace_id": workspace_id,
+            "convert_to_local": convert_to_local
+        }
+        
+        response = self.post(url, json_data=request_data)
+        
+        if response.success:
+            return BaseResponse(
+                success=True,
+                message="Profile storage converted successfully",
                 data=response.data
             )
         

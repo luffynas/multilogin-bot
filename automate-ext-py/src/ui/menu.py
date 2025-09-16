@@ -74,13 +74,14 @@ This tool helps you automate Multilogin browser profiles with:
 5. Available Extensions
 6. Activate Extension
 7. Import Cookies
-8. Start Bot (Single Profile)
-9. Start Bot (Multiple Profiles)
-10. Start Bot Script-Runner (Multiple Profiles)
-11. Stop Profile
-12. Stop All Profiles
-13. View Running Profiles Status
-14. Exit
+8. Convert Storage
+9. Start Bot (Single Profile)
+10. Start Bot (Multiple Profiles)
+11. Start Bot Script-Runner (Multiple Profiles)
+12. Stop Profile
+13. Stop All Profiles
+14. View Running Profiles Status
+15. Exit
         """
         
         panel = Panel(menu_text, title="Main Menu", border_style="green")
@@ -88,7 +89,7 @@ This tool helps you automate Multilogin browser profiles with:
         
         choice = Prompt.ask(
             "Select an option",
-            choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"],
+            choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"],
             default="1"
         )
         
@@ -714,8 +715,29 @@ This tool helps you automate Multilogin browser profiles with:
         """Start Script Runner for multiple profiles"""
         self.console.print("\n🚀 Start Bot Script-Runner (Multiple Profiles)")
         
-        # Get script file name
-        script_file = Prompt.ask("Enter script file name (e.g., 'example.py')", default="advanced_website_robot.py")
+        # Get script file name with options
+        script_options = [
+            "advanced_website_robot.py",
+            "minimal_test_script.py", 
+            "simple_test_script.py",
+            "custom"
+        ]
+        
+        self.console.print("\n📄 Available Scripts:")
+        for i, script in enumerate(script_options[:-1], 1):
+            self.console.print(f"  {i}. {script}")
+        self.console.print(f"  {len(script_options)}. Custom script name")
+        
+        script_choice = Prompt.ask(
+            "Select script (enter number)", 
+            choices=[str(i) for i in range(1, len(script_options) + 1)],
+            default="1"
+        )
+        
+        if script_choice == str(len(script_options)):
+            script_file = Prompt.ask("Enter custom script file name")
+        else:
+            script_file = script_options[int(script_choice) - 1]
         
         # Get max concurrent profiles
         max_concurrent = int(Prompt.ask("Enter max concurrent profiles", default="5"))
@@ -771,6 +793,11 @@ This tool helps you automate Multilogin browser profiles with:
             self.console.print(f"🔧 Automation type: selenium (default)")
             self.console.print(f"👁️  Headless mode: {'Enabled' if is_headless else 'Disabled'}")
             self.console.print(f"📄 Script file: {script_file}")
+            self.console.print(f"\n💡 Monitoring Tips:")
+            self.console.print(f"  - Check Multilogin X interface for actual browser behavior")
+            self.console.print(f"  - Monitor system resources (CPU, Memory)")
+            self.console.print(f"  - API success ≠ Script execution success")
+            self.console.print(f"  - Use 'minimal_test_script.py' for debugging")
             
             # Extract profile IDs
             profile_ids = [profile.id for profile in profiles if profile.id]
@@ -784,47 +811,75 @@ This tool helps you automate Multilogin browser profiles with:
             
             all_results = []
             
-            # Use ThreadPoolExecutor to truly limit concurrent execution
+            # Use ThreadPoolExecutor with progressive submission (like Multiple Bots)
             with ThreadPoolExecutor(max_workers=max_concurrent) as executor:
-                # Submit all tasks
-                future_to_profile = {}
-                for profile_id in profile_ids:
-                    future = executor.submit(
-                        self._start_single_script_runner,
-                        script_file=script_file,
-                        profile_id=profile_id,
-                        is_headless=is_headless
-                    )
-                    future_to_profile[future] = profile_id
-                
-                # Process completed tasks
+                # Progressive submission with delays
+                profiles_queue = profile_ids.copy()
+                random.shuffle(profiles_queue)  # Randomize order
+                futures = {}
+                started_count = 0
                 completed_count = 0
-                for future in as_completed(future_to_profile):
-                    profile_id = future_to_profile[future]
-                    completed_count += 1
-                    
-                    try:
-                        result = future.result()
-                        all_results.append(result)
+                
+                while profiles_queue or futures:
+                    # Start new profiles if we have capacity and profiles in queue
+                    while (len(futures) < max_concurrent and 
+                           started_count < len(profile_ids) and 
+                           profiles_queue):
                         
-                        if result.get("status") == "success":
-                            self.console.print(f"  ✅ [{completed_count}/{len(profile_ids)}] Profile {profile_id[:8]}... started successfully")
+                        profile_id = profiles_queue.pop(0)
+                        future = executor.submit(
+                            self._start_single_script_runner,
+                            script_file=script_file,
+                            profile_id=profile_id,
+                            is_headless=is_headless
+                        )
+                        futures[future] = profile_id
+                        started_count += 1
+                        
+                        # Random delay between starts (2-5 seconds)
+                        if profiles_queue:  # Don't delay if this is the last profile
+                            delay = random.uniform(2, 5)
+                            self.console.print(f"  🚀 [{started_count}/{len(profile_ids)}] Starting profile {profile_id[:8]}... (waiting {delay:.1f}s)")
+                            time.sleep(delay)
                         else:
-                            error_msg = result.get("message", "Unknown error")
-                            self.console.print(f"  ❌ [{completed_count}/{len(profile_ids)}] Profile {profile_id[:8]}... failed: {error_msg}")
-                            
-                    except Exception as e:
-                        error_result = {
-                            "profile_id": profile_id,
-                            "status": "error",
-                            "message": f"Exception: {str(e)}"
-                        }
-                        all_results.append(error_result)
-                        self.console.print(f"  ❌ [{completed_count}/{len(profile_ids)}] Profile {profile_id[:8]}... exception: {str(e)}")
+                            self.console.print(f"  🚀 [{started_count}/{len(profile_ids)}] Starting profile {profile_id[:8]}...")
                     
-                    # Add small delay between completions to avoid overwhelming the system
-                    if completed_count < len(profile_ids):
-                        time.sleep(random.uniform(0.5, 1.5))
+                    # Check for completed tasks
+                    completed_futures = []
+                    for future in futures:
+                        if future.done():
+                            completed_futures.append(future)
+                    
+                    # Process completed tasks
+                    for future in completed_futures:
+                        profile_id = futures[future]
+                        completed_count += 1
+                        
+                        try:
+                            result = future.result()
+                            all_results.append(result)
+                            
+                            if result.get("status") == "success":
+                                self.console.print(f"  ✅ [{completed_count}/{len(profile_ids)}] Profile {profile_id[:8]}... completed successfully")
+                            else:
+                                error_msg = result.get("message", "Unknown error")
+                                self.console.print(f"  ❌ [{completed_count}/{len(profile_ids)}] Profile {profile_id[:8]}... failed: {error_msg}")
+                                
+                        except Exception as e:
+                            error_result = {
+                                "profile_id": profile_id,
+                                "status": "error",
+                                "message": f"Exception: {str(e)}"
+                            }
+                            all_results.append(error_result)
+                            self.console.print(f"  ❌ [{completed_count}/{len(profile_ids)}] Profile {profile_id[:8]}... exception: {str(e)}")
+                        
+                        # Remove completed future
+                        del futures[future]
+                    
+                    # Small delay to prevent busy waiting
+                    if profiles_queue or futures:
+                        time.sleep(0.1)
             
             # Display final results summary
             if all_results:
@@ -834,7 +889,7 @@ This tool helps you automate Multilogin browser profiles with:
                 self.console.print(f"\n📊 Final Script Runner Results:")
                 self.console.print(f"✅ Total Successful: {successful}")
                 self.console.print(f"❌ Total Failed: {failed}")
-                self.console.print(f"📦 Total Batches: {len(batches)}")
+                self.console.print(f"📊 Total Profiles: {len(all_results)}")
                 
                 # Show details for failed profiles
                 if failed > 0:
@@ -992,6 +1047,80 @@ This tool helps you automate Multilogin browser profiles with:
         else:
             self.console.print("ℹ️ No profiles currently running")
     
+    def convert_storage(self):
+        """Convert profile storage between local and cloud"""
+        self.console.print("\n🔄 Convert Profile Storage")
+        
+        # Get profile selection
+        profile_input = Prompt.ask("Enter profile ID or 'all' to convert all profiles")
+        
+        if profile_input.lower() == "all":
+            # Get all profile IDs
+            profile_ids = self.profile_api.get_profile_ids_list()
+            if not profile_ids:
+                self.console.print("❌ No profiles found. Please run 'Check All Profiles' first.")
+                return
+        else:
+            # Validate single profile
+            profile = self.profile_api.get_profile_by_id(profile_input)
+            if not profile:
+                self.console.print(f"❌ Profile with ID '{profile_input}' not found in saved profiles.")
+                return
+            profile_ids = [profile_input]
+        
+        # Get conversion direction
+        conversion_type = Prompt.ask(
+            "Select conversion type",
+            choices=["local_to_cloud", "cloud_to_local"],
+            default="local_to_cloud"
+        )
+        
+        convert_to_local = conversion_type == "cloud_to_local"
+        
+        # Get workspace ID (using default from profiles data)
+        workspace_id = Prompt.ask("Enter workspace ID", default="d3602d53-2e54-4cce-87d7-64e89e0f8679")
+        
+        # Confirm conversion
+        direction_text = "local to cloud" if not convert_to_local else "cloud to local"
+        if not Confirm.ask(f"Convert {len(profile_ids)} profile(s) from {direction_text}?"):
+            self.console.print("❌ Conversion cancelled")
+            return
+        
+        self.console.print(f"🔄 Converting {len(profile_ids)} profile(s) from {direction_text}...")
+        
+        success_count = 0
+        for i, profile_id in enumerate(profile_ids, 1):
+            self.console.print(f"\n📝 Processing profile {i}/{len(profile_ids)}: {profile_id[:8]}...")
+            
+            # Get profile info for display
+            profile = self.profile_api.get_profile_by_id(profile_id)
+            profile_name = profile.get("name", "Unknown") if profile else "Unknown"
+            current_storage = "local" if profile.get("is_local", True) else "cloud"
+            
+            self.console.print(f"  📋 Profile: {profile_name}")
+            self.console.print(f"  💾 Current storage: {current_storage}")
+            
+            # Convert storage
+            response = self.profile_api.convert_profile_storage(
+                profile_id=profile_id,
+                workspace_id=workspace_id,
+                convert_to_local=convert_to_local
+            )
+            
+            if response.success:
+                self.console.print(f"  ✅ Successfully converted profile: {profile_name}")
+                success_count += 1
+            else:
+                self.console.print(f"  ❌ Failed to convert profile {profile_name}: {response.error}")
+        
+        self.console.print(f"\n📊 Conversion Results:")
+        self.console.print(f"✅ Successfully converted: {success_count}")
+        self.console.print(f"❌ Failed: {len(profile_ids) - success_count}")
+        self.console.print(f"📊 Total profiles: {len(profile_ids)}")
+        
+        if success_count > 0:
+            self.console.print(f"\n💡 Tip: Run 'Check All Profiles' to see updated storage status")
+    
     def run(self):
         """Run the main menu loop"""
         self.display_welcome()
@@ -1015,23 +1144,25 @@ This tool helps you automate Multilogin browser profiles with:
                 elif choice == "7":
                     self.import_cookies()
                 elif choice == "8":
-                    self.start_single_bot()
+                    self.convert_storage()
                 elif choice == "9":
-                    self.start_multiple_bots()
+                    self.start_single_bot()
                 elif choice == "10":
-                    self.start_script_runner_multiple_profiles()
+                    self.start_multiple_bots()
                 elif choice == "11":
-                    self.stop_single_profile()
+                    self.start_script_runner_multiple_profiles()
                 elif choice == "12":
-                    self.stop_all_profiles()
+                    self.stop_single_profile()
                 elif choice == "13":
-                    self.view_running_status()
+                    self.stop_all_profiles()
                 elif choice == "14":
+                    self.view_running_status()
+                elif choice == "15":
                     self.console.print("👋 Goodbye!")
                     break
                 
                 # Pause before showing menu again
-                if choice != "14":
+                if choice != "15":
                     Prompt.ask("\nPress Enter to continue...")
                     
             except KeyboardInterrupt:
