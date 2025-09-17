@@ -37,3 +37,4 @@ if errorlevel 1 (
     echo ❌ Application exited with an error.
     pause
 )
+
