@@ -4,6 +4,7 @@ Authentication management for Multilogin X API
 import json
 import requests
 import hashlib
+import base64
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 from pathlib import Path
@@ -22,6 +23,31 @@ class AuthManager:
     def _hash_password(self, password: str) -> str:
         """Hash password using MD5 as required by Multilogin X API"""
         return hashlib.md5(password.encode()).hexdigest()
+    
+    def _decode_jwt_payload(self, token: str) -> Optional[Dict[str, Any]]:
+        """Decode JWT token payload without verification (for expiration check)"""
+        try:
+            # Split token into parts
+            parts = token.split('.')
+            if len(parts) != 3:
+                return None
+            
+            # Decode payload (second part)
+            payload = parts[1]
+            
+            # Add padding if needed
+            missing_padding = len(payload) % 4
+            if missing_padding:
+                payload += '=' * (4 - missing_padding)
+            
+            # Decode base64
+            decoded_bytes = base64.urlsafe_b64decode(payload)
+            payload_data = json.loads(decoded_bytes.decode('utf-8'))
+            
+            return payload_data
+        except Exception as e:
+            print(f"Error decoding JWT payload: {e}")
+            return None
     
     def load_token(self) -> Optional[TokenInfo]:
         """Load token from file"""
@@ -45,14 +71,55 @@ class AuthManager:
             print(f"Error saving token: {e}")
     
     def is_token_valid(self) -> bool:
-        """Check if current token is valid"""
-        if not self._current_token:
+        """Check if current token is valid by decoding JWT exp field"""
+        if not self._current_token or not self._current_token.access_token:
             return False
         
-        if self._current_token.expires_at:
-            return datetime.now() < self._current_token.expires_at
+        # Decode JWT payload to get expiration time
+        payload = self._decode_jwt_payload(self._current_token.access_token)
+        if not payload or 'exp' not in payload:
+            return False
         
-        return True
+        # Check if token is expired
+        exp_timestamp = payload['exp']
+        exp_datetime = datetime.fromtimestamp(exp_timestamp)
+        current_time = datetime.now()
+        
+        # Add 1 minute buffer to avoid edge cases
+        return current_time < (exp_datetime - timedelta(minutes=1))
+    
+    def get_token_expiration_time(self) -> Optional[datetime]:
+        """Get token expiration time from JWT payload"""
+        if not self._current_token or not self._current_token.access_token:
+            return None
+        
+        payload = self._decode_jwt_payload(self._current_token.access_token)
+        if not payload or 'exp' not in payload:
+            return None
+        
+        exp_timestamp = payload['exp']
+        return datetime.fromtimestamp(exp_timestamp)
+    
+    def get_token_remaining_time(self) -> Optional[timedelta]:
+        """Get remaining time until token expires"""
+        exp_time = self.get_token_expiration_time()
+        if not exp_time:
+            return None
+        
+        current_time = datetime.now()
+        remaining = exp_time - current_time
+        return remaining if remaining.total_seconds() > 0 else timedelta(0)
+    
+    def get_workspace_id(self) -> Optional[str]:
+        """Get workspace ID from current JWT token"""
+        if not self._current_token or not self._current_token.access_token:
+            return None
+        
+        payload = self._decode_jwt_payload(self._current_token.access_token)
+        if not payload:
+            return None
+        
+        return payload.get('workspaceID')
     
     def get_auth_headers(self) -> Dict[str, str]:
         """Get authentication headers"""
@@ -99,13 +166,11 @@ class AuthManager:
             
             # Check if the response has the expected structure
             if data.get("status", {}).get("http_code") == 200:
-                # Calculate expiration time (30 minutes from now)
-                expires_at = datetime.now() + timedelta(minutes=30)
-                
+                # Create token without manual expires_at - will be calculated from JWT
                 token = TokenInfo(
                     access_token=data["data"]["token"],
                     refresh_token=data["data"].get("refresh_token"),
-                    expires_at=expires_at
+                    expires_at=None  # Will be calculated from JWT exp field
                 )
                 
                 self.save_token(token)
@@ -141,8 +206,21 @@ class AuthManager:
             )
         
         url = f"{self.base_url}/user/refresh_token"
+        
+        # Get workspace ID from current JWT token
+        workspace_id = self.get_workspace_id()
+        
+        # Fallback to default if not found in token
+        if not workspace_id:
+            workspace_id = "d3602d53-2e54-4cce-87d7-64e89e0f8679"
+            print(f"⚠️ Using fallback workspace ID: {workspace_id}")
+        else:
+            print(f"✅ Using workspace ID from JWT: {workspace_id}")
+        
         payload = {
-            "refresh_token": self._current_token.refresh_token
+            "email": Config.MULTILOGIN_EMAIL,
+            "refresh_token": self._current_token.refresh_token,
+            "workspace_id": workspace_id
         }
         
         headers = {
@@ -158,13 +236,11 @@ class AuthManager:
             
             # Check if the response has the expected structure
             if data.get("status", {}).get("http_code") == 200:
-                # Calculate expiration time (30 minutes from now)
-                expires_at = datetime.now() + timedelta(minutes=30)
-                
+                # Create token without manual expires_at - will be calculated from JWT
                 token = TokenInfo(
                     access_token=data["data"]["token"],
                     refresh_token=data["data"].get("refresh_token"),
-                    expires_at=expires_at
+                    expires_at=None  # Will be calculated from JWT exp field
                 )
                 
                 self.save_token(token)

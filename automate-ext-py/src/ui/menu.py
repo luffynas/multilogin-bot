@@ -789,11 +789,14 @@ This tool helps you automate Multilogin browser profiles with:
         
         if Confirm.ask("Start Script Runner for all profiles?"):
             self.console.print("🚀 Starting Script Runner for multiple profiles...")
-            self.console.print(f"📊 Max concurrent profiles: {max_concurrent}")
+            self.console.print(f"📊 Processing mode: Concurrent with 3-5 minute delays between starts")
             self.console.print(f"🔧 Automation type: selenium (default)")
             self.console.print(f"👁️  Headless mode: {'Enabled' if is_headless else 'Disabled'}")
             self.console.print(f"📄 Script file: {script_file}")
+            self.console.print(f"⏰ Estimated total time: {len(profiles) * 4} minutes")
             self.console.print(f"\n💡 Monitoring Tips:")
+            self.console.print(f"  - Profiles start with 3-5 minute delays but run concurrently")
+            self.console.print(f"  - Authentication is checked before each profile starts")
             self.console.print(f"  - Check Multilogin X interface for actual browser behavior")
             self.console.print(f"  - Monitor system resources (CPU, Memory)")
             self.console.print(f"  - API success ≠ Script execution success")
@@ -806,14 +809,16 @@ This tool helps you automate Multilogin browser profiles with:
                 self.console.print("❌ No valid profile IDs found")
                 return
             
-            # Process profiles with true concurrent control using ThreadPoolExecutor
-            self.console.print(f"🔄 Processing {len(profile_ids)} profiles with max {max_concurrent} concurrent")
+            # Process profiles concurrently with 3-5 minute delays between starts
+            self.console.print(f"🔄 Processing {len(profile_ids)} profiles concurrently with 3-5 minute delays between starts")
+            self.console.print(f"📊 Max concurrent profiles: {max_concurrent}")
+            self.console.print(f"⏰ Estimated total time: {len(profile_ids) * 4} minutes (4 minutes average per profile)")
             
             all_results = []
             
-            # Use ThreadPoolExecutor with progressive submission (like Multiple Bots)
+            # Use ThreadPoolExecutor with progressive submission and delays
             with ThreadPoolExecutor(max_workers=max_concurrent) as executor:
-                # Progressive submission with delays
+                # Progressive submission with 3-5 minute delays
                 profiles_queue = profile_ids.copy()
                 random.shuffle(profiles_queue)  # Randomize order
                 futures = {}
@@ -836,13 +841,31 @@ This tool helps you automate Multilogin browser profiles with:
                         futures[future] = profile_id
                         started_count += 1
                         
-                        # Random delay between starts (2-5 seconds)
+                        # 3-5 minute delay between starts (except for the last profile)
                         if profiles_queue:  # Don't delay if this is the last profile
-                            delay = random.uniform(2, 5)
-                            self.console.print(f"  🚀 [{started_count}/{len(profile_ids)}] Starting profile {profile_id[:8]}... (waiting {delay:.1f}s)")
-                            time.sleep(delay)
+                            delay_minutes = random.uniform(3, 5)
+                            delay_seconds = int(delay_minutes * 60)
+                            
+                            self.console.print(f"  🚀 [{started_count}/{len(profile_ids)}] Starting profile {profile_id[:8]}... (waiting {delay_minutes:.1f} minutes)")
+                            self.console.print(f"  📊 Progress: {started_count}/{len(profile_ids)} profiles started")
+                            
+                            # Show countdown every 30 seconds
+                            remaining_seconds = delay_seconds
+                            while remaining_seconds > 0:
+                                if remaining_seconds % 30 == 0 or remaining_seconds <= 10:
+                                    minutes_left = remaining_seconds // 60
+                                    seconds_left = remaining_seconds % 60
+                                    if minutes_left > 0:
+                                        self.console.print(f"  ⏰ {minutes_left}m {seconds_left}s remaining...")
+                                    else:
+                                        self.console.print(f"  ⏰ {seconds_left}s remaining...")
+                                
+                                time.sleep(1)
+                                remaining_seconds -= 1
+                            
+                            self.console.print(f"  ✅ Wait completed, starting next profile...")
                         else:
-                            self.console.print(f"  🚀 [{started_count}/{len(profile_ids)}] Starting profile {profile_id[:8]}...")
+                            self.console.print(f"  🚀 [{started_count}/{len(profile_ids)}] Starting profile {profile_id[:8]}... (last profile)")
                     
                     # Check for completed tasks
                     completed_futures = []
@@ -865,6 +888,9 @@ This tool helps you automate Multilogin browser profiles with:
                                 error_msg = result.get("message", "Unknown error")
                                 self.console.print(f"  ❌ [{completed_count}/{len(profile_ids)}] Profile {profile_id[:8]}... failed: {error_msg}")
                                 
+                                # Log detailed error for debugging
+                                self.console.print(f"    🔍 Debug info: {result}")
+                                
                         except Exception as e:
                             error_result = {
                                 "profile_id": profile_id,
@@ -873,6 +899,10 @@ This tool helps you automate Multilogin browser profiles with:
                             }
                             all_results.append(error_result)
                             self.console.print(f"  ❌ [{completed_count}/{len(profile_ids)}] Profile {profile_id[:8]}... exception: {str(e)}")
+                            
+                            # Log detailed exception for debugging
+                            import traceback
+                            self.console.print(f"    🔍 Exception details: {traceback.format_exc()}")
                         
                         # Remove completed future
                         del futures[future]
@@ -894,11 +924,29 @@ This tool helps you automate Multilogin browser profiles with:
                 # Show details for failed profiles
                 if failed > 0:
                     self.console.print("\n❌ Failed profiles:")
+                    error_summary = {}
                     for result in all_results:
                         if result.get("status") != "success":
                             profile_id = result.get("profile_id", "Unknown")
                             error_message = result.get("message", "Unknown error")
                             self.console.print(f"  - {profile_id[:8]}...: {error_message}")
+                            
+                            # Count error types for summary
+                            if "proxy connection" in error_message.lower():
+                                error_type = "Proxy Connection Issues"
+                            elif "authentication failed" in error_message.lower():
+                                error_type = "Authentication Issues"
+                            elif ":" in error_message:
+                                error_type = error_message.split(":")[0]
+                            else:
+                                error_type = error_message
+                            error_summary[error_type] = error_summary.get(error_type, 0) + 1
+                    
+                    # Show error summary
+                    if error_summary:
+                        self.console.print(f"\n📊 Error Summary:")
+                        for error_type, count in error_summary.items():
+                            self.console.print(f"  - {error_type}: {count} profiles")
                 
                 # Show details for successful profiles
                 if successful > 0:
@@ -921,7 +969,7 @@ This tool helps you automate Multilogin browser profiles with:
     
     def _start_single_script_runner(self, script_file: str, profile_id: str, is_headless: bool = False) -> Dict[str, Any]:
         """
-        Start Script Runner for a single profile
+        Start Script Runner for a single profile with authentication check
         
         Args:
             script_file: Name of the script file
@@ -932,6 +980,38 @@ This tool helps you automate Multilogin browser profiles with:
             Dict with result information
         """
         try:
+            # Check authentication before starting script runner
+            self.console.print(f"  🔐 Checking authentication for profile {profile_id[:8]}...")
+            
+            # Ensure we have valid authentication with retry mechanism
+            max_auth_retries = 3
+            auth_success = False
+            
+            for retry in range(max_auth_retries):
+                if self.script_runner_api.auth_manager.ensure_valid_token():
+                    auth_success = True
+                    break
+                else:
+                    self.console.print(f"    ⚠️ Authentication retry {retry + 1}/{max_auth_retries} for profile {profile_id[:8]}")
+                    if retry < max_auth_retries - 1:
+                        time.sleep(2)  # Wait 2 seconds before retry
+            
+            if not auth_success:
+                return {
+                    "profile_id": profile_id,
+                    "status": "error",
+                    "message": "Authentication failed - token is invalid or expired after retries"
+                }
+            
+            self.console.print(f"  ✅ Authentication valid for profile {profile_id[:8]}")
+            
+            # Check token expiration time for monitoring
+            remaining_time = self.script_runner_api.auth_manager.get_token_remaining_time()
+            if remaining_time:
+                remaining_minutes = int(remaining_time.total_seconds() / 60)
+                if remaining_minutes < 5:
+                    self.console.print(f"    ⚠️ Token expires in {remaining_minutes} minutes")
+            
             # Start Script Runner for single profile
             response = self.script_runner_api.start_script_runner(
                 script_file=script_file,
@@ -943,7 +1023,20 @@ This tool helps you automate Multilogin browser profiles with:
             if response.data and "data" in response.data:
                 results = response.data.get("data", [])
                 if results:
-                    return results[0]  # Return first (and only) result
+                    result = results[0]  # Get first (and only) result
+                    
+                    # Check for proxy-related errors
+                    if result.get("status") != "success":
+                        error_msg = result.get("message", "")
+                        if "proxy connection" in error_msg.lower():
+                            return {
+                                "profile_id": profile_id,
+                                "status": "error",
+                                "message": f"Proxy connection failed: {error_msg}",
+                                "error_type": "proxy_error"
+                            }
+                    
+                    return result
                 else:
                     return {
                         "profile_id": profile_id,
