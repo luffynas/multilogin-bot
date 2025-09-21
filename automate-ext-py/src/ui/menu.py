@@ -78,10 +78,11 @@ This tool helps you automate Multilogin browser profiles with:
 9. Start Bot (Single Profile)
 10. Start Bot (Multiple Profiles)
 11. Start Bot Script-Runner (Multiple Profiles)
-12. Stop Profile
-13. Stop All Profiles
-14. View Running Profiles Status
-15. Exit
+12. Profile Warm (Multiple Profiles)
+13. Stop Profile
+14. Stop All Profiles
+15. View Running Profiles Status
+16. Exit
         """
         
         panel = Panel(menu_text, title="Main Menu", border_style="green")
@@ -89,7 +90,7 @@ This tool helps you automate Multilogin browser profiles with:
         
         choice = Prompt.ask(
             "Select an option",
-            choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"],
+            choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"],
             default="1"
         )
         
@@ -359,6 +360,45 @@ This tool helps you automate Multilogin browser profiles with:
                 
         except Exception as e:
             self.console.print(f"  ❌ Error processing profile: {str(e)}")
+            return False
+    
+    def _update_proxy_before_script_runner(self, profile_id: str) -> bool:
+        """
+        Update proxy for a profile before starting script runner
+        Uses default US geo settings as per project memory
+        
+        Args:
+            profile_id: Profile ID to update proxy for
+            
+        Returns:
+            bool: True if proxy update successful, False otherwise
+        """
+        try:
+            # Get profile information
+            profile = self.profile_api.get_profile_by_id(profile_id)
+            if not profile:
+                self.console.print(f"    ❌ Profile with ID '{profile_id}' not found")
+                return False
+            
+            # Use default proxy settings based on project memory (US geo)
+            country = "us"  # Default to US as per project memory
+            protocol = "socks5"  # Default protocol
+            connection_type = "residential"  # Default connection type
+            custom_start_urls = []  # No custom start URLs for script runner
+            
+            self.console.print(f"    🔧 Using default proxy settings: {country.upper()}, {protocol}, {connection_type}")
+            
+            # Update proxy using the existing _update_single_profile_proxy method
+            return self._update_single_profile_proxy(
+                profile=profile,
+                country=country,
+                protocol=protocol,
+                connection_type=connection_type,
+                custom_start_urls=custom_start_urls
+            )
+            
+        except Exception as e:
+            self.console.print(f"    ❌ Error updating proxy for profile {profile_id[:8]}: {str(e)}")
             return False
     
     def upload_object(self):
@@ -718,8 +758,7 @@ This tool helps you automate Multilogin browser profiles with:
         # Get script file name with options
         script_options = [
             "advanced_website_robot.py",
-            "minimal_test_script.py", 
-            "simple_test_script.py",
+            "multilogin_profile_warmer.py",
             "custom"
         ]
         
@@ -843,7 +882,7 @@ This tool helps you automate Multilogin browser profiles with:
                         
                         # 3-5 minute delay between starts (except for the last profile)
                         if profiles_queue:  # Don't delay if this is the last profile
-                            delay_minutes = random.uniform(3, 5)
+                            delay_minutes = random.uniform(1, 2)
                             delay_seconds = int(delay_minutes * 60)
                             
                             self.console.print(f"  🚀 [{started_count}/{len(profile_ids)}] Starting profile {profile_id[:8]}... (waiting {delay_minutes:.1f} minutes)")
@@ -967,9 +1006,243 @@ This tool helps you automate Multilogin browser profiles with:
             else:
                 self.console.print(f"\n❌ No results received from Script Runner")
     
+    def start_profile_warm_multiple_profiles(self):
+        """Start Profile Warm for multiple profiles with faster processing"""
+        self.console.print("\n🔥 Profile Warm (Multiple Profiles)")
+        
+        # Use profile warmer script by default
+        script_file = "multilogin_profile_warmer.py"
+        self.console.print(f"📄 Using script: {script_file}")
+        
+        # Get max concurrent profiles (higher default for faster processing)
+        max_concurrent = int(Prompt.ask("Enter max concurrent profiles", default="10"))
+        
+        # Get headless mode
+        is_headless = Confirm.ask("Enable headless mode?", default=True)
+        
+        # Get folder selection
+        self.console.print("\n📁 Folder Selection:")
+        folders = self.bot_manager.get_available_folders()
+        
+        if folders:
+            self.console.print("Available folders:")
+            folder_choices = ["all"]  # Default option
+            for i, folder in enumerate(folders, 1):
+                folder_name = folder.get("name", "Unknown")
+                folder_id = folder.get("folder_id", "")
+                profiles_count = folder.get("profiles_count", 0)
+                self.console.print(f"  {i}. {folder_name} (ID: {folder_id[:8]}..., Profiles: {profiles_count})")
+                folder_choices.append(folder_id)
+            
+            folder_choice = Prompt.ask(
+                "Select folder (enter number or 'all' for all folders)", 
+                choices=[str(i) for i in range(1, len(folders) + 1)] + ["all"],
+                default="all"
+            )
+            
+            if folder_choice == "all":
+                selected_folder_id = None
+                self.console.print("📁 Selected: All folders")
+            else:
+                selected_folder_id = folder_choices[int(folder_choice)]
+                selected_folder_name = folders[int(folder_choice) - 1].get("name", "Unknown")
+                self.console.print(f"📁 Selected: {selected_folder_name}")
+        else:
+            self.console.print("⚠️  No folders found, using all profiles")
+            selected_folder_id = None
+        
+        # Get profiles based on folder selection
+        profiles = self.bot_manager.get_all_profiles(selected_folder_id)
+        
+        if not profiles:
+            self.console.print("❌ No profiles available in selected folder")
+            return
+        
+        self.console.print(f"📋 Found {len(profiles)} profiles")
+        
+        if Confirm.ask("Start Profile Warm for all profiles?"):
+            self.console.print("🔥 Starting Profile Warm for multiple profiles...")
+            self.console.print(f"📊 Processing mode: Fast concurrent with 30-60 second delays between starts")
+            self.console.print(f"🔧 Automation type: selenium (default)")
+            self.console.print(f"👁️  Headless mode: {'Enabled' if is_headless else 'Disabled'}")
+            self.console.print(f"📄 Script file: {script_file}")
+            self.console.print(f"⏰ Estimated total time: {len(profiles) * 1} minutes (1 minute average per profile)")
+            self.console.print(f"\n💡 Profile Warm Features:")
+            self.console.print(f"  - Faster processing with shorter delays (30-60 seconds)")
+            self.console.print(f"  - Higher concurrent limit for faster execution")
+            self.console.print(f"  - Optimized for profile warming and testing")
+            self.console.print(f"  - Proxy update included for each profile")
+            self.console.print(f"  - Authentication checked before each profile starts")
+            
+            # Extract profile IDs
+            profile_ids = [profile.id for profile in profiles if profile.id]
+            
+            if not profile_ids:
+                self.console.print("❌ No valid profile IDs found")
+                return
+            
+            # Process profiles concurrently with faster 30-60 second delays between starts
+            self.console.print(f"🔄 Processing {len(profile_ids)} profiles concurrently with 30-60 second delays between starts")
+            self.console.print(f"📊 Max concurrent profiles: {max_concurrent}")
+            self.console.print(f"⏰ Estimated total time: {len(profile_ids) * 1} minutes (1 minute average per profile)")
+            
+            all_results = []
+            
+            # Use ThreadPoolExecutor with progressive submission and faster delays
+            with ThreadPoolExecutor(max_workers=max_concurrent) as executor:
+                # Progressive submission with 30-60 second delays
+                profiles_queue = profile_ids.copy()
+                random.shuffle(profiles_queue)  # Randomize order
+                futures = {}
+                started_count = 0
+                completed_count = 0
+                
+                while profiles_queue or futures:
+                    # Start new profiles if we have capacity and profiles in queue
+                    while (len(futures) < max_concurrent and 
+                           started_count < len(profile_ids) and 
+                           profiles_queue):
+                        
+                        profile_id = profiles_queue.pop(0)
+                        future = executor.submit(
+                            self._start_single_script_runner,
+                            script_file=script_file,
+                            profile_id=profile_id,
+                            is_headless=is_headless
+                        )
+                        futures[future] = profile_id
+                        started_count += 1
+                        
+                        # 30-60 second delay between starts (faster than script runner)
+                        if profiles_queue:  # Don't delay if this is the last profile
+                            delay_seconds = random.randint(30, 60)  # 30-60 seconds
+                            
+                            self.console.print(f"  🔥 [{started_count}/{len(profile_ids)}] Starting profile {profile_id[:8]}... (waiting {delay_seconds} seconds)")
+                            self.console.print(f"  📊 Progress: {started_count}/{len(profile_ids)} profiles started")
+                            
+                            # Show countdown every 10 seconds
+                            remaining_seconds = delay_seconds
+                            while remaining_seconds > 0:
+                                if remaining_seconds % 10 == 0 or remaining_seconds <= 5:
+                                    if remaining_seconds > 60:
+                                        minutes_left = remaining_seconds // 60
+                                        seconds_left = remaining_seconds % 60
+                                        self.console.print(f"  ⏰ {minutes_left}m {seconds_left}s remaining...")
+                                    else:
+                                        self.console.print(f"  ⏰ {remaining_seconds}s remaining...")
+                                
+                                time.sleep(1)
+                                remaining_seconds -= 1
+                            
+                            self.console.print(f"  ✅ Wait completed, starting next profile...")
+                        else:
+                            self.console.print(f"  🔥 [{started_count}/{len(profile_ids)}] Starting profile {profile_id[:8]}... (last profile)")
+                    
+                    # Check for completed tasks
+                    completed_futures = []
+                    for future in futures:
+                        if future.done():
+                            completed_futures.append(future)
+                    
+                    # Process completed tasks
+                    for future in completed_futures:
+                        profile_id = futures[future]
+                        completed_count += 1
+                        
+                        try:
+                            result = future.result()
+                            all_results.append(result)
+                            
+                            if result.get("status") == "success":
+                                self.console.print(f"  ✅ [{completed_count}/{len(profile_ids)}] Profile {profile_id[:8]}... warmed successfully")
+                            else:
+                                error_msg = result.get("message", "Unknown error")
+                                self.console.print(f"  ❌ [{completed_count}/{len(profile_ids)}] Profile {profile_id[:8]}... failed: {error_msg}")
+                                
+                                # Log detailed error for debugging
+                                self.console.print(f"    🔍 Debug info: {result}")
+                                
+                        except Exception as e:
+                            error_result = {
+                                "profile_id": profile_id,
+                                "status": "error",
+                                "message": f"Exception: {str(e)}"
+                            }
+                            all_results.append(error_result)
+                            self.console.print(f"  ❌ [{completed_count}/{len(profile_ids)}] Profile {profile_id[:8]}... exception: {str(e)}")
+                            
+                            # Log detailed exception for debugging
+                            import traceback
+                            self.console.print(f"    🔍 Exception details: {traceback.format_exc()}")
+                        
+                        # Remove completed future
+                        del futures[future]
+                    
+                    # Small delay to prevent busy waiting
+                    if profiles_queue or futures:
+                        time.sleep(0.1)
+            
+            # Display final results summary
+            if all_results:
+                successful = sum(1 for r in all_results if r.get("status") == "success")
+                failed = len(all_results) - successful
+                
+                self.console.print(f"\n📊 Final Profile Warm Results:")
+                self.console.print(f"✅ Total Successful: {successful}")
+                self.console.print(f"❌ Total Failed: {failed}")
+                self.console.print(f"📊 Total Profiles: {len(all_results)}")
+                
+                # Show details for failed profiles
+                if failed > 0:
+                    self.console.print("\n❌ Failed profiles:")
+                    error_summary = {}
+                    for result in all_results:
+                        if result.get("status") != "success":
+                            profile_id = result.get("profile_id", "Unknown")
+                            error_message = result.get("message", "Unknown error")
+                            self.console.print(f"  - {profile_id[:8]}...: {error_message}")
+                            
+                            # Count error types for summary
+                            if "proxy connection" in error_message.lower():
+                                error_type = "Proxy Connection Issues"
+                            elif "authentication failed" in error_message.lower():
+                                error_type = "Authentication Issues"
+                            elif "proxy update" in error_message.lower():
+                                error_type = "Proxy Update Issues"
+                            elif ":" in error_message:
+                                error_type = error_message.split(":")[0]
+                            else:
+                                error_type = error_message
+                            error_summary[error_type] = error_summary.get(error_type, 0) + 1
+                    
+                    # Show error summary
+                    if error_summary:
+                        self.console.print(f"\n📊 Error Summary:")
+                        for error_type, count in error_summary.items():
+                            self.console.print(f"  - {error_type}: {count} profiles")
+                
+                # Show details for successful profiles
+                if successful > 0:
+                    self.console.print("\n✅ Successfully warmed profiles:")
+                    for result in all_results:
+                        if result.get("status") == "success":
+                            profile_id = result.get("profile_id", "Unknown")
+                            message = result.get("message", "Warmed successfully")
+                            self.console.print(f"  - {profile_id[:8]}...: {message}")
+                
+                # Overall status message
+                if successful == len(all_results):
+                    self.console.print(f"\n🎉 All {len(all_results)} profiles warmed successfully!")
+                elif successful > 0:
+                    self.console.print(f"\n⚠️  Partial success: {successful}/{len(all_results)} profiles warmed")
+                else:
+                    self.console.print(f"\n❌ All {len(all_results)} profiles failed to warm")
+            else:
+                self.console.print(f"\n❌ No results received from Profile Warm")
+    
     def _start_single_script_runner(self, script_file: str, profile_id: str, is_headless: bool = False) -> Dict[str, Any]:
         """
-        Start Script Runner for a single profile with authentication check
+        Start Script Runner for a single profile with authentication check and proxy update
         
         Args:
             script_file: Name of the script file
@@ -1011,6 +1284,20 @@ This tool helps you automate Multilogin browser profiles with:
                 remaining_minutes = int(remaining_time.total_seconds() / 60)
                 if remaining_minutes < 5:
                     self.console.print(f"    ⚠️ Token expires in {remaining_minutes} minutes")
+            
+            # Update proxy before starting script runner
+            self.console.print(f"  🌐 Updating proxy for profile {profile_id[:8]}...")
+            proxy_update_success = self._update_proxy_before_script_runner(profile_id)
+            
+            if not proxy_update_success:
+                return {
+                    "profile_id": profile_id,
+                    "status": "error",
+                    "message": "Failed to update proxy before starting script runner",
+                    "error_type": "proxy_update_error"
+                }
+            
+            self.console.print(f"  ✅ Proxy updated successfully for profile {profile_id[:8]}")
             
             # Start Script Runner for single profile
             response = self.script_runner_api.start_script_runner(
@@ -1245,17 +1532,19 @@ This tool helps you automate Multilogin browser profiles with:
                 elif choice == "11":
                     self.start_script_runner_multiple_profiles()
                 elif choice == "12":
-                    self.stop_single_profile()
+                    self.start_profile_warm_multiple_profiles()
                 elif choice == "13":
-                    self.stop_all_profiles()
+                    self.stop_single_profile()
                 elif choice == "14":
-                    self.view_running_status()
+                    self.stop_all_profiles()
                 elif choice == "15":
+                    self.view_running_status()
+                elif choice == "16":
                     self.console.print("👋 Goodbye!")
                     break
                 
                 # Pause before showing menu again
-                if choice != "15":
+                if choice != "16":
                     Prompt.ask("\nPress Enter to continue...")
                     
             except KeyboardInterrupt:
