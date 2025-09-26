@@ -758,6 +758,7 @@ This tool helps you automate Multilogin browser profiles with:
         # Get script file name with options
         script_options = [
             "advanced_website_robot.py",
+            "advanced_website_robot_v2.py",
             "multilogin_profile_warmer.py",
             "custom"
         ]
