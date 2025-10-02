@@ -759,6 +759,7 @@ This tool helps you automate Multilogin browser profiles with:
         script_options = [
             "advanced_website_robot.py",
             "advanced_website_robot_v2.py",
+            "advanced_website_robot_v4.py",
             "multilogin_profile_warmer.py",
             "custom"
         ]
@@ -883,7 +884,7 @@ This tool helps you automate Multilogin browser profiles with:
                         
                         # 3-5 minute delay between starts (except for the last profile)
                         if profiles_queue:  # Don't delay if this is the last profile
-                            delay_minutes = random.uniform(1, 2)
+                            delay_minutes = random.uniform(0.5, 1.3)
                             delay_seconds = int(delay_minutes * 60)
                             
                             self.console.print(f"  🚀 [{started_count}/{len(profile_ids)}] Starting profile {profile_id[:8]}... (waiting {delay_minutes:.1f} minutes)")
